@@ -17,7 +17,7 @@ public class Multilogger implements Logging {
     private List<Logger> loggers = new ArrayList<>();
 
     private Multilogger() {
-        addLogger(new LogfileLogger());
+        addLogger(new LogfileLogger(LogfileLogger.createDefaultDebugFile()));
     }
     public static Multilogger getInstance() {
         return  instance;

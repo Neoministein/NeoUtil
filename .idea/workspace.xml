@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46852e55-1932-40c3-96d8-76b9e7b0752a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,7 +78,7 @@
       <workItem from="1589033985183" duration="1295000" />
       <workItem from="1589120388618" duration="4405000" />
       <workItem from="1589534271304" duration="3366000" />
-      <workItem from="1589730834896" duration="1677000" />
+      <workItem from="1589730834896" duration="2085000" />
     </task>
     <task id="LOCAL-00001" summary="-removed old project specific code">
       <created>1589535185913</created>
@@ -105,7 +101,14 @@
       <option name="project" value="LOCAL" />
       <updated>1589731561553</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="-LogfileLogger can have a variable file location">
+      <created>1589733374745</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1589733374745</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -115,13 +118,14 @@
     <MESSAGE value="-removed old project specific code" />
     <MESSAGE value="-initial Commit" />
     <MESSAGE value="-added pom and iml" />
-    <option name="LAST_COMMIT_MESSAGE" value="-added pom and iml" />
+    <MESSAGE value="-LogfileLogger can have a variable file location" />
+    <option name="LAST_COMMIT_MESSAGE" value="-LogfileLogger can have a variable file location" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="905" y="296" key="CommitChangelistDialog2" timestamp="1589731561029">
+    <state x="905" y="296" key="CommitChangelistDialog2" timestamp="1589733374240">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="905" y="296" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1589731561029" />
+    <state x="905" y="296" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1589733374240" />
     <state x="987" y="351" key="FileChooserDialogImpl" timestamp="1589731094766">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -157,10 +161,10 @@
       <screen x="2560" y="0" width="1920" height="1040" />
     </state>
     <state x="3000" y="94" key="SettingsEditor/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1589128329251" />
-    <state x="872" y="432" key="Vcs.Push.Dialog.v2" timestamp="1589731566514">
+    <state x="872" y="432" key="Vcs.Push.Dialog.v2" timestamp="1589733545142">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="872" y="432" key="Vcs.Push.Dialog.v2/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1589731566514" />
+    <state x="872" y="432" key="Vcs.Push.Dialog.v2/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1589733545142" />
     <state x="3336" y="297" key="chooseDestDirectoryDialog" timestamp="1588955475086">
       <screen x="2560" y="0" width="1920" height="1040" />
     </state>
