@@ -13,8 +13,8 @@ public class LogfileLogger implements Logger {
     private final String logLocation;
 
 
-    public LogfileLogger(){
-        logLocation = createDebugFile();
+    public LogfileLogger(String logLocation){
+        this.logLocation = logLocation;
     }
 
     @Override
@@ -22,7 +22,7 @@ public class LogfileLogger implements Logger {
         FileWriter.writeToFile(logLocation,text);
     }
 
-    private String createDebugFile() {
+    public static String createDefaultDebugFile() {
 
         String logFileLocation = BASELOCATION +
                 (new SimpleDateFormat("yyyy.MM.dd - HH.mm.ss").format(
