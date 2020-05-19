@@ -9,12 +9,13 @@ public class LogfileLogger implements Logger {
 
     private static final String BASELOCATION = System.getProperty("user.dir") +"\\logs\\";
 
-    private final int logLevel = Integer.MAX_VALUE;
+    private final int logLevel;
     private final String logLocation;
 
 
-    public LogfileLogger(String logLocation){
+    public LogfileLogger(String logLocation, int logLevel){
         this.logLocation = logLocation;
+        this.logLevel = logLevel;
     }
 
     @Override

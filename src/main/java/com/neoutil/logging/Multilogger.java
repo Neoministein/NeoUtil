@@ -17,7 +17,7 @@ public class Multilogger implements Logging {
     private List<Logger> loggers = new ArrayList<>();
 
     private Multilogger() {
-        addLogger(new LogfileLogger(LogfileLogger.createDefaultDebugFile()));
+        addLogger(new LogfileLogger(LogfileLogger.createDefaultDebugFile(),Integer.MAX_VALUE));
     }
     public static Multilogger getInstance() {
         return  instance;
@@ -73,11 +73,7 @@ public class Multilogger implements Logging {
 
     private boolean hasNewLine(String textToPrint) {
         stringToLog += textToPrint;
-        if(stringToLog.contains("\n") || stringToLog.contains("\r")){
-            return true;
-        }else {
-            return false;
-        }
+        return stringToLog.contains("\n") || stringToLog.contains("\r");
     }
 
     private void resetLoggingText(){
