@@ -45,29 +45,13 @@ public class Multilogger implements Logging {
         printNoIO(loggingLevel,text+Logging.stackTraceToString(exception)+"\n");
     }
 
-    public void printNoIO(int loggingLevel,String text){
-        for(Logger logger : loggers){
-            if(!logger.isIOLogger()) {
+    public void printNoIO(int loggingLevel,String text) {
+        for (Logger logger : loggers) {
+            if (!logger.isIOLogger()) {
                 if (loggingLevel <= logger.getLoglevel()) {
                     logger.print(text);
                 }
             }
-        }
-    }
-    static String debugLevelToString(int debugLevel){
-        switch (debugLevel){
-            case FATAL:
-                return "[FATAL]";
-            case ERROR:
-                return "[ERROR]";
-            case WARN:
-                return "[WARN]";
-            case INFO:
-                return "[INFO]";
-            case DEBUG:
-                return "[DEBUG]";
-            default:
-                return "[?????]";
         }
     }
 
@@ -93,7 +77,7 @@ public class Multilogger implements Logging {
     private String generatePreText(int loggingLevel){
         return "["+new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(
                 new Timestamp(System.currentTimeMillis()))+"]" +
-                debugLevelToString(loggingLevel)+
+                Logging.debugLevelToString(loggingLevel)+
                 stringToLog;
     }
 

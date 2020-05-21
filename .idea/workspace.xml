@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="46852e55-1932-40c3-96d8-76b9e7b0752a" name="Default Changelist" comment="">
+    <list default="true" id="46852e55-1932-40c3-96d8-76b9e7b0752a" name="Default Changelist" comment="-removed debugLevelToString from MultiLogger">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Logging.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Logging.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/logger/LogfileLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/logger/LogfileLogger.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +82,7 @@
       <workItem from="1589730834896" duration="4289000" />
       <workItem from="1589888416116" duration="1694000" />
       <workItem from="1589958985216" duration="1777000" />
-      <workItem from="1590076359789" duration="280000" />
+      <workItem from="1590076359789" duration="1171000" />
     </task>
     <task id="LOCAL-00001" summary="-removed old project specific code">
       <created>1589535185913</created>
@@ -127,7 +126,14 @@
       <option name="project" value="LOCAL" />
       <updated>1589889297970</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="-Logfile only gets created after first Logging">
+      <created>1590076697541</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1590076697541</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -143,14 +149,16 @@
     <MESSAGE value="-LogfileLogger can have a variable file location" />
     <MESSAGE value="-removed mistake" />
     <MESSAGE value="-changed Logfile constructor" />
-    <option name="LAST_COMMIT_MESSAGE" value="-changed Logfile constructor" />
+    <MESSAGE value="-Logfile only gets created after first Logging" />
+    <MESSAGE value="-removed debugLevelToString from MultiLogger" />
+    <option name="LAST_COMMIT_MESSAGE" value="-removed debugLevelToString from MultiLogger" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="3239" y="220" key="CommitChangelistDialog2" timestamp="1589889297345">
+    <state x="3647" y="232" key="CommitChangelistDialog2" timestamp="1590076906740">
       <screen x="2560" y="0" width="1920" height="1040" />
     </state>
     <state x="905" y="296" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1589733563203" />
-    <state x="3239" y="220" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1589889297345" />
+    <state x="3647" y="232" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1590076906740" />
     <state x="987" y="351" key="FileChooserDialogImpl" timestamp="1589731094766">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>

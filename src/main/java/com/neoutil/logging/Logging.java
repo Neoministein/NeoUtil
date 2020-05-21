@@ -33,7 +33,7 @@ public interface Logging {
             case DEBUG:
                 return "[DEBUG]";
             default:
-                return "[?????]";
+                return "[Level:"+debugLevel+"]";
         }
     }
 
