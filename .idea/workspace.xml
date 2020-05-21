@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46852e55-1932-40c3-96d8-76b9e7b0752a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" afterDir="false" />
@@ -82,7 +81,9 @@
       <workItem from="1589120388618" duration="4405000" />
       <workItem from="1589534271304" duration="3366000" />
       <workItem from="1589730834896" duration="4289000" />
-      <workItem from="1589888416116" duration="714000" />
+      <workItem from="1589888416116" duration="1694000" />
+      <workItem from="1589958985216" duration="1777000" />
+      <workItem from="1590076359789" duration="280000" />
     </task>
     <task id="LOCAL-00001" summary="-removed old project specific code">
       <created>1589535185913</created>
@@ -119,7 +120,14 @@
       <option name="project" value="LOCAL" />
       <updated>1589733563704</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="-changed Logfile constructor">
+      <created>1589889297970</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1589889297970</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -134,14 +142,15 @@
     <MESSAGE value="-added pom and iml" />
     <MESSAGE value="-LogfileLogger can have a variable file location" />
     <MESSAGE value="-removed mistake" />
-    <option name="LAST_COMMIT_MESSAGE" value="-removed mistake" />
+    <MESSAGE value="-changed Logfile constructor" />
+    <option name="LAST_COMMIT_MESSAGE" value="-changed Logfile constructor" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="3239" y="220" key="CommitChangelistDialog2" timestamp="1589889214359">
+    <state x="3239" y="220" key="CommitChangelistDialog2" timestamp="1589889297345">
       <screen x="2560" y="0" width="1920" height="1040" />
     </state>
     <state x="905" y="296" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1589733563203" />
-    <state x="3239" y="220" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1589889214359" />
+    <state x="3239" y="220" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1589889297345" />
     <state x="987" y="351" key="FileChooserDialogImpl" timestamp="1589731094766">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -177,17 +186,18 @@
       <screen x="2560" y="0" width="1920" height="1040" />
     </state>
     <state x="3000" y="94" key="SettingsEditor/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1589888503922" />
-    <state x="872" y="432" key="Vcs.Push.Dialog.v2" timestamp="1589733570818">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state x="3214" y="321" key="Vcs.Push.Dialog.v2" timestamp="1589889310899">
+      <screen x="2560" y="0" width="1920" height="1040" />
     </state>
     <state x="872" y="432" key="Vcs.Push.Dialog.v2/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1589733570818" />
+    <state x="3214" y="321" key="Vcs.Push.Dialog.v2/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1589889310899" />
     <state x="3336" y="297" key="chooseDestDirectoryDialog" timestamp="1588955475086">
       <screen x="2560" y="0" width="1920" height="1040" />
     </state>
     <state x="3336" y="297" key="chooseDestDirectoryDialog/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1588955475086" />
-    <state x="3216" y="343" key="com.intellij.ide.util.TipDialog" timestamp="1589120388492">
+    <state x="3216" y="343" key="com.intellij.ide.util.TipDialog" timestamp="1590076365937">
       <screen x="2560" y="0" width="1920" height="1040" />
     </state>
-    <state x="3216" y="343" key="com.intellij.ide.util.TipDialog/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1589120388492" />
+    <state x="3216" y="343" key="com.intellij.ide.util.TipDialog/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1590076365937" />
   </component>
 </project>

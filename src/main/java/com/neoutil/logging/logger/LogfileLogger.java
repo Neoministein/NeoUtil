@@ -7,10 +7,12 @@ import java.text.SimpleDateFormat;
 
 public class LogfileLogger implements Logger {
 
-    private static final String BASELOCATION = System.getProperty("user.dir") +"\\logs\\";
+    public static final String BASELOCATION = System.getProperty("user.dir") +"\\logs\\";
 
     private final int logLevel;
     private final String logLocation;
+    private boolean isFileCrated = false;
+    private String fileLocation;
 
 
     public LogfileLogger(String logLocation, int logLevel){
@@ -20,12 +22,16 @@ public class LogfileLogger implements Logger {
 
     @Override
     public void print(String text) {
-        FileWriter.writeToFile(logLocation,text);
+        if(!isFileCrated) {
+           fileLocation = createDefaultDebugFile(logLocation);
+           isFileCrated = true;
+        }
+        FileWriter.writeToFile(fileLocation, text);
     }
 
-    public static String createDefaultDebugFile() {
+    public static String createDefaultDebugFile(String location) {
 
-        String logFileLocation = BASELOCATION +
+        String logFileLocation = location +
                 (new SimpleDateFormat("yyyy.MM.dd - HH.mm.ss").format(
                         new Timestamp(System.currentTimeMillis())) +
                         ".txt").replace(":",".");
