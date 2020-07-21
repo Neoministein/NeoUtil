@@ -36,7 +36,7 @@ public class LogfileLogger implements Logger {
                         new Timestamp(System.currentTimeMillis())) +
                         ".txt").replace(":",".");
 
-        FileWriter.createFile(logFileLocation);
+        FileWriter.createFileNoLog(logFileLocation);
 
         return logFileLocation;
 

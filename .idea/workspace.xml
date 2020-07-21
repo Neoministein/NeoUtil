@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="46852e55-1932-40c3-96d8-76b9e7b0752a" name="Default Changelist" comment="-removed debugLevelToString from MultiLogger">
+    <list default="true" id="46852e55-1932-40c3-96d8-76b9e7b0752a" name="Default Changelist" comment="-reworked readsystem and LogfileLogger">
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Logging.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Logging.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileReader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileWriter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/logger/LogfileLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/logger/LogfileLogger.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,49 +25,24 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="IgnoredFileRootStore">
-    <option name="generatedRoots">
-      <set>
-        <option value="F:\Programming\Java\NeoUtil\.idea" />
-      </set>
-    </option>
-  </component>
-  <component name="MavenImportPreferences">
-    <option name="importingSettings">
-      <MavenImportingSettings>
-        <option name="importAutomatically" value="true" />
-      </MavenImportingSettings>
-    </option>
-  </component>
   <component name="ProjectId" id="1bdGnelI07MAs9mGL1xNACx4k94" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="TERMINAL_CUSTOM_COMMANDS_GOT_IT" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Problems" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../TextBased" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
-  </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
-      <list>
-        <serviceView>
-          <treeState>
-            <expand />
-            <select />
-          </treeState>
-        </serviceView>
-      </list>
-    </option>
+    <property name="settings.editor.selected.configurable" value="configurable.group.build.tools" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -83,6 +62,15 @@
       <workItem from="1589888416116" duration="1694000" />
       <workItem from="1589958985216" duration="1777000" />
       <workItem from="1590076359789" duration="1171000" />
+      <workItem from="1592309498115" duration="61000" />
+      <workItem from="1592309607599" duration="368000" />
+      <workItem from="1593760472360" duration="58000" />
+      <workItem from="1593760570343" duration="590000" />
+      <workItem from="1593761208943" duration="321000" />
+      <workItem from="1593761568362" duration="41000" />
+      <workItem from="1595231918343" duration="59000" />
+      <workItem from="1595232065694" duration="874000" />
+      <workItem from="1595232968177" duration="10616000" />
     </task>
     <task id="LOCAL-00001" summary="-removed old project specific code">
       <created>1589535185913</created>
@@ -137,7 +125,7 @@
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
+    <option name="version" value="2" />
   </component>
   <component name="VcsManagerConfiguration">
     <ignored-roots>
@@ -151,17 +139,29 @@
     <MESSAGE value="-changed Logfile constructor" />
     <MESSAGE value="-Logfile only gets created after first Logging" />
     <MESSAGE value="-removed debugLevelToString from MultiLogger" />
-    <option name="LAST_COMMIT_MESSAGE" value="-removed debugLevelToString from MultiLogger" />
+    <MESSAGE value="-reworked readsystem and LogfileLogger" />
+    <option name="LAST_COMMIT_MESSAGE" value="-reworked readsystem and LogfileLogger" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="3647" y="232" key="CommitChangelistDialog2" timestamp="1590076906740">
-      <screen x="2560" y="0" width="1920" height="1040" />
+    <state x="474" y="255" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog" timestamp="1593760522472">
+      <screen x="0" y="0" width="1440" height="770" />
     </state>
+    <state x="474" y="255" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@0.0.1440.770" timestamp="1593760522472" />
+    <state x="401" y="121" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1595231939874">
+      <screen x="0" y="0" width="1440" height="770" />
+    </state>
+    <state x="401" y="121" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@0.0.1440.770" timestamp="1595231939874" />
+    <state x="-2753" y="472" key="CommitChangelistDialog2" timestamp="1595343901245">
+      <screen x="-3840" y="290" width="1920" height="1040" />
+    </state>
+    <state x="-2753" y="472" key="CommitChangelistDialog2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-3840.290.1920.1040" timestamp="1595343901245" />
     <state x="905" y="296" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1589733563203" />
     <state x="3647" y="232" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1590076906740" />
-    <state x="987" y="351" key="FileChooserDialogImpl" timestamp="1589731094766">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state x="-1180" y="470" key="FileChooserDialogImpl" timestamp="1595233274362">
+      <screen x="-1920" y="179" width="1920" height="1160" />
     </state>
+    <state x="-1180" y="470" key="FileChooserDialogImpl/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1595233274362" />
+    <state x="555" y="193" key="FileChooserDialogImpl/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@0.0.1440.770" timestamp="1593761441938" />
     <state x="987" y="351" key="FileChooserDialogImpl/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1589731094766" />
     <state x="3300" y="261" key="FileChooserDialogImpl/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1589056315992" />
     <state x="1123" y="556" width="260" height="214" key="Github.ShareDialog" timestamp="1589731595694">
@@ -190,9 +190,10 @@
       <screen x="2560" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="282" key="GridCell.Tab.0.right/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1588976667182" />
-    <state x="3000" y="94" key="SettingsEditor" timestamp="1589888503922">
-      <screen x="2560" y="0" width="1920" height="1040" />
+    <state x="330" y="0" key="SettingsEditor" timestamp="1593761529681">
+      <screen x="0" y="0" width="1440" height="770" />
     </state>
+    <state x="330" y="0" key="SettingsEditor/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@0.0.1440.770" timestamp="1593761529681" />
     <state x="3000" y="94" key="SettingsEditor/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1589888503922" />
     <state x="3214" y="321" key="Vcs.Push.Dialog.v2" timestamp="1589889310899">
       <screen x="2560" y="0" width="1920" height="1040" />

@@ -1,7 +1,6 @@
 package com.neoutil.file;
 
 import java.io.*;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import com.neoutil.logging.Logging;
@@ -29,42 +28,51 @@ public class FileReader {
             return null;
         }
     }
-
-    public static String readLineToSting(String location,int line) {
+    public static String readFileToLine(String[] file, int line){
         Logging loggingHandler = Multilogger.getInstance();
         try {
-            String l = readFile(location)[line];
+            return file[line];
+        }catch (NullPointerException ex){
+            loggingHandler.println(Multilogger.WARN,"Can't read file line out of bounds");
+        }catch (Exception ex){
+            loggingHandler.println(Multilogger.WARN,"There was a problem trying to read the file");
+        }
+        return null;
+    }
+
+    public static String readLineToSting(String[] file,int line) {
+        Logging loggingHandler = Multilogger.getInstance();
+        try {
+            String l = readFileToLine(file,line);
             String value = l.substring(l.indexOf(":")+1);
             loggingHandler.println(Multilogger.DEBUG,"Line ["+ line +"] contains ["+ value +"]");
             return value;
         }catch (Exception ex) {
-            loggingHandler.println(Multilogger.WARN,"There was a wrong value found on line ["+ line +"] in file ["+ location+"]");
-            return "";
+            loggingHandler.println(Multilogger.WARN,"There was no value found on line ["+ line +"]");
+            return null;
         }
     }
 
-    public static int readLineToInt(String location,int line) {
+    public static int readLineToInt(String[] file,int line) {
         Logging loggingHandler = Multilogger.getInstance();
-        String l = readFile(location)[line];
         try {
-            int value = Integer.parseInt(l.substring(l.indexOf(":")+1));
+            int value = Integer.parseInt(readFileToLine(file,line));
             loggingHandler.println(Multilogger.DEBUG,"Line ["+ line +"] contains ["+ value+"]");
             return value;
         }catch (Exception ex) {
-            loggingHandler.println(Multilogger.WARN,"There was a wrong value found on line ["+ line +"] in file ["+ location+"]");
+            loggingHandler.println(Multilogger.WARN,"No integer value was found on line ["+ line +"]");
             return 0;
         }
     }
 
-    public static boolean readLineToBoolan(String location,int line) {
+    public static boolean readLineToBoolan(String[] file,int line) {
         Logging loggingHandler = Multilogger.getInstance();
-        String l = readFile(location)[line];
         try {
-            boolean value = Boolean.parseBoolean(l.replaceAll(" ","").substring((l.replaceAll(" ","").indexOf(":")+1)));
+            boolean value = Boolean.parseBoolean(readLineToSting(file,line).replace(' ', Character.MIN_VALUE));
             loggingHandler.println(Multilogger.DEBUG,"Line ["+ line +"] contains ["+ value +"]");
             return value;
         }catch (Exception ex) {
-            loggingHandler.println(Multilogger.WARN,"There was a wrong value found on line ["+ line +"] in file ["+ location+"]");
+            loggingHandler.println(Multilogger.WARN,"There was a wrong value found on line ["+ line +"]");
             return false;
         }
     }
