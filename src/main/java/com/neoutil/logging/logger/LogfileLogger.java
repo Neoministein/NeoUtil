@@ -5,28 +5,35 @@ import com.neoutil.file.FileWriter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
-public class LogfileLogger implements Logger {
+public class LogfileLogger implements Logger, Runnable{
 
     public static final String BASELOCATION = System.getProperty("user.dir") +"\\logs\\";
+    public static final long DEFAULT_SECONDS_BETWEEN_LOG = 1000;
 
     private final int logLevel;
     private final String logLocation;
     private boolean isFileCrated = false;
     private String fileLocation;
+    private long milisecondsBetweenLog;
+    private Thread printThread = new Thread(this);
+
+    private String textToPrint = "";
 
 
-    public LogfileLogger(String logLocation, int logLevel){
+
+    public LogfileLogger(String logLocation, int logLevel, long miliseconds){
         this.logLocation = logLocation;
         this.logLevel = logLevel;
+        this.milisecondsBetweenLog = miliseconds;
     }
 
     @Override
     public void print(String text) {
-        if(!isFileCrated) {
-           fileLocation = createDefaultDebugFile(logLocation);
-           isFileCrated = true;
+        textToPrint += text;
+        if(!printThread.isAlive()){
+            printThread.setDaemon(true);
+            printThread.start();
         }
-        FileWriter.writeToFile(fileLocation, text);
     }
 
     public static String createDefaultDebugFile(String location) {
@@ -55,5 +62,21 @@ public class LogfileLogger implements Logger {
     @Override
     public String getLoglocation() {
         return logLocation;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep( milisecondsBetweenLog );
+            } catch (InterruptedException e) {
+            }
+            if (!isFileCrated) {
+                fileLocation = createDefaultDebugFile( logLocation );
+                isFileCrated = true;
+            }
+            FileWriter.writeToFile( fileLocation, textToPrint );
+            textToPrint = "";
+        }
     }
 }

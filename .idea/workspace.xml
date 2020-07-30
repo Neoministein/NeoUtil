@@ -2,13 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46852e55-1932-40c3-96d8-76b9e7b0752a" name="Default Changelist" comment="-reworked readsystem and LogfileLogger">
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileReader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileWriter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/logger/LogfileLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/logger/LogfileLogger.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/file/FileWriter.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/file/FileWriter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Multilogger.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Multilogger.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/logging/logger/LogfileLogger.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/logging/logger/LogfileLogger.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/neoutil-1.0.5.jar" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,6 +73,8 @@
       <workItem from="1595231918343" duration="59000" />
       <workItem from="1595232065694" duration="874000" />
       <workItem from="1595232968177" duration="10616000" />
+      <workItem from="1595343911826" duration="1441000" />
+      <workItem from="1596111811224" duration="6696000" />
     </task>
     <task id="LOCAL-00001" summary="-removed old project specific code">
       <created>1589535185913</created>
@@ -147,14 +151,18 @@
       <screen x="0" y="0" width="1440" height="770" />
     </state>
     <state x="474" y="255" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@0.0.1440.770" timestamp="1593760522472" />
+    <state x="-1155" y="465" key="#com.intellij.ide.util.MemberChooser" timestamp="1596112163736">
+      <screen x="-1920" y="179" width="1920" height="1160" />
+    </state>
+    <state x="-1155" y="465" key="#com.intellij.ide.util.MemberChooser/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1596112163736" />
     <state x="401" y="121" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1595231939874">
       <screen x="0" y="0" width="1440" height="770" />
     </state>
     <state x="401" y="121" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@0.0.1440.770" timestamp="1595231939874" />
-    <state x="-2753" y="472" key="CommitChangelistDialog2" timestamp="1595343901245">
+    <state x="-2907" y="419" key="CommitChangelistDialog2" timestamp="1595344034134">
       <screen x="-3840" y="290" width="1920" height="1040" />
     </state>
-    <state x="-2753" y="472" key="CommitChangelistDialog2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-3840.290.1920.1040" timestamp="1595343901245" />
+    <state x="-2907" y="419" key="CommitChangelistDialog2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-3840.290.1920.1040" timestamp="1595344034134" />
     <state x="905" y="296" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1589733563203" />
     <state x="3647" y="232" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1590076906740" />
     <state x="-1180" y="470" key="FileChooserDialogImpl" timestamp="1595233274362">
@@ -195,9 +203,10 @@
     </state>
     <state x="330" y="0" key="SettingsEditor/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@0.0.1440.770" timestamp="1593761529681" />
     <state x="3000" y="94" key="SettingsEditor/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1589888503922" />
-    <state x="3214" y="321" key="Vcs.Push.Dialog.v2" timestamp="1589889310899">
-      <screen x="2560" y="0" width="1920" height="1040" />
+    <state x="-3186" y="611" key="Vcs.Push.Dialog.v2" timestamp="1595344042569">
+      <screen x="-3840" y="290" width="1920" height="1040" />
     </state>
+    <state x="-3186" y="611" key="Vcs.Push.Dialog.v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-3840.290.1920.1040" timestamp="1595344042569" />
     <state x="872" y="432" key="Vcs.Push.Dialog.v2/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1589733570818" />
     <state x="3214" y="321" key="Vcs.Push.Dialog.v2/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1589889310899" />
     <state x="3336" y="297" key="chooseDestDirectoryDialog" timestamp="1588955475086">
@@ -208,5 +217,9 @@
       <screen x="2560" y="0" width="1920" height="1040" />
     </state>
     <state x="3216" y="343" key="com.intellij.ide.util.TipDialog/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1590076365937" />
+    <state x="-3071" y="724" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1595343917509">
+      <screen x="-3840" y="290" width="1920" height="1040" />
+    </state>
+    <state x="-3071" y="724" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-3840.290.1920.1040" timestamp="1595343917509" />
   </component>
 </project>
