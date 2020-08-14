@@ -8,13 +8,13 @@ import java.text.SimpleDateFormat;
 public class LogfileLogger implements Logger, Runnable{
 
     public static final String BASELOCATION = System.getProperty("user.dir") +"\\logs\\";
-    public static final long DEFAULT_SECONDS_BETWEEN_LOG = 1000;
+    public static final long DEFAULT_SECONDS_BETWEEN_LOG = 10;
 
     private final int logLevel;
     private final String logLocation;
     private boolean isFileCrated = false;
     private String fileLocation;
-    private long milisecondsBetweenLog;
+    private final long milisecondsBetweenLog;
     private Thread printThread = new Thread(this);
 
     private String textToPrint = "";
