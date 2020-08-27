@@ -6,7 +6,7 @@
 
   <groupId>com.neoutil</groupId>
   <artifactId>neoutil</artifactId>
-  <version>1.0.7</version>
+  <version>1.0.8</version>
 
   <name>NeoUtil</name>
   <!-- FIXME change it to the project's website -->
@@ -17,6 +17,14 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20190722</version>
+    </dependency>
+  </dependencies>
 
   <distributionManagement>
     <repository>
