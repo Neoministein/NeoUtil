@@ -8,6 +8,23 @@ public interface Logging {
     int INFO  = 3;
     int DEBUG = 4;
 
+    LevelToString defaultToString = loggingLevel -> {
+        switch (loggingLevel) {
+            case FATAL:
+                return "[FATAL]";
+            case ERROR:
+                return "[ERROR]";
+            case WARN:
+                return "[WARN]";
+            case INFO:
+                return "[INFO]";
+            case DEBUG:
+                return "[DEBUG]";
+            default:
+                return "[Level:" + loggingLevel + "]";
+        }
+    };
+
     void println(int loggingLevel, String text);
 
     void println(int loggingLevel, String text, Exception exception);
@@ -20,24 +37,13 @@ public interface Logging {
 
     void printNoIO(int loggingLevel,String text);
 
-    static String debugLevelToString(int debugLevel){
-        switch (debugLevel){
-            case FATAL:
-                return "[FATAL]";
-            case ERROR:
-                return "[ERROR]";
-            case WARN:
-                return "[WARN]";
-            case INFO:
-                return "[INFO]";
-            case DEBUG:
-                return "[DEBUG]";
-            default:
-                return "[Level:"+debugLevel+"]";
-        }
-    }
+    void printlnToLevel(int loggingLevel, String text);
 
-    static String stackTraceToString(Exception exception){
+    void printlnToLevel(int loggingLevel, String text, Exception exception);
+
+    void printToLevel(int loggingLevel, String text);
+
+    static String stackTraceToString(Exception exception) {
         String stackTrace = ("\n"+exception.getStackTrace()[0].getClassName()+": "+exception.getMessage());
         for(StackTraceElement stackTraceElement: exception.getStackTrace()) {
 
@@ -49,4 +55,6 @@ public interface Logging {
         }
         return stackTrace;
     }
+
+    void setLevelToString(LevelToString levelToString);
 }

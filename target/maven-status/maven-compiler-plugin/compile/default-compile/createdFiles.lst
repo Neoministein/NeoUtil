@@ -1,7 +1,9 @@
 com\neoutil\logging\Multilogger.class
+com\neoutil\json\JSONReader.class
 com\neoutil\logging\logger\LogfileLogger.class
 com\neoutil\logging\Logging.class
 com\neoutil\logging\logger\Logger.class
 com\neoutil\file\FileWriter.class
+com\neoutil\logging\LevelToString.class
 com\neoutil\file\FileReader.class
 com\neoutil\logging\logger\ConsoleLogger.class

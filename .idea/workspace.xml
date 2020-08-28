@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="46852e55-1932-40c3-96d8-76b9e7b0752a" name="Default Changelist" comment="-added new reader to FileReader">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/json/JSONReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/LevelToString.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Logging.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Logging.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/file/FileReader.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/file/FileReader.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Logging.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Logging.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Multilogger.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Multilogger.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
@@ -45,18 +67,6 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="configurable.group.build.tools" />
   </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
-      <list>
-        <serviceView>
-          <treeState>
-            <expand />
-            <select />
-          </treeState>
-        </serviceView>
-      </list>
-    </option>
-  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -87,12 +97,6 @@
       <workItem from="1595343911826" duration="1441000" />
       <workItem from="1596111811224" duration="9235000" />
       <workItem from="1597409980626" duration="1153000" />
-      <workItem from="1597418878585" duration="631000" />
-      <workItem from="1597598475589" duration="372000" />
-      <workItem from="1597605660652" duration="625000" />
-      <workItem from="1598199039605" duration="61000" />
-      <workItem from="1598285957381" duration="18000" />
-      <workItem from="1598560651325" duration="1405000" />
     </task>
     <task id="LOCAL-00001" summary="-removed old project specific code">
       <created>1589535185913</created>
@@ -154,7 +158,10 @@
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
+    <option name="version" value="2" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <ignored-roots>
@@ -178,25 +185,20 @@
       <screen x="0" y="0" width="1440" height="770" />
     </state>
     <state x="474" y="255" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@0.0.1440.770" timestamp="1593760522472" />
-    <state x="-1155" y="465" key="#com.intellij.ide.util.MemberChooser" timestamp="1596112163736">
+    <state x="-1155" y="465" key="#com.intellij.ide.util.MemberChooser" timestamp="1598622888058">
       <screen x="-1920" y="179" width="1920" height="1160" />
     </state>
-    <state x="-1155" y="465" key="#com.intellij.ide.util.MemberChooser/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1596112163736" />
+    <state x="-1155" y="465" key="#com.intellij.ide.util.MemberChooser/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1598622888058" />
     <state x="401" y="121" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1595231939874">
       <screen x="0" y="0" width="1440" height="770" />
     </state>
     <state x="401" y="121" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@0.0.1440.770" timestamp="1595231939874" />
-    <state x="1244" y="174" key="CommitChangelistDialog2" timestamp="1598562634756">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state x="-987" y="323" key="CommitChangelistDialog2" timestamp="1597412444622">
+      <screen x="-1920" y="179" width="1920" height="1160" />
     </state>
     <state x="-987" y="323" key="CommitChangelistDialog2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1597412444622" />
     <state x="-2907" y="419" key="CommitChangelistDialog2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-3840.290.1920.1040" timestamp="1595344034134" />
-    <state x="1244" y="174" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1598562634756" />
     <state x="3647" y="232" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1590076906740" />
-    <state x="496" y="0" key="DiffContextDialog" timestamp="1598562566735">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="496" y="0" key="DiffContextDialog/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1598562566735" />
     <state x="-1180" y="470" key="FileChooserDialogImpl" timestamp="1595233274362">
       <screen x="-1920" y="179" width="1920" height="1160" />
     </state>
@@ -211,11 +213,10 @@
     </state>
     <state x="-1266" y="537" key="Vcs.Push.Dialog.v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1596120085459" />
     <state x="-3186" y="611" key="Vcs.Push.Dialog.v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-3840.290.1920.1040" timestamp="1595344042569" />
-    <state x="875" y="462" key="com.intellij.ide.util.TipDialog" timestamp="1598285959361">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state x="3216" y="343" key="com.intellij.ide.util.TipDialog" timestamp="1590076365937">
+      <screen x="2560" y="0" width="1920" height="1040" />
     </state>
-    <state x="875" y="462" key="com.intellij.ide.util.TipDialog/0.0.2560.1400/2560.0.1920.1040@0.0.2560.1400" timestamp="1598285959361" />
-    <state x="3216" y="343" key="com.intellij.ide.util.TipDialog/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1597598830068" />
+    <state x="3216" y="343" key="com.intellij.ide.util.TipDialog/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1590076365937" />
     <state x="-1151" y="663" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1596120061174">
       <screen x="-1920" y="179" width="1920" height="1160" />
     </state>
