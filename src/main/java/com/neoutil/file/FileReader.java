@@ -6,11 +6,24 @@ import com.neoutil.logging.*;
 
 public class FileReader {
 
-    public static String[] readFileToArray (String location) {
+    /**
+     * Returns a io.FileReader which you need to close after you are finished!
+     *
+     * @param location  location which the reader leads to
+     * @return          io.FileReader
+     */
+    protected static java.io.FileReader getReader(String location) throws FileNotFoundException {
+        return new java.io.FileReader(location);
+    }
+
+    protected static void fileNotfound(String location) {
+        Multilogger.getInstance().println(Logging.ERROR,"There was a problem trying to read the file at ["+ location +"]");
+    }
+
+    public static List<String> readFileToList(String location){
+        List<String> lines = new ArrayList<>();
         try {
-            java.io.FileReader fileReader = new java.io.FileReader(System.getProperty("user.dir")+"\\"+location);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            List<String> lines = new ArrayList<String>();
+            BufferedReader bufferedReader = new BufferedReader(getReader(location));
             String line;
 
             while ((line = bufferedReader.readLine()) != null) {
@@ -18,19 +31,21 @@ public class FileReader {
             }
 
             bufferedReader.close();
-
-            return lines.toArray(new String[0]);
         }catch (IOException ex) {
-            Multilogger.getInstance().println(Logging.ERROR,"There was a problem trying to read the file at ["+ location +"]");
-            return null;
+            fileNotfound(location);
         }
+        return lines;
+    }
+
+    public static String[] readFileToArray (String location) {
+        return readFileToList(location).toArray(new String[0]);
     }
 
     public static String readFileToString (String location) {
         StringBuilder buffer = new StringBuilder();
 
         try {
-            BufferedReader br = new BufferedReader(new java.io.FileReader(location));
+            BufferedReader br = new BufferedReader(getReader(location));
 
             String jsonCode;
             while ((jsonCode = br.readLine()) != null){
@@ -38,7 +53,7 @@ public class FileReader {
             }
             br.close();
         } catch (IOException exception) {
-            Multilogger.getInstance().println(Logging.ERROR,"There was a problem trying to read the file at ["+ location +"]");
+            fileNotfound(location);
         }
         return buffer.toString();
     }
@@ -52,42 +67,5 @@ public class FileReader {
             Multilogger.getInstance().println(Logging.WARN,"There was a problem trying to read the file");
         }
         return null;
-    }
-
-    public static String readLineToSting(String[] file,int line) {
-        Logging loggingHandler = Multilogger.getInstance();
-        try {
-            String l = readFileToLine(file,line);
-            String value = l.substring(l.indexOf(":")+1);
-            loggingHandler.println(Logging.DEBUG,"Line ["+ line +"] contains ["+ value +"]");
-            return value;
-        }catch (Exception ex) {
-            loggingHandler.println(Logging.WARN,"There was no value found on line ["+ line +"]");
-            return null;
-        }
-    }
-
-    public static int readLineToInt(String[] file,int line) {
-        Logging loggingHandler = Multilogger.getInstance();
-        try {
-            int value = Integer.parseInt(readFileToLine(file,line));
-            loggingHandler.println(Logging.DEBUG,"Line ["+ line +"] contains ["+ value+"]");
-            return value;
-        }catch (Exception ex) {
-            loggingHandler.println(Logging.WARN,"No integer value was found on line ["+ line +"]");
-            return 0;
-        }
-    }
-
-    public static boolean readLineToBoolan(String[] file,int line) {
-        Logging loggingHandler = Multilogger.getInstance();
-        try {
-            boolean value = Boolean.parseBoolean(readLineToSting(file,line).replace(' ', Character.MIN_VALUE));
-            loggingHandler.println(Logging.DEBUG,"Line ["+ line +"] contains ["+ value +"]");
-            return value;
-        }catch (Exception ex) {
-            Multilogger.getInstance().println(Logging.WARN,"There was a wrong value found on line ["+ line +"]");
-            return false;
-        }
     }
 }

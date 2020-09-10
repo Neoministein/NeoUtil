@@ -9,16 +9,36 @@ import java.io.IOException;
 
 public class FileWriter {
 
-    public static void writeToFile(String location, String fileContent) {
-        Logging loggingHandler = Multilogger.getInstance();
+    /*
+     * You need to close the writer after you are finished!
+     */
+    protected static BufferedWriter getWriter(String location,boolean append) throws IOException {
+        return new BufferedWriter(new java.io.FileWriter(location, append));
+    }
+
+    protected static void fileNotFound(String location, Exception ex) {
+        Multilogger.getInstance().printlnNoIO(Multilogger.ERROR,"There was problem trying to write toa a file at ["+location+"]",ex);
+    }
+
+    public static void appendToFile(String location, String fileContent) {
         try {
-            BufferedWriter writer = new BufferedWriter(new java.io.FileWriter(location,true));
+            BufferedWriter writer = new BufferedWriter(getWriter(location,true));
             writer.write(fileContent);
             writer.close();
         }catch (IOException ex) {
-            loggingHandler.printlnNoIO(Multilogger.ERROR,"There was problem trying to write toa a file at ["+location+"]",ex);
+            fileNotFound(location,ex);
         }
 
+    }
+
+    public static void writeToFile(String location, String fileContent) {
+        try {
+            BufferedWriter writer = new BufferedWriter(getWriter(location,false));
+            writer.write(fileContent);
+            writer.close();
+        }catch (IOException ex) {
+            fileNotFound(location, ex);
+        }
     }
 
     public static void createFileNoLog(String location){
@@ -40,7 +60,6 @@ public class FileWriter {
             loggingHandler.println(Multilogger.FATAL,"There is a problem creating a the File at ["+location+"]",ex);
         }
         loggingHandler.println( Multilogger.DEBUG, "Created new file at [" + location + "]" );
-
     }
 
     public static void deleteFile(String location){
