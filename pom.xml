@@ -6,7 +6,7 @@
 
   <groupId>com.neoutil</groupId>
   <artifactId>neoutil</artifactId>
-  <version>1.0.9</version>
+  <version>1.0.10</version>
 
   <name>NeoUtil</name>
   <!-- FIXME change it to the project's website -->
@@ -33,5 +33,4 @@
       <url>https://maven.pkg.github.com/neoministein/neoutil</url>
     </repository>
   </distributionManagement>
-
 </project>

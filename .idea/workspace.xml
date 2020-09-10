@@ -19,19 +19,21 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46852e55-1932-40c3-96d8-76b9e7b0752a" name="Default Changelist" comment="-added new reader to FileReader">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/LevelToString.java" afterDir="false" />
+    <list default="true" id="46852e55-1932-40c3-96d8-76b9e7b0752a" name="Default Changelist" comment="-added Multilogger function to print to Specific Level&#10;-added interchangeable level to String function">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/property/PropertyReader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/property/PropertyWriter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_28_08_2020_09_01_[Default_Changelist]/FileReader.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_28_08_2020_09_01_[Default_Changelist]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_28_08_2020_09_01__Default_Changelist_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Logging.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Logging.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileReader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileWriter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/json/JSONReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/json/JSONReader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/file/FileReader.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/file/FileReader.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Logging.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Logging.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Multilogger.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Multilogger.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/logger/LogfileLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/logger/LogfileLogger.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/neoutil-1.0.6.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/neoutil-1.0.9.jar" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,6 +99,8 @@
       <workItem from="1595343911826" duration="1441000" />
       <workItem from="1596111811224" duration="9235000" />
       <workItem from="1597409980626" duration="1153000" />
+      <workItem from="1598795778310" duration="13000" />
+      <workItem from="1599489083400" duration="10390000" />
     </task>
     <task id="LOCAL-00001" summary="-removed old project specific code">
       <created>1589535185913</created>
@@ -161,6 +165,15 @@
     <option name="version" value="2" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
@@ -178,7 +191,8 @@
     <MESSAGE value="-reworked readsystem and LogfileLogger" />
     <MESSAGE value="-working on performance" />
     <MESSAGE value="-added new reader to FileReader" />
-    <option name="LAST_COMMIT_MESSAGE" value="-added new reader to FileReader" />
+    <MESSAGE value="-added Multilogger function to print to Specific Level&#10;-added interchangeable level to String function" />
+    <option name="LAST_COMMIT_MESSAGE" value="-added Multilogger function to print to Specific Level&#10;-added interchangeable level to String function" />
   </component>
   <component name="WindowStateProjectService">
     <state x="474" y="255" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog" timestamp="1593760522472">
@@ -198,7 +212,6 @@
     </state>
     <state x="-987" y="323" key="CommitChangelistDialog2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1597412444622" />
     <state x="-2907" y="419" key="CommitChangelistDialog2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-3840.290.1920.1040" timestamp="1595344034134" />
-    <state x="3647" y="232" key="CommitChangelistDialog2/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1590076906740" />
     <state x="-1180" y="470" key="FileChooserDialogImpl" timestamp="1595233274362">
       <screen x="-1920" y="179" width="1920" height="1160" />
     </state>
@@ -208,19 +221,16 @@
       <screen x="0" y="0" width="1440" height="770" />
     </state>
     <state x="330" y="0" key="SettingsEditor/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@0.0.1440.770" timestamp="1593761529681" />
-    <state x="-1266" y="537" key="Vcs.Push.Dialog.v2" timestamp="1596120085459">
+    <state x="-1266" y="537" key="Vcs.Push.Dialog.v2" timestamp="1598623994915">
       <screen x="-1920" y="179" width="1920" height="1160" />
     </state>
-    <state x="-1266" y="537" key="Vcs.Push.Dialog.v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1596120085459" />
+    <state x="-1266" y="537" key="Vcs.Push.Dialog.v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1598623994915" />
     <state x="-3186" y="611" key="Vcs.Push.Dialog.v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-3840.290.1920.1040" timestamp="1595344042569" />
-    <state x="3216" y="343" key="com.intellij.ide.util.TipDialog" timestamp="1590076365937">
-      <screen x="2560" y="0" width="1920" height="1040" />
+    <state x="577" y="321" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1599505238917">
+      <screen x="0" y="0" width="1440" height="770" />
     </state>
-    <state x="3216" y="343" key="com.intellij.ide.util.TipDialog/0.0.2560.1400/2560.0.1920.1040@2560.0.1920.1040" timestamp="1590076365937" />
-    <state x="-1151" y="663" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1596120061174">
-      <screen x="-1920" y="179" width="1920" height="1160" />
-    </state>
-    <state x="-1151" y="663" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1596120061174" />
+    <state x="-1151" y="663" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1599489598284" />
     <state x="-3071" y="724" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-3840.290.1920.1040" timestamp="1595343917509" />
+    <state x="577" y="321" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.770@0.0.1440.770" timestamp="1599505238917" />
   </component>
 </project>
