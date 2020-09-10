@@ -1,4 +1,4 @@
-package com.neoutil.json;
+package com.neoutil.file.json;
 
 import com.neoutil.file.FileReader;
 import org.json.JSONArray;

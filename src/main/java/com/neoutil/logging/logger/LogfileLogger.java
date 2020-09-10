@@ -7,15 +7,15 @@ import java.text.SimpleDateFormat;
 
 public class LogfileLogger implements Logger, Runnable{
 
-    public static final String BASELOCATION = System.getProperty("user.dir") +"\\logs\\";
+    public static final String BASE_LOCATION = System.getProperty("user.dir") +"\\logs\\";
     public static final long DEFAULT_SECONDS_BETWEEN_LOG = 10;
 
     private final int logLevel;
     private final String logLocation;
     private boolean isFileCrated = false;
     private String fileLocation;
-    private final long milisecondsBetweenLog;
-    private Thread printThread = new Thread(this);
+    private final long millisecondsBetweenLog;
+    private final Thread printThread = new Thread(this);
 
     private String textToPrint = "";
 
@@ -24,7 +24,7 @@ public class LogfileLogger implements Logger, Runnable{
     public LogfileLogger(String logLocation, int logLevel, long miliseconds){
         this.logLocation = logLocation;
         this.logLevel = logLevel;
-        this.milisecondsBetweenLog = miliseconds;
+        this.millisecondsBetweenLog = miliseconds;
     }
 
     @Override
@@ -68,14 +68,13 @@ public class LogfileLogger implements Logger, Runnable{
     public void run() {
         while (true) {
             try {
-                Thread.sleep( milisecondsBetweenLog );
-            } catch (InterruptedException e) {
-            }
+                Thread.sleep(millisecondsBetweenLog);
+            } catch (InterruptedException e) {}
             if (!isFileCrated) {
                 fileLocation = createDefaultDebugFile( logLocation );
                 isFileCrated = true;
             }
-            FileWriter.writeToFile( fileLocation, textToPrint );
+            FileWriter.appendToFile(fileLocation, textToPrint);
             textToPrint = "";
         }
     }

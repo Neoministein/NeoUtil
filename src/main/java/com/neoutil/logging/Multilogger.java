@@ -13,11 +13,11 @@ public class Multilogger implements Logging {
     private String stringToLog = "";
     private LevelToString levelToString = Logging.defaultToString;
 
-    private static Multilogger instance = new Multilogger();
-    private List<Logger> loggers = new ArrayList<>();
+    private final static Multilogger instance = new Multilogger();
+    private final List<Logger> loggers = new ArrayList<>();
 
     private Multilogger() {
-        addLogger(new LogfileLogger(LogfileLogger.BASELOCATION,Integer.MAX_VALUE,LogfileLogger.DEFAULT_SECONDS_BETWEEN_LOG));
+        addLogger(new LogfileLogger(LogfileLogger.BASE_LOCATION,Integer.MAX_VALUE,LogfileLogger.DEFAULT_SECONDS_BETWEEN_LOG));
     }
     public static Multilogger getInstance() {
         return  instance;
