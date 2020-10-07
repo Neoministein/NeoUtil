@@ -19,20 +19,25 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46852e55-1932-40c3-96d8-76b9e7b0752a" name="Default Changelist" comment="-added Multilogger function to print to Specific Level&#10;-added interchangeable level to String function">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/property/PropertyReader.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/property/PropertyWriter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_28_08_2020_09_01_[Default_Changelist]/FileReader.class" beforeDir="false" />
+    <list default="true" id="46852e55-1932-40c3-96d8-76b9e7b0752a" name="Default Changelist" comment="-added new version to Pom">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/ResourceGatherer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_28_08_2020_09_01_[Default_Changelist]/shelved.patch" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_28_08_2020_09_01__Default_Changelist_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileReader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/FileWriter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/json/JSONReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/json/JSONReader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/file/property/PropertyWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/file/property/PropertyWriter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/LevelToString.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/LevelToString.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Logging.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Logging.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/Multilogger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/logger/LogfileLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/neoutil/logging/logger/LogfileLogger.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/file/FileReader.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/file/FileReader.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/file/FileWriter.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/file/FileWriter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/json/JSONReader.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Logging.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Logging.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Multilogger.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/logging/Multilogger.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/neoutil/logging/logger/LogfileLogger.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/neoutil/logging/logger/LogfileLogger.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/neoutil-1.0.9.jar" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -62,7 +67,7 @@
     <property name="TERMINAL_CUSTOM_COMMANDS_GOT_IT" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../TextBased" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../SCDC/repos/WM6_Trunk/wm6-components/wm6-all-components" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.15" />
@@ -100,7 +105,12 @@
       <workItem from="1596111811224" duration="9235000" />
       <workItem from="1597409980626" duration="1153000" />
       <workItem from="1598795778310" duration="13000" />
-      <workItem from="1599489083400" duration="10390000" />
+      <workItem from="1599489083400" duration="15639000" />
+      <workItem from="1600412299159" duration="3781000" />
+      <workItem from="1600695745340" duration="2200000" />
+      <workItem from="1601538117745" duration="1399000" />
+      <workItem from="1601826956225" duration="115000" />
+      <workItem from="1601899016426" duration="1734000" />
     </task>
     <task id="LOCAL-00001" summary="-removed old project specific code">
       <created>1589535185913</created>
@@ -158,7 +168,35 @@
       <option name="project" value="LOCAL" />
       <updated>1596120080809</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="-reworked reader and writer">
+      <created>1599722611726</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1599722611726</updated>
+    </task>
+    <task id="LOCAL-00010" summary="-add Property reader and writer">
+      <created>1599722661419</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1599722661419</updated>
+    </task>
+    <task id="LOCAL-00011" summary="-worked on neoutil">
+      <created>1599722739225</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1599722739225</updated>
+    </task>
+    <task id="LOCAL-00012" summary="-added new version to Pom">
+      <created>1599722771861</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1599722771861</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -192,7 +230,11 @@
     <MESSAGE value="-working on performance" />
     <MESSAGE value="-added new reader to FileReader" />
     <MESSAGE value="-added Multilogger function to print to Specific Level&#10;-added interchangeable level to String function" />
-    <option name="LAST_COMMIT_MESSAGE" value="-added Multilogger function to print to Specific Level&#10;-added interchangeable level to String function" />
+    <MESSAGE value="-reworked reader and writer" />
+    <MESSAGE value="-add Property reader and writer" />
+    <MESSAGE value="-worked on neoutil" />
+    <MESSAGE value="-added new version to Pom" />
+    <option name="LAST_COMMIT_MESSAGE" value="-added new version to Pom" />
   </component>
   <component name="WindowStateProjectService">
     <state x="474" y="255" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog" timestamp="1593760522472">
@@ -212,19 +254,20 @@
     </state>
     <state x="-987" y="323" key="CommitChangelistDialog2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1597412444622" />
     <state x="-2907" y="419" key="CommitChangelistDialog2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-3840.290.1920.1040" timestamp="1595344034134" />
-    <state x="-1180" y="470" key="FileChooserDialogImpl" timestamp="1595233274362">
-      <screen x="-1920" y="179" width="1920" height="1160" />
+    <state x="555" y="193" key="FileChooserDialogImpl" timestamp="1601827067933">
+      <screen x="0" y="0" width="1440" height="770" />
     </state>
     <state x="-1180" y="470" key="FileChooserDialogImpl/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1595233274362" />
     <state x="555" y="193" key="FileChooserDialogImpl/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@0.0.1440.770" timestamp="1593761441938" />
-    <state x="330" y="0" key="SettingsEditor" timestamp="1593761529681">
+    <state x="555" y="193" key="FileChooserDialogImpl/0.0.1440.770@0.0.1440.770" timestamp="1601827067933" />
+    <state x="330" y="0" key="SettingsEditor" timestamp="1600698659438">
       <screen x="0" y="0" width="1440" height="770" />
     </state>
-    <state x="330" y="0" key="SettingsEditor/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@0.0.1440.770" timestamp="1593761529681" />
-    <state x="-1266" y="537" key="Vcs.Push.Dialog.v2" timestamp="1598623994915">
+    <state x="330" y="0" key="SettingsEditor/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@0.0.1440.770" timestamp="1600698659438" />
+    <state x="-1266" y="537" key="Vcs.Push.Dialog.v2" timestamp="1599722780003">
       <screen x="-1920" y="179" width="1920" height="1160" />
     </state>
-    <state x="-1266" y="537" key="Vcs.Push.Dialog.v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1598623994915" />
+    <state x="-1266" y="537" key="Vcs.Push.Dialog.v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1599722780003" />
     <state x="-3186" y="611" key="Vcs.Push.Dialog.v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-3840.290.1920.1040" timestamp="1595344042569" />
     <state x="577" y="321" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1599505238917">
       <screen x="0" y="0" width="1440" height="770" />
@@ -232,5 +275,9 @@
     <state x="-1151" y="663" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-1920.179.1920.1160" timestamp="1599489598284" />
     <state x="-3071" y="724" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.770/-3840.290.1920.1040/-1920.179.1920.1160@-3840.290.1920.1040" timestamp="1595343917509" />
     <state x="577" y="321" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.770@0.0.1440.770" timestamp="1599505238917" />
+    <state x="145" y="46" key="new project wizard" timestamp="1600170161919">
+      <screen x="0" y="0" width="1440" height="770" />
+    </state>
+    <state x="145" y="46" key="new project wizard/0.0.1440.770@0.0.1440.770" timestamp="1600170161919" />
   </component>
 </project>

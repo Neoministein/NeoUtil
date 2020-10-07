@@ -103,7 +103,7 @@ public class Multilogger implements Logging {
     private String generatePreText(int loggingLevel){
         return "["+new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(
                 new Timestamp(System.currentTimeMillis()))+"]" +
-                levelToString.run(loggingLevel)+
+                levelToString.levelToString(loggingLevel)+
                 stringToLog;
     }
 

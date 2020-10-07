@@ -8,20 +8,41 @@ public interface Logging {
     int INFO  = 3;
     int DEBUG = 4;
 
-    LevelToString defaultToString = loggingLevel -> {
-        switch (loggingLevel) {
-            case FATAL:
-                return "[FATAL]";
-            case ERROR:
-                return "[ERROR]";
-            case WARN:
-                return "[WARN]";
-            case INFO:
-                return "[INFO]";
-            case DEBUG:
-                return "[DEBUG]";
-            default:
-                return "[Level:" + loggingLevel + "]";
+    LevelToString defaultToString = new LevelToString() {
+        @Override
+        public String levelToString(int loggingLevel) {
+            switch (loggingLevel) {
+                case FATAL:
+                    return "[FATAL]";
+                case ERROR:
+                    return "[ERROR]";
+                case WARN:
+                    return "[WARN]";
+                case INFO:
+                    return "[INFO]";
+                case DEBUG:
+                    return "[DEBUG]";
+                default:
+                    return "[Level:" + loggingLevel + "]";
+            }
+        }
+
+        @Override
+        public int stringToLevel(String loggingLevel) {
+            switch (loggingLevel) {
+                case "[FATAL]":
+                    return FATAL;
+                case  "[ERROR]":
+                    return ERROR;
+                case "[WARN]":
+                    return WARN;
+                case "[INFO]":
+                    return INFO;
+                case "[DEBUG]":
+                    return DEBUG;
+                default:
+                    return 0;
+            }
         }
     };
 
@@ -47,7 +68,7 @@ public interface Logging {
         String stackTrace = ("\n"+exception.getStackTrace()[0].getClassName()+": "+exception.getMessage());
         for(StackTraceElement stackTraceElement: exception.getStackTrace()) {
 
-            stackTrace +=("\n"+"at "+stackTraceElement.getClassName()+
+            stackTrace +=("\n"+"    at "+stackTraceElement.getClassName()+
                     "."+stackTraceElement.getMethodName()+
                     "("+stackTraceElement.getMethodName()+
                     "."+stackTraceElement.getLineNumber()+")");

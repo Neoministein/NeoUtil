@@ -9,10 +9,11 @@ import java.util.Properties;
 public class PropertyWriter extends FileWriter {
 
     public static void writePropertyFile(Properties prop,String location){
-        prop.putAll(PropertyReader.readPropertyFile(location));
+        Properties properties = PropertyReader.readPropertyFile(location);
+        properties.putAll(prop);
         try {
             Writer writer = getWriter(location, false);
-            prop.store(writer, null);
+            properties.store(writer, null);
             writer.close();
         } catch (IOException ex) {
             fileNotFound(location, ex);

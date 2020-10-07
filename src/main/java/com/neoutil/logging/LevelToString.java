@@ -2,5 +2,7 @@ package com.neoutil.logging;
 
 public interface LevelToString {
 
-    String run(int loggingLevel);
+    String levelToString(int loggingLevel);
+
+    int stringToLevel(String loggingLevel);
 }
