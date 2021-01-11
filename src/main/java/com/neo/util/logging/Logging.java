@@ -55,28 +55,27 @@ public interface Logging {
 
     void println(int loggingLevel, String text, Exception exception);
 
-    void print(int loggingLevel, String text);
+    void println(int loggingLevel, String text, boolean noIO);
 
-    void printlnNoIO(int loggingLevel, String text);
+    void println(int loggingLevel, String text, Exception exception, boolean noIO);
 
-    void printlnNoIO(int loggingLevel, String text, Exception exception);
-
-    void printNoIO(int loggingLevel,String text);
-
-    void printlnToLevel(int loggingLevel, String text);
-
-    void printlnToLevel(int loggingLevel, String text, Exception exception);
-
-    void printToLevel(int loggingLevel, String text);
-
-    static String stackTraceToString(Exception exception) {
-        String stackTrace = ("\n"+exception.getStackTrace()[0].getClassName()+": "+exception.getMessage());
+    static StringBuilder stackTraceToString(Exception exception) {
+        StringBuilder stackTrace = new StringBuilder();
+        stackTrace.append("\n")
+                .append(exception.getStackTrace()[0].getClassName())
+                .append(": ")
+                .append(exception.getMessage());
         for(StackTraceElement stackTraceElement: exception.getStackTrace()) {
 
-            stackTrace +=("\n"+"    at "+stackTraceElement.getClassName()+
-                    "."+stackTraceElement.getMethodName()+
-                    "("+stackTraceElement.getMethodName()+
-                    "."+stackTraceElement.getLineNumber()+")");
+            stackTrace.append("\n" + "    at ")
+                    .append(stackTraceElement.getClassName())
+                    .append(".")
+                    .append(stackTraceElement.getMethodName())
+                    .append("(")
+                    .append(stackTraceElement.getMethodName())
+                    .append(".")
+                    .append(stackTraceElement.getLineNumber())
+                    .append(")");
 
         }
         return stackTrace;

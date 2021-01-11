@@ -10,12 +10,10 @@ public class RNG {
 
     private static long seed;
 
-    private static Random random = null;
-    private final static Logging LOGGING = Multilogger.getInstance();
+    private static final Logging LOGGING = Multilogger.getInstance();
+    private static Random random = setRandomSeed();
 
-    private RNG(){
-        setRandomSeed();
-    }
+    private RNG(){}
 
     /**
      * Resets random with the given seed.
@@ -31,10 +29,11 @@ public class RNG {
     /*
      * Resets random with a random seed.
      */
-    public static void setRandomSeed(){
+    public static Random setRandomSeed(){
         if(random == null) {
             setRandomSeed(new Random().nextLong());
         }
+        return random;
     }
 
     /**
@@ -91,6 +90,15 @@ public class RNG {
         } else {
             return max;
         }
+    }
+
+    /**
+     * Returns a random float between min and max
+     *
+     * @return      a random float
+     */
+    public static float getRandomFloat(){
+        return getRandomFloat(Float.MAX_VALUE,Float.MIN_VALUE);
     }
 
     /**

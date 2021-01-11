@@ -5,6 +5,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JSONReader {
+
+    private JSONReader(){}
+
     public static JSONArray readToJSONArray(String location) {
         return new JSONArray(FileReader.readFileToString(location));
     }

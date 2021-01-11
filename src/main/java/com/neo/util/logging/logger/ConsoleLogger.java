@@ -9,8 +9,8 @@ public class ConsoleLogger implements Logger {
     }
 
     @Override
-    public void print(String text) {
-        System.out.print(text);
+    public void print(StringBuilder text) {
+        System.out.print(text.toString());
     }
 
     @Override
@@ -24,7 +24,7 @@ public class ConsoleLogger implements Logger {
     }
 
     @Override
-    public String getLoglocation() {
+    public String getLogLocation() {
         return "Console";
     }
 }

@@ -1,98 +1,77 @@
 package com.neo.util.logging;
 
-import com.neo.util.logging.logger.LogfileLogger;
 import com.neo.util.logging.logger.Logger;
 
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class Multilogger implements Logging {
+public class Multilogger implements Logging{
 
-    private String stringToLog = "";
+    private static final int START_OF_STRING = 0;
+    private static final String SIMPLE_DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
+    private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat(SIMPLE_DATE_FORMAT);
+
     private LevelToString levelToString = Logging.defaultToString;
 
-    private final static Multilogger instance = new Multilogger();
+    private static final Multilogger instance = new Multilogger();
     private final List<Logger> loggers = new ArrayList<>();
 
-    private Multilogger() {
-        addLogger(new LogfileLogger(LogfileLogger.BASE_LOCATION,Integer.MAX_VALUE,LogfileLogger.DEFAULT_SECONDS_BETWEEN_LOG));
-    }
+    private Multilogger() {}
+
     public static Multilogger getInstance() {
         return  instance;
     }
 
     @Override
     public void println(int loggingLevel, String text){
-        print(loggingLevel,text + "\n");
+        log(loggingLevel, new StringBuilder(text)
+                .append(System.lineSeparator()));
     }
 
     @Override
     public void println(int loggingLevel, String text, Exception exception){
-        print(loggingLevel,text + Logging.stackTraceToString(exception) + "\n");
-    }
+        log(loggingLevel, new StringBuilder(text)
+                .append(Logging.stackTraceToString(exception))
+                .append(System.lineSeparator()));
+     }
 
     @Override
-    public void print(int loggingLevel,String text){
-        if(hasNewLine(text)){
-            log(loggingLevel);
-            resetLoggingText();
+    public void println(int loggingLevel, String text, boolean noIO) {
+        StringBuilder toPrint = new StringBuilder(text)
+                .append(System.lineSeparator());
+
+        if (noIO) {
+            logNoIO(loggingLevel, toPrint);
+        } else {
+            log(loggingLevel, toPrint);
         }
     }
 
     @Override
-    public void printlnNoIO(int loggingLevel, String text) {
-        printNoIO(loggingLevel,text+"\n");
+    public void println(int loggingLevel, String text, Exception exception, boolean noIO) {
+        StringBuilder toPrint = new StringBuilder(text)
+                .append(Logging.stackTraceToString(exception))
+                .append(System.lineSeparator());
+
+        if(noIO){
+            logNoIO(loggingLevel, toPrint);
+        } else {
+            log(loggingLevel, toPrint);
+        }
     }
 
-    @Override
-    public void printlnNoIO(int loggingLevel, String text, Exception exception) {
-        printNoIO(loggingLevel,text+Logging.stackTraceToString(exception) + "\n");
-    }
+    private void logNoIO(int loggingLevel, StringBuilder textToPrint) {
+        textToPrint.insert(START_OF_STRING, generatePreText(loggingLevel));
 
-    @Override
-    public void printNoIO(int loggingLevel,String text) {
         for (Logger logger : loggers) {
-            if (!logger.isIOLogger()) {
-                if (loggingLevel <= logger.getLoglevel()) {
-                    logger.print(text);
-                }
+            if (!logger.isIOLogger() && loggingLevel <= logger.getLoglevel()) {
+                logger.print(textToPrint);
             }
         }
     }
 
-    @Override
-    public void printlnToLevel(int loggingLevel, String text) {
-        printToLevel(loggingLevel,text + "\n");
-    }
-
-    @Override
-    public void printlnToLevel(int loggingLevel, String text, Exception exception) {
-        printToLevel(loggingLevel,text + Logging.stackTraceToString(exception) + "\n");
-    }
-
-    @Override
-    public void printToLevel(int loggingLevel, String text) {
-        for (Logger logger : loggers){
-            if (loggingLevel == logger.getLoglevel()){
-                logger.print(text);
-            }
-        }
-    }
-
-    private boolean hasNewLine(String textToPrint) {
-        stringToLog += textToPrint;
-        return stringToLog.contains("\n") || stringToLog.contains("\r");
-    }
-
-    private void resetLoggingText(){
-        stringToLog = "";
-    }
-
-    private void log(int loggingLevel){
-        String textToPrint = generatePreText(loggingLevel);
-
+    private void log(int loggingLevel, StringBuilder textToPrint){
+        textToPrint.insert(START_OF_STRING, generatePreText(loggingLevel));
         for (Logger logger : loggers){
             if (loggingLevel <= logger.getLoglevel()){
                 logger.print(textToPrint);
@@ -100,16 +79,17 @@ public class Multilogger implements Logging {
         }
     }
 
-    private String generatePreText(int loggingLevel){
-        return "[" + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(
-                new Timestamp(System.currentTimeMillis())) + "]" +
-                levelToString.levelToString(loggingLevel) +
-                stringToLog;
+    private StringBuilder generatePreText(int loggingLevel){
+        return new StringBuilder()
+                .append("[")
+                .append(dateTimeFormat.format(new Date()))
+                .append("]")
+                .append(levelToString.levelToString(loggingLevel));
     }
 
     public void addLogger(Logger logger){
         loggers.add(logger);
-        println(Multilogger.DEBUG,"new Log location at ["+logger.getLoglocation()+"]");
+        println(Logging.DEBUG,"new Log location at ["+logger.getLogLocation()+"]");
     }
 
     public void setLevelToString(LevelToString levelToString) {

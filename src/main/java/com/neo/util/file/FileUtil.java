@@ -4,11 +4,15 @@ import com.neo.util.logging.Logging;
 import com.neo.util.logging.Multilogger;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
 public class FileUtil {
+
+    private FileUtil() {}
 
     public static List<File> folderContent(String location) {
         List<File> names = new ArrayList<>();
@@ -19,7 +23,7 @@ public class FileUtil {
             names.addAll(Arrays.asList(folderContent));
 
         }catch (Exception e) {
-            Multilogger.getInstance().println(Multilogger.WARN, "There was a problem trying to find the Files");
+            Multilogger.getInstance().println(Logging.WARN, "There was a problem trying to find the Files");
         }
         return names;
     }
@@ -41,7 +45,7 @@ public class FileUtil {
        return null;
     }
 
-    public static String findLastModifiedFile(String location) throws Exception {
+    public static String findLastModifiedFile(String location) throws IOException {
         Logging logging = Multilogger.getInstance();
 
         logging.println(Logging.DEBUG, "Looking for newest File directory [" + location + "]");
@@ -58,15 +62,27 @@ public class FileUtil {
                 if (mostRecentFileOrFolder.isPresent()) {
                     mostRecent = mostRecentFileOrFolder.get();
                 }
-                logging.println(Multilogger.DEBUG, "Found directory/file [" + mostRecent.getAbsolutePath() + "]");
+                logging.println(Logging.DEBUG, "Found directory/file [" + mostRecent.getAbsolutePath() + "]");
             } while (mostRecent.isDirectory());
-            logging.println(Multilogger.INFO, "Newest file ["+ mostRecent.getAbsolutePath()+"]");
+            logging.println(Logging.INFO, "Newest file ["+ mostRecent.getAbsolutePath()+"]");
 
         }catch (Exception e) {
-            logging.println(Multilogger.ERROR,"There was a Problem trying to find the newest file: ");
-            throw new Exception(e);
+            logging.println(Logging.ERROR,"There was a Problem trying to find the newest file: ");
+            throw new IOException(e);
         }
 
         return mostRecent.getAbsolutePath();
+    }
+
+    public static boolean deleteFile(String location){
+        Logging logging = Multilogger.getInstance();
+        try {
+            Files.delete(Paths.get(location));
+            logging.println(Logging.DEBUG,"Deleted File at ["+location+"]");
+            return true;
+        }catch (IOException e) {
+            logging.println(Logging.WARN,"There is a problem deleting the File at ["+location+"]",e);
+            return false;
+        }
     }
 }

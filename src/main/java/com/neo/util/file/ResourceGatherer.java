@@ -4,6 +4,8 @@ import java.net.URL;
 
 public class ResourceGatherer {
 
+    private ResourceGatherer(){}
+
     public static URL getResourceURL(String fileName) {
         return  ResourceGatherer.class.getClassLoader().getResource(fileName);
     }

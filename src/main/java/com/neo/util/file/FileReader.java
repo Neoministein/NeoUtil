@@ -11,31 +11,31 @@ import java.util.List;
 
 public class FileReader {
 
+    private FileReader() {}
+
     /**
      * Returns a io.FileReader which you need to close after you are finished!
      *
      * @param location  location which the reader leads to
      * @return          io.FileReader
      */
-    protected static java.io.FileReader getReader(String location) throws FileNotFoundException {
+    public static java.io.FileReader getReader(String location) throws FileNotFoundException {
         return new java.io.FileReader(location);
     }
 
-    protected static void fileNotfound(String location) {
+    public static void fileNotfound(String location) {
         Multilogger.getInstance().println(Logging.ERROR,"Cannot create a FileReader at ["+ location +"]");
     }
 
     public static List<String> readFileToList(String location){
         List<String> lines = new ArrayList<>();
-        try {
-            BufferedReader bufferedReader = new BufferedReader(getReader(location));
+        try (BufferedReader bufferedReader = new BufferedReader(getReader(location))) {
             String line;
 
             while ((line = bufferedReader.readLine()) != null) {
                 lines.add(line);
             }
 
-            bufferedReader.close();
         }catch (IOException ex) {
             fileNotfound(location);
         }
@@ -49,14 +49,12 @@ public class FileReader {
     public static String readFileToString (String location) {
         StringBuilder buffer = new StringBuilder();
 
-        try {
-            BufferedReader br = new BufferedReader(getReader(location));
-
-            String jsonCode;
-            while ((jsonCode = br.readLine()) != null){
-                buffer.append(jsonCode);
+        try (BufferedReader br = new BufferedReader(getReader(location))) {
+            String line;
+            while ((line = br.readLine()) != null){
+                buffer.append(line);
             }
-            br.close();
+
         } catch (IOException exception) {
             fileNotfound(location);
         }
