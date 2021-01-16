@@ -55,4 +55,8 @@ public class BufferedPropertyReader {
     public float getFloat(String key) {
         return (float) getValue(key, float.class);
     }
+
+    public Object get(String key) {
+        return buffer.get(key);
+    }
 }
