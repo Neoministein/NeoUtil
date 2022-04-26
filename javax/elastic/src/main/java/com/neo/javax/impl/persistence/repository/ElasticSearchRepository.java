@@ -281,29 +281,21 @@ public class ElasticSearchRepository implements SearchRepository {
 
         configService.get(ElasticSearchConnectionRepository.ELASTIC_CONFIG);
 
-        Optional<Integer> flushInterval = configService.get("FlushInterval").asInt().asOptional();
-        if (flushInterval.isPresent()) {
-            LOGGER.info("BulkProcessor.Builder FlushInterval: {}", flushInterval.get());
-            builder.setFlushInterval(TimeValue.timeValueSeconds(flushInterval.get()));
-        }
+        int flushInterval = configService.get("FlushInterval").asInt().orElse(10);
+        LOGGER.info("BulkProcessor.Builder FlushInterval: {}", flushInterval);
+        builder.setFlushInterval(TimeValue.timeValueSeconds(flushInterval));
 
-        Optional<Integer> bulkAction = configService.get("BulkActions").asInt().asOptional();
-        if (bulkAction.isPresent()) {
-            LOGGER.info("BulkProcessor.Builder BulkActions: {}", bulkAction.get());
-            builder.setBulkActions(bulkAction.get());
-        }
+        int bulkAction = configService.get("BulkActions").asInt().orElse(2500);
+        LOGGER.info("BulkProcessor.Builder BulkActions: {}", bulkAction);
+        builder.setBulkActions(bulkAction);
 
-        Optional<Integer> concurrentRequests = configService.get("ConcurrentRequests").asInt().asOptional();
-        if (concurrentRequests.isPresent()) {
-            LOGGER.info("BulkProcessor.Builder ConcurrentRequests: {}", concurrentRequests.get());
-            builder.setConcurrentRequests(concurrentRequests.get());
-        }
+        int concurrentRequests = configService.get("ConcurrentRequests").asInt().orElse(3);
+        LOGGER.info("BulkProcessor.Builder ConcurrentRequests: {}", concurrentRequests);
+        builder.setConcurrentRequests(concurrentRequests);
 
-        Optional<Integer> bulkSize = configService.get("BulkSize").asInt().asOptional();
-        if (bulkSize.isPresent()) {
-            LOGGER.info("BulkProcessor.Builder BulkSize: {}", bulkSize.get());
-            builder.setBulkSize(new ByteSizeValue(bulkSize.get(), ByteSizeUnit.MB));
-        }
+        int bulkSize = configService.get("BulkSize").asInt().orElse(10);
+        LOGGER.info("BulkProcessor.Builder BulkSize: {}", bulkSize);
+        builder.setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.MB));
 
         return builder;
     }
