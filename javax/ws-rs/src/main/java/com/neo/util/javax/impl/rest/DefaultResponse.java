@@ -9,40 +9,40 @@ public class DefaultResponse {
 
     private DefaultResponse() {}
 
-    public static JSONObject defaultResponse(int code, String context) {
+    public static JSONObject defaultResponse(int code, RequestContext context) {
         JSONObject responseMessage = new JSONObject();
         responseMessage.put("status", code);
         responseMessage.put("apiVersion", "1.0");
-        responseMessage.put("context", context);
+        responseMessage.put("context", context.toString());
         return responseMessage;
     }
 
-    public static Response partialSuccess(int code, JSONObject error ,JSONArray data, String context) {
+    public static Response partialSuccess(int code, JSONObject error ,JSONArray data, RequestContext context) {
         JSONObject response = DefaultResponse.defaultResponse(code, context);
         response.put("data", data);
         response.put("error", error);
         return Response.ok().entity(response).build();
     }
 
-    public static Response success(String context) {
+    public static Response success(RequestContext context) {
         return Response.ok().entity(defaultResponse(200, context).toString()).build();
     }
 
-    public static Response success(String context ,JSONArray data) {
+    public static Response success(RequestContext context ,JSONArray data) {
         JSONObject responseMessage = defaultResponse(200 ,context);
         responseMessage.put("data", data);
 
         return Response.ok().entity(responseMessage.toString()).build();
     }
 
-    public static Response error(int code, String context, String errorCode, String message) {
+    public static Response error(int code, RequestContext context, String errorCode, String message) {
         JSONObject response = defaultResponse(code, context);
         response.put("error", errorObject(errorCode, message));
 
         return Response.ok().entity(response.toString()).build();
     }
 
-    public static Response error(int code, JSONObject error, String context) {
+    public static Response error(int code, JSONObject error, RequestContext context) {
         JSONObject response = defaultResponse(code, context);
         response.put("error", error);
 

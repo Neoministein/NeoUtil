@@ -1,5 +1,6 @@
 package com.neo.javax.api.connection;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface RequestDetails {
@@ -19,11 +20,11 @@ public interface RequestDetails {
     String getRequestId();
 
     /**
-     * Returns the current user's UUID or null
+     * Returns the current user's as an Optional UUID
      *
      * @return the current uuid
      */
-    UUID getUUId();
+    Optional<UUID> getUUId();
 
     /**
      * Checks if the current user has the role

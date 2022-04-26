@@ -173,32 +173,32 @@ public class ElasticSearchRepository implements SearchRepository {
 
     @Override
     public void update(Searchable searchable, boolean partial, IndexParameter indexParameter) {
-        throw new RuntimeException("Not implemented yet");
+        throw new InternalLogicException("Not implemented yet");
     }
 
     @Override
     public void update(List<? extends Searchable> searchableList, boolean partial) {
-        throw new RuntimeException("Not implemented yet");
+        throw new InternalLogicException("Not implemented yet");
     }
 
     @Override
     public void delete(Searchable searchable) {
-        throw new RuntimeException("Not implemented yet");
+        throw new InternalLogicException("Not implemented yet");
     }
 
     @Override
     public void delete(List<? extends Searchable> searchableList) {
-        throw new RuntimeException("Not implemented yet");
+        throw new InternalLogicException("Not implemented yet");
     }
 
     @Override
     public void deleteAll(Class<? extends Searchable> searchableClazz) {
-        throw new RuntimeException("Not implemented yet");
+        throw new InternalLogicException("Not implemented yet");
     }
 
     @Override
     public SearchResult fetch(String index, SearchParameters parameters) {
-        throw new RuntimeException("Not implemented yet");
+        throw new InternalLogicException("Not implemented yet");
     }
 
     protected void addToBulkProcessor(DocWriteRequest<?> request) {
@@ -222,7 +222,7 @@ public class ElasticSearchRepository implements SearchRepository {
             throw new InternalLogicException("Error while parsing searchable to json: BusinessId key cannot be null");
         }
         try {
-            ObjectNode objectNode = searchable.getJson();
+            ObjectNode objectNode = searchable.getJsonNode();
             objectNode.put(Searchable.BUSINESS_ID, searchable.getBusinessId());
             objectNode.put(Searchable.TYPE, searchable.getClassName());
             return objectNode;

@@ -11,9 +11,9 @@ import javax.persistence.*;
 @Cacheable(value = false)
 public class EntityAuditTrail extends AbstractDataBaseEntity implements DataBaseEntity {
 
-    public static final String TABLE_NAME = "AuditTrail";
+    public static final String TABLE_NAME = "audit_trail";
 
-    public static final String C_OBJECT_KEY = "cobject_key";
+    public static final String C_OBJECT_KEY = "object_key";
     public static final String C_CLASS_TYPE = "class_type";
     public static final String C_OPERATION = "operation";
 
@@ -28,6 +28,7 @@ public class EntityAuditTrail extends AbstractDataBaseEntity implements DataBase
     @Column(name = C_CLASS_TYPE)
     private String classType;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = C_OPERATION)
     private PersistenceOperation operation;
 

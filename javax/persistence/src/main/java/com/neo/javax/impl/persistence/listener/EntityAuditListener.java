@@ -18,7 +18,7 @@ public class EntityAuditListener {
     protected static final Logger LOGGER = LoggerFactory.getLogger(EntityAuditListener.class);
 
     @Inject
-    EntityRepository<EntityAuditTrail> auditTrailEntityRepository;
+    EntityRepository entityRepository;
 
     @PrePersist
     public void prePersist(AbstractDataBaseEntity entity) {
@@ -43,9 +43,10 @@ public class EntityAuditListener {
             auditTrail.setOperation(operation);
             auditTrail.setClassType(entity.getClass().getSimpleName());
             auditTrail.setObjectKey(entity.getPrimaryKey().toString());
-            auditTrailEntityRepository.create(auditTrail);
+            entityRepository.create(auditTrail);
         } catch (RollbackException ex) {
-            LOGGER.error("Unable to persist audit trail for" + entity.getClass().getSimpleName() + ":" + entity.getPrimaryKey(), ex);
+            String entityIdentifier = entity.getClass().getSimpleName() + ":" + entity.getPrimaryKey();
+            LOGGER.error("Unable to persist audit trail for {}", entityIdentifier, ex);
         }
     }
 

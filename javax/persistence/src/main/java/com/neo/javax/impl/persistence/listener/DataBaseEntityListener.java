@@ -7,35 +7,44 @@ import javax.inject.Inject;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 public class DataBaseEntityListener {
-
-    protected static final String SYSTEM_INTERNAL = "internal";
 
     @Inject
     RequestDetails requestDetails;
 
     @PrePersist
     protected void prePersist(AbstractDataBaseEntity entity) {
-        UUID uuid = requestDetails.getUUId();
-        if (uuid != null) {
-            entity.setCreatedBy(uuid.toString());
+        Optional<UUID> uuid = requestDetails.getUUId();
+        if (uuid.isPresent()) {
+            setPersistData(entity,uuid.toString());
+            setUpdateData(entity, uuid.toString());
         } else {
-            entity.setCreatedBy(SYSTEM_INTERNAL);
+            setPersistData(entity, requestDetails.getRemoteAddress());
+            setUpdateData(entity, requestDetails.getRemoteAddress());
         }
-        entity.setCreatedOn(new Date());
     }
 
     @PreUpdate
     protected void preUpdate(AbstractDataBaseEntity entity) {
-        UUID uuid = requestDetails.getUUId();
-        if (uuid != null) {
-            entity.setUpdatedBy(uuid.toString());
+        Optional<UUID> uuid = requestDetails.getUUId();
+        if (uuid.isPresent()) {
+            setUpdateData(entity, uuid.get().toString());
         } else {
-            entity.setUpdatedBy(SYSTEM_INTERNAL);
+            setUpdateData(entity, requestDetails.getRequestId());
         }
+    }
+
+    protected void setPersistData(AbstractDataBaseEntity entity, String by) {
+        entity.setCreatedBy(by);
+        entity.setCreatedOn(new Date());
+    }
+
+    protected void setUpdateData(AbstractDataBaseEntity entity, String by) {
+        entity.setTransactionCount(entity.getTransactionCount()+1);
+        entity.setUpdatedBy(by);
         entity.setUpdatedOn(new Date());
-        entity.setTransactionCount(entity.getTransactionCount() + 1);
     }
 }

@@ -26,7 +26,7 @@ public interface Searchable {
      *
      * @return the index name in which the searchable should be stored
      */
-    String getSearchableIndexName();
+    String getIndexName();
 
     /**
      * The simple class name of the Searchable
@@ -40,18 +40,19 @@ public interface Searchable {
      *
      * @return the index period
      */
-    IndexPeriod getIndexperiod();
+    IndexPeriod getIndexPeriod();
 
     /**
+     * The creation date
      *
-     * @return
+     * @return the creation date
      */
-    Date getSearchableDate();
+    Date getCreationDate();
 
     /**
      * The Object in json format
      *
      * @return the Object in json format
      */
-    ObjectNode getJson();
+    ObjectNode getJsonNode();
 }

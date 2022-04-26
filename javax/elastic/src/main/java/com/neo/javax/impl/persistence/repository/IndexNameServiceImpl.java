@@ -66,12 +66,12 @@ public class IndexNameServiceImpl implements IndexNameingService {
         Config config = configService.get(ElasticSearchConnectionRepository.ELASTIC_CONFIG);
 
         mappingVersion = config.get(MAPPING_VERSION_CONFIG).asString().orElse(DEFAULT_MAPPING_VERSION);
-        String projectId = config.get(PROJECT_ID_CONFIG).asString().orElse(StringUtils.EMPTY);
+        String id = config.get(PROJECT_ID_CONFIG).asString().orElse(StringUtils.EMPTY);
 
-        if (!StringUtils.isEmpty(projectId)) {
-            projectId = INDEX_SEPARATOR + projectId.toLowerCase();
+        if (!StringUtils.isEmpty(id)) {
+            id = INDEX_SEPARATOR + id.toLowerCase();
         }
-        this.projectId = projectId;
+        this.projectId = id;
     }
 
     /**
@@ -85,7 +85,7 @@ public class IndexNameServiceImpl implements IndexNameingService {
 
         for (Searchable searchable : searchables) {
             indexNamePrefixes.put(searchable.getClass(), getIndexNamePrefix(searchable, false));
-            indexPeriods.put(searchable.getClass(), searchable.getIndexperiod());
+            indexPeriods.put(searchable.getClass(), searchable.getIndexPeriod());
         }
     }
 
@@ -94,9 +94,9 @@ public class IndexNameServiceImpl implements IndexNameingService {
 
         sb.append(getIndexNamePrefix(searchable, true));
 
-        if (!IndexPeriod.EXTERNAL.equals(searchable.getIndexperiod())) {
+        if (!IndexPeriod.EXTERNAL.equals(searchable.getIndexPeriod())) {
 
-            String postfix = getIndexNamePostfix(searchable.getIndexperiod(), searchable);
+            String postfix = getIndexNamePostfix(searchable.getIndexPeriod(), searchable);
             if (!StringUtils.isEmpty(postfix)) {
                 sb.append(INDEX_SEPARATOR).append(postfix);
             }
@@ -111,7 +111,7 @@ public class IndexNameServiceImpl implements IndexNameingService {
      * 1. The getSearchableIndexName method 2. The @SearchableIndex annotation 3. The class name
      */
     protected String getIndexNamePrefix(Searchable searchable, boolean appendProjectIdPart) {
-        return searchable.getSearchableIndexName() + (appendProjectIdPart ? getProjectIdPostfix() : StringUtils.EMPTY);
+        return searchable.getIndexName() + (appendProjectIdPart ? getProjectIdPostfix() : StringUtils.EMPTY);
     }
 
     public String getIndexNamePrefixFromClass(Class<?> searchableClazz, boolean appendProjectIdPart) {
@@ -132,7 +132,7 @@ public class IndexNameServiceImpl implements IndexNameingService {
         }
         DateTimeFormatter formatter = getDateFormatter(indexPeriod);
 
-        return getDateFormatString(new DateTime(searchable.getSearchableDate()), formatter);
+        return getDateFormatString(new DateTime(searchable.getCreationDate()), formatter);
     }
 
     /**

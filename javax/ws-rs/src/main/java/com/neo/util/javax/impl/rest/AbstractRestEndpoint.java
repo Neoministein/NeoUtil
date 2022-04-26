@@ -23,18 +23,18 @@ public abstract class AbstractRestEndpoint {
     @Inject
     protected RequestDetails requestDetails;
 
-    public Response restCall(RestAction restAction, HttpMethod method, String context) {
-        return restCall(restAction, method, context, List.of());
+    public Response restCall(RestAction restAction, RequestContext context) {
+        return restCall(restAction, context, List.of());
     }
 
-    public Response restCall(RestAction restAction, HttpMethod method, String context, List<String> requiredRoles) {
+    public Response restCall(RestAction restAction, RequestContext context, List<String> requiredRoles) {
         MDC.put("traceId", requestDetails.getRequestId());
-        LOGGER.debug("{}", getContext(method, context));
+        LOGGER.debug("{} {}", context, requestDetails.getRemoteAddress());
 
         if (!authorized(requiredRoles)) {
             return DefaultResponse.error(
                     403,
-                    getContext(method, context),
+                    context,
                     E_UNAUTHORIZED,
                     "Unauthorized");
         }
@@ -44,7 +44,7 @@ public abstract class AbstractRestEndpoint {
             LOGGER.debug("Invalid json format in the request body");
             return DefaultResponse.error(
                     400,
-                    getContext(method, context),
+                    context,
                     E_INVALID_JSON,
                     "Invalid json format in the request body"
             );
@@ -52,7 +52,7 @@ public abstract class AbstractRestEndpoint {
             LOGGER.error("A exception occurred during a rest call", ex);
             return DefaultResponse.error(
                     500,
-                    getContext(method, context),
+                    context,
                     E_INTERNAL_LOGIC,
                     "Internal server error please try again later"
             );
@@ -60,7 +60,7 @@ public abstract class AbstractRestEndpoint {
             LOGGER.error("A unexpected exception occurred during a rest call", ex);
             return DefaultResponse.error(
                     500,
-                    getContext(method, context),
+                    context,
                     E_INTERNAL_LOGIC,
                     "Internal server error please try again later"
             );
@@ -78,8 +78,8 @@ public abstract class AbstractRestEndpoint {
 
     protected abstract String getClassURI();
 
-    public String getContext(HttpMethod method, String methodURI) {
-        return method + " " + getClassURI() + methodURI;
+    public RequestContext getContext(HttpMethod method, String methodURI) {
+        return new RequestContext(method, getClassURI(), methodURI);
     }
 
     //Only for testing purposes

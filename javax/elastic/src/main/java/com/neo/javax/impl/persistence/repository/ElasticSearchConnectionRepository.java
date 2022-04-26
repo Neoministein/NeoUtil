@@ -15,6 +15,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
@@ -55,7 +56,8 @@ public class ElasticSearchConnectionRepository implements Serializable {
 
     private final AtomicBoolean connectorInitializationOngoing = new AtomicBoolean(false);
 
-    public void onStartUp(@Observes ApplicationReadyEvent preReadyEvent) {
+    @PostConstruct
+    public void postConstruct() {
         LOGGER.debug("Loading elastic search configuration");
         Config config = configService.get(ELASTIC_CONFIG).get(NODE_CONFIG);
         List<String> nodes = config.asList(String.class).orElse(List.of(DEFAULT_URL));
@@ -63,6 +65,10 @@ public class ElasticSearchConnectionRepository implements Serializable {
         nodeList = nodes;
         LOGGER.debug("Elasticsearch nodes {}", nodes);
         connect();
+    }
+
+    public void onStartUp(@Observes ApplicationReadyEvent preReadyEvent) {
+        LOGGER.debug("Startup event received");
     }
 
     /**
