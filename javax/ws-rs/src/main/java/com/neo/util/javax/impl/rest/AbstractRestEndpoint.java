@@ -1,5 +1,6 @@
 package com.neo.util.javax.impl.rest;
 
+import com.neo.common.impl.exception.InternalJsonException;
 import com.neo.common.impl.exception.InternalLogicException;
 import com.neo.javax.api.connection.RequestDetails;
 import com.neo.util.javax.api.rest.RestAction;
@@ -42,27 +43,16 @@ public abstract class AbstractRestEndpoint {
             return restAction.run();
         } catch (JSONException ex) {
             LOGGER.debug("Invalid json format in the request body");
-            return DefaultResponse.error(
-                    400,
-                    context,
-                    E_INVALID_JSON,
-                    "Invalid json format in the request body"
-            );
+            return DefaultResponse.error(400, context, E_INVALID_JSON, "Invalid json format in the request body");
+        } catch (InternalJsonException ex) {
+            LOGGER.debug("Invalid json format in the request body");
+            return DefaultResponse.error(400, context, E_INVALID_JSON, "Invalid json format in the request body " + ex.getMessage());
         } catch (InternalLogicException ex) {
             LOGGER.error("A exception occurred during a rest call", ex);
-            return DefaultResponse.error(
-                    500,
-                    context,
-                    E_INTERNAL_LOGIC,
-                    "Internal server error please try again later"
-            );
+            return DefaultResponse.error(500, context,E_INTERNAL_LOGIC, "Internal server error please try again later");
         } catch (Exception ex) {
             LOGGER.error("A unexpected exception occurred during a rest call", ex);
-            return DefaultResponse.error(
-                    500,
-                    context,
-                    E_INTERNAL_LOGIC,
-                    "Internal server error please try again later"
+            return DefaultResponse.error(500, context, E_INTERNAL_LOGIC, "Internal server error please try again later"
             );
         }
     }

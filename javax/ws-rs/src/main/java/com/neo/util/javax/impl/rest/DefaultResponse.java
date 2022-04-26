@@ -55,14 +55,14 @@ public class DefaultResponse {
 
     public static JSONObject errorObject(String errorCode, String message) {
         JSONObject errorObject = new JSONObject();
-        errorObject.put("error", errorCode);
+        errorObject.put("code", errorCode);
         errorObject.put("message", message);
         return errorObject;
     }
 
     public static JSONArray errorArray(String errorCode, String message) {
         JSONObject errorObject = new JSONObject();
-        errorObject.put("error", errorCode);
+        errorObject.put("code", errorCode);
         errorObject.put("message", message);
         return new JSONArray().put(errorObject);
     }

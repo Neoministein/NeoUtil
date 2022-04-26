@@ -21,7 +21,6 @@ public class GenericSearchable implements Searchable {
     @JsonIgnore
     private String businessId;
 
-
     @Override
     public String getBusinessId() {
         return businessId;
@@ -57,6 +56,10 @@ public class GenericSearchable implements Searchable {
     @Override
     public Date getCreationDate() {
         return creationDate;
+    }
+
+    protected void setJsonNode(ObjectNode jsonNode) {
+        this.jsonNode = jsonNode;
     }
 
     @Override
