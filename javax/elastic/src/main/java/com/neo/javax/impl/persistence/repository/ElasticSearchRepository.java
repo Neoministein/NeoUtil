@@ -5,7 +5,7 @@ import com.neo.common.impl.enumeration.Synchronization;
 import com.neo.common.impl.exception.InternalLogicException;
 import com.neo.javax.api.config.ConfigService;
 import com.neo.javax.api.event.ElasticSearchConnectionStatusEvent;
-import com.neo.javax.api.persistence.repository.IndexNameingService;
+import com.neo.javax.api.persistence.repository.IndexNamingService;
 import com.neo.javax.api.persitence.IndexParameter;
 import com.neo.javax.api.persitence.SearchParameters;
 import com.neo.javax.api.persitence.SearchResult;
@@ -49,8 +49,7 @@ public class ElasticSearchRepository implements SearchRepository {
     @Inject
     ConfigService configService;
 
-    @Inject
-    IndexNameingService indexNameService;
+    @Inject IndexNamingService indexNameService;
 
     @Inject
     ElasticSearchConnectionRepository connection;

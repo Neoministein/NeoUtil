@@ -5,7 +5,7 @@ import com.neo.javax.api.persitence.entity.Searchable;
 /**
  * This service retrieves the index which shall be used in for the given searchable
  */
-public interface IndexNameingService {
+public interface IndexNamingService {
 
     /**
      * The index name for the searchable
@@ -19,7 +19,13 @@ public interface IndexNameingService {
 
     /**
      * Since multiple project could be housed in the same Cluster it's the project indices are separated
-     * by the defined id
+     * by a prefix. This is used to differentiate between different project.
      */
-    String getProjectIdPostfix();
+    String getIndexPrefix();
+
+    /**
+     * Since multiple project could be housed in the same Cluster it's the project indices are separated
+     * by a postfix. Normally used for a project with multiple location
+     */
+    String getIndexPostfix();
 }

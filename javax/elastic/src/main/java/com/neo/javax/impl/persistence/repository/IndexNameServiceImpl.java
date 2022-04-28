@@ -3,7 +3,7 @@ package com.neo.javax.impl.persistence.repository;
 import com.neo.common.impl.StringUtils;
 import com.neo.javax.api.config.Config;
 import com.neo.javax.api.config.ConfigService;
-import com.neo.javax.api.persistence.repository.IndexNameingService;
+import com.neo.javax.api.persistence.repository.IndexNamingService;
 import com.neo.javax.api.persitence.IndexPeriod;
 import com.neo.javax.api.persitence.entity.Searchable;
 import org.joda.time.DateTime;
@@ -21,14 +21,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ApplicationScoped
-public class IndexNameServiceImpl implements IndexNameingService {
+public class IndexNameServiceImpl implements IndexNamingService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IndexNameServiceImpl.class);
 
     protected static final String INDEX_SEPARATOR = "-";
     protected static final String SEARCH_PROVIDER_NO_DATE_INDEX_POSTFIX = "no-date";
 
-    protected static final String PROJECT_ID_CONFIG = "projectId";
+    protected static final String PROJECT_PREFIX_CONFIG = "prefix";
+    protected static final String PROJECT_POSTFIX_CONFIG = "postfix";
     protected static final String MAPPING_VERSION_CONFIG = "mappingVersion";
 
     protected static final String DEFAULT_MAPPING_VERSION = "v1";
@@ -40,7 +41,8 @@ public class IndexNameServiceImpl implements IndexNameingService {
     protected static final DateTimeFormatter INDEX_DATE_FORMAT_YEAR = DateTimeFormat.forPattern("yyyy");
 
     protected String mappingVersion;
-    protected String projectId;
+    protected String indexPrefix;
+    protected String indexPostFix;
 
     @Inject
     ConfigService configService;
@@ -66,12 +68,19 @@ public class IndexNameServiceImpl implements IndexNameingService {
         Config config = configService.get(ElasticSearchConnectionRepository.ELASTIC_CONFIG);
 
         mappingVersion = config.get(MAPPING_VERSION_CONFIG).asString().orElse(DEFAULT_MAPPING_VERSION);
-        String id = config.get(PROJECT_ID_CONFIG).asString().orElse(StringUtils.EMPTY);
 
-        if (!StringUtils.isEmpty(id)) {
-            id = INDEX_SEPARATOR + id.toLowerCase();
+        String prefix = config.get(PROJECT_PREFIX_CONFIG).asString().orElse(StringUtils.EMPTY);
+
+        if (!StringUtils.isEmpty(prefix)) {
+            prefix = prefix.toLowerCase() + INDEX_SEPARATOR;
         }
-        this.projectId = id;
+        this.indexPrefix = prefix;
+        String postfix = config.get(PROJECT_POSTFIX_CONFIG).asString().orElse(StringUtils.EMPTY);
+
+        if (!StringUtils.isEmpty(postfix)) {
+            postfix = INDEX_SEPARATOR + postfix.toLowerCase();
+        }
+        this.indexPostFix = postfix;
     }
 
     /**
@@ -105,22 +114,23 @@ public class IndexNameServiceImpl implements IndexNameingService {
         return sb.toString();
     }
 
-    /**
-     * Returns the index prefix. The following order is used
-     *
-     * 1. The getSearchableIndexName method 2. The @SearchableIndex annotation 3. The class name
-     */
-    protected String getIndexNamePrefix(Searchable searchable, boolean appendProjectIdPart) {
-        return searchable.getIndexName() + (appendProjectIdPart ? getProjectIdPostfix() : StringUtils.EMPTY);
+    protected String getIndexNamePrefix(Searchable searchable, boolean appendInfix ) {
+        return (appendInfix  ? getIndexPrefix() : StringUtils.EMPTY) + searchable.getIndexName() + (appendInfix  ? getIndexPostfix() : StringUtils.EMPTY);
     }
 
-    public String getIndexNamePrefixFromClass(Class<?> searchableClazz, boolean appendProjectIdPart) {
-        return indexNamePrefixes.get(searchableClazz) + (appendProjectIdPart ? getProjectIdPostfix() : StringUtils.EMPTY);
+    public String getIndexNamePrefixFromClass(Class<?> searchableClazz, boolean appendInfix ) {
+        return (appendInfix  ? getIndexPrefix() : StringUtils.EMPTY) + indexNamePrefixes.get(searchableClazz) + (appendInfix  ? getIndexPostfix() : StringUtils.EMPTY);
+    }
+
+
+    @Override
+    public String getIndexPostfix() {
+        return indexPostFix;
     }
 
     @Override
-    public String getProjectIdPostfix() {
-        return projectId;
+    public String getIndexPrefix() {
+        return indexPrefix;
     }
 
     /**
