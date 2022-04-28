@@ -1,9 +1,12 @@
 package com.neo.util.helidon.impl.authentication;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.common.impl.KeyUtils;
+import com.neo.common.impl.exception.InternalJsonException;
 import com.neo.common.impl.exception.InternalLogicException;
 import com.neo.common.impl.http.LazyHttpCaller;
 import com.neo.common.impl.http.verify.DefaultSuccessResponse;
+import com.neo.common.impl.json.JsonUtil;
 import com.neo.util.helidon.impl.authentication.key.JWTKey;
 import com.neo.util.helidon.impl.authentication.key.JWTPublicKey;
 import io.jsonwebtoken.Claims;
@@ -14,10 +17,6 @@ import io.jsonwebtoken.security.SignatureException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,8 +82,7 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
         boolean hasChanged;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             LOGGER.trace("Calling public key endpoint [{}]", publicKeyEndpoint.getURI());
-            String response = LazyHttpCaller.call(
-                    httpClient, publicKeyEndpoint, new DefaultSuccessResponse(), 5);
+            String response = LazyHttpCaller.call(httpClient, publicKeyEndpoint, new DefaultSuccessResponse(), 5);
 
             Map<String, JWTKey> newMap = parseEndpointResult(response);
             lastUpdate = System.currentTimeMillis();
@@ -107,30 +105,24 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
 
     protected Map<String, JWTKey> parseEndpointResult(String resultString) {
         try {
-            JSONObject result = new JSONObject(new JSONTokener(resultString));
-            int status = result.getInt("status");
-            LOGGER.trace("Repose body status [{}]", status);
-            if (status == 200) {
-                Map<String, JWTKey> newMap = new HashMap<>();
-                JSONArray data = result.getJSONArray("data");
-                for (int i = 0; i < data.length(); i++) {
-                    JSONObject jwtPublicKeyObject = data.getJSONObject(i);
+            JsonNode result = JsonUtil.fromJson(resultString);
+            Map<String, JWTKey> newMap = new HashMap<>();
+            JsonNode data = result.get("data");
+            for (int i = 0; i < data.size(); i++) {
+                JsonNode jwtPublicKeyObject = data.get(i);
 
 
-                    JWTKey jwtPublicKey = new JWTPublicKey(
-                            jwtPublicKeyObject.getString("kid"),
-                            KeyUtils.parseRSAPublicKey(jwtPublicKeyObject.getString("key")),
-                            new Date(jwtPublicKeyObject.getLong("exp"))
-                    );
+                JWTKey jwtPublicKey = new JWTPublicKey(
+                        jwtPublicKeyObject.get("kid").asText(),
+                        KeyUtils.parseRSAPublicKey(jwtPublicKeyObject.get("key").asText()),
+                        new Date(jwtPublicKeyObject.get("exp").asLong())
+                );
 
-                    newMap.put(jwtPublicKey.getId(), jwtPublicKey);
-                }
-                LOGGER.trace("Received public kid {}", newMap.keySet());
-                return newMap;
+                newMap.put(jwtPublicKey.getId(), jwtPublicKey);
             }
-            LOGGER.error("PublicKey Endpoint returned the error [{}] [{}]", status, result.getJSONObject("error").getString("message"));
-            throw new InternalLogicException("PublicKey Endpoint returned the error " + status + " " + result.getString("message"));
-        } catch (JSONException ex) {
+            LOGGER.trace("Received public kid {}", newMap.keySet());
+            return newMap;
+        } catch (InternalJsonException ex) {
             LOGGER.error("Cannot parse json result from PublicKey Endpoint");
             throw new InternalLogicException("Cannot parse json result from PublicKey Endpoint");
         }

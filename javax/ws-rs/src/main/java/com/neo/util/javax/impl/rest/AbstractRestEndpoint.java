@@ -4,7 +4,6 @@ import com.neo.common.impl.exception.InternalJsonException;
 import com.neo.common.impl.exception.InternalLogicException;
 import com.neo.javax.api.connection.RequestDetails;
 import com.neo.util.javax.api.rest.RestAction;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -41,9 +40,6 @@ public abstract class AbstractRestEndpoint {
         }
         try {
             return restAction.run();
-        } catch (JSONException ex) {
-            LOGGER.debug("Invalid json format in the request body");
-            return DefaultResponse.error(400, context, E_INVALID_JSON, "Invalid json format in the request body");
         } catch (InternalJsonException ex) {
             LOGGER.debug("Invalid json format in the request body");
             return DefaultResponse.error(400, context, E_INVALID_JSON, "Invalid json format in the request body " + ex.getMessage());

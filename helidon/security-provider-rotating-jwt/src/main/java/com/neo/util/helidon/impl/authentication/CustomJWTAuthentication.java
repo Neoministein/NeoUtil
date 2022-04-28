@@ -1,8 +1,11 @@
 package com.neo.util.helidon.impl.authentication;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.common.impl.KeyUtils;
 import com.neo.common.impl.StringUtils;
+import com.neo.common.impl.exception.InternalJsonException;
 import com.neo.common.impl.exception.InternalLogicException;
+import com.neo.common.impl.json.JsonUtil;
 import io.helidon.config.Config;
 import io.helidon.security.*;
 import io.helidon.security.spi.AuthenticationProvider;
@@ -11,9 +14,6 @@ import io.helidon.security.spi.ProviderConfig;
 import io.helidon.security.spi.SynchronousProvider;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -203,9 +203,9 @@ public class CustomJWTAuthentication extends SynchronousProvider implements Auth
                 sb.append(line);
             }
 
-            JSONObject jsonObject = new JSONObject(new JSONTokener(sb.toString()));
-            return KeyUtils.parseRSAPrivateKey(jsonObject.getString("private"));
-        } catch (NullPointerException | IOException | JSONException ex) {
+            JsonNode node = JsonUtil.fromJson(sb.toString());
+            return KeyUtils.parseRSAPrivateKey(node.get("private").asText());
+        } catch (NullPointerException | IOException | InternalJsonException ex) {
             LOGGER.error("Unable to retrieve private key from resources");
         }
         throw new InternalLogicException();
