@@ -174,7 +174,7 @@ public class JsonUtil {
      * @param <T> the object type
      * @return
      */
-    public static <T> T toExistingEntity(T pojo, String json, Class<T> clazz, Class<?> serializationScope) {
+    public static <T> T updateExistingEntity(T pojo, String json, Class<T> clazz, Class<?> serializationScope) {
         try {
             return MAPPER.readerForUpdating(pojo).withView(serializationScope).readValue(json, clazz);
         } catch (IOException ex) {

@@ -47,16 +47,16 @@ public class EntityParameters<T extends DataBaseEntity> {
         this(clazz, fields, offset, maxResults, filters, new HashMap<>());
     }
 
-    public EntityParameters(Class<T> clazz,Integer maxResults, List<SearchCriteria> filters) {
+    public EntityParameters(Class<T> clazz, Integer maxResults, List<SearchCriteria> filters) {
         this(clazz,null, 0, maxResults, filters);
     }
 
-    public EntityParameters(Class<T> clazz, Integer maxResults) {
-        this(clazz ,maxResults, new ArrayList<>());
+    public EntityParameters(Class<T> clazz, List<SearchCriteria> filters) {
+        this(clazz,0, filters);
     }
 
     public EntityParameters(Class<T> clazz) {
-        this(clazz,null);
+        this(clazz,new ArrayList<>());
     }
 
     public Class<T> getEntityClass() {
