@@ -1,5 +1,6 @@
 package com.neo.util.javax.impl.rest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.common.impl.json.JsonUtil;
@@ -18,7 +19,7 @@ public class DefaultResponse {
         return responseMessage;
     }
 
-    public static Response partialSuccess(int code, ObjectNode error, ArrayNode data, RequestContext context) {
+    public static Response partialSuccess(int code, ObjectNode error, JsonNode data, RequestContext context) {
         ObjectNode response = DefaultResponse.defaultResponse(code, context);
         response.putIfAbsent("data", data);
         response.putIfAbsent("error", error);
@@ -29,7 +30,7 @@ public class DefaultResponse {
         return Response.ok().entity(defaultResponse(200, context).toString()).build();
     }
 
-    public static Response success(RequestContext context, ArrayNode data) {
+    public static Response success(RequestContext context, JsonNode data) {
         ObjectNode responseMessage = defaultResponse(200 ,context);
         responseMessage.putIfAbsent("data", data);
 

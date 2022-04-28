@@ -107,7 +107,7 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
         try {
             JsonNode result = JsonUtil.fromJson(resultString);
             Map<String, JWTKey> newMap = new HashMap<>();
-            JsonNode data = result.get("data");
+            JsonNode data = result.get("data").get("keys");
             for (int i = 0; i < data.size(); i++) {
                 JsonNode jwtPublicKeyObject = data.get(i);
 
