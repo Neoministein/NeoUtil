@@ -12,6 +12,8 @@ public interface Searchable {
 
     String BUSINESS_ID = "businessId";
 
+    String INDEX_SEARCH_KEYWORD = ".keyword";
+
     String TYPE = "type";
 
     /**

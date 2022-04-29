@@ -4,10 +4,7 @@ import com.neo.javax.api.persitence.aggregation.SearchAggregation;
 import com.neo.javax.api.persitence.criteria.SearchCriteria;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Defines a search query for a search provider
@@ -39,7 +36,7 @@ public class SearchParameters implements Serializable {
     /**
      * The max duration in ms the search query can take
      * */
-    private Long timeout;
+    private Optional<Long> timeout;
     /**
      * The search criteria for the query
      */
@@ -61,30 +58,31 @@ public class SearchParameters implements Serializable {
      * Create a new SearchParameters.
      */
     public SearchParameters(List<String> fields, int offset, Integer maxResults, Long timeout, List<SearchCriteria> filters,
-            Map<String, Boolean> sorting) {
+            Map<String, Boolean> sorting, List<SearchAggregation> aggregations) {
         super();
         this.fields = fields;
         this.offset = offset;
         this.maxResults = maxResults;
-        this.timeout = timeout;
+        this.timeout = Optional.ofNullable(timeout);
         this.filters = filters;
         this.sorting = sorting;
+        this.aggregations = aggregations;
     }
 
     public SearchParameters(List<String> fields, int offset ,Integer maxResults, List<SearchCriteria> filters) {
-        this(fields, offset, maxResults, null, filters, new HashMap<>());
+        this(fields, offset, maxResults, null, filters, new HashMap<>(), new ArrayList<>());
     }
 
     public SearchParameters(Integer maxResults, List<SearchCriteria> filters) {
         this(null,0 ,maxResults, filters);
     }
 
-    public SearchParameters() {
-        this(SEARCH_PARAMETERS_DEFAULT);
+    public SearchParameters(Integer maxResults) {
+        this(new ArrayList<>(),0 ,maxResults, null, new ArrayList<>(), new HashMap<>(), new ArrayList<>());
     }
 
-    public SearchParameters(Integer maxResults) {
-        this(null,0 ,maxResults, null, new ArrayList<>(), new HashMap<>());
+    public SearchParameters() {
+        this(SEARCH_PARAMETERS_DEFAULT);
     }
 
     public List<String> getFields() {
@@ -111,12 +109,12 @@ public class SearchParameters implements Serializable {
         this.maxResults = maxResults;
     }
 
-    public Long getTimeout() {
+    public Optional<Long> getTimeout() {
         return timeout;
     }
 
     public void setTimeout(Long timeout) {
-        this.timeout = timeout;
+        this.timeout = Optional.ofNullable(timeout);
     }
 
     public List<SearchCriteria> getFilters() {

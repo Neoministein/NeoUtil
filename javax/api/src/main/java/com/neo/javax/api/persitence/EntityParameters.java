@@ -71,8 +71,11 @@ public class EntityParameters<T extends DataBaseEntity> {
         return fields;
     }
 
-    public void setFields(Optional<List<String>> fields) {
-        this.fields = fields;
+    public void setFields(List<String> fields) {
+        if (fields == null || fields.isEmpty()) {
+            this.fields = Optional.empty();
+        }
+        this.fields = Optional.empty();
     }
 
     public int getOffset() {
@@ -87,8 +90,8 @@ public class EntityParameters<T extends DataBaseEntity> {
         return maxResults;
     }
 
-    public void setMaxResults(Optional<Integer> maxResults) {
-        this.maxResults = maxResults;
+    public void setMaxResults(Integer maxResults) {
+        this.maxResults = Optional.ofNullable(maxResults);
     }
 
     public List<SearchCriteria> getFilters() {

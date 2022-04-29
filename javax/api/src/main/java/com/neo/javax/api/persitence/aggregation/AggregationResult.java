@@ -5,7 +5,7 @@ package com.neo.javax.api.persitence.aggregation;
  */
 public abstract class AggregationResult {
 
-    private String name;
+    private final String name;
 
     protected AggregationResult(String name) {
         this.name = name;

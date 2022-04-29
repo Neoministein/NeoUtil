@@ -14,8 +14,10 @@ public abstract class SearchAggregation implements Serializable {
         COUNT, SUM, AVG, MIN, MAX, CARDINALITY;
     }
 
-    private AggregationType aggregationType;
-    private String name;
+    /* The aggregation type of this aggregation */
+    private final AggregationType aggregationType;
+    /* The name of this aggregation */
+    private final String name;
 
     protected SearchAggregation(String name, AggregationType aggregationType) {
         this.aggregationType = aggregationType;
