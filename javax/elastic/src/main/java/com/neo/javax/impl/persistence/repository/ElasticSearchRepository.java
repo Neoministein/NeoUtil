@@ -29,8 +29,7 @@ import org.elasticsearch.client.indices.GetMappingsResponse;
 import org.elasticsearch.cluster.metadata.MappingMetadata;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -45,6 +44,7 @@ import org.elasticsearch.search.aggregations.metrics.*;
 import org.elasticsearch.search.aggregations.support.ValuesSourceAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.elasticsearch.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +59,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * This class provides methods to interact with elastic search
  */
+@SuppressWarnings("deprecation")
 @ApplicationScoped
 public class ElasticSearchRepository implements SearchRepository {
 
@@ -310,9 +311,9 @@ public class ElasticSearchRepository implements SearchRepository {
                     }
                 }
             }
-        } catch (IOException | IllegalStateException e) {
+        } catch (IOException | IllegalStateException ex) {
             // FIXME handle exceptions properly
-            e.printStackTrace();
+            ex.printStackTrace();
         }
 
         return results;
@@ -770,8 +771,8 @@ public class ElasticSearchRepository implements SearchRepository {
                 bulkProcessor.awaitClose(30L,
                         TimeUnit.SECONDS);
             }
-        } catch (InterruptedException e) {
-            LOGGER.warn("exception while closing bulkProcessor, error: {}", e.getMessage());
+        } catch (InterruptedException ex) {
+            LOGGER.warn("exception while closing bulkProcessor, error: {}", ex.getMessage());
         }
         bulkProcessor = null;
     }

@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * This class is responsible for upholding the connection to the elasticsearch nodes.
  */
+@SuppressWarnings("deprecation")
 @ApplicationScoped
 public class ElasticSearchConnectionRepository implements Serializable {
 
