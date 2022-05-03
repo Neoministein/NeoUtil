@@ -56,7 +56,7 @@ public class StringUtils {
      * @param c the char to split the string by
      * @return list of strings
      */
-    private static List<String> characterSeparatedStrToList(String s, char c) {
+    public static List<String> characterSeparatedStrToList(String s, char c) {
         if (s == null) {
             return Collections.emptyList();
         }

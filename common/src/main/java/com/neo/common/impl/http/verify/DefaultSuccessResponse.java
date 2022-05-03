@@ -9,18 +9,21 @@ import com.networknt.schema.JsonSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 public class DefaultSuccessResponse implements ResponseFormatVerification {
 
     private static final Logger LOGGER =  LoggerFactory.getLogger(DefaultSuccessResponse.class);
 
-    protected static final JsonSchema JSON_SCHEMA = JsonSchemaUtil.generateSchemaFromResource("schemas/DefaultInternalResponse.json");
+    protected static final JsonSchema JSON_SCHEMA = JsonSchemaUtil.generateSchemaFromResource("schema/DefaultInternalResponse.json");
 
     @Override
     @SuppressWarnings("java:S2629")
     public boolean verify(String message) {
         try {
             JsonNode jsonNode = JsonUtil.fromJson(message);
-            if (JsonSchemaUtil.isValid(jsonNode,JSON_SCHEMA).isEmpty()) {
+            Optional<String> errorMessage = JsonSchemaUtil.isValid(jsonNode,JSON_SCHEMA);
+            if (errorMessage.isEmpty()) {
                 if (jsonNode.get("status").asInt() == 200) {
                     return true;
                 }
@@ -30,6 +33,8 @@ public class DefaultSuccessResponse implements ResponseFormatVerification {
                     JsonNode error = jsonNode.get("error");
                     LOGGER.trace("Error code {} message {}", error.get("code").asText(), error.get("message").asText());
                 }
+            } else {
+                LOGGER.debug("Json schema not valid {}", errorMessage.get());
             }
         } catch (InternalJsonException ex) {
             LOGGER.trace("The provided message cannot correctly parsed to json");

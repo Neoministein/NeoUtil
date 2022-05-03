@@ -12,7 +12,7 @@ public class MathUtils {
         if (val == null) {
             return false;
         }
-        return isInBounds(val, min, max);
+        return isInBounds(val.intValue(), min, max);
     }
 
     public static boolean isInBounds(int val, int min, int max) {
@@ -33,17 +33,5 @@ public class MathUtils {
 
     public static int clamp(int val, int min, int max) {
         return Math.max(min, Math.min(max, val));
-    }
-
-    public static Long parseLong(String value) {
-        try {
-            return Long.parseLong(value);
-        }catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
-    public static boolean isZero(Integer integer) {
-        return integer == null || integer == 0;
     }
 }
