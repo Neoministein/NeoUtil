@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 import javax.transaction.RollbackException;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +49,11 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> exten
         return () -> entityByColumn(DataBaseEntity.C_ID, convertToPrimaryKey(primaryKey), requestContext);
     }
 
-    public RestAction create(String x, RequestContext requestContext) {
+    protected RestAction getByValue(String column, String value, RequestContext requestContext) {
+        return () -> entityByColumn(column, value, requestContext);
+    }
+
+    protected RestAction create(String x, RequestContext requestContext) {
         return  () -> {
             T entity = JsonUtil.fromJson(x, getEntityClass(), getSerializationScope());
             try {
