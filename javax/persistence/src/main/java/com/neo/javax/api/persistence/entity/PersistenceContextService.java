@@ -1,4 +1,4 @@
-package com.neo.javax.api.persistence.repository;
+package com.neo.javax.api.persistence.entity;
 
 import javax.persistence.EntityManager;
 

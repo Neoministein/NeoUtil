@@ -1,6 +1,6 @@
-package com.neo.javax.api.persistence.repository;
+package com.neo.javax.api.persistence.entity;
 
-import com.neo.javax.api.persitence.entity.Searchable;
+import com.neo.javax.api.persitence.search.Searchable;
 
 /**
  * This service retrieves the index which shall be used in for the given searchable

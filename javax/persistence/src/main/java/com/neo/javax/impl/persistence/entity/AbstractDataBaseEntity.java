@@ -3,8 +3,8 @@ package com.neo.javax.impl.persistence.entity;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.neo.common.api.json.Views;
 import com.neo.javax.api.persitence.entity.DataBaseEntity;
-import com.neo.javax.impl.persistence.listener.DataBaseEntityListener;
-import com.neo.javax.impl.persistence.listener.EntityAuditListener;
+import com.neo.javax.impl.persistence.entity.listener.DataBaseEntityListener;
+import com.neo.javax.impl.persistence.entity.listener.EntityAuditListener;
 
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;

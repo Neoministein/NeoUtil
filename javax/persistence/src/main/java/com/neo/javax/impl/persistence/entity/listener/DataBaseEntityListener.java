@@ -1,4 +1,4 @@
-package com.neo.javax.impl.persistence.listener;
+package com.neo.javax.impl.persistence.entity.listener;
 
 import com.neo.javax.api.connection.RequestDetails;
 import com.neo.javax.impl.persistence.entity.AbstractDataBaseEntity;

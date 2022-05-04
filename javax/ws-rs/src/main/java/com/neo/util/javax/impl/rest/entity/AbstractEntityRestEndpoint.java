@@ -1,17 +1,15 @@
 package com.neo.util.javax.impl.rest.entity;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.common.api.json.Views;
 import com.neo.common.impl.exception.InternalJsonException;
 import com.neo.common.impl.exception.InternalLogicException;
 import com.neo.common.impl.json.JsonUtil;
-import com.neo.javax.api.persitence.EntityParameters;
-import com.neo.javax.api.persitence.EntityResult;
+import com.neo.javax.api.persitence.entity.EntityQuery;
+import com.neo.javax.api.persitence.entity.EntityResult;
 import com.neo.javax.api.persitence.criteria.ExplicitSearchCriteria;
 import com.neo.javax.api.persitence.entity.DataBaseEntity;
-import com.neo.javax.api.persitence.repository.EntityRepository;
+import com.neo.javax.api.persitence.entity.EntityRepository;
 import com.neo.util.javax.api.rest.RestAction;
 import com.neo.util.javax.impl.rest.AbstractRestEndpoint;
 import com.neo.util.javax.impl.rest.DefaultResponse;
@@ -103,7 +101,7 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> exten
      * @return the response to be delivered to the client
      */
     protected Response entityByColumn(String field, Object value, RequestContext requestContext) {
-        EntityParameters<T> entityParameters = new EntityParameters<>(getEntityClass(), 1, List.of(new ExplicitSearchCriteria(field, value)));
+        EntityQuery<T> entityParameters = new EntityQuery<>(getEntityClass(), 1, List.of(new ExplicitSearchCriteria(field, value)));
         EntityResult<T> entity = entityRepository.find(entityParameters);
         if (entity.getHitSize() == 1) {
             LOGGER.debug("Entity not found [{},{}:{}]", getEntityClass().getSimpleName(), field, value);

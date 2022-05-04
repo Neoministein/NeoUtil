@@ -1,4 +1,4 @@
-package com.neo.javax.api.persitence;
+package com.neo.javax.api.persitence.search;
 
 import com.neo.javax.api.persitence.aggregation.SearchAggregation;
 import com.neo.javax.api.persitence.criteria.SearchCriteria;
@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Defines a search query for a search provider
  */
-public class SearchParameters implements Serializable {
+public class SearchQuery implements Serializable {
 
     private static final int SEARCH_PARAMETERS_DEFAULT = 10;
 
@@ -57,7 +57,7 @@ public class SearchParameters implements Serializable {
     /**
      * Create a new SearchParameters.
      */
-    public SearchParameters(List<String> fields, int offset, Integer maxResults, Long timeout, List<SearchCriteria> filters,
+    public SearchQuery(List<String> fields, int offset, Integer maxResults, Long timeout, List<SearchCriteria> filters,
             Map<String, Boolean> sorting, List<SearchAggregation> aggregations) {
         super();
         this.fields = fields;
@@ -69,19 +69,19 @@ public class SearchParameters implements Serializable {
         this.aggregations = aggregations;
     }
 
-    public SearchParameters(List<String> fields, int offset ,Integer maxResults, List<SearchCriteria> filters) {
+    public SearchQuery(List<String> fields, int offset ,Integer maxResults, List<SearchCriteria> filters) {
         this(fields, offset, maxResults, null, filters, new HashMap<>(), new ArrayList<>());
     }
 
-    public SearchParameters(Integer maxResults, List<SearchCriteria> filters) {
+    public SearchQuery(Integer maxResults, List<SearchCriteria> filters) {
         this(null,0 ,maxResults, filters);
     }
 
-    public SearchParameters(Integer maxResults) {
+    public SearchQuery(Integer maxResults) {
         this(new ArrayList<>(),0 ,maxResults, null, new ArrayList<>(), new HashMap<>(), new ArrayList<>());
     }
 
-    public SearchParameters() {
+    public SearchQuery() {
         this(SEARCH_PARAMETERS_DEFAULT);
     }
 

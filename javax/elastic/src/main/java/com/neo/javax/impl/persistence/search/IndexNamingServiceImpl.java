@@ -1,11 +1,11 @@
-package com.neo.javax.impl.persistence.repository;
+package com.neo.javax.impl.persistence.search;
 
 import com.neo.common.impl.StringUtils;
 import com.neo.javax.api.config.Config;
 import com.neo.javax.api.config.ConfigService;
-import com.neo.javax.api.persistence.repository.IndexNamingService;
-import com.neo.javax.api.persitence.IndexPeriod;
-import com.neo.javax.api.persitence.entity.Searchable;
+import com.neo.javax.api.persistence.entity.IndexNamingService;
+import com.neo.javax.api.persitence.search.IndexPeriod;
+import com.neo.javax.api.persitence.search.Searchable;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ApplicationScoped
-public class IndexNameServiceImpl implements IndexNamingService {
+public class IndexNamingServiceImpl implements IndexNamingService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(IndexNameServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IndexNamingServiceImpl.class);
 
     protected static final String INDEX_SEPARATOR = "-";
     protected static final String SEARCH_PROVIDER_NO_DATE_INDEX_POSTFIX = "no-date";
@@ -56,7 +56,7 @@ public class IndexNameServiceImpl implements IndexNamingService {
     /**
      * Create a new IndexNameServiceImpl.
      */
-    public IndexNameServiceImpl() {
+    public IndexNamingServiceImpl() {
         super();
     }
 

@@ -1,13 +1,13 @@
-package com.neo.javax.impl.persistence.repository;
+package com.neo.javax.impl.persistence.entity;
 
 import com.neo.common.impl.StopWatch;
 import com.neo.common.impl.exception.InternalLogicException;
-import com.neo.javax.api.persistence.repository.PersistenceContextService;
-import com.neo.javax.api.persitence.EntityParameters;
-import com.neo.javax.api.persitence.EntityResult;
+import com.neo.javax.api.persistence.entity.PersistenceContextService;
+import com.neo.javax.api.persitence.entity.EntityQuery;
+import com.neo.javax.api.persitence.entity.EntityResult;
 import com.neo.javax.api.persitence.criteria.*;
 import com.neo.javax.api.persitence.entity.DataBaseEntity;
-import com.neo.javax.api.persitence.repository.EntityRepository;
+import com.neo.javax.api.persitence.entity.EntityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +62,7 @@ public class EntityRepositoryImpl implements EntityRepository {
     }
 
     @Override
-    public <X extends DataBaseEntity> EntityResult<X> find(EntityParameters<X> parameters) {
+    public <X extends DataBaseEntity> EntityResult<X> find(EntityQuery<X> parameters) {
         LOGGER.trace("Searching for entity {} maxResults {} SearchCriteria {}",
                 parameters.getEntityClass().getSimpleName(),
                 parameters.getMaxResults().orElse(-1),

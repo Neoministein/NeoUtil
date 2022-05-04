@@ -1,4 +1,4 @@
-package com.neo.javax.impl.persistence.repository;
+package com.neo.javax.impl.persistence.search;
 
 import com.neo.common.impl.StringUtils;
 import com.neo.javax.api.config.Config;

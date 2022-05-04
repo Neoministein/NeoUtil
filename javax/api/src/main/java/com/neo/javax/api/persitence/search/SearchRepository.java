@@ -1,9 +1,4 @@
-package com.neo.javax.api.persitence.repository;
-
-import com.neo.javax.api.persitence.IndexParameter;
-import com.neo.javax.api.persitence.SearchParameters;
-import com.neo.javax.api.persitence.SearchResult;
-import com.neo.javax.api.persitence.entity.Searchable;
+package com.neo.javax.api.persitence.search;
 
 import java.util.List;
 
@@ -32,7 +27,7 @@ public interface SearchRepository {
 
     void deleteAll(Class<? extends Searchable> searchableClazz);
 
-    SearchResult fetch(String index, SearchParameters parameters);
+    SearchResult fetch(String index, SearchQuery parameters);
 
     void reconnect();
 }

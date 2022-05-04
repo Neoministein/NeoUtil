@@ -1,11 +1,10 @@
-package com.neo.javax.api.persitence;
+package com.neo.javax.api.persitence.entity;
 
 import com.neo.javax.api.persitence.criteria.SearchCriteria;
-import com.neo.javax.api.persitence.entity.DataBaseEntity;
 
 import java.util.*;
 
-public class EntityParameters<T extends DataBaseEntity> {
+public class EntityQuery<T extends DataBaseEntity> {
 
     /**
      * The class of the DataBaseEntity
@@ -33,7 +32,7 @@ public class EntityParameters<T extends DataBaseEntity> {
      */
     private Map<String, Boolean> sorting;
 
-    public EntityParameters(Class<T> clazz, List<String> fields, int offset, Integer maxResults, List<SearchCriteria> filters,
+    public EntityQuery(Class<T> clazz, List<String> fields, int offset, Integer maxResults, List<SearchCriteria> filters,
             Map<String, Boolean> sorting) {
         this.entityClass = clazz;
         this.fields = Optional.ofNullable(fields);
@@ -43,19 +42,19 @@ public class EntityParameters<T extends DataBaseEntity> {
         this.sorting = sorting;
     }
 
-    public EntityParameters(Class<T> clazz, List<String> fields, int offset, Integer maxResults, List<SearchCriteria> filters) {
+    public EntityQuery(Class<T> clazz, List<String> fields, int offset, Integer maxResults, List<SearchCriteria> filters) {
         this(clazz, fields, offset, maxResults, filters, new HashMap<>());
     }
 
-    public EntityParameters(Class<T> clazz, Integer maxResults, List<SearchCriteria> filters) {
+    public EntityQuery(Class<T> clazz, Integer maxResults, List<SearchCriteria> filters) {
         this(clazz,null, 0, maxResults, filters);
     }
 
-    public EntityParameters(Class<T> clazz, List<SearchCriteria> filters) {
+    public EntityQuery(Class<T> clazz, List<SearchCriteria> filters) {
         this(clazz,0, filters);
     }
 
-    public EntityParameters(Class<T> clazz) {
+    public EntityQuery(Class<T> clazz) {
         this(clazz,new ArrayList<>());
     }
 

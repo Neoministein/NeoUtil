@@ -1,18 +1,18 @@
-package com.neo.javax.impl.persistence.repository;
+package com.neo.javax.impl.persistence.search;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.common.impl.enumeration.Synchronization;
 import com.neo.common.impl.exception.InternalLogicException;
 import com.neo.javax.api.config.ConfigService;
 import com.neo.javax.api.event.ElasticSearchConnectionStatusEvent;
-import com.neo.javax.api.persistence.repository.IndexNamingService;
-import com.neo.javax.api.persitence.IndexParameter;
-import com.neo.javax.api.persitence.SearchParameters;
-import com.neo.javax.api.persitence.SearchResult;
+import com.neo.javax.api.persistence.entity.IndexNamingService;
+import com.neo.javax.api.persitence.search.IndexParameter;
+import com.neo.javax.api.persitence.search.SearchQuery;
+import com.neo.javax.api.persitence.search.SearchResult;
 import com.neo.javax.api.persitence.aggregation.*;
 import com.neo.javax.api.persitence.criteria.*;
-import com.neo.javax.api.persitence.entity.Searchable;
-import com.neo.javax.api.persitence.repository.SearchRepository;
+import com.neo.javax.api.persitence.search.Searchable;
+import com.neo.javax.api.persitence.search.SearchRepository;
 import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.bulk.BulkProcessor;
@@ -221,7 +221,7 @@ public class ElasticSearchRepository implements SearchRepository {
     }
 
     @Override
-    public SearchResult fetch(String index, SearchParameters parameters) {
+    public SearchResult fetch(String index, SearchQuery parameters) {
         SearchRequest searchRequest = new SearchRequest(index);
         searchRequest.indicesOptions(IndicesOptions.lenientExpand());
 
@@ -581,7 +581,7 @@ public class ElasticSearchRepository implements SearchRepository {
         }
     }
 
-    protected SearchResult parseSearchResponse(SearchParameters parameters, SearchResponse response) {
+    protected SearchResult parseSearchResponse(SearchQuery parameters, SearchResponse response) {
         return new SearchResult(
                 response.getHits().getTotalHits().value,
                 response.getHits().getMaxScore(),

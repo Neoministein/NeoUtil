@@ -1,8 +1,4 @@
-package com.neo.javax.api.persitence.repository;
-
-import com.neo.javax.api.persitence.EntityParameters;
-import com.neo.javax.api.persitence.EntityResult;
-import com.neo.javax.api.persitence.entity.DataBaseEntity;
+package com.neo.javax.api.persitence.entity;
 
 import javax.transaction.RollbackException;
 import java.util.Optional;
@@ -50,5 +46,5 @@ public interface EntityRepository {
      *
      * @return the result of the given search
      */
-    <X extends DataBaseEntity> EntityResult<X> find(EntityParameters<X> parameters);
+    <X extends DataBaseEntity> EntityResult<X> find(EntityQuery<X> parameters);
 }

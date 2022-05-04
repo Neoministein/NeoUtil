@@ -1,7 +1,6 @@
-package com.neo.javax.api.persitence.entity;
+package com.neo.javax.api.persitence.search;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.neo.javax.api.persitence.IndexPeriod;
 
 import java.util.Date;
 

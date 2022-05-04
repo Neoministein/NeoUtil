@@ -1,4 +1,4 @@
-package com.neo.javax.api.persitence;
+package com.neo.javax.api.persitence.search;
 
 /**
  * The period for an index. This will be used to decided when new indexes have to be created.

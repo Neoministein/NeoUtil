@@ -1,7 +1,7 @@
-package com.neo.javax.impl.persistence.listener;
+package com.neo.javax.impl.persistence.entity.listener;
 
 import com.neo.common.impl.enumeration.PersistenceOperation;
-import com.neo.javax.api.persitence.repository.EntityRepository;
+import com.neo.javax.api.persitence.entity.EntityRepository;
 import com.neo.javax.impl.persistence.entity.AbstractDataBaseEntity;
 import com.neo.javax.impl.persistence.entity.EntityAuditTrail;
 import org.slf4j.Logger;

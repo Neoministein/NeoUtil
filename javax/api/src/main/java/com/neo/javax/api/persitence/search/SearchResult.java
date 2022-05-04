@@ -1,4 +1,4 @@
-package com.neo.javax.api.persitence;
+package com.neo.javax.api.persitence.search;
 
 import com.neo.javax.api.persitence.aggregation.AggregationResult;
 

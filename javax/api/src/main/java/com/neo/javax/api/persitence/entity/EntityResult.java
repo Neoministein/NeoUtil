@@ -1,6 +1,4 @@
-package com.neo.javax.api.persitence;
-
-import com.neo.javax.api.persitence.entity.DataBaseEntity;
+package com.neo.javax.api.persitence.entity;
 
 import java.util.ArrayList;
 import java.util.List;
