@@ -14,7 +14,7 @@ public class EntityQuery<T extends DataBaseEntity> {
     /**
      * The fields that are returned in the result set
      */
-    private Optional<List<String>> fields;
+    private List<String> fields;
     /**
      * The offset from where the result set starts
      */
@@ -22,7 +22,7 @@ public class EntityQuery<T extends DataBaseEntity> {
     /**
      * The max amount of results in the result set
      */
-    private Optional<Integer> maxResults;
+    private Integer maxResults;
     /**
      * The search criteria for the query
      */
@@ -35,9 +35,9 @@ public class EntityQuery<T extends DataBaseEntity> {
     public EntityQuery(Class<T> clazz, List<String> fields, int offset, Integer maxResults, List<SearchCriteria> filters,
             Map<String, Boolean> sorting) {
         this.entityClass = clazz;
-        this.fields = Optional.ofNullable(fields);
+        this.fields = fields;
         this.offset = offset;
-        this.maxResults = Optional.ofNullable(maxResults);
+        this.maxResults = maxResults;
         this.filters = filters;
         this.sorting = sorting;
     }
@@ -51,7 +51,7 @@ public class EntityQuery<T extends DataBaseEntity> {
     }
 
     public EntityQuery(Class<T> clazz, List<SearchCriteria> filters) {
-        this(clazz,0, filters);
+        this(clazz,null, filters);
     }
 
     public EntityQuery(Class<T> clazz) {
@@ -67,14 +67,11 @@ public class EntityQuery<T extends DataBaseEntity> {
     }
 
     public Optional<List<String>> getFields() {
-        return fields;
+        return Optional.ofNullable(fields);
     }
 
     public void setFields(List<String> fields) {
-        if (fields == null || fields.isEmpty()) {
-            this.fields = Optional.empty();
-        }
-        this.fields = Optional.empty();
+        this.fields = fields;
     }
 
     public int getOffset() {
@@ -86,11 +83,11 @@ public class EntityQuery<T extends DataBaseEntity> {
     }
 
     public Optional<Integer> getMaxResults() {
-        return maxResults;
+        return Optional.ofNullable(maxResults);
     }
 
     public void setMaxResults(Integer maxResults) {
-        this.maxResults = Optional.ofNullable(maxResults);
+        this.maxResults = maxResults;
     }
 
     public List<SearchCriteria> getFilters() {
