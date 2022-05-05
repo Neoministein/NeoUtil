@@ -42,12 +42,12 @@ public class EntityQuery<T extends DataBaseEntity> {
         this.sorting = sorting;
     }
 
-    public EntityQuery(Class<T> clazz, List<String> fields, int offset, Integer maxResults, List<SearchCriteria> filters) {
-        this(clazz, fields, offset, maxResults, filters, new HashMap<>());
+    public EntityQuery(Class<T> clazz, int offset, Integer maxResults, List<SearchCriteria> filters, Map<String, Boolean> sorting) {
+        this(clazz, null, offset, maxResults, filters, sorting);
     }
 
     public EntityQuery(Class<T> clazz, Integer maxResults, List<SearchCriteria> filters) {
-        this(clazz,null, 0, maxResults, filters);
+        this(clazz,0, maxResults, filters, new HashMap<>());
     }
 
     public EntityQuery(Class<T> clazz, List<SearchCriteria> filters) {
