@@ -3,11 +3,14 @@ package com.neo.common.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Utilities for {@link String}
  */
 public class StringUtils {
+
+    private static final Pattern ALPHANUMERIC = Pattern.compile("[^a-zA-Z0-9]");
 
     private StringUtils() {}
 
@@ -61,5 +64,15 @@ public class StringUtils {
             return Collections.emptyList();
         }
         return Arrays.asList(s.trim().split("\\s*" + c + "\\s*"));
+    }
+
+    /**
+     * Checks if the string is alphanumeric
+     *
+     * @param s the string to check
+     * @return true if it is alphanumeric
+     */
+    public static boolean isAlphaNumeric(String s) {
+        return !ALPHANUMERIC.matcher(s).find();
     }
 }

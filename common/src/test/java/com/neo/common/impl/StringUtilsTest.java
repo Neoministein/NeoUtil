@@ -29,4 +29,14 @@ class StringUtilsTest {
                 List.of("0","1","2","3","4"),
                 StringUtils.characterSeparatedStrToList("0,1,2,3,4",','));
     }
+
+    @Test
+    void alphaNumericTest() {
+        Assertions.assertTrue(StringUtils.isAlphaNumeric("abcd"));
+        Assertions.assertTrue(StringUtils.isAlphaNumeric("0123"));
+        Assertions.assertTrue(StringUtils.isAlphaNumeric("abc0123"));
+
+        Assertions.assertFalse(StringUtils.isAlphaNumeric(";"));
+        Assertions.assertFalse(StringUtils.isAlphaNumeric("-"));
+    }
 }
