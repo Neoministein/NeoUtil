@@ -64,7 +64,7 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> exten
                 LOGGER.debug("Entity is missing mandatory fields");
                 return DefaultResponse.error(400, E_MISSING_FIELDS, requestContext);
             }
-            return parseEntityToResponse(entity, requestContext, getSerializationScope());
+            return parseEntityToResponse(entity, requestContext, Views.Owner.class);
         };
     }
 
@@ -165,7 +165,7 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> exten
                 serializationScope = Views.Owner.class;
             }
 
-            if (requestDetails.isInRole("internal")) {
+            if (requestDetails.isInRole(E_INTERNAL)) {
                 serializationScope = Views.Internal.class;
             }
         }
