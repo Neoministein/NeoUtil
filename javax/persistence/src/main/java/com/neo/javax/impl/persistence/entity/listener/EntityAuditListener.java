@@ -8,9 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
+import javax.persistence.*;
 import javax.transaction.RollbackException;
 
 public class EntityAuditListener {
@@ -20,19 +18,19 @@ public class EntityAuditListener {
     @Inject
     EntityRepository entityRepository;
 
-    @PrePersist
+    @PostPersist
     public void prePersist(AbstractDataBaseEntity entity) {
         if (!(entity instanceof EntityAuditTrail)) {
             createAuditTrail(entity, PersistenceOperation.CREATE);
         }
     }
 
-    @PreUpdate
+    @PostUpdate
     public void preUpdate(AbstractDataBaseEntity entity) {
         createAuditTrail(entity, PersistenceOperation.UPDATE);
     }
 
-    @PreRemove
+    @PostRemove
     public void preRemove(AbstractDataBaseEntity entity) {
         createAuditTrail(entity, PersistenceOperation.DELETE);
     }
