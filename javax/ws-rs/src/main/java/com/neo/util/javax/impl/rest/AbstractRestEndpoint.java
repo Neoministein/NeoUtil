@@ -54,12 +54,7 @@ public abstract class AbstractRestEndpoint {
     }
 
     public boolean authorized(List<String> requiredRoles) {
-        for (String role : requiredRoles) {
-            if (!requestDetails.isInRole(role)) {
-                return false;
-            }
-        }
-        return true;
+        return requestDetails.isInRoles(requiredRoles);
     }
 
     protected abstract String getClassURI();

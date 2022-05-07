@@ -1,5 +1,6 @@
 package com.neo.javax.api.connection;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,4 +34,12 @@ public interface RequestDetails {
      * @return true if the current user has the role
      */
     boolean isInRole(String role);
+
+    /**
+     * Checks if the current user has all the roles
+     *
+     * @param roles the roles to check for
+     * @return true if the current user has all the roles
+     */
+    boolean isInRoles(List<String> roles);
 }
