@@ -1,5 +1,6 @@
 package com.neo.util.javax.impl.rest;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.common.impl.exception.InternalJsonException;
 import com.neo.common.impl.exception.InternalLogicException;
 import com.neo.javax.api.connection.RequestDetails;
@@ -16,9 +17,11 @@ public abstract class AbstractRestEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRestEndpoint.class);
 
+    public static final ObjectNode E_INTERNAL_LOGIC = DefaultResponse.errorObject("unknown","Internal server error please try again later");
+    public static final ObjectNode E_UNAUTHORIZED = DefaultResponse.errorObject("auth/000", "Unauthorized");
+    public static final ObjectNode E_FORBIDDEN = DefaultResponse.errorObject("auth/001", "Forbidden");
+
     protected static final String E_INVALID_JSON = "json/000";
-    protected static final String E_UNAUTHORIZED = "auth/100";
-    protected static final String E_INTERNAL_LOGIC = "unknown";
 
     @Inject
     protected RequestDetails requestDetails;
@@ -32,11 +35,7 @@ public abstract class AbstractRestEndpoint {
         LOGGER.debug("{} {}", context, requestDetails.getRemoteAddress());
 
         if (!authorized(requiredRoles)) {
-            return DefaultResponse.error(
-                    403,
-                    context,
-                    E_UNAUTHORIZED,
-                    "Unauthorized");
+            return DefaultResponse.error(403, E_FORBIDDEN, context);
         }
         try {
             return restAction.run();
@@ -45,11 +44,10 @@ public abstract class AbstractRestEndpoint {
             return DefaultResponse.error(400, context, E_INVALID_JSON, "Invalid json format in the request body " + ex.getMessage());
         } catch (InternalLogicException ex) {
             LOGGER.error("A exception occurred during a rest call", ex);
-            return DefaultResponse.error(500, context,E_INTERNAL_LOGIC, "Internal server error please try again later");
+            return DefaultResponse.error(500, E_INTERNAL_LOGIC, context);
         } catch (Exception ex) {
             LOGGER.error("A unexpected exception occurred during a rest call", ex);
-            return DefaultResponse.error(500, context, E_INTERNAL_LOGIC, "Internal server error please try again later"
-            );
+            return DefaultResponse.error(500, E_INTERNAL_LOGIC, context);
         }
     }
 
