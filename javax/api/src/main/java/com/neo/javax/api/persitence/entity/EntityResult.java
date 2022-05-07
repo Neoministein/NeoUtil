@@ -5,6 +5,7 @@ import com.neo.common.api.json.Views;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Defines a result from a search query from a search provider
@@ -77,5 +78,12 @@ public class EntityResult<T extends DataBaseEntity> {
 
     public long getHitCount() {
         return hitCount;
+    }
+
+    public Optional<T> getFirst() {
+        if (hitCount != 0) {
+            return Optional.of(hits.get(0));
+        }
+        return Optional.empty();
     }
 }
