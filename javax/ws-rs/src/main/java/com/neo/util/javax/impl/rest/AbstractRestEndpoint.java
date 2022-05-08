@@ -23,7 +23,7 @@ public abstract class AbstractRestEndpoint {
 
     protected static final String E_INVALID_JSON = "json/000";
 
-    protected static final String E_INTERNAL = "internal";
+    protected static final String PERM_INTERNAL = "internal";
 
     @Inject
     protected RequestDetails requestDetails;

@@ -165,7 +165,7 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> exten
                 serializationScope = Views.Owner.class;
             }
 
-            if (requestDetails.isInRole(E_INTERNAL)) {
+            if (requestDetails.isInRole(PERM_INTERNAL)) {
                 serializationScope = Views.Internal.class;
             }
         }
