@@ -196,7 +196,9 @@ public class ElasticSearchConnectionRepository implements Serializable {
         try {
             List<HttpHost> nodes = new ArrayList<>(nodeList.size());
             for (String nodeUrl : nodeList) {
-                nodes.add(HttpHost.create(nodeUrl));
+                if (!StringUtils.isEmpty(nodeUrl)) {
+                    nodes.add(HttpHost.create(nodeUrl));
+                }
             }
             return nodes;
         } catch (Exception ex) {
