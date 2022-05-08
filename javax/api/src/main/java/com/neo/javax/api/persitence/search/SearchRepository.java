@@ -29,5 +29,10 @@ public interface SearchRepository {
 
     SearchResult fetch(String index, SearchQuery parameters);
 
-    void reconnect();
+    /**
+     * Reloads the config and reconnects to the SearchRepository to the nodes
+     */
+    void reload();
+
+    boolean enabled();
 }

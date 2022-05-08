@@ -74,7 +74,8 @@ public class ElasticSearchRepository implements SearchRepository {
     @Inject
     ConfigService configService;
 
-    @Inject IndexNamingService indexNameService;
+    @Inject
+    IndexNamingService indexNameService;
 
     @Inject
     ElasticSearchConnectionRepository connection;
@@ -735,10 +736,16 @@ public class ElasticSearchRepository implements SearchRepository {
         }
     }
 
-    public void reconnect() {
+    public void reload() {
         closeBulkProcessor();
+        connection.reloadConfig();
         connection.disconnect();
         connection.connect();
+    }
+
+    @Override
+    public boolean enabled() {
+        return connection.enabled();
     }
 
     protected void disconnect() {
@@ -755,7 +762,7 @@ public class ElasticSearchRepository implements SearchRepository {
     protected boolean reconnectClientIfNeeded(IllegalStateException ex) {
         if (Arrays.stream(FILTER_HTTPCLIENT_MESSAGES).anyMatch(ex.getMessage()::contains)) {
             LOGGER.info("IllegalStateException reconnectClient");
-            reconnect();
+            reload();
             return true;
         }
         return false;

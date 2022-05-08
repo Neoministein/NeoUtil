@@ -35,15 +35,18 @@ public class ElasticSearchConnectionRepository implements Serializable {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchConnectionRepository.class);
 
-    private static final String DEFAULT_SCHEME = "http";
-    private static final String LOCALHOST_HOST_NAME = "127.0.0.1";
-    private static final int DEFAULT_PORT = 9200;
+    protected static final String DEFAULT_SCHEME = "http";
+    protected static final String LOCALHOST_HOST_NAME = "127.0.0.1";
+    protected static final int DEFAULT_PORT = 9200;
 
-    private static final String DEFAULT_URL = DEFAULT_SCHEME + "://" + LOCALHOST_HOST_NAME + ":" + DEFAULT_PORT;
+    protected static final String DEFAULT_URL = DEFAULT_SCHEME + "://" + LOCALHOST_HOST_NAME + ":" + DEFAULT_PORT;
 
     protected static final String ELASTIC_CONFIG = "elastic";
-    private static final String NODE_CONFIG = "nodes";
-    private static final String CREDENTIALS_CONFIG = "credentials";
+    protected static final String NODE_CONFIG = "nodes";
+    protected static final String CREDENTIALS_CONFIG = "credentials";
+    protected static final String ENABLED_CONFIG = "enabled";
+
+    protected boolean enabled = false;
 
     @Inject
     ConfigService configService;
@@ -59,13 +62,22 @@ public class ElasticSearchConnectionRepository implements Serializable {
 
     @PostConstruct
     public void postConstruct() {
+        reloadConfig();
+    }
+
+    public void reloadConfig() {
         LOGGER.debug("Loading elastic search configuration");
-        Config config = configService.get(ELASTIC_CONFIG).get(NODE_CONFIG);
-        List<String> nodes = config.asList(String.class).orElse(List.of(DEFAULT_URL));
+        Config elasticConfig = configService.get(ELASTIC_CONFIG);
+        List<String> nodes = elasticConfig.get(NODE_CONFIG).asList(String.class).orElse(List.of(DEFAULT_URL));
 
         nodeList = nodes;
         LOGGER.debug("Elasticsearch nodes {}", nodes);
-        connect();
+        this.enabled = elasticConfig.get(ENABLED_CONFIG).asBoolean().orElse(false);
+        if (enabled) {
+            connect();
+        } else {
+            LOGGER.info("Elasticsearch isn't enabled. Connection won't be established");
+        }
     }
 
     public void onStartUp(@Observes ApplicationReadyEvent preReadyEvent) {
@@ -92,6 +104,10 @@ public class ElasticSearchConnectionRepository implements Serializable {
         }
         LOGGER.error("Elastic client is not yet ready yet");
         throw new IllegalStateException("Elastic client is not yet ready");
+    }
+
+    public boolean enabled() {
+        return enabled;
     }
 
     /**
