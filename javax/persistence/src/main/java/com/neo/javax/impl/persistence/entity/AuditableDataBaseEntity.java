@@ -3,8 +3,7 @@ package com.neo.javax.impl.persistence.entity;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.neo.common.api.json.Views;
 import com.neo.javax.api.persitence.entity.DataBaseEntity;
-import com.neo.javax.impl.persistence.entity.listener.DataBaseEntityListener;
-import com.neo.javax.impl.persistence.entity.listener.EntityAuditListener;
+import com.neo.javax.impl.persistence.entity.listener.DataBaseAuditListener;
 
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
@@ -12,8 +11,8 @@ import javax.persistence.MappedSuperclass;
 import java.util.Date;
 
 @MappedSuperclass
-@EntityListeners( { DataBaseEntityListener.class, EntityAuditListener.class } )
-public abstract class AbstractDataBaseEntity implements DataBaseEntity {
+@EntityListeners( { DataBaseAuditListener.class } )
+public abstract class AuditableDataBaseEntity implements DataBaseEntity {
 
     public static final String C_CREATED_ON = "created_on";
     public static final String C_CREATED_BY = "created_by";

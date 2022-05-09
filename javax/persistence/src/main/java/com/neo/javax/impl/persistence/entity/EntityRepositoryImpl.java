@@ -1,6 +1,7 @@
 package com.neo.javax.impl.persistence.entity;
 
 import com.neo.common.impl.StopWatch;
+import com.neo.common.impl.enumeration.PersistenceOperation;
 import com.neo.common.impl.exception.InternalLogicException;
 import com.neo.javax.api.persistence.entity.PersistenceContextService;
 import com.neo.javax.api.persitence.entity.EntityQuery;
@@ -30,24 +31,43 @@ public class EntityRepositoryImpl implements EntityRepository {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(EntityRepositoryImpl.class);
 
-    @Inject PersistenceContextService pcs;
+    @Inject
+    PersistenceContextService pcs;
 
     @Override
     public void create(DataBaseEntity entity) {
         pcs.getEntityManager().persist(entity);
         LOGGER.debug("Created entity {}:{}", entity.getPrimaryKey(), entity.getClass().getSimpleName());
+        if (!(entity instanceof EntityAuditTrail)) {
+            createAuditTrail(entity, PersistenceOperation.CREATE);
+        }
     }
 
     @Override
     public void edit(DataBaseEntity entity) {
         pcs.getEntityManager().merge(entity);
         LOGGER.debug("Edited entity {}:{}", entity.getPrimaryKey(), entity.getClass().getSimpleName());
+        createAuditTrail(entity, PersistenceOperation.UPDATE);
     }
 
     @Override
     public void remove(DataBaseEntity entity) {
         pcs.getEntityManager().remove(pcs.getEntityManager().merge(entity));
         LOGGER.debug("Removed entity {}:{}", entity.getPrimaryKey(), entity.getClass().getSimpleName());
+        createAuditTrail(entity, PersistenceOperation.DELETE);
+    }
+
+    protected void createAuditTrail(DataBaseEntity entity, PersistenceOperation operation) {
+        try {
+            EntityAuditTrail auditTrail = new EntityAuditTrail();
+            auditTrail.setOperation(operation);
+            auditTrail.setClassType(entity.getClass().getSimpleName());
+            auditTrail.setObjectKey(entity.getPrimaryKey().toString());
+            this.create(auditTrail);
+        } catch (Exception ex) {
+            String entityIdentifier = entity.getClass().getSimpleName() + ":" + entity.getPrimaryKey();
+            LOGGER.error("Unable to persist audit trail for {}", entityIdentifier, ex);
+        }
     }
 
     @Override

@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = EntityAuditTrail.TABLE_NAME)
 @Cacheable(value = false)
-public class EntityAuditTrail extends AbstractDataBaseEntity implements DataBaseEntity {
+public class EntityAuditTrail extends AuditableDataBaseEntity implements DataBaseEntity {
 
     public static final String TABLE_NAME = "audit_trail";
 
