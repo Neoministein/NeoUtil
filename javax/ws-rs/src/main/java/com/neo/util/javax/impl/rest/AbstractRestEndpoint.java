@@ -7,7 +7,6 @@ import com.neo.javax.api.connection.RequestDetails;
 import com.neo.util.javax.api.rest.RestAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
@@ -28,39 +27,31 @@ public abstract class AbstractRestEndpoint {
     @Inject
     protected RequestDetails requestDetails;
 
-    public Response restCall(RestAction restAction, RequestContext context) {
-        return restCall(restAction, context, List.of());
+    public Response restCall(RestAction restAction) {
+        return restCall(restAction, List.of());
     }
 
-    public Response restCall(RestAction restAction, RequestContext context, List<String> requiredRoles) {
-        MDC.put("traceId", requestDetails.getRequestId());
-        LOGGER.debug("{} {}", context, requestDetails.getRemoteAddress());
-
+    public Response restCall(RestAction restAction, List<String> requiredRoles) {
         if (!authorized(requiredRoles)) {
-            return DefaultResponse.error(403, E_FORBIDDEN, context);
+            return DefaultResponse.error(403, E_FORBIDDEN, requestDetails.getRequestContext());
         }
         try {
+            LOGGER.debug("Executing action at {}", requestDetails.getRequestContext());
             return restAction.run();
         } catch (InternalJsonException ex) {
             LOGGER.debug("Invalid json format in the request body");
-            return DefaultResponse.error(400, context, E_INVALID_JSON, "Invalid json format in the request body " + ex.getMessage());
+            return DefaultResponse.error(400, requestDetails.getRequestContext(), E_INVALID_JSON, "Invalid json format in the request body " + ex.getMessage());
         } catch (InternalLogicException ex) {
             LOGGER.error("A exception occurred during a rest call", ex);
-            return DefaultResponse.error(500, E_INTERNAL_LOGIC, context);
+            return DefaultResponse.error(500, E_INTERNAL_LOGIC, requestDetails.getRequestContext());
         } catch (Exception ex) {
             LOGGER.error("A unexpected exception occurred during a rest call", ex);
-            return DefaultResponse.error(500, E_INTERNAL_LOGIC, context);
+            return DefaultResponse.error(500, E_INTERNAL_LOGIC, requestDetails.getRequestContext());
         }
     }
 
     public boolean authorized(List<String> requiredRoles) {
         return requestDetails.isInRoles(requiredRoles);
-    }
-
-    protected abstract String getClassURI();
-
-    public RequestContext getContext(HttpMethod method, String methodURI) {
-        return new RequestContext(method, getClassURI(), methodURI);
     }
 
     //Only for testing purposes

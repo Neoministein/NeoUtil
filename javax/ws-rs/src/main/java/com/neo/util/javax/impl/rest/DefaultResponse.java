@@ -1,9 +1,9 @@
 package com.neo.util.javax.impl.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.common.impl.json.JsonUtil;
+import com.neo.javax.api.connection.RequestContext;
 
 import javax.ws.rs.core.Response;
 

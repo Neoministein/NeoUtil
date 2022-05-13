@@ -42,4 +42,18 @@ public interface RequestDetails {
      * @return true if the current user has all the roles
      */
     boolean isInRoles(List<String> roles);
+
+    /**
+     * The current context of the request
+     *
+     * @return the current context
+     */
+    RequestContext getRequestContext();
+
+    /**
+     * Sets the current requestContext
+     *
+     * @param requestContext the current requestContext
+     */
+    void setRequestContext(RequestContext requestContext);
 }

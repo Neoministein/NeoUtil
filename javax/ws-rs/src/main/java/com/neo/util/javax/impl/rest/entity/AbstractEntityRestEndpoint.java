@@ -13,7 +13,6 @@ import com.neo.javax.api.persitence.entity.EntityRepository;
 import com.neo.util.javax.api.rest.RestAction;
 import com.neo.util.javax.impl.rest.AbstractRestEndpoint;
 import com.neo.util.javax.impl.rest.DefaultResponse;
-import com.neo.util.javax.impl.rest.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,15 +42,15 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> exten
 
     protected abstract Class<T> getEntityClass();
 
-    protected RestAction getByPrimaryKey(String primaryKey, RequestContext requestContext) {
-        return () -> entityByColumn(DataBaseEntity.C_ID, convertToPrimaryKey(primaryKey), requestContext);
+    protected RestAction getByPrimaryKeyAction(String primaryKey) {
+        return () -> entityByColumn(DataBaseEntity.C_ID, convertToPrimaryKey(primaryKey));
     }
 
-    protected RestAction getByValue(String column, String value, RequestContext requestContext) {
-        return () -> entityByColumn(column, value, requestContext);
+    protected RestAction getByValueAction(String column, String value) {
+        return () -> entityByColumn(column, value);
     }
 
-    protected RestAction create(String x, RequestContext requestContext) {
+    protected RestAction createAction(String x) {
         return  () -> {
             T entity = JsonUtil.fromJson(x, getEntityClass(), getSerializationScope());
             try {
@@ -59,34 +58,34 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> exten
                 LOGGER.info("Created new [{},{}]",getEntityClass().getSimpleName(), entity.getPrimaryKey());
             } catch (RollbackException ex) {
                 LOGGER.debug("Provided value isn't unique");
-                return DefaultResponse.error(400, E_NOT_UNIQUE, requestContext);
+                return DefaultResponse.error(400, E_NOT_UNIQUE, requestDetails.getRequestContext());
             } catch (PersistenceException ex) {
                 LOGGER.debug("Entity is missing mandatory fields");
-                return DefaultResponse.error(400, E_MISSING_FIELDS, requestContext);
+                return DefaultResponse.error(400, E_MISSING_FIELDS, requestDetails.getRequestContext());
             }
-            return parseEntityToResponse(entity, requestContext, Views.Owner.class);
+            return parseEntityToResponse(entity,Views.Owner.class);
         };
     }
 
-    public RestAction edit(String x, RequestContext requestContext) {
-        return () -> editEntity(parseJSONIntoExistingEntity(x, getSerializationScope()), getSerializationScope(), requestContext);
+    public RestAction editAction(String x) {
+        return () -> editEntity(parseJSONIntoExistingEntity(x, getSerializationScope()), getSerializationScope());
     }
 
-    public RestAction delete(String primaryKey, RequestContext requestContext) {
+    public RestAction deleteAction(String primaryKey) {
         return () -> {
             Optional<T> entity = entityRepository.find(convertToPrimaryKey(primaryKey), getEntityClass());
 
             if (entity.isEmpty()) {
                 LOGGER.debug("Entity not found [{},{}]", getEntityClass().getSimpleName() ,primaryKey);
-                return DefaultResponse.error(404, E_NOT_FOUND, requestContext);
+                return DefaultResponse.error(404, E_NOT_FOUND, requestDetails.getRequestContext());
             }
 
             try {
                 entityRepository.remove(entity.get());
                 LOGGER.info("Deleted entity [{},{}]",getEntityClass().getSimpleName(), entity.get().getPrimaryKey());
-                return DefaultResponse.success(requestContext);
+                return DefaultResponse.success(requestDetails.getRequestContext());
             } catch (RollbackException ex) {
-                return DefaultResponse.error(400, E_MISSING_FIELDS, requestContext);
+                return DefaultResponse.error(400, E_MISSING_FIELDS, requestDetails.getRequestContext());
             }
         };
     }
@@ -96,56 +95,54 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> exten
      *
      * @param field the entity field
      * @param value the value which entity field must have
-     * @param requestContext the resource location of the caller
      *
      * @return the response to be delivered to the client
      */
-    protected Response entityByColumn(String field, Object value, RequestContext requestContext) {
+    protected Response entityByColumn(String field, Object value) {
         EntityQuery<T> entityParameters = new EntityQuery<>(getEntityClass(), 1, List.of(new ExplicitSearchCriteria(field, value)));
         EntityResult<T> entity = entityRepository.find(entityParameters);
         if (entity.getHitSize() == 1) {
             LOGGER.debug("Entity not found [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
-            return DefaultResponse.error(404, E_NOT_FOUND, requestContext);
+            return DefaultResponse.error(404, E_NOT_FOUND, requestDetails.getRequestContext());
         }
         LOGGER.trace("Entity lookup success [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
-        return parseEntityToResponse(entity.getHits().get(0), requestContext, getSerializationScope());
+        return parseEntityToResponse(entity.getHits().get(0), getSerializationScope());
     }
 
-    protected Response editEntity(T entity, Class<?> serializationScope, RequestContext requestContext) {
+    protected Response editEntity(T entity, Class<?> serializationScope) {
         try {
             entityRepository.edit(entity);
             LOGGER.info("Created new [{},{}]",getEntityClass().getSimpleName(), entity.getPrimaryKey());
         } catch (RollbackException ex) {
             LOGGER.debug("Provided value isn't unique");
-            return DefaultResponse.error(400, E_NOT_UNIQUE, requestContext);
+            return DefaultResponse.error(400, E_NOT_UNIQUE, requestDetails.getRequestContext());
         } catch (PersistenceException ex) {
             LOGGER.debug("Entity is missing mandatory fields");
-            return DefaultResponse.error(400, E_MISSING_FIELDS, requestContext);
+            return DefaultResponse.error(400, E_MISSING_FIELDS, requestDetails.getRequestContext());
         } catch (InternalLogicException ex) {
             //TODO
         }
 
         Optional<T> after = entityRepository.find(entity.getPrimaryKey(),getEntityClass());
 
-        return parseEntityToResponse(after.get(), requestContext, serializationScope);
+        return parseEntityToResponse(after.get(), serializationScope);
     }
 
     /**
      * Parsed the entity to a JSON response
      *
      * @param entity the entity to parse
-     * @param requestContext request context
      * @param serializationScope the jackson serialization scope
      *
      * @return the response to be delivered to the client
      */
-    protected Response parseEntityToResponse(T entity, RequestContext requestContext, Class<?> serializationScope) {
+    protected Response parseEntityToResponse(T entity, Class<?> serializationScope) {
         try {
             String result = JsonUtil.toJson(entity, serializationScope);
-            return DefaultResponse.success(requestContext, JsonUtil.fromJson(result));
+            return DefaultResponse.success(requestDetails.getRequestContext(), JsonUtil.fromJson(result));
         } catch (InternalJsonException ex) {
             LOGGER.error("Unable to parse database entity to JSON {}", ex.getMessage());
-            return DefaultResponse.error(500, E_CANNOT_PARSE, requestContext);
+            return DefaultResponse.error(500, E_CANNOT_PARSE, requestDetails.getRequestContext());
         }
     }
 
