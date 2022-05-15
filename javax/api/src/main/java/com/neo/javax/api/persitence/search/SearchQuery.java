@@ -22,7 +22,16 @@ public class SearchQuery implements Serializable {
     }
 
     /**
+     * The hits only contain the desired fields and no meta data
+     */
+    private boolean onlySource;
+
+    /**
      * The fields that are returned in the result set
+     *
+     * Null: All fields
+     * Empty: No fields
+     * Not empty: Those fields
      */
     private List<String> fields;
     /**
@@ -36,7 +45,7 @@ public class SearchQuery implements Serializable {
     /**
      * The max duration in ms the search query can take
      * */
-    private Optional<Long> timeout;
+    private Long timeout;
     /**
      * The search criteria for the query
      */
@@ -58,35 +67,44 @@ public class SearchQuery implements Serializable {
      * Create a new SearchParameters.
      */
     public SearchQuery(List<String> fields, int offset, Integer maxResults, Long timeout, List<SearchCriteria> filters,
-            Map<String, Boolean> sorting, List<SearchAggregation> aggregations) {
+            Map<String, Boolean> sorting, List<SearchAggregation> aggregations, boolean onlySource) {
         super();
         this.fields = fields;
         this.offset = offset;
         this.maxResults = maxResults;
-        this.timeout = Optional.ofNullable(timeout);
+        this.timeout = timeout;
         this.filters = filters;
         this.sorting = sorting;
         this.aggregations = aggregations;
+        this.onlySource = onlySource;
     }
 
     public SearchQuery(List<String> fields, int offset ,Integer maxResults, List<SearchCriteria> filters) {
-        this(fields, offset, maxResults, null, filters, new HashMap<>(), new ArrayList<>());
+        this(fields, offset, maxResults, null, filters, new HashMap<>(), new ArrayList<>(), false);
     }
 
     public SearchQuery(Integer maxResults, List<SearchCriteria> filters) {
-        this(null,0 ,maxResults, filters);
+        this(new ArrayList<>(),0 ,maxResults, filters);
     }
 
     public SearchQuery(Integer maxResults) {
-        this(new ArrayList<>(),0 ,maxResults, null, new ArrayList<>(), new HashMap<>(), new ArrayList<>());
+        this(new ArrayList<>(),0 ,maxResults, null, new ArrayList<>(), new HashMap<>(), new ArrayList<>(), false);
     }
 
     public SearchQuery() {
         this(SEARCH_PARAMETERS_DEFAULT);
     }
 
-    public List<String> getFields() {
-        return fields;
+    public boolean getOnlySource() {
+        return onlySource;
+    }
+
+    public void setOnlySource(boolean onlySource) {
+        this.onlySource = onlySource;
+    }
+
+    public Optional<List<String>> getFields() {
+        return Optional.ofNullable(fields);
     }
 
     public void setFields(List<String> fields) {
@@ -110,11 +128,11 @@ public class SearchQuery implements Serializable {
     }
 
     public Optional<Long> getTimeout() {
-        return timeout;
+        return Optional.ofNullable(timeout);
     }
 
     public void setTimeout(Long timeout) {
-        this.timeout = Optional.ofNullable(timeout);
+        this.timeout = timeout;
     }
 
     public List<SearchCriteria> getFilters() {

@@ -1,8 +1,10 @@
 package com.neo.javax.impl.persistence.search;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.common.impl.enumeration.Synchronization;
 import com.neo.common.impl.exception.InternalLogicException;
+import com.neo.common.impl.json.JsonUtil;
 import com.neo.javax.api.config.ConfigService;
 import com.neo.javax.api.event.ElasticSearchConnectionStatusEvent;
 import com.neo.javax.api.persistence.entity.IndexNamingService;
@@ -21,7 +23,6 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetMappingsRequest;
@@ -224,7 +225,7 @@ public class ElasticSearchRepository implements SearchRepository {
     @Override
     public SearchResult fetch(String index, SearchQuery parameters) {
         SearchRequest searchRequest = new SearchRequest(index);
-        searchRequest.indicesOptions(IndicesOptions.lenientExpand());
+        //searchRequest.indicesOptions(IndicesOptions.lenientExpand());
 
         SearchSourceBuilder builder = new SearchSourceBuilder();
         builder.size(parameters.getMaxResults());
@@ -236,12 +237,18 @@ public class ElasticSearchRepository implements SearchRepository {
 
         addSearchFilters(parameters.getFilters(), builder);
 
-        if (parameters.getFields().isEmpty()) {
-            //If no fields are requested, then the result doesn't need any hits
-            builder.size(0);
+        if (parameters.getFields().isPresent()) {
+            if (parameters.getFields().get().isEmpty()) {
+                //If no fields are requested, then the result doesn't need any hits
+                builder.size(0);
+
+            } else {
+                builder.fetchSource(parameters.getFields().get().toArray(new String[0]), new String[0]);
+            }
         } else {
-            builder.fetchSource(parameters.getFields().toArray(new String[0]), new String[0]);
+            builder.fetchSource(true);
         }
+
 
         if (!parameters.getSorting().isEmpty()) {
             Map<String, Class<?>> mapping = getFlatTypeMapping(readTypeMapping(index));
@@ -279,7 +286,7 @@ public class ElasticSearchRepository implements SearchRepository {
         request.setMasterTimeout(TimeValue.timeValueMinutes(1));
         request.indices(index);
 
-        request.indicesOptions(IndicesOptions.lenientExpandOpen());
+        //request.indicesOptions(IndicesOptions.lenientExpandOpen());
 
         try {
             GetMappingsResponse response = getClient().indices().getMapping(request, RequestOptions.DEFAULT);
@@ -590,16 +597,21 @@ public class ElasticSearchRepository implements SearchRepository {
                 response.isTerminatedEarly() != null ? response.isTerminatedEarly() : false,
                 response.isTimedOut(),
                 response.getScrollId(),
-                parseHits(response.getHits()),
+                parseHits(response.getHits(), parameters.getOnlySource()),
                 parseAggregations(response.getAggregations(), parameters.getAggregations()),
                 TotalHits.Relation.GREATER_THAN_OR_EQUAL_TO.equals(response.getHits().getTotalHits().relation));
     }
 
-    protected List<Map<String, Object>> parseHits(SearchHits searchHits) {
-        List<Map<String, Object>> hitList = new ArrayList<>();
+    protected List<JsonNode> parseHits(SearchHits searchHits, boolean onlySource) {
+        List<JsonNode> hitList = new ArrayList<>();
 
         for (SearchHit hit : searchHits.getHits()) {
-            hitList.add(hit.getSourceAsMap());
+            if (onlySource) {
+                hitList.add(JsonUtil.fromJson(hit.toString()).get("_source"));
+            } else {
+                hitList.add(JsonUtil.fromJson(hit.toString()));
+            }
+
         }
 
         return hitList;

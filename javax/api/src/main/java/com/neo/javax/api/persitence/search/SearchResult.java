@@ -1,5 +1,9 @@
 package com.neo.javax.api.persitence.search;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.neo.common.api.json.Views;
 import com.neo.javax.api.persitence.aggregation.AggregationResult;
 
 import java.util.ArrayList;
@@ -15,47 +19,56 @@ public class SearchResult {
     /**
      * Total number of hits which match the query, regardless of the maxResults.
      */
+        @JsonIgnore
     private long hitSize;
     /**
      * Maximum score of the found search results
      */
+        @JsonIgnore
     private double maxScore;
     /**
      * Duration of search in milliseconds
      */
+        @JsonView(Views.Owner.class)
     private long tookInMillis;
     /**
      * true in case the search was terminated due to reaching the timeout setting in the search parameter
      */
+        @JsonView(Views.Owner.class)
     private boolean terminatedEarly;
     /**
      * true in case the search was terminated by elasticsearch's timeout settings
      */
+        @JsonView(Views.Owner.class)
     private boolean timedOut;
     /**
      * scrollId in case paging is used
      */
+        @JsonView(Views.Public.class)
     private String scrollId;
 
     /**
      * true in case the search returned the maximum number of records, potentially more records exist
      */
+        @JsonView(Views.Public.class)
     private boolean relationGreaterThenEqualTo;
 
     /**
      * The search hits found
      */
-    private List<Map<String, Object>> hits;
+        @JsonView(Views.Public.class)
+    private List<JsonNode> hits;
     /**
      * The aggregations defined in the SearchParameter's
      */
+        @JsonView(Views.Public.class)
     private Map<String, AggregationResult> aggregations = new HashMap<>();
 
     /**
      * Create a new SearchResult.
      */
     public SearchResult(long hitSize, double maxScore, long tookInMillis, boolean terminatedEarly, boolean timedOut,
-            String scrollId, List<Map<String, Object>> hits, Map<String, AggregationResult> aggregations,
+            String scrollId, List<JsonNode> hits, Map<String, AggregationResult> aggregations,
             boolean relationGreaterThen) {
         super();
         this.hitSize = hitSize;
@@ -105,7 +118,7 @@ public class SearchResult {
         return scrollId;
     }
 
-    public List<Map<String, Object>> getHits() {
+    public List<JsonNode> getHits() {
         return hits;
     }
 
@@ -124,7 +137,8 @@ public class SearchResult {
         return relationGreaterThenEqualTo;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "SearchResult [hitSize=" + hitSize + ", tookInMillis=" + tookInMillis + ", returnedHits=" + hits.size()
                 + "]";
     }
