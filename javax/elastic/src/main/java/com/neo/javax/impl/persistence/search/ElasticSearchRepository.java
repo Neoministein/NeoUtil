@@ -639,7 +639,7 @@ public class ElasticSearchRepository implements SearchRepository {
                     aggregationResults.put(aggName, new SimpleAggregationResult(aggName, ((InternalValueCount) agg).getValue()));
                 } else if (agg instanceof NumericMetricsAggregation.SingleValue) {
 
-                    aggregationResults.put(aggName, new SimpleAggregationResult(aggName, ((NumericMetricsAggregation.SingleValue) agg).getValueAsString()));
+                    aggregationResults.put(aggName, new SimpleAggregationResult(aggName, ((NumericMetricsAggregation.SingleValue) agg).value()));
                 } else if (agg instanceof StringTerms) {
 
                     parseStringAggregation(aggregationResults, aggregationColumnNames, agg, ((StringTerms) agg).getBuckets());
@@ -735,9 +735,6 @@ public class ElasticSearchRepository implements SearchRepository {
     }
 
     protected ObjectNode parseSearchableToObjectNode(Searchable searchable) {
-        if (searchable.getBusinessId() == null) {
-            throw new InternalLogicException("Error while parsing searchable to json: BusinessId key cannot be null");
-        }
         try {
             ObjectNode objectNode = searchable.getJsonNode();
             objectNode.put(Searchable.BUSINESS_ID, searchable.getBusinessId());
