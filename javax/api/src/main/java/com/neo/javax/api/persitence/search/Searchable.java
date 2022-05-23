@@ -13,7 +13,7 @@ public interface Searchable {
 
     String INDEX_SEARCH_KEYWORD = ".keyword";
 
-    String TYPE = "type";
+    String TYPE = "searchable";
 
     /**
      * A value which is unique to this searchable
