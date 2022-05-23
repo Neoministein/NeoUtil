@@ -19,11 +19,11 @@ public class DataBaseAuditListener {
     protected void prePersist(AuditableDataBaseEntity entity) {
         Optional<UUID> uuid = requestDetails.getUUId();
         if (uuid.isPresent()) {
-            setPersistData(entity,uuid.toString());
-            setUpdateData(entity, uuid.toString());
+            setPersistData(entity,uuid.get().toString());
+            setUpdateData(entity, uuid.get().toString());
         } else {
-            setPersistData(entity, requestDetails.getRemoteAddress());
-            setUpdateData(entity, requestDetails.getRemoteAddress());
+            setPersistData(entity, requestDetails.getRequestId());
+            setUpdateData(entity, requestDetails.getRequestId());
         }
     }
 
