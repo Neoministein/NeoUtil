@@ -33,21 +33,25 @@ public abstract class AbstractRestEndpoint {
 
     public Response restCall(RestAction restAction, List<String> requiredRoles) {
         if (!authorized(requiredRoles)) {
+            LOGGER.debug("Unable to execute rest at {} action missing permissions {}",requestDetails.getRequestContext(), requiredRoles);
             return DefaultResponse.error(403, E_FORBIDDEN, requestDetails.getRequestContext());
         }
+
+        Response response;
         try {
             LOGGER.debug("Executing action at {}", requestDetails.getRequestContext());
-            return restAction.run();
+            response = restAction.run();
         } catch (InternalJsonException ex) {
             LOGGER.debug("Invalid json format in the request body");
-            return DefaultResponse.error(400, requestDetails.getRequestContext(), E_INVALID_JSON, "Invalid json format in the request body " + ex.getMessage());
+            response = DefaultResponse.error(400, requestDetails.getRequestContext(), E_INVALID_JSON, "Invalid json format in the request body " + ex.getMessage());
         } catch (InternalLogicException ex) {
             LOGGER.error("A exception occurred during a rest call", ex);
-            return DefaultResponse.error(500, E_INTERNAL_LOGIC, requestDetails.getRequestContext());
+            response = DefaultResponse.error(500, E_INTERNAL_LOGIC, requestDetails.getRequestContext());
         } catch (Exception ex) {
             LOGGER.error("A unexpected exception occurred during a rest call", ex);
-            return DefaultResponse.error(500, E_INTERNAL_LOGIC, requestDetails.getRequestContext());
+            response = DefaultResponse.error(500, E_INTERNAL_LOGIC, requestDetails.getRequestContext());
         }
+        return response;
     }
 
     public boolean authorized(List<String> requiredRoles) {
