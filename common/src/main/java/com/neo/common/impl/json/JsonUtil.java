@@ -156,7 +156,7 @@ public class JsonUtil {
      *
      * @return the ObjectNode
      */
-    public static ObjectNode toObjectNode(Object pojo) {
+    public static <T extends JsonNode> T fromPojo(Object pojo) {
         if (pojo == null) {
             return null;
         }
