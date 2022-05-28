@@ -10,6 +10,14 @@ public class RequestContext {
         this.uri = uri;
     }
 
+    public String getHttpMethod() {
+        return httpMethod;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
     @Override
     public String toString() {
         return httpMethod + " " + uri;

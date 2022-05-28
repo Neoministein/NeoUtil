@@ -1,5 +1,6 @@
 package com.neo.javax.api.connection;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,4 +57,18 @@ public interface RequestDetails {
      * @param requestContext the current requestContext
      */
     void setRequestContext(RequestContext requestContext);
+
+    /**
+     * Sets the date and time when the system received the request
+     *
+     * @param startDate
+     */
+    void setRequestReceiveDate(Date startDate);
+
+    /**
+     * Returns the date the request has been received
+     *
+     * @return the date
+     */
+    Date getRequestReceiveDate();
 }

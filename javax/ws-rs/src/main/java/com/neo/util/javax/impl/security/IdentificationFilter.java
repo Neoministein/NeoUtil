@@ -12,6 +12,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
+import java.util.Date;
 
 @Provider
 @Priority(100)
@@ -25,6 +26,7 @@ public class IdentificationFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext containerRequest) {
         requestDetails.setRequestContext(new RequestContext(containerRequest.getMethod(), getUri(containerRequest.getUriInfo())));
+        requestDetails.setRequestReceiveDate(new Date());
         MDC.put("traceId", requestDetails.getRequestId());
         LOGGER.debug("{} {}", requestDetails.getRemoteAddress(), requestDetails.getRequestContext());
     }
