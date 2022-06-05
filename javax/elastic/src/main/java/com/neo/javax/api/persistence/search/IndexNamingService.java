@@ -1,4 +1,4 @@
-package com.neo.javax.api.persistence.entity;
+package com.neo.javax.api.persistence.search;
 
 import com.neo.javax.api.persitence.search.Searchable;
 

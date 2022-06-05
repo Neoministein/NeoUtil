@@ -7,7 +7,7 @@ import com.neo.common.impl.exception.InternalLogicException;
 import com.neo.common.impl.json.JsonUtil;
 import com.neo.javax.api.config.ConfigService;
 import com.neo.javax.api.event.ElasticSearchConnectionStatusEvent;
-import com.neo.javax.api.persistence.entity.IndexNamingService;
+import com.neo.javax.api.persistence.search.IndexNamingService;
 import com.neo.javax.api.persitence.search.IndexParameter;
 import com.neo.javax.api.persitence.search.SearchQuery;
 import com.neo.javax.api.persitence.search.SearchResult;
@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.*;
@@ -60,6 +61,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * This class provides methods to interact with elastic search
  */
+@Default
 @SuppressWarnings("deprecation")
 @ApplicationScoped
 public class ElasticSearchRepository implements SearchRepository {
@@ -78,8 +80,7 @@ public class ElasticSearchRepository implements SearchRepository {
     @Inject
     IndexNamingService indexNameService;
 
-    @Inject
-    ElasticSearchConnectionRepository connection;
+    @Inject ElasticSearchConnectionRepositoryImpl connection;
 
     private volatile BulkProcessor bulkProcessor;
 
@@ -799,7 +800,7 @@ public class ElasticSearchRepository implements SearchRepository {
                         getClient().bulkAsync(request, RequestOptions.DEFAULT, bulkListener),
                 listener);
 
-        configService.get(ElasticSearchConnectionRepository.ELASTIC_CONFIG);
+        configService.get(ElasticSearchConnectionRepositoryImpl.ELASTIC_CONFIG);
 
         int flushInterval = configService.get("FlushInterval").asInt().orElse(10);
         LOGGER.info("BulkProcessor.Builder FlushInterval: {}", flushInterval);

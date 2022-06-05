@@ -5,6 +5,7 @@ import com.neo.javax.api.config.Config;
 import com.neo.javax.api.config.ConfigService;
 import com.neo.javax.api.event.ApplicationReadyEvent;
 import com.neo.javax.api.event.ElasticSearchConnectionStatusEvent;
+import com.neo.javax.api.persistence.search.ElasticSearchConnectionRepository;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -19,9 +20,9 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,11 +30,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * This class is responsible for upholding the connection to the elasticsearch nodes.
  */
+@Default
 @SuppressWarnings("deprecation")
 @ApplicationScoped
-public class ElasticSearchConnectionRepository implements Serializable {
+public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConnectionRepository {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchConnectionRepository.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchConnectionRepositoryImpl.class);
 
     protected static final String DEFAULT_SCHEME = "http";
     protected static final String LOCALHOST_HOST_NAME = "127.0.0.1";
@@ -113,7 +115,7 @@ public class ElasticSearchConnectionRepository implements Serializable {
     /**
      * Disconnects the client from elasticsearch
      */
-    protected synchronized void disconnect() {
+    public synchronized void disconnect() {
         if (client == null) {
             return;
         }
@@ -131,7 +133,7 @@ public class ElasticSearchConnectionRepository implements Serializable {
     /**
      * Connects the client to elasticsearch and fires a {@link ElasticSearchConnectionStatusEvent}
      */
-    protected synchronized void connect() {
+    public synchronized void connect() {
         if (client != null) {
             return;
         }

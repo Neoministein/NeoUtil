@@ -3,7 +3,7 @@ package com.neo.javax.impl.persistence.search;
 import com.neo.common.impl.StringUtils;
 import com.neo.javax.api.config.Config;
 import com.neo.javax.api.config.ConfigService;
-import com.neo.javax.api.persistence.entity.IndexNamingService;
+import com.neo.javax.api.persistence.search.IndexNamingService;
 import com.neo.javax.api.persitence.search.IndexPeriod;
 import com.neo.javax.api.persitence.search.Searchable;
 import org.joda.time.DateTime;
@@ -15,11 +15,13 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
+@Default
 @ApplicationScoped
 public class IndexNamingServiceImpl implements IndexNamingService {
 
@@ -65,7 +67,7 @@ public class IndexNamingServiceImpl implements IndexNamingService {
      */
     @PostConstruct
     public void postConstruct() {
-        Config config = configService.get(ElasticSearchConnectionRepository.ELASTIC_CONFIG);
+        Config config = configService.get(ElasticSearchConnectionRepositoryImpl.ELASTIC_CONFIG);
 
         mappingVersion = config.get(MAPPING_VERSION_CONFIG).asString().orElse(DEFAULT_MAPPING_VERSION);
 
