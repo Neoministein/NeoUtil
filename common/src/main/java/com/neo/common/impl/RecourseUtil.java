@@ -18,7 +18,7 @@ public class RecourseUtil {
      * @throws IOException if read fails for any reason
      */
     public static String getResourceFileAsString(String fileName) throws IOException {
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         try (InputStream is = classLoader.getResourceAsStream(fileName)) {
             if (is == null) throw new IOException("Unable to find file: " + fileName);
 
