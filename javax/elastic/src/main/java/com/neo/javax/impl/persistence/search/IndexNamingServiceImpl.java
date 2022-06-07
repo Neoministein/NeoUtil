@@ -15,13 +15,11 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
-@Default
 @ApplicationScoped
 public class IndexNamingServiceImpl implements IndexNamingService {
 

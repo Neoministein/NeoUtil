@@ -20,7 +20,6 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * This class is responsible for upholding the connection to the elasticsearch nodes.
  */
-@Default
 @SuppressWarnings("deprecation")
 @ApplicationScoped
 public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConnectionRepository {

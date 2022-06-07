@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.*;
@@ -61,7 +60,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * This class provides methods to interact with elastic search
  */
-@Default
 @SuppressWarnings("deprecation")
 @ApplicationScoped
 public class ElasticSearchRepository implements SearchRepository {
