@@ -3,13 +3,13 @@ package com.neo.util.framework.rest.impl.entity;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.api.json.Views;
 import com.neo.util.common.impl.json.JsonUtil;
+import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.api.persitence.criteria.ExplicitSearchCriteria;
 import com.neo.util.framework.api.persitence.entity.DataBaseEntity;
 import com.neo.util.framework.api.persitence.entity.EntityQuery;
 import com.neo.util.framework.api.persitence.entity.EntityRepository;
 import com.neo.util.framework.api.persitence.entity.EntityResult;
 import com.neo.util.framework.rest.api.RestAction;
-import com.neo.util.framework.rest.impl.AbstractRestEndpoint;
 import com.neo.util.common.impl.exception.InternalJsonException;
 import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.framework.rest.impl.DefaultResponse;
@@ -23,7 +23,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> extends AbstractRestEndpoint {
+public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEntityRestEndpoint.class);
 
@@ -35,8 +35,13 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> exten
 
     protected static final String ENTITY_PERM = "CRUD_";
 
+    protected static final String PERM_INTERNAL = "internal";
+
     @Inject
     protected EntityRepository entityRepository;
+
+    @Inject
+    protected RequestDetails requestDetails;
 
     protected abstract Object convertToPrimaryKey(String primaryKey);
 

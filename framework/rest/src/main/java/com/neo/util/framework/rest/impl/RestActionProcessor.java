@@ -8,13 +8,15 @@ import com.neo.util.framework.rest.api.RestAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-public abstract class AbstractRestEndpoint {
+@RequestScoped
+public class RestActionProcessor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRestEndpoint.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestActionProcessor.class);
 
     public static final ObjectNode E_INTERNAL_LOGIC = DefaultResponse.errorObject("unknown","Internal server error please try again later");
     public static final ObjectNode E_UNAUTHORIZED = DefaultResponse.errorObject("auth/000", "Unauthorized");
@@ -22,16 +24,14 @@ public abstract class AbstractRestEndpoint {
 
     protected static final String E_INVALID_JSON = "json/000";
 
-    protected static final String PERM_INTERNAL = "internal";
-
     @Inject
     protected RequestDetails requestDetails;
 
-    public Response restCall(RestAction restAction) {
-        return restCall(restAction, List.of());
+    public Response process(RestAction restAction) {
+        return process(restAction, List.of());
     }
 
-    public Response restCall(RestAction restAction, List<String> requiredRoles) {
+    public Response process(RestAction restAction, List<String> requiredRoles) {
         if (!authorized(requiredRoles)) {
             LOGGER.debug("Unable to execute rest at {} action missing permissions {}",requestDetails.getRequestContext(), requiredRoles);
             return DefaultResponse.error(403, E_FORBIDDEN, requestDetails.getRequestContext());
