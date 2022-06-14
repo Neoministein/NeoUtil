@@ -1,1 +1,1 @@
-com.neo.util.helidon.impl.authentication.CustomJWTSecurityProviderService
+com.neo.util.helidon.security.impl.CustomJWTSecurityProviderService

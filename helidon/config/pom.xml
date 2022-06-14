@@ -3,20 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.neo.util.helidon</groupId>
-        <artifactId>helidon</artifactId>
+        <artifactId>root</artifactId>
         <version>1.0.0</version>
     </parent>
     <artifactId>config</artifactId>
     <name>Neo Util Helidon Config Jar</name>
     <packaging>jar</packaging>
 
-    <properties>
-        <helidon.version>2.4.0</helidon.version>
-    </properties>
-
     <dependencies>
         <dependency>
-            <groupId>com.neo.util.javax</groupId>
+            <groupId>com.neo.util.framework</groupId>
             <artifactId>api</artifactId>
             <version>1.0.0</version>
         </dependency>

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.neo.util.helidon</groupId>
-        <artifactId>helidon</artifactId>
+        <artifactId>root</artifactId>
         <version>1.0.0</version>
     </parent>
     <artifactId>security-provider-rotating-jwt</artifactId>
