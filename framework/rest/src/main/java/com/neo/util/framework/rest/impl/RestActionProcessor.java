@@ -55,11 +55,6 @@ public class RestActionProcessor {
     }
 
     public boolean authorized(List<String> requiredRoles) {
-        return requestDetails.isInRoles(requiredRoles);
-    }
-
-    //Only for testing purposes
-    public void setRequestDetails(RequestDetails requestDetails) {
-        this.requestDetails = requestDetails;
+        return requiredRoles.isEmpty() || requestDetails.isInRoles(requiredRoles);
     }
 }
