@@ -83,7 +83,7 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
         boolean hasChanged;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             LOGGER.trace("Calling public key endpoint [{}]", publicKeyEndpoint.getURI());
-            String response = lazyHttpExecutor.call(httpClient, publicKeyEndpoint, new DefaultSuccessResponse(), 5);
+            String response = lazyHttpExecutor.execute(httpClient, publicKeyEndpoint, new DefaultSuccessResponse(), 5);
 
             Map<String, JWTKey> newMap = parseEndpointResult(response);
             lastUpdate = System.currentTimeMillis();

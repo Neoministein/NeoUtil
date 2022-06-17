@@ -40,7 +40,7 @@ public class LazyHttpExecutor {
      *
      * @return the response message
      */
-    public String call(HttpClient httpClient, HttpUriRequest httpUriRequest, ResponseFormatVerification formatVerifier, int retries) {
+    public String execute(HttpClient httpClient, HttpUriRequest httpUriRequest, ResponseFormatVerification formatVerifier, int retries) {
         Action<String> action = () -> {
             try {
                 HttpResponse httpResponse = httpClient.execute(httpUriRequest);

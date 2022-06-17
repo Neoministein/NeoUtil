@@ -76,7 +76,7 @@ class RotatingSigningKeyResolverTest extends AbstractJWTTest{
         setupSubject(false);
         JwsHeader jwsHeader = Mockito.mock(JwsHeader.class);
 
-        Mockito.doReturn(defaultEndpointResponse("0")).when(lazyHttpExecutor).call(Mockito.any(HttpClient.class),Mockito.any(HttpUriRequest.class),Mockito.any(
+        Mockito.doReturn(defaultEndpointResponse("0")).when(lazyHttpExecutor).execute(Mockito.any(HttpClient.class),Mockito.any(HttpUriRequest.class),Mockito.any(
                 ResponseFormatVerification.class),Mockito.anyInt());
 
         Mockito.doReturn("1").when(jwsHeader).getKeyId();
@@ -99,7 +99,7 @@ class RotatingSigningKeyResolverTest extends AbstractJWTTest{
         lazyHttpExecutor = Mockito.mock(LazyHttpExecutor.class);
         subject.lazyHttpExecutor = lazyHttpExecutor;
 
-        Mockito.doReturn(defaultEndpointResponse("1")).when(lazyHttpExecutor).call(Mockito.any(HttpClient.class),Mockito.any(HttpUriRequest.class),Mockito.any(
+        Mockito.doReturn(defaultEndpointResponse("1")).when(lazyHttpExecutor).execute(Mockito.any(HttpClient.class),Mockito.any(HttpUriRequest.class),Mockito.any(
                 ResponseFormatVerification.class),Mockito.anyInt());
         //Act
         Key key = subject.resolveSigningKey(jwsHeader, (Claims) null);
