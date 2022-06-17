@@ -2,7 +2,7 @@ package com.neo.util.common.impl.http;
 
 import com.neo.util.common.api.action.Action;
 import com.neo.util.common.api.http.verify.ResponseFormatVerification;
-import com.neo.util.common.impl.lazy.LazyAction;
+import com.neo.util.common.impl.lazy.LazyExecutor;
 import com.neo.util.common.impl.exception.InternalLogicException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -16,9 +16,17 @@ import java.io.IOException;
 /**
  * This utility class handles sending and retrying http calls through a apache http client.
  */
-public class LazyHttpCaller {
+public class LazyHttpExecutor {
 
-    private LazyHttpCaller() {}
+    protected final LazyExecutor lazyExecutor;
+
+    public LazyHttpExecutor() {
+        this(new LazyExecutor());
+    }
+
+    protected LazyHttpExecutor(LazyExecutor lazyAction) {
+        this.lazyExecutor = lazyAction;
+    }
 
     /**
      * Executes the httpUriRequest via the httpClient and verifies if the response format is correct and reties if it fails
@@ -32,7 +40,7 @@ public class LazyHttpCaller {
      *
      * @return the response message
      */
-    public static String call(HttpClient httpClient, HttpUriRequest httpUriRequest, ResponseFormatVerification formatVerifier, int retries) {
+    public String call(HttpClient httpClient, HttpUriRequest httpUriRequest, ResponseFormatVerification formatVerifier, int retries) {
         Action<String> action = () -> {
             try {
                 HttpResponse httpResponse = httpClient.execute(httpUriRequest);
@@ -54,6 +62,6 @@ public class LazyHttpCaller {
             }
         };
 
-        return LazyAction.call(action, retries);
+        return lazyExecutor.execute(action, retries);
     }
 }

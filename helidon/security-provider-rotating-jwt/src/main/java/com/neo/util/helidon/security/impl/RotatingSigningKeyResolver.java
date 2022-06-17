@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.helidon.security.impl.key.JWTKey;
 import com.neo.util.helidon.security.impl.key.JWTPublicKey;
 import com.neo.util.common.impl.KeyUtils;
-import com.neo.util.common.impl.http.LazyHttpCaller;
+import com.neo.util.common.impl.http.LazyHttpExecutor;
 import com.neo.util.common.impl.http.verify.DefaultSuccessResponse;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.common.impl.exception.InternalJsonException;
@@ -30,11 +30,12 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
 
     private static final Logger LOGGER =  LoggerFactory.getLogger(RotatingSigningKeyResolver.class);
 
-    private static final int TEN_SECONDS = 10 * 1000;
-    private long lastUpdate = 0L;
+    protected static final int TEN_SECONDS = 10 * 1000;
+    protected long lastUpdate = 0L;
 
-    private final HttpGet publicKeyEndpoint;
+    protected final HttpGet publicKeyEndpoint;
     protected Map<String, JWTKey> keyMap = new HashMap<>();
+    protected LazyHttpExecutor lazyHttpExecutor = new LazyHttpExecutor();
 
     public RotatingSigningKeyResolver(String publicKeyEndpoint, boolean isSecurityService) {
         this.publicKeyEndpoint = new HttpGet(publicKeyEndpoint);
@@ -82,7 +83,7 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
         boolean hasChanged;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             LOGGER.trace("Calling public key endpoint [{}]", publicKeyEndpoint.getURI());
-            String response = LazyHttpCaller.call(httpClient, publicKeyEndpoint, new DefaultSuccessResponse(), 5);
+            String response = lazyHttpExecutor.call(httpClient, publicKeyEndpoint, new DefaultSuccessResponse(), 5);
 
             Map<String, JWTKey> newMap = parseEndpointResult(response);
             lastUpdate = System.currentTimeMillis();
