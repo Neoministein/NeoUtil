@@ -28,7 +28,6 @@
   },
   "required": [
     "apiVersion",
-    "data",
     "context",
     "status"
   ]
