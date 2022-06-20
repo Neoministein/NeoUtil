@@ -14,12 +14,12 @@ import java.util.Date;
 @EntityListeners( { DataBaseAuditListener.class } )
 public abstract class AuditableDataBaseEntity implements DataBaseEntity {
 
-    public static final String C_CREATED_ON = "created_on";
-    public static final String C_CREATED_BY = "created_by";
+    public static final String C_CREATED_ON = "createdOn";
+    public static final String C_CREATED_BY = "createdBy";
 
-    public static final String C_TRANSACTION_COUNT = "transaction_count";
-    public static final String C_UPDATED_ON = "updated_on";
-    public static final String C_UPDATED_BY = "updated_by";
+    public static final String C_TRANSACTION_COUNT = "transactionCount";
+    public static final String C_UPDATED_ON = "updatedOn";
+    public static final String C_UPDATED_BY = "updatedBy";
 
     @Column(name = C_CREATED_ON, nullable = false, updatable = false)
         @JsonView(Views.Owner.class)
