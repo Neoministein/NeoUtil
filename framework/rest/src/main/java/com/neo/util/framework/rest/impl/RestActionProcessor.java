@@ -42,7 +42,7 @@ public class RestActionProcessor {
             LOGGER.debug("Executing action at {}", requestDetails.getRequestContext());
             response = restAction.run();
         } catch (InternalJsonException ex) {
-            LOGGER.debug("Invalid json format in the request body");
+            LOGGER.warn("Invalid json format in the request body [{}]", ex.getMessage());
             response = DefaultResponse.error(400, requestDetails.getRequestContext(), E_INVALID_JSON, "Invalid json format in the request body " + ex.getMessage());
         } catch (InternalLogicException ex) {
             LOGGER.error("A exception occurred during a rest call", ex);
