@@ -2,7 +2,7 @@ package com.neo.util.framework.persistence.impl;
 
 import com.neo.util.common.impl.enumeration.PersistenceOperation;
 import com.neo.util.common.impl.exception.InternalLogicException;
-import com.neo.util.framework.api.persitence.entity.DataBaseEntity;
+import com.neo.util.framework.api.persistence.entity.DataBaseEntity;
 
 import javax.persistence.*;
 

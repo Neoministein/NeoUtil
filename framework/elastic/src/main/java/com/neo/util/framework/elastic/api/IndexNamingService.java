@@ -1,6 +1,6 @@
 package com.neo.util.framework.elastic.api;
 
-import com.neo.util.framework.api.persitence.search.Searchable;
+import com.neo.util.framework.api.persistence.search.Searchable;
 
 /**
  * This service retrieves the index which shall be used in for the given searchable

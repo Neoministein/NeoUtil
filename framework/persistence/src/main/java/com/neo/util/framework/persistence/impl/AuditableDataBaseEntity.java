@@ -2,7 +2,7 @@ package com.neo.util.framework.persistence.impl;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.neo.util.common.api.json.Views;
-import com.neo.util.framework.api.persitence.entity.DataBaseEntity;
+import com.neo.util.framework.api.persistence.entity.DataBaseEntity;
 import com.neo.util.framework.persistence.impl.listener.DataBaseAuditListener;
 
 import javax.persistence.Column;

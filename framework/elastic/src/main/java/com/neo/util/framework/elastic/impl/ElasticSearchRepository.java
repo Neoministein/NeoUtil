@@ -6,9 +6,9 @@ import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.config.ConfigService;
-import com.neo.util.framework.api.persitence.aggregation.*;
-import com.neo.util.framework.api.persitence.criteria.*;
-import com.neo.util.framework.api.persitence.search.*;
+import com.neo.util.framework.api.persistence.aggregation.*;
+import com.neo.util.framework.api.persistence.criteria.*;
+import com.neo.util.framework.api.persistence.search.*;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.action.DocWriteRequest;
@@ -73,7 +73,8 @@ public class ElasticSearchRepository implements SearchRepository {
     @Inject
     IndexNamingService indexNameService;
 
-    @Inject ElasticSearchConnectionRepositoryImpl connection;
+    @Inject
+    ElasticSearchConnectionRepositoryImpl connection;
 
     private volatile BulkProcessor bulkProcessor;
 
