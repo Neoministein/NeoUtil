@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>com.neo.util.framework</groupId>
 	<artifactId>root</artifactId>
-	<name>Neo Util Javax JAR</name>
+	<name>Neo Util Framework POM</name>
 	<packaging>pom</packaging>
 
 	<modules>
