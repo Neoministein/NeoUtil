@@ -9,6 +9,7 @@ import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.persistence.aggregation.*;
 import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.search.*;
+import com.neo.util.framework.elastic.api.ElasticSearchConnectionRepository;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.action.DocWriteRequest;
@@ -47,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.*;
@@ -56,6 +58,7 @@ import java.util.concurrent.TimeUnit;
  * This class provides methods to interact with elastic search
  */
 @SuppressWarnings("deprecation")
+@Alternative
 @ApplicationScoped
 public class ElasticSearchRepository implements SearchRepository {
 
@@ -74,7 +77,7 @@ public class ElasticSearchRepository implements SearchRepository {
     IndexNamingService indexNameService;
 
     @Inject
-    ElasticSearchConnectionRepositoryImpl connection;
+    ElasticSearchConnectionRepository connection;
 
     private volatile BulkProcessor bulkProcessor;
 
