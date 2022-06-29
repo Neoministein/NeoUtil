@@ -5,6 +5,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * The annotation generates a {@link QueueProducer} based on the annotation value
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface OutgoingQueueConnection {

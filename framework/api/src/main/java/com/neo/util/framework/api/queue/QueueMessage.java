@@ -18,7 +18,7 @@ public class QueueMessage implements Serializable {
     protected String messageType;
 
     /**
-     * An arbitrary serializable data structure.
+     * An arbitrary serializable data structure.Which will be parsed to json.
      */
     protected Serializable message;
 

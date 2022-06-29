@@ -3,7 +3,7 @@ package com.neo.util.framework.api.persistence.entity;
 import java.io.Serializable;
 
 /**
- * A Interface which enables easy working with unknown database entities
+ * An interface which enables easy working with unknown database entities
  */
 public interface DataBaseEntity extends Serializable {
 
