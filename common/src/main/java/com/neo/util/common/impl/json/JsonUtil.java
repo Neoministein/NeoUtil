@@ -28,7 +28,7 @@ public class JsonUtil {
      *
      * The only caveat is that you can't be modifying configuration of the mapper once it is shared;
      * but you are not changing configuration so that is fine. If you did need to change configuration,
-     * you would do that from the static block and it would be fine as well.
+     * you would do that from the static block, and it would be fine as well.
      */
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -183,4 +183,38 @@ public class JsonUtil {
         }
     }
 
+    /**
+     * Merges the two {@link JsonNode} together
+     *
+     * @param mainNode merge into Node
+     * @param updateNode merge from Node
+     * @return the merged Node
+     */
+    public static JsonNode merge(JsonNode mainNode, JsonNode updateNode) {
+        Iterator<String> fieldNames = updateNode.fieldNames();
+
+        while (fieldNames.hasNext()) {
+            String updatedFieldName = fieldNames.next();
+            JsonNode valueToBeUpdated = mainNode.get(updatedFieldName);
+            JsonNode updatedValue = updateNode.get(updatedFieldName);
+
+            if (valueToBeUpdated != null && valueToBeUpdated.isArray() && updatedValue.isArray()) {
+                for (int i = 0; i < updatedValue.size(); i++) {
+                    JsonNode updatedChildNode = updatedValue.get(i);
+                    if (valueToBeUpdated.size() <= i) {
+                        ((ArrayNode) valueToBeUpdated).add(updatedChildNode);
+                    }
+                    JsonNode childNodeToBeUpdated = valueToBeUpdated.get(i);
+                    merge(childNodeToBeUpdated, updatedChildNode);
+                }
+            } else if (valueToBeUpdated != null && valueToBeUpdated.isObject()) {
+                merge(valueToBeUpdated, updatedValue);
+            } else {
+                if (mainNode instanceof ObjectNode) {
+                    ((ObjectNode) mainNode).replace(updatedFieldName, updatedValue);
+                }
+            }
+        }
+        return mainNode;
+    }
 }

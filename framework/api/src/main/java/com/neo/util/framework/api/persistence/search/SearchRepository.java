@@ -27,6 +27,10 @@ public interface SearchRepository {
 
     void deleteAll(Class<? extends Searchable> searchableClazz);
 
+    void process(QueueableSearchable transportSearchable);
+
+    void process(List<QueueableSearchable> transportSearchableList);
+
     SearchResult fetch(String index, SearchQuery parameters);
 
     /**

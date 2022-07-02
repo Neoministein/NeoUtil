@@ -26,11 +26,12 @@ public class QueueServiceImpl implements QueueService {
 
     protected Map<String, QueueProducer> queueProducerMap = new HashMap<>();
 
+    /**
+     * Initializes the mapping to the {@link QueueProducer}.
+     * This is done only once at startup as no new queues should be added at runtime.
+     */
     @Inject
-    protected Instance<QueueProducer> queueProducerInstances;
-
-    @PostConstruct
-    protected void init() {
+    protected void init(Instance<QueueProducer> queueProducerInstances) {
         for (QueueProducer queueProducer: queueProducerInstances) {
             if (queueProducerMap.containsKey(queueProducer.getQueueName())) {
                 LOGGER.error("Found duplicated queue {} {} {}",

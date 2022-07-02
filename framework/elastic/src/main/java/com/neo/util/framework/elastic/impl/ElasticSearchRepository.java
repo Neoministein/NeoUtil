@@ -9,16 +9,22 @@ import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.persistence.aggregation.*;
 import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.search.*;
+import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionRepository;
 import com.neo.util.framework.elastic.api.IndexNamingService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.DocWriteRequest;
+import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetMappingsRequest;
@@ -27,7 +33,9 @@ import org.elasticsearch.cluster.metadata.MappingMetadata;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.core.TimeValue;
+import org.elasticsearch.index.VersionType;
 import org.elasticsearch.index.query.*;
+import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -62,26 +70,35 @@ import java.util.concurrent.TimeUnit;
 @ApplicationScoped
 public class ElasticSearchRepository implements SearchRepository {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchRepository.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchRepository.class);
+
+    protected static final List<RestStatus> FILTER_REST_STATUS = Arrays.asList(RestStatus.CONFLICT,
+            RestStatus.NOT_FOUND);
 
     //{"I/O reactor status: STOPPED","I/O reactor has been shut down"}
     protected static final String[] FILTER_HTTPCLIENT_MESSAGES = new String[] { "I/O reactor" };
 
+    protected static final String[] FILTER_MESSAGES = new String[] { "type=version_conflict_engine_exception" };
+
     protected static final String TYPE = "type";
     protected static final String PROPERTIES = "properties";
 
-    @Inject
-    ConfigService configService;
+    protected long flushInterval = 0;
 
     @Inject
-    IndexNamingService indexNameService;
+    protected ConfigService configService;
 
     @Inject
-    ElasticSearchConnectionRepository connection;
+    protected IndexingQueueService indexerQueueService;
 
-    private volatile BulkProcessor bulkProcessor;
+    @Inject
+    protected IndexNamingService indexNameService;
 
-    //TODO MAKE THIS BETTER
+    @Inject
+    protected ElasticSearchConnectionRepository connection;
+
+    protected volatile BulkProcessor bulkProcessor;
+
     protected synchronized void setupBulkProcessor() {
         if (bulkProcessor != null) {
             return;
@@ -90,23 +107,27 @@ public class ElasticSearchRepository implements SearchRepository {
         BulkProcessor.Listener listener = new BulkProcessor.Listener() {
             @Override
             public void beforeBulk(long executionId, BulkRequest bulkRequest) {
-                int numberOfActions = bulkRequest.numberOfActions();
-                LOGGER.debug("Executing bulk [{}] with {} requests, first doc [{}]", executionId, numberOfActions,
-                            numberOfActions > 0 ? bulkRequest.requests().get(0) : "Empty");
-
+                LOGGER.debug("Executing bulk [{}] with [{}] requests", executionId, bulkRequest.numberOfActions());
             }
 
             @Override
             public void afterBulk(long executionId, BulkRequest bulkRequest, BulkResponse bulkResponse) {
-                LOGGER.info("Executed bulk [{}] with {} requests, hasFailures: {}, took: {}, ingestTook: {}",
-                        executionId, bulkRequest.numberOfActions(), bulkResponse.hasFailures(), bulkResponse.getTook(),
-                        bulkResponse.getIngestTook());
+                handleBulkResponse(executionId, bulkRequest, bulkResponse);
             }
 
             @Override
             public void afterBulk(long executionId, BulkRequest bulkRequest, Throwable failure) {
-                LOGGER.info("Executed bulk [{}] with failure complete bulk will be retried, message: {}", executionId,
+                LOGGER.info("Executed bulk [{}] with complete failure, entire bulk will be retried, message: [{}]", executionId,
                         failure.getMessage());
+                ArrayList<QueueableSearchable> bulkQueueableSearchableList = new ArrayList<>();
+                for (DocWriteRequest<?> request : bulkRequest.requests()) {
+                    bulkQueueableSearchableList.add(generateQueueableSearchable(request));
+                }
+                indexerQueueService.addToIndexingQueue(new QueueMessage(
+                        QueueableSearchable.RequestType.BULK.toString(), bulkQueueableSearchableList));
+                if (failure instanceof IllegalStateException) {
+                    reconnectClientIfNeeded((IllegalStateException) failure);
+                }
             }
         };
 
@@ -221,9 +242,96 @@ public class ElasticSearchRepository implements SearchRepository {
     }
 
     @Override
+    public void process(QueueableSearchable queueableSearchable) {
+        switch (queueableSearchable.getRequestType()) {
+            case INDEX:
+                getBulkProcessor().add(generateIndexRequest(queueableSearchable));
+                break;
+            case UPDATE:
+                throw new InternalLogicException("Not implemented yet");
+            case DELETE:
+                throw new InternalLogicException("Not implemented yet");
+        }
+    }
+
+    @Override
+    public void process(List<QueueableSearchable> transportSearchableList) {
+        BulkRequest bulkRequest = new BulkRequest();
+        for (QueueableSearchable queueableSearchable : transportSearchableList) {
+            switch (queueableSearchable.getRequestType()) {
+            case INDEX:
+                bulkRequest.add(generateIndexRequest(queueableSearchable));
+                break;
+            case UPDATE:
+                throw new InternalLogicException("Not implemented yet");
+            case DELETE:
+                throw new InternalLogicException("Not implemented yet");
+            }
+        }
+
+        try {
+            BulkResponse bulkResponse = getClient().bulk(bulkRequest, RequestOptions.DEFAULT);
+            handleBulkResponse(-1,bulkRequest, bulkResponse);
+        } catch (IOException ex) {
+            LOGGER.warn("Executed bulk with complete failure, entire bulk will be retried, message: [{}]",
+                    ex.getMessage());
+            throw new InternalLogicException("Indexing-IOException unable to process bulk Untransportable");
+        } catch (IllegalStateException ex) {
+            LOGGER.warn("Executed bulk with complete failure, entire bulk will be retried, message: [{}]",
+                    ex.getMessage());
+            reconnectClientIfNeeded(ex);
+            throw new InternalLogicException("Indexing-IOException unable to process bulk Untransportable");
+        }
+    }
+
+    protected void handleBulkResponse(long executionId, BulkRequest bulkRequest, BulkResponse bulkResponse) {
+        LOGGER.info("Executed bulk [{}] with [{}] requests, hasFailures: [{}], took: [{}], ingestTook: [{}]",
+                executionId, bulkRequest.numberOfActions(), bulkResponse.hasFailures(), bulkResponse.getTook(),
+                bulkResponse.getIngestTook());
+        if (bulkResponse.hasFailures()) {
+            List<QueueableSearchable> queueableSearchableList = handleFailedBulkProcess(bulkRequest, bulkResponse);
+            for (QueueableSearchable queueableSearchable: queueableSearchableList) {
+                indexerQueueService.addToIndexingQueue(new QueueMessage(
+                        queueableSearchable.getRequestType().toString(), queueableSearchable));
+            }
+        }
+    }
+
+    /**
+     * Collect the items of bulk request result which have failed and can be retried
+     */
+    protected ArrayList<QueueableSearchable> handleFailedBulkProcess(BulkRequest bulkRequest,
+            BulkResponse bulkResponse) {
+        if (!bulkResponse.hasFailures()) {
+            return new ArrayList<>();
+        }
+        ArrayList<QueueableSearchable> bulkQueueableSearchableList = new ArrayList<>();
+        BulkItemResponse[] bulkItemResponse = bulkResponse.getItems();
+        for (int i = 0; i < bulkItemResponse.length; i++) {
+
+            BulkItemResponse item = bulkItemResponse[i];
+            if (item.isFailed()) {
+                BulkItemResponse.Failure failure = item.getFailure();
+                if (exceptionIsToBeRetried(failure.getCause())) {
+                    DocWriteRequest<?> request = bulkRequest.requests().get(i);
+                    QueueableSearchable transportSearchable = generateQueueableSearchable(request);
+                    bulkQueueableSearchableList.add(transportSearchable);
+                    LOGGER.info("Request failed, to be retried, failureMessage:[{}], transportSearchable:[{}]",
+                            failure.getMessage(), transportSearchable);
+                } else {
+                    LOGGER.info("Request failed, no retry, failureMessage:[{}]", failure.getMessage());
+                }
+            }
+        }
+        LOGGER.debug("Sending bulk failure to queue, initial size:[{}], retry size:[{}]", bulkRequest.numberOfActions(),
+                bulkQueueableSearchableList.size());
+
+        return bulkQueueableSearchableList;
+    }
+
+    @Override
     public SearchResult fetch(String index, SearchQuery parameters) {
         SearchRequest searchRequest = new SearchRequest(index);
-        //searchRequest.indicesOptions(IndicesOptions.lenientExpand());
 
         SearchSourceBuilder builder = new SearchSourceBuilder();
         builder.size(parameters.getMaxResults());
@@ -284,8 +392,6 @@ public class ElasticSearchRepository implements SearchRepository {
         request.setMasterTimeout(TimeValue.timeValueMinutes(1));
         request.indices(index);
 
-        //request.indicesOptions(IndicesOptions.lenientExpandOpen());
-
         try {
             GetMappingsResponse response = getClient().indices().getMapping(request, RequestOptions.DEFAULT);
             Map<String, MappingMetadata> mappings = response.mappings();
@@ -318,7 +424,7 @@ public class ElasticSearchRepository implements SearchRepository {
                 }
             }
         } catch (IOException | IllegalStateException ex) {
-            // FIXME handle exceptions properly
+            //TODO handle exceptions properly
             ex.printStackTrace();
         }
 
@@ -799,7 +905,7 @@ public class ElasticSearchRepository implements SearchRepository {
 
         configService.get(ElasticSearchConnectionRepositoryImpl.ELASTIC_CONFIG);
 
-        int flushInterval = configService.get("FlushInterval").asInt().orElse(10);
+        flushInterval = configService.get("FlushInterval").asInt().orElse(10);
         LOGGER.info("BulkProcessor.Builder FlushInterval: {}", flushInterval);
         builder.setFlushInterval(TimeValue.timeValueSeconds(flushInterval));
 
@@ -816,5 +922,60 @@ public class ElasticSearchRepository implements SearchRepository {
         builder.setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.MB));
 
         return builder;
+    }
+
+
+    protected IndexRequest generateIndexRequest(QueueableSearchable queueableSearchable) {
+        IndexRequest request = new IndexRequest(queueableSearchable.getIndex()).id(queueableSearchable.getId())
+                .routing(queueableSearchable.getRouting())
+                .source(queueableSearchable.getJsonSource(), XContentType.JSON);
+        if (queueableSearchable.getVersion() != null && StringUtils.isNotEmpty(queueableSearchable.getId())) {
+            request.versionType(VersionType.EXTERNAL_GTE).version(queueableSearchable.getVersion());
+        }
+
+        return request;
+    }
+
+    /**
+     * Checks the message of the exception if its an {@link ElasticsearchException} otherwise it will be retried
+     */
+    public boolean exceptionIsToBeRetried(Exception e) {
+        if (e instanceof ElasticsearchException) {
+            ElasticsearchException elasticEx = (ElasticsearchException) e;
+            if (FILTER_REST_STATUS.contains(elasticEx.status()) ||
+                    Arrays.stream(FILTER_MESSAGES).anyMatch(elasticEx.getDetailedMessage()::contains)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected QueueableSearchable generateQueueableSearchable(DocWriteRequest<?> request) {
+        if (request instanceof UpdateRequest) {
+            return generateQueueableSearchable((UpdateRequest) request);
+        } else if (request instanceof IndexRequest) {
+            return generateQueueableSearchable((IndexRequest) request);
+        } else if (request instanceof DeleteRequest) {
+            return generateQueueableSearchable((DeleteRequest) request);
+        }
+        throw new IllegalArgumentException("Unknown request type: " + request.getClass().getName());
+    }
+
+    protected QueueableSearchable generateQueueableSearchable(IndexRequest request) {
+        return new QueueableSearchable(request.index(), request.id(), request.version(), request.routing(),
+                request.source().utf8ToString(), QueueableSearchable.RequestType.INDEX);
+    }
+
+    protected QueueableSearchable generateQueueableSearchable(UpdateRequest request) {
+        return new QueueableSearchable(request.index(), request.id(), request.version(), request.routing(),
+                request.doc().source().utf8ToString(),
+                request.upsertRequest() != null ? request.upsertRequest().source().utf8ToString() : null,
+                QueueableSearchable.RequestType.UPDATE);
+
+    }
+
+    protected QueueableSearchable generateQueueableSearchable(DeleteRequest request) {
+        return new QueueableSearchable(request.index(), request.id(), request.version(), request.routing(), null,
+                QueueableSearchable.RequestType.DELETE);
     }
 }

@@ -3,7 +3,7 @@ package com.neo.util.common.impl.exception;
 /**
  * This class handles all Exceptions associated with misconfiguration of the application
  */
-public class InternalConfigurationException extends RuntimeException {
+public class InternalConfigurationException extends IllegalStateException {
 
     /**
      * Constructs a new InternalConfigurationException with {@code null} as its detail message.

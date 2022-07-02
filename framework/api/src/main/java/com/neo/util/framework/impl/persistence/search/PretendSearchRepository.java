@@ -60,6 +60,16 @@ public class PretendSearchRepository implements SearchRepository {
     }
 
     @Override
+    public void process(QueueableSearchable transportSearchable) {
+
+    }
+
+    @Override
+    public void process(List<QueueableSearchable> transportSearchableList) {
+
+    }
+
+    @Override
     public SearchResult fetch(String index, SearchQuery parameters) {
         return null;
     }
