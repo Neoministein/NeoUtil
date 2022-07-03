@@ -1,7 +1,7 @@
 package com.neo.util.common.impl.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.neo.util.common.impl.RecourseUtil;
+import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.exception.InternalJsonException;
 import com.networknt.schema.*;
 import org.slf4j.Logger;
@@ -11,9 +11,10 @@ import java.io.IOException;
 import java.util.Optional;
 
 /**
- * A Util class for generating and checking valid json schemas
- *
- * The json Schema specification can be found here https://json-schema.org/specification.html
+ * This is a utility class for generating and checking valid json schemas.
+ * <p>
+ * The json Schema specification can be found here
+ * <a href="https://json-schema.org/specification.html">https://json-schema.org/specification.html</a>
  */
 public class JsonSchemaUtil {
 
@@ -28,7 +29,7 @@ public class JsonSchemaUtil {
      * @param jsonNode the node to check for validity
      * @param jsonSchema the schema to check against
      *
-     * @throws InternalJsonException is thrown if is isn't valid
+     * @throws InternalJsonException is thrown if it isn't valid
      */
     public static void isValidOrThrow(JsonNode jsonNode, JsonSchema jsonSchema) {
         try {
@@ -67,7 +68,7 @@ public class JsonSchemaUtil {
      */
     public static JsonSchema generateSchemaFromResource(String fileLocation) {
         try {
-            return generateNewSchema(RecourseUtil.getResourceFileAsString(fileLocation), SpecVersion.VersionFlag.V201909);
+            return generateNewSchema(ResourceUtil.getResourceFileAsString(fileLocation), SpecVersion.VersionFlag.V201909);
         } catch (IOException ex) {
             LOGGER.error("Unable to retrieve json schema from file {}", ex.getMessage(), ex);
             throw new InternalJsonException("Unable to create a json schema file could not be read");

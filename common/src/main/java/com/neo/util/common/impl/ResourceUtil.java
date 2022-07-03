@@ -6,9 +6,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.stream.Collectors;
 
-public class RecourseUtil {
+public class ResourceUtil {
 
-    private RecourseUtil(){}
+    private ResourceUtil(){}
 
     /**
      * Reads given resource file as a string.
