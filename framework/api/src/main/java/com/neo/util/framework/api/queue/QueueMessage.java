@@ -1,5 +1,7 @@
 package com.neo.util.framework.api.queue;
 
+import com.neo.util.common.impl.json.JsonUtil;
+
 import java.io.Serializable;
 
 /**
@@ -17,21 +19,28 @@ public class QueueMessage implements Serializable {
      */
     protected String messageType;
 
+    protected String methodClass;
+
     /**
-     * An arbitrary serializable data structure.Which will be parsed to json.
+     * An arbitrary serializable data structure. Which will be parsed to json.
      */
-    protected Serializable message;
+    protected String message;
 
     public QueueMessage(String messageType, Serializable payload) {
         this.messageType = messageType;
-        this.message = payload;
-    }
-
-    public QueueMessage(String messageType) {
-        this.messageType = messageType;
+        this.message = JsonUtil.toJson(payload);
+        this.methodClass = payload.getClass().getName();
     }
 
     public QueueMessage() {}
+
+    public Serializable getPayload() {
+        try {
+            return (Serializable) JsonUtil.fromJson(message, Class.forName(methodClass));
+        } catch (ClassNotFoundException ex) {
+            return null;
+        }
+    }
 
     public String getMessageType() {
         return messageType;
@@ -41,11 +50,19 @@ public class QueueMessage implements Serializable {
         this.messageType = messageType;
     }
 
-    public Serializable getMessage() {
+    public String getMethodClass() {
+        return methodClass;
+    }
+
+    public void setMethodClass(String methodClass) {
+        this.methodClass = methodClass;
+    }
+
+    public String getMessage() {
         return message;
     }
 
-    public void setMessage(Serializable message) {
+    public void setMessage(String message) {
         this.message = message;
     }
 }

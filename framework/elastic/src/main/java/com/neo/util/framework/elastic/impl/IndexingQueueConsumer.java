@@ -8,9 +8,11 @@ import com.neo.util.framework.api.queue.QueueMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.List;
 
+@ApplicationScoped
 @IncomingQueueConnection(IndexingQueueService.QUEUE_NAME)
 public class IndexingQueueConsumer implements QueueListener {
 
@@ -24,10 +26,10 @@ public class IndexingQueueConsumer implements QueueListener {
         String messageType = message.getMessageType();
         if (searchRepository.enabled()) {
             if (QueueableSearchable.RequestType.BULK.toString().equals(messageType)) {
-                List<QueueableSearchable> transportSearchables = (List<QueueableSearchable>) message.getMessage();
-                searchRepository.process(transportSearchables);
+                List<QueueableSearchable> transportSearchableList = (List<QueueableSearchable>) message.getPayload();
+                searchRepository.process(transportSearchableList);
             } else {
-                QueueableSearchable transportSearchable = (QueueableSearchable) message.getMessage();
+                QueueableSearchable transportSearchable = (QueueableSearchable) message.getPayload();
                 searchRepository.process(transportSearchable);
             }
         }
