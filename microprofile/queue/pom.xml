@@ -18,7 +18,7 @@
             <artifactId>api</artifactId>
             <version>1.0.0</version>
         </dependency>
-
+        <!-- Micro profile-->
         <dependency>
             <groupId>org.eclipse.microprofile.reactive.messaging</groupId>
             <artifactId>microprofile-reactive-messaging-api</artifactId>
@@ -29,7 +29,7 @@
             <artifactId>reactive-streams</artifactId>
             <version>1.0.3</version>
         </dependency>
-
+        <!-- Class generation and reflection for processor logic -->
         <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
@@ -39,6 +39,11 @@
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
             <version>1.0-rc2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.10.2</version>
         </dependency>
     </dependencies>
 </project>

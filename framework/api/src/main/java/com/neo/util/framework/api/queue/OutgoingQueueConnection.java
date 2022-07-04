@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * The annotation generates a {@link QueueProducer} based on the annotation value
  */
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.CLASS)
 public @interface OutgoingQueueConnection {
 
     String value();

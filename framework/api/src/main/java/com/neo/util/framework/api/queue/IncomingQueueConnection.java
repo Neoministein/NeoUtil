@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * Each queue can only have one annotation and interface utilizing it per program
  */
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.CLASS)
 public @interface IncomingQueueConnection {
 
     /**

@@ -2,15 +2,15 @@ package com.neo.util.framework.microprofile.impl.queue;
 
 import com.google.auto.service.AutoService;
 import com.neo.util.common.impl.annotation.AnnotationProcessorUtils;
-import com.neo.util.framework.api.queue.IncomingQueueConnection;
 import com.neo.util.framework.api.queue.OutgoingQueueConnection;
 import com.neo.util.framework.api.queue.QueueProducer;
 import com.squareup.javapoet.*;
-import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 import org.reactivestreams.FlowAdapters;
 import org.reactivestreams.Publisher;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +18,8 @@ import javax.annotation.processing.*;
 import javax.enterprise.context.ApplicationScoped;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import javax.lang.model.util.Elements;
+import java.util.*;
 import java.util.concurrent.SubmissionPublisher;
 
 @SupportedAnnotationTypes("com.neo.util.framework.api.queue.OutgoingQueueConnection")
@@ -31,8 +30,10 @@ public class OutgoingQueueConnectionProcessor extends AbstractProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(OutgoingQueueConnectionProcessor.class);
 
     protected static final String BASIC_ANNOTATION_FIELD_NAME = "value";
+    protected static final String QUEUE_PREFIX = "to-";
 
     private Filer filer;
+    protected Elements elements;
     protected Map<String, String> existingIncomingAnnotation = new HashMap<>();
     protected Map<String, String> generatedClasses = new HashMap<>();
 
@@ -40,16 +41,17 @@ public class OutgoingQueueConnectionProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         this.filer = processingEnv.getFiler();
+        this.elements = processingEnv.getElementUtils();
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        Set<? extends Element> queueConsumerElements = roundEnv.getElementsAnnotatedWith(OutgoingQueueConnection.class);
-        if (queueConsumerElements.isEmpty()) {
+        List<TypeElement> queueProducerElements = getDependencyClasses();
+        queueProducerElements.addAll((getSourceClasses(roundEnv)));
+        if (queueProducerElements.isEmpty()) {
             return false;
         }
         LOGGER.debug("Generating associated files for {} annotation", OutgoingQueueConnection.class.getName());
-
         Set<? extends Element> incomingElements = roundEnv.getElementsAnnotatedWith(Outgoing.class);
         for (Element element: incomingElements) {
             Parameterizable parameterizable = (Parameterizable) element;
@@ -59,15 +61,11 @@ public class OutgoingQueueConnectionProcessor extends AbstractProcessor {
         }
         LOGGER.debug("Existing queues {}", existingIncomingAnnotation);
 
-        for (Element element: queueConsumerElements) {
-            if (element.getKind() != ElementKind.CLASS) {
-                throw new IllegalStateException(OutgoingQueueConnection.class.getName() +  " must annotate a Class");
-            }
-            TypeElement typeElement = (TypeElement) element;
-            String queueName = (String) AnnotationProcessorUtils.getAnnotationValue(element.getAnnotationMirrors(), OutgoingQueueConnection.class,
+        for (TypeElement typeElement: queueProducerElements) {
+            String queueName = (String) AnnotationProcessorUtils.getAnnotationValue(typeElement.getAnnotationMirrors(), OutgoingQueueConnection.class,
                     BASIC_ANNOTATION_FIELD_NAME);
 
-            String existingQueueAnnotationClass = existingIncomingAnnotation.get(queueName);
+            String existingQueueAnnotationClass = existingIncomingAnnotation.get(QUEUE_PREFIX + queueName);
             if (existingQueueAnnotationClass != null) {
                 LOGGER.debug("Skipping outgoing class generation for queue {}. It is already in use in {}", queueName, existingQueueAnnotationClass);
                 break;
@@ -83,6 +81,29 @@ public class OutgoingQueueConnectionProcessor extends AbstractProcessor {
             generatedClasses.put(queueName, typeElement.getSimpleName().toString());
         }
         return false;
+    }
+
+    protected List<TypeElement> getSourceClasses(RoundEnvironment roundEnv) {
+        List<TypeElement> classList = new ArrayList<>();
+        Set<? extends Element> queueConsumerElements = roundEnv.getElementsAnnotatedWith(OutgoingQueueConnection.class);
+        for (Element element: queueConsumerElements) {
+            if (element.getKind() != ElementKind.CLASS) {
+                throw new IllegalStateException(OutgoingQueueConnection.class.getName() + " must annotate a Class");
+            }
+            classList.add((TypeElement) element);
+        }
+        return classList;
+    }
+
+    protected List<TypeElement> getDependencyClasses() {
+        List<TypeElement> classList = new ArrayList<>();
+        Reflections reflections = new Reflections("com.neo");
+        Set<Class<?>> clazzSet = reflections.get(Scanners.SubTypes.of(Scanners.TypesAnnotated.with(OutgoingQueueConnection.class)).asClass());
+        for (Class<?> clazz: clazzSet) {
+            String clazzName = clazz.getName();
+            classList.add(elements.getTypeElement(clazzName));
+        }
+        return classList;
     }
 
     protected void createConsumeClass(String queueName, TypeElement typeElement) {
@@ -103,7 +124,7 @@ public class OutgoingQueueConnectionProcessor extends AbstractProcessor {
                     .addModifiers(Modifier.PUBLIC)
                     .returns(ParameterizedTypeName.get(Publisher.class, String.class))
                     .addAnnotation(AnnotationSpec.builder(Outgoing.class)
-                            .addMember(BASIC_ANNOTATION_FIELD_NAME, "$S", queueName).build())
+                            .addMember(BASIC_ANNOTATION_FIELD_NAME, "$S", QUEUE_PREFIX + queueName).build())
                     .addStatement("return $T.fromPublisher($T.toPublisher(emitter)).buildRs()", ReactiveStreams.class, FlowAdapters.class)
                     .build();
             MethodSpec getQueueName = MethodSpec.methodBuilder("getQueueName")
