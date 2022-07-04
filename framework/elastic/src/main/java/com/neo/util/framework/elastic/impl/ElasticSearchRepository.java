@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.common.impl.json.JsonUtil;
+import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.persistence.aggregation.*;
 import com.neo.util.framework.api.persistence.criteria.*;
@@ -54,6 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PreDestroy;
+import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Alternative;
@@ -67,6 +69,7 @@ import java.util.concurrent.TimeUnit;
  */
 @SuppressWarnings("deprecation")
 @Alternative
+@Priority(PriorityConstants.APPLICATION)
 @ApplicationScoped
 public class ElasticSearchRepository implements SearchRepository {
 
@@ -145,7 +148,7 @@ public class ElasticSearchRepository implements SearchRepository {
         disconnect();
     }
 
-    protected void connectionStatusListener(@Observes ElasticSearchConnectionStatusEvent event) {
+    public void connectionStatusListener(@Observes ElasticSearchConnectionStatusEvent event) {
         if (ElasticSearchConnectionStatusEvent.STATUS_EVENT_CONNECTED.equals(event.getConnectionStatus())) {
             setupBulkProcessor();
         }

@@ -2,6 +2,7 @@ package com.neo.util.framework.microprofile.impl.queue;
 
 import com.neo.util.common.impl.exception.InternalConfigurationException;
 import com.neo.util.common.impl.json.JsonUtil;
+import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.api.queue.QueueProducer;
@@ -9,7 +10,7 @@ import com.neo.util.framework.api.queue.QueueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
+import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Alternative;
@@ -18,6 +19,7 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
+@Priority(PriorityConstants.APPLICATION)
 @Alternative
 @ApplicationScoped
 public class QueueServiceImpl implements QueueService {
