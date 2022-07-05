@@ -3,7 +3,7 @@ package com.neo.util.framework.api.persistence.search;
 import com.neo.util.common.impl.json.JsonUtil;
 
 import java.io.Serializable;
-import java.time.Instant;
+import java.util.Date;
 
 /**
  * Generic bean type object to put and retrieve index specific messages from the Queue.
@@ -25,7 +25,7 @@ public class QueueableSearchable implements Serializable {
     /**
      * The creation date of the initial searchable
      */
-    protected Instant creationDate;
+    protected Date creationDate;
     /**
      * The index where this object shall be persisted to
      */
@@ -67,7 +67,7 @@ public class QueueableSearchable implements Serializable {
     public QueueableSearchable(String index, String id, Long version, String routing, String jsonSource,
             String jsonUpsertSource, RequestType requestType) {
         super();
-        this.creationDate = Instant.now();
+        this.creationDate = new Date();
         this.index = index;
         this.id = id;
         this.version = version;
@@ -77,11 +77,11 @@ public class QueueableSearchable implements Serializable {
         this.requestType = requestType;
     }
 
-    public Instant getCreationDate() {
+    public Date getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Instant creationDate) {
+    public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
 
