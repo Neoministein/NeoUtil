@@ -9,13 +9,13 @@ import com.neo.util.framework.api.persistence.entity.DataBaseEntity;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityRepository;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
-import com.neo.util.framework.rest.api.RestAction;
 import com.neo.util.common.impl.exception.InternalJsonException;
 import com.neo.util.common.impl.exception.InternalLogicException;
-import com.neo.util.framework.rest.impl.DefaultResponse;
+import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 import javax.transaction.RollbackException;
@@ -23,15 +23,20 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This abstract class provides the base CRUD functionality for {@link DataBaseEntity}
+ *
+ * @param <T> the {@link DataBaseEntity} to be accessed
+ */
 public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEntityRestEndpoint.class);
 
-    protected static final ObjectNode E_NOT_FOUND = DefaultResponse.errorObject("pgs/resources/000","Entity not found");
-    protected static final ObjectNode E_CANNOT_PARSE = DefaultResponse.errorObject("pgs/resources/001","Unable to retrieve entity");
-    protected static final ObjectNode E_MISSING_FIELDS = DefaultResponse.errorObject("pgs/resources/002","Entity is missing mandatory fields");
-    protected static final ObjectNode E_NOT_UNIQUE = DefaultResponse.errorObject("pgs/resources/003","Provided value isn't unique");
-    protected static final ObjectNode E_INVALID_RESOURCE_PERMISSION = DefaultResponse.errorObject("pgs/resources/004","Invalid resource permission");
+    protected ObjectNode errorNotFound;
+    protected ObjectNode errorCannotParse;
+    protected ObjectNode errorMissingFields;
+    protected ObjectNode errorNotUnique;
+    protected ObjectNode errorInvalidResourcePermission;
 
     protected static final String ENTITY_PERM = "CRUD_";
 
@@ -43,56 +48,64 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
     @Inject
     protected RequestDetails requestDetails;
 
+    @Inject
+    protected ResponseGenerator responseGenerator;
+
     protected abstract Object convertToPrimaryKey(String primaryKey);
 
     protected abstract Class<T> getEntityClass();
 
-    protected RestAction getByPrimaryKeyAction(String primaryKey) {
-        return () -> entityByColumn(DataBaseEntity.C_ID, convertToPrimaryKey(primaryKey));
+    @PostConstruct
+    protected void init() {
+        errorNotFound = responseGenerator.errorObject("resources/000","Entity not found");
+        errorCannotParse = responseGenerator.errorObject("resources/001","Unable to retrieve entity");
+        errorMissingFields = responseGenerator.errorObject("resources/002","Entity is missing mandatory fields");
+        errorNotUnique = responseGenerator.errorObject("resources/003","Provided value isn't unique");
+        errorInvalidResourcePermission = responseGenerator.errorObject("resources/004","Invalid resource permission");
     }
 
-    protected RestAction getByValueAction(String column, String value) {
-        return () -> entityByColumn(column, value);
+    protected Response getByPrimaryKey(String primaryKey) {
+        return entityByColumn(DataBaseEntity.C_ID, convertToPrimaryKey(primaryKey));
     }
 
-    protected RestAction createAction(String x) {
-        return  () -> {
-            T entity = JsonUtil.fromJson(x, getEntityClass(), getSerializationScope());
-            try {
-                entityRepository.create(entity);
-                LOGGER.info("Created new [{},{}]",getEntityClass().getSimpleName(), entity.getPrimaryKey());
-            } catch (RollbackException ex) {
-                LOGGER.debug("Provided value isn't unique");
-                return DefaultResponse.error(400, E_NOT_UNIQUE, requestDetails.getRequestContext());
-            } catch (PersistenceException ex) {
-                LOGGER.debug("Entity is missing mandatory fields");
-                return DefaultResponse.error(400, E_MISSING_FIELDS, requestDetails.getRequestContext());
-            }
-            return parseEntityToResponse(entity,Views.Owner.class);
-        };
+    protected Response getByValue(String column, String value) {
+        return entityByColumn(column, value);
     }
 
-    public RestAction editAction(String x) {
-        return () -> editEntity(parseJSONIntoExistingEntity(x, getSerializationScope()), getSerializationScope());
+    protected Response create(String x) {
+        T entity = JsonUtil.fromJson(x, getEntityClass(), getSerializationScope());
+        try {
+            entityRepository.create(entity);
+            LOGGER.info("Created new [{},{}]",getEntityClass().getSimpleName(), entity.getPrimaryKey());
+        } catch (RollbackException ex) {
+            LOGGER.debug("Provided value isn't unique");
+            return responseGenerator.error(400, errorNotUnique);
+        } catch (PersistenceException ex) {
+            LOGGER.debug("Entity is missing mandatory fields");
+            return responseGenerator.error(400, errorMissingFields);
+        }
+        return parseEntityToResponse(entity,Views.Owner.class);
     }
 
-    public RestAction deleteAction(String primaryKey) {
-        return () -> {
-            Optional<T> entity = entityRepository.find(convertToPrimaryKey(primaryKey), getEntityClass());
+    protected Response edit(String x) {
+        return editEntity(parseJSONIntoExistingEntity(x, getSerializationScope()), getSerializationScope());
+    }
 
-            if (entity.isEmpty()) {
-                LOGGER.debug("Entity not found [{},{}]", getEntityClass().getSimpleName() ,primaryKey);
-                return DefaultResponse.error(404, E_NOT_FOUND, requestDetails.getRequestContext());
-            }
+    protected Response delete(String primaryKey) {
+        Optional<T> entity = entityRepository.find(convertToPrimaryKey(primaryKey), getEntityClass());
 
-            try {
-                entityRepository.remove(entity.get());
-                LOGGER.info("Deleted entity [{},{}]",getEntityClass().getSimpleName(), entity.get().getPrimaryKey());
-                return DefaultResponse.success(requestDetails.getRequestContext());
-            } catch (RollbackException ex) {
-                return DefaultResponse.error(400, E_MISSING_FIELDS, requestDetails.getRequestContext());
-            }
-        };
+        if (entity.isEmpty()) {
+            LOGGER.debug("Entity not found [{},{}]", getEntityClass().getSimpleName() ,primaryKey);
+            return responseGenerator.error(404, errorNotFound);
+        }
+
+        try {
+            entityRepository.remove(entity.get());
+            LOGGER.info("Deleted entity [{},{}]",getEntityClass().getSimpleName(), entity.get().getPrimaryKey());
+            return responseGenerator.success();
+        } catch (RollbackException ex) {
+            return responseGenerator.error(400, errorMissingFields);
+        }
     }
 
     /**
@@ -108,7 +121,7 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
         EntityResult<T> entity = entityRepository.find(entityParameters);
         if (entity.getHitSize() == 1) {
             LOGGER.debug("Entity not found [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
-            return DefaultResponse.error(404, E_NOT_FOUND, requestDetails.getRequestContext());
+            return responseGenerator.error(404, errorNotFound);
         }
         LOGGER.trace("Entity lookup success [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
         return parseEntityToResponse(entity.getHits().get(0), getSerializationScope());
@@ -120,10 +133,10 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
             LOGGER.info("Created new [{},{}]",getEntityClass().getSimpleName(), entity.getPrimaryKey());
         } catch (RollbackException ex) {
             LOGGER.debug("Provided value isn't unique");
-            return DefaultResponse.error(400, E_NOT_UNIQUE, requestDetails.getRequestContext());
+            return responseGenerator.error(400, errorNotUnique);
         } catch (PersistenceException ex) {
             LOGGER.debug("Entity is missing mandatory fields");
-            return DefaultResponse.error(400, E_MISSING_FIELDS, requestDetails.getRequestContext());
+            return responseGenerator.error(400, errorMissingFields);
         } catch (InternalLogicException ex) {
             //TODO
         }
@@ -144,10 +157,10 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
     protected Response parseEntityToResponse(T entity, Class<?> serializationScope) {
         try {
             String result = JsonUtil.toJson(entity, serializationScope);
-            return DefaultResponse.success(requestDetails.getRequestContext(), JsonUtil.fromJson(result));
+            return responseGenerator.success(JsonUtil.fromJson(result));
         } catch (InternalJsonException ex) {
             LOGGER.error("Unable to parse database entity to JSON {}", ex.getMessage());
-            return DefaultResponse.error(500, E_CANNOT_PARSE, requestDetails.getRequestContext());
+            return responseGenerator.error(500, errorCannotParse);
         }
     }
 
@@ -162,7 +175,7 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
     protected Class<?> getSerializationScope() {
         Class<?> serializationScope = Views.Public.class;
 
-        if (requestDetails.getUUId().isPresent()) {
+        if (requestDetails.getUser().isPresent()) {
             if (requestDetails.isInRole(ENTITY_PERM + getEntityClass().getSimpleName())) {
                 serializationScope = Views.Owner.class;
             }

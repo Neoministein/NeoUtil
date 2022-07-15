@@ -1,10 +1,14 @@
 package com.neo.util.framework.api.connection;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import com.neo.util.framework.api.security.RolePrincipal;
 
+import java.util.Collection;
+import java.util.Date;
+import java.util.Optional;
+
+/**
+ * This interface consolidates all the data for a single http request.
+ */
 public interface RequestDetails {
 
     /**
@@ -22,11 +26,18 @@ public interface RequestDetails {
     String getRequestId();
 
     /**
-     * Returns the current user's as an Optional UUID
+     * Returns the current user's as an {@link Optional<RolePrincipal>}
      *
      * @return the current uuid
      */
-    Optional<UUID> getUUId();
+    Optional<RolePrincipal> getUser();
+
+    /**
+     * Sets the principal of the current request
+     *
+     * @param principal
+     */
+    void setUser(RolePrincipal principal);
 
     /**
      * Checks if the current user has the role
@@ -42,7 +53,7 @@ public interface RequestDetails {
      * @param roles the roles to check for
      * @return true if the current user has all the roles
      */
-    boolean isInRoles(List<String> roles);
+    boolean isInRoles(Collection<String> roles);
 
     /**
      * The current context of the request
@@ -57,13 +68,6 @@ public interface RequestDetails {
      * @param requestContext the current requestContext
      */
     void setRequestContext(RequestContext requestContext);
-
-    /**
-     * Sets the date and time when the system received the request
-     *
-     * @param startDate
-     */
-    void setRequestReceiveDate(Date startDate);
 
     /**
      * Returns the date the request has been received

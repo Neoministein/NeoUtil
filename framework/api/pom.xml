@@ -51,6 +51,10 @@
             <artifactId>jakarta.ws.rs-api</artifactId>
             <version>2.1.6</version>
         </dependency>
-
+        <dependency>
+            <groupId>jakarta.security.enterprise</groupId>
+            <artifactId>jakarta.security.enterprise-api</artifactId>
+            <version>1.0.2</version>
+        </dependency>
     </dependencies>
 </project>

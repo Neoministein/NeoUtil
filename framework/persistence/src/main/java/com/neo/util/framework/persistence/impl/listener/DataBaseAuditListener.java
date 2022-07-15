@@ -1,6 +1,7 @@
 package com.neo.util.framework.persistence.impl.listener;
 
 import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.api.security.RolePrincipal;
 import com.neo.util.framework.persistence.impl.AuditableDataBaseEntity;
 
 import javax.inject.Inject;
@@ -8,7 +9,6 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 
 public class DataBaseAuditListener {
 
@@ -17,10 +17,10 @@ public class DataBaseAuditListener {
 
     @PrePersist
     protected void prePersist(AuditableDataBaseEntity entity) {
-        Optional<UUID> uuid = requestDetails.getUUId();
+        Optional<RolePrincipal> uuid = requestDetails.getUser();
         if (uuid.isPresent()) {
-            setPersistData(entity,uuid.get().toString());
-            setUpdateData(entity, uuid.get().toString());
+            setPersistData(entity,uuid.get().getName());
+            setUpdateData(entity, uuid.get().getName());
         } else {
             setPersistData(entity, requestDetails.getRequestId());
             setUpdateData(entity, requestDetails.getRequestId());
@@ -29,9 +29,9 @@ public class DataBaseAuditListener {
 
     @PreUpdate
     protected void preUpdate(AuditableDataBaseEntity entity) {
-        Optional<UUID> uuid = requestDetails.getUUId();
+        Optional<RolePrincipal> uuid = requestDetails.getUser();
         if (uuid.isPresent()) {
-            setUpdateData(entity, uuid.get().toString());
+            setUpdateData(entity, uuid.get().getName());
         } else {
             setUpdateData(entity, requestDetails.getRequestId());
         }
