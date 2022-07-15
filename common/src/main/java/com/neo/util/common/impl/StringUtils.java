@@ -1,5 +1,9 @@
 package com.neo.util.common.impl;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -74,5 +78,23 @@ public class StringUtils {
      */
     public static boolean isAlphaNumeric(String s) {
         return !ALPHANUMERIC.matcher(s).find();
+    }
+
+    /**
+     *  Converts an {@link InputStream} to a {@link String}
+     *
+     * @param inputStream the input stream to process
+     * @param charset the charset to convert it to
+     * @return the consent of the input stream
+     *
+     * @throws IOException if something goes wrong
+     */
+    public static String toString(InputStream inputStream, Charset charset) throws IOException {
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        for (int length; (length = inputStream.read(buffer)) != -1; ) {
+            result.write(buffer, 0, length);
+        }
+        return result.toString(charset.name());
     }
 }
