@@ -12,7 +12,7 @@ public class EntityQuery<T extends DataBaseEntity> {
     private Class<T> entityClass;
 
     /**
-     * The fields that are returned in the result set
+     * The fields that are returned to the result set
      */
     private List<String> fields;
     /**
