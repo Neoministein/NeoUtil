@@ -26,7 +26,7 @@ public class InternalLogicMapper implements ExceptionMapper<InternalLogicExcepti
 
     @PostConstruct
     protected void init() {
-        responseGenerator.errorObject("unknown","Internal server error please try again later");
+        errorObject = responseGenerator.errorObject("unknown","Internal server error please try again later");
     }
 
     @Override
