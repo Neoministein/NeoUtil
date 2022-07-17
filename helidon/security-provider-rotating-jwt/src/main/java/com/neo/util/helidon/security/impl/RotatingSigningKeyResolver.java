@@ -35,9 +35,15 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
 
     protected final HttpGet publicKeyEndpoint;
     protected Map<String, JWTKey> keyMap = new HashMap<>();
-    protected LazyHttpExecutor lazyHttpExecutor = new LazyHttpExecutor();
+    protected LazyHttpExecutor lazyHttpExecutor;
 
     public RotatingSigningKeyResolver(String publicKeyEndpoint, boolean isSecurityService) {
+        this(publicKeyEndpoint, isSecurityService, new LazyHttpExecutor());
+    }
+
+
+    protected RotatingSigningKeyResolver(String publicKeyEndpoint, boolean isSecurityService, LazyHttpExecutor lazyHttpExecutor) {
+        this.lazyHttpExecutor = lazyHttpExecutor;
         this.publicKeyEndpoint = new HttpGet(publicKeyEndpoint);
         if (!isSecurityService) {
             updateCache();
@@ -108,18 +114,20 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
         try {
             JsonNode result = JsonUtil.fromJson(resultString);
             Map<String, JWTKey> newMap = new HashMap<>();
-            JsonNode data = result.get("data").get("keys");
-            for (int i = 0; i < data.size(); i++) {
-                JsonNode jwtPublicKeyObject = data.get(i);
+            JsonNode data = result.get("data");
+            if (!data.isNull()) {
+                for (int i = 0; i < data.size(); i++) {
+                    JsonNode jwtPublicKeyObject = data.get(i);
 
 
-                JWTKey jwtPublicKey = new JWTPublicKey(
-                        jwtPublicKeyObject.get("kid").asText(),
-                        KeyUtils.parseRSAPublicKey(jwtPublicKeyObject.get("key").asText()),
-                        new Date(jwtPublicKeyObject.get("exp").asLong())
-                );
+                    JWTKey jwtPublicKey = new JWTPublicKey(
+                            jwtPublicKeyObject.get("kid").asText(),
+                            KeyUtils.parseRSAPublicKey(jwtPublicKeyObject.get("key").asText()),
+                            new Date(jwtPublicKeyObject.get("exp").asLong())
+                    );
 
-                newMap.put(jwtPublicKey.getId(), jwtPublicKey);
+                    newMap.put(jwtPublicKey.getId(), jwtPublicKey);
+                }
             }
             LOGGER.trace("Received public kid {}", newMap.keySet());
             return newMap;
