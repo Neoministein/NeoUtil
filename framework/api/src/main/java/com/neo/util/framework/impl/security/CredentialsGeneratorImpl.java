@@ -26,19 +26,18 @@ public class CredentialsGeneratorImpl implements CredentialsGenerator {
         int index = httpHeader.indexOf(' ');
         if (index >= 0) {
             String httpScheme = httpHeader.substring(0 ,index);
-            String content = httpHeader.substring(index + 1);
-            return generate(httpScheme, content);
+            return generate(httpScheme, httpHeader);
         }
         throw new IllegalStateException("Unsupported header scheme");
     }
 
-    protected Credential generate(String httpScheme, String content) {
-        if (authenticationProvider.getSupportedAuthenticationSchemes().contains(httpScheme)) {
-            switch (httpScheme) {
+    protected Credential generate(String httpScheme, String httpHeader) {
+        if (authenticationProvider.getSupportedAuthenticationSchemes().contains(httpScheme.toUpperCase())) {
+            switch (httpScheme.toUpperCase()) {
             case AuthenticationScheme.BASIC:
-                return new BasicAuthenticationCredential(content);
+                return new BasicAuthenticationCredential(httpHeader);
             case AuthenticationScheme.BEARER:
-                return new BearerCredentials(content);
+                return new BearerCredentials(httpHeader);
             default:
             }
         }

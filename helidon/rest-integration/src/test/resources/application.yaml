@@ -1,0 +1,10 @@
+javax:
+    sql:
+        DataSource:
+            helidon-integration:
+                dataSourceClassName: org.h2.jdbcx.JdbcDataSource
+                dataSource:
+                    url: jdbc:h2:mem:helidon-integration
+                    user: sa
+                    password: ""
+

@@ -49,7 +49,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     @PostConstruct
     protected void init() {
-        responseGenerator.errorObject("auth/000", "Unauthorized");
+        unauthorized = responseGenerator.errorObject("auth/000", "Unauthorized");
     }
 
     @Override

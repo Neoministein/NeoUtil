@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "properties": {
+    "string": {
+      "type": "string"
+    },
+    "integer": {
+      "type": "integer"
+    },
+    "boolean": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "string",
+    "integer",
+    "boolean"
+  ]
+}

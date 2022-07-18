@@ -12,8 +12,8 @@ public class BearerCredentials extends AbstractClearableCredential {
     protected String token;
 
     public BearerCredentials(String authorizationHeader) {
-        if (authorizationHeader != null && authorizationHeader.toLowerCase()
-                .startsWith(AUTHENTICATION_SCHEME.toLowerCase() + " ")) {
+        if (authorizationHeader != null && authorizationHeader.toUpperCase()
+                .startsWith(AUTHENTICATION_SCHEME.toUpperCase() + " ")) {
             token = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
         } else {
             throw new IllegalArgumentException("Invalid bearer http header scheme");

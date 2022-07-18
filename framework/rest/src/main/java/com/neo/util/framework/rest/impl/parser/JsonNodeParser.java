@@ -61,6 +61,5 @@ public class JsonNodeParser implements MessageBodyReader<JsonNode> {
 
     protected JsonSchema retrieveSchemaFromString(String schemaLocation) {
         return schemaMap.computeIfAbsent(schemaLocation, JsonSchemaUtil::generateSchemaFromResource);
-
     }
 }

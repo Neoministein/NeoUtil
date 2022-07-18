@@ -11,7 +11,8 @@ import java.util.Optional;
 @ApplicationScoped
 public class PretendAuthenticationProvider implements AuthenticationProvider {
 
-    @Override public Optional<RolePrincipal> authenticate(Credential credential) {
+    @Override
+    public Optional<RolePrincipal> authenticate(Credential credential) {
         return Optional.empty();
     }
 
