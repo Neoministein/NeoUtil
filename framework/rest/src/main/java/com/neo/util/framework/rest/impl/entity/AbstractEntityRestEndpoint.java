@@ -19,6 +19,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 import javax.transaction.RollbackException;
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
@@ -38,9 +39,9 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
     protected ObjectNode errorNotUnique;
     protected ObjectNode errorInvalidResourcePermission;
 
-    protected static final String ENTITY_PERM = "CRUD_";
+    public static final String ENTITY_PERM = "CRUD_";
 
-    protected static final String PERM_INTERNAL = "internal";
+    public static final String PERM_INTERNAL = "internal";
 
     @Inject
     protected EntityRepository entityRepository;
@@ -119,7 +120,7 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
     protected Response entityByColumn(String field, Object value) {
         EntityQuery<T> entityParameters = new EntityQuery<>(getEntityClass(), 1, List.of(new ExplicitSearchCriteria(field, value)));
         EntityResult<T> entity = entityRepository.find(entityParameters);
-        if (entity.getHitSize() == 1) {
+        if (entity.getHitSize() == 0) {
             LOGGER.debug("Entity not found [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
             return responseGenerator.error(404, errorNotFound);
         }
@@ -137,13 +138,8 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
         } catch (PersistenceException ex) {
             LOGGER.debug("Entity is missing mandatory fields");
             return responseGenerator.error(400, errorMissingFields);
-        } catch (InternalLogicException ex) {
-            //TODO
         }
-
-        Optional<T> after = entityRepository.find(entity.getPrimaryKey(),getEntityClass());
-
-        return parseEntityToResponse(after.get(), serializationScope);
+        return parseEntityToResponse(entity, serializationScope);
     }
 
     /**
@@ -167,9 +163,9 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
     protected T parseJSONIntoExistingEntity(String x, Class<?> serializationScope) {
         Optional<T> entity = entityRepository.find(JsonUtil.fromJson(x, getEntityClass()).getPrimaryKey(), getEntityClass());
         if (entity.isEmpty()) {
-            throw new InternalLogicException("");
+            throw new ClientErrorException(404);
         }
-        return JsonUtil.updateExistingEntity(entity.get(), x,getEntityClass(), serializationScope);
+        return JsonUtil.updateExistingEntity(entity.get(), x, getEntityClass(), serializationScope);
     }
 
     protected Class<?> getSerializationScope() {

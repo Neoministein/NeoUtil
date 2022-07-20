@@ -1,8 +1,8 @@
-package com.neo.util.helion.integreation.exception;
+package com.neo.util.helidon.rest.exception;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.helion.integreation.AbstractIntegrationTest;
+import com.neo.util.helidon.rest.AbstractIntegrationTest;
 import io.helidon.microprofile.tests.junit5.AddBean;
 import io.helidon.microprofile.tests.junit5.HelidonTest;
 import org.junit.jupiter.api.Assertions;

@@ -1,4 +1,4 @@
-package com.neo.util.helion.integreation.connection;
+package com.neo.util.helidon.rest.connection;
 
 import com.neo.util.framework.persistence.api.PersistenceContextService;
 

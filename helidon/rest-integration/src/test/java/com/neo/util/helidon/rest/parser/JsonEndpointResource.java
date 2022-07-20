@@ -1,4 +1,4 @@
-package com.neo.util.helion.integreation.parser;
+package com.neo.util.helidon.rest.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.json.JsonUtil;

@@ -1,4 +1,4 @@
-package com.neo.util.helion.integreation.security;
+package com.neo.util.helidon.rest.security;
 
 import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.rest.api.security.Secured;

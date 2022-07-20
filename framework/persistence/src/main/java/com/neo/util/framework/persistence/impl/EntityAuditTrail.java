@@ -18,8 +18,8 @@ public class EntityAuditTrail extends AuditableDataBaseEntity implements DataBas
     public static final String C_OPERATION = "operation";
 
     @Id
-    @Column(name = DataBaseEntity.C_ID, columnDefinition = "serial")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = DataBaseEntity.C_ID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = C_OBJECT_KEY)

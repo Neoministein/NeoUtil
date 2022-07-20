@@ -1,4 +1,4 @@
-package com.neo.util.helion.integreation.exception;
+package com.neo.util.helidon.rest.exception;
 
 import com.neo.util.common.impl.exception.InternalJsonException;
 import com.neo.util.common.impl.exception.InternalLogicException;

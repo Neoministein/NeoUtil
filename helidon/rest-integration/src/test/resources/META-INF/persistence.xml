@@ -7,6 +7,8 @@
 
     <persistence-unit name="mainPersistence" transaction-type="JTA">
         <jta-data-source>helidon-integration</jta-data-source>
+        <class>com.neo.util.helidon.rest.entity.TestPersonEntity</class>
+        <class>com.neo.util.framework.persistence.impl.EntityAuditTrail</class>
 
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
