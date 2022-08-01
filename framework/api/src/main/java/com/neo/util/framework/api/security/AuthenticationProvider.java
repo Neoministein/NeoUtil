@@ -1,6 +1,6 @@
 package com.neo.util.framework.api.security;
 
-import javax.security.enterprise.credential.Credential;
+import jakarta.security.enterprise.credential.Credential;
 import java.util.List;
 import java.util.Optional;
 

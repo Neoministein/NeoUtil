@@ -5,11 +5,11 @@ import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
 import org.junit.jupiter.api.*;
 
-import javax.inject.Inject;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {

@@ -12,7 +12,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <helidon.version>2.4.0</helidon.version>
+        <helidon.version>3.0.0</helidon.version>
     </properties>
 
 

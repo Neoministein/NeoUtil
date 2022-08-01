@@ -10,17 +10,16 @@ import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityRepository;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
 import com.neo.util.common.impl.exception.InternalJsonException;
-import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
-import javax.transaction.RollbackException;
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.core.Response;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
+import jakarta.transaction.RollbackException;
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
 

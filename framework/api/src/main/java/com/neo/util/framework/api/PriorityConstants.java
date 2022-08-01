@@ -1,6 +1,6 @@
 package com.neo.util.framework.api;
 
-import javax.interceptor.Interceptor;
+import jakarta.interceptor.Interceptor;
 
 /**
  * <a href="https://docs.oracle.com/javaee/7/api/javax/interceptor/Interceptor.Priority.html">https://docs.oracle.com/javaee/7/api/javax/interceptor/Interceptor.Priority.html</a>

@@ -6,8 +6,8 @@ import com.neo.util.framework.api.security.RolePrincipal;
 import io.helidon.security.SecurityContext;
 import io.helidon.webserver.ServerRequest;
 
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.core.Context;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.ws.rs.core.Context;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;

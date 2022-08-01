@@ -4,9 +4,9 @@ import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.api.security.RolePrincipal;
 import com.neo.util.framework.persistence.impl.AuditableDataBaseEntity;
 
-import javax.inject.Inject;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import jakarta.inject.Inject;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import java.util.Date;
 import java.util.Optional;
 

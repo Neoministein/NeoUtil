@@ -1,10 +1,10 @@
 package com.neo.util.framework.rest.impl.exception;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
 
 /**
  * The client error mapper returns the provided response by the {@link ClientErrorException}

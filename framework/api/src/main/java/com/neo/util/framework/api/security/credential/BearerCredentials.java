@@ -1,6 +1,6 @@
 package com.neo.util.framework.api.security.credential;
 
-import javax.security.enterprise.credential.AbstractClearableCredential;
+import jakarta.security.enterprise.credential.AbstractClearableCredential;
 
 /**
  * Credentials implementation for Bearer

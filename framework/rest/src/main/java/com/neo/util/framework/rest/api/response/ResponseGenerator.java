@@ -3,7 +3,7 @@ package com.neo.util.framework.rest.api.response;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 /**
  * This interface defines common response which can look different based on applications

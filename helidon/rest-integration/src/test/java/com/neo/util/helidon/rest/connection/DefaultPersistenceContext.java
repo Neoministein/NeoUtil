@@ -2,8 +2,8 @@ package com.neo.util.helidon.rest.connection;
 
 import com.neo.util.framework.persistence.api.PersistenceContextService;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 public class DefaultPersistenceContext implements PersistenceContextService {
 

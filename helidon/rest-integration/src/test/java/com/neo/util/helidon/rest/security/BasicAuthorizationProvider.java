@@ -6,9 +6,9 @@ import com.neo.util.framework.api.security.AuthenticationScheme;
 import com.neo.util.framework.api.security.RolePrincipal;
 import com.neo.util.framework.api.security.credential.BearerCredentials;
 
-import javax.annotation.Priority;
-import javax.enterprise.inject.Alternative;
-import javax.security.enterprise.credential.Credential;
+import jakarta.annotation.Priority;
+import jakarta.enterprise.inject.Alternative;
+import jakarta.security.enterprise.credential.Credential;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

@@ -3,11 +3,10 @@ package com.neo.util.framework.helidon.impl.config;
 import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-
-@RequestScoped
+@ApplicationScoped
 public class ConfigServiceImpl implements ConfigService {
 
     @Inject

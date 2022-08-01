@@ -2,7 +2,7 @@ package com.neo.util.framework.impl.persistence.search;
 
 import com.neo.util.framework.api.persistence.search.*;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
 @ApplicationScoped

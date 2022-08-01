@@ -3,8 +3,8 @@ package com.neo.util.framework.impl.security;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.RolePrincipal;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.security.enterprise.credential.Credential;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.security.enterprise.credential.Credential;
 import java.util.List;
 import java.util.Optional;
 

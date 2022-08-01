@@ -5,9 +5,9 @@ import com.neo.util.common.api.json.Views;
 import com.neo.util.framework.api.persistence.entity.DataBaseEntity;
 import com.neo.util.framework.persistence.impl.listener.DataBaseAuditListener;
 
-import javax.persistence.Column;
-import javax.persistence.EntityListeners;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
 import java.util.Date;
 
 @MappedSuperclass

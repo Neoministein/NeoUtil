@@ -23,12 +23,5 @@
             <artifactId>helidon-config</artifactId>
             <version>${helidon.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-            <version>1.2</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 </project>

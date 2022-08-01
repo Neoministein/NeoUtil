@@ -4,7 +4,7 @@ import com.neo.util.common.impl.enumeration.PersistenceOperation;
 import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.framework.api.persistence.entity.DataBaseEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = EntityAuditTrail.TABLE_NAME)

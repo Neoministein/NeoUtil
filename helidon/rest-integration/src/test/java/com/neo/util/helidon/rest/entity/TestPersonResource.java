@@ -2,9 +2,9 @@ package com.neo.util.helidon.rest.entity;
 
 import com.neo.util.framework.rest.impl.entity.AbstractEntityRestEndpoint;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @Path(TestPersonResource.RESOURCE_LOCATION)
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")

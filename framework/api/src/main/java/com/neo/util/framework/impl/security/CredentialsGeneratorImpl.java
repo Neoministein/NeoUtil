@@ -6,10 +6,10 @@ import com.neo.util.framework.api.security.AuthenticationScheme;
 import com.neo.util.framework.api.security.CredentialsGenerator;
 import com.neo.util.framework.api.security.credential.BearerCredentials;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.security.enterprise.credential.BasicAuthenticationCredential;
-import javax.security.enterprise.credential.Credential;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.security.enterprise.credential.BasicAuthenticationCredential;
+import jakarta.security.enterprise.credential.Credential;
 
 @ApplicationScoped
 public class CredentialsGeneratorImpl implements CredentialsGenerator {

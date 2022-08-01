@@ -6,9 +6,9 @@ import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.ws.rs.core.Response;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Response;
 
 @ApplicationScoped
 public class DefaultResponseGenerator implements ResponseGenerator {
@@ -32,7 +32,7 @@ public class DefaultResponseGenerator implements ResponseGenerator {
     @Override
     public Response success(JsonNode data) {
         ObjectNode responseMessage = defaultResponse(200);
-        responseMessage.putIfAbsent("data", data);
+        responseMessage.set("data", data);
 
         return Response.ok().entity(responseMessage.toString()).build();
     }
@@ -40,15 +40,15 @@ public class DefaultResponseGenerator implements ResponseGenerator {
     @Override
     public Response partialSuccess(int code, JsonNode data, ObjectNode error) {
         ObjectNode response = defaultResponse(code);
-        response.putIfAbsent("data", data);
-        response.putIfAbsent("error", error);
+        response.set("data", data);
+        response.set("error", error);
         return Response.ok().entity(response).build();
     }
 
     @Override
     public Response error(int code, String errorCode, String message) {
         ObjectNode response = defaultResponse(code);
-        response.putIfAbsent("error", errorObject(errorCode, message));
+        response.set("error", errorObject(errorCode, message));
 
         return Response.status(code).entity(response.toString()).build();
     }
@@ -56,7 +56,7 @@ public class DefaultResponseGenerator implements ResponseGenerator {
     @Override
     public Response error(int code, ObjectNode error) {
         ObjectNode response = defaultResponse(code);
-        response.putIfAbsent("error", error);
+        response.set("error", error);
 
         return Response.status(code).entity(response.toString()).build();
     }

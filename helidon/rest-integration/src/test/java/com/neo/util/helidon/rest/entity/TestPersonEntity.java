@@ -1,10 +1,8 @@
 package com.neo.util.helidon.rest.entity;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.neo.util.common.api.json.Views;
 import com.neo.util.framework.api.persistence.entity.DataBaseEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = TestPersonEntity.TABLE_NAME)

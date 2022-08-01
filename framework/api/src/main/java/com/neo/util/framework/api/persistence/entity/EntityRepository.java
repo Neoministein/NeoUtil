@@ -1,6 +1,6 @@
 package com.neo.util.framework.api.persistence.entity;
 
-import javax.transaction.RollbackException;
+import jakarta.transaction.RollbackException;
 import java.util.Optional;
 
 /**
