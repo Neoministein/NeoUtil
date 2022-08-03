@@ -48,10 +48,10 @@ public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConne
     protected boolean enabled = false;
 
     @Inject
-    ConfigService configService;
+    protected ConfigService configService;
 
     @Inject
-    Event<ElasticSearchConnectionStatusEvent> connectionStatusEvent;
+    protected Event<ElasticSearchConnectionStatusEvent> connectionStatusEvent;
 
     private volatile RestHighLevelClient client;
 

@@ -128,8 +128,8 @@ public class ElasticSearchRepository implements SearchRepository {
                 }
                 indexerQueueService.addToIndexingQueue(new QueueMessage(
                         QueueableSearchable.RequestType.BULK.toString(), bulkQueueableSearchableList));
-                if (failure instanceof IllegalStateException) {
-                    reconnectClientIfNeeded((IllegalStateException) failure);
+                if (failure instanceof IllegalStateException illegalStateException) {
+                    reconnectClientIfNeeded(illegalStateException);
                 }
             }
         };
@@ -247,13 +247,9 @@ public class ElasticSearchRepository implements SearchRepository {
     @Override
     public void process(QueueableSearchable queueableSearchable) {
         switch (queueableSearchable.getRequestType()) {
-            case INDEX:
-                getBulkProcessor().add(generateIndexRequest(queueableSearchable));
-                break;
-            case UPDATE:
-                throw new InternalLogicException("Not implemented yet");
-            case DELETE:
-                throw new InternalLogicException("Not implemented yet");
+        case INDEX -> getBulkProcessor().add(generateIndexRequest(queueableSearchable));
+        case UPDATE, DELETE -> throw new InternalLogicException("Not implemented yet");
+        default -> throw new InternalLogicException("Not supported");
         }
     }
 
@@ -262,13 +258,9 @@ public class ElasticSearchRepository implements SearchRepository {
         BulkRequest bulkRequest = new BulkRequest();
         for (QueueableSearchable queueableSearchable : transportSearchableList) {
             switch (queueableSearchable.getRequestType()) {
-            case INDEX:
-                bulkRequest.add(generateIndexRequest(queueableSearchable));
-                break;
-            case UPDATE:
-                throw new InternalLogicException("Not implemented yet");
-            case DELETE:
-                throw new InternalLogicException("Not implemented yet");
+            case INDEX -> bulkRequest.add(generateIndexRequest(queueableSearchable));
+            case UPDATE, DELETE -> throw new InternalLogicException("Not implemented yet");
+            default -> throw new InternalLogicException("Not supported");
             }
         }
 
@@ -366,9 +358,9 @@ public class ElasticSearchRepository implements SearchRepository {
                 // property of that field
                 if (mapping.get(sorting.getKey()).isAssignableFrom(String.class)) {
                     builder.sort(sorting.getKey().concat(Searchable.INDEX_SEARCH_KEYWORD),
-                            sorting.getValue() ? SortOrder.ASC : SortOrder.DESC);
+                            sorting.getValue().booleanValue() ? SortOrder.ASC : SortOrder.DESC);
                 } else {
-                    builder.sort(sorting.getKey(), sorting.getValue() ? SortOrder.ASC : SortOrder.DESC);
+                    builder.sort(sorting.getKey(), sorting.getValue().booleanValue() ? SortOrder.ASC : SortOrder.DESC);
                 }
             }
         }
@@ -493,8 +485,8 @@ public class ElasticSearchRepository implements SearchRepository {
         for (Map.Entry<String, Object> entry : readTypeMapping.entrySet()) {
             String fieldName = prefix + entry.getKey();
 
-            if (entry.getValue() instanceof Class) {
-                result.put(fieldName, (Class<?>) entry.getValue());
+            if (entry.getValue() instanceof Class clazz) {
+                result.put(fieldName, clazz);
 
             } else {
                 // currently we support nested fields and the field as a whole, so we just write
@@ -529,30 +521,15 @@ public class ElasticSearchRepository implements SearchRepository {
     }
 
     protected QueryBuilder buildInnerQuery(SearchCriteria filter) {
-        if (filter instanceof RangeBasedSearchCriteria) {
-            if (filter instanceof DateSearchCriteria) {
-                return buildDateQuery((DateSearchCriteria) filter);
-            }
-            return buildRangeRangeBasedQuery((RangeBasedSearchCriteria)filter);
-        }
-
-        if (filter instanceof ExplicitSearchCriteria) {
-            return buildExplicitSearchQuery((ExplicitSearchCriteria) filter);
-        }
-
-        if (filter instanceof ContainsSearchCriteria) {
-            return buildContainsSearchQuery((ContainsSearchCriteria) filter);
-        }
-
-        if (filter instanceof ExistingFieldSearchCriteria) {
-            return buildExistingFieldQuery((ExistingFieldSearchCriteria) filter);
-        }
-
-        if (filter instanceof CombinedSearchCriteria){
-            return buildCombinedQuery((CombinedSearchCriteria) filter);
-        }
-
-        throw  new InternalLogicException("Criteria not supported " + filter.getClass().getName());
+        return switch (filter) {
+            case DateSearchCriteria criteria -> buildDateQuery(criteria);
+            case RangeBasedSearchCriteria criteria -> buildRangeRangeBasedQuery(criteria);
+            case ExplicitSearchCriteria criteria -> buildExplicitSearchQuery(criteria);
+            case ContainsSearchCriteria criteria -> buildContainsSearchQuery(criteria);
+            case ExistingFieldSearchCriteria criteria -> buildExistingFieldQuery(criteria);
+            case CombinedSearchCriteria criteria -> buildCombinedQuery(criteria);
+            default -> throw new InternalLogicException("Criteria not supported " + filter.getClass().getName());
+        };
     }
 
     protected QueryBuilder buildDateQuery(DateSearchCriteria criteria) {
@@ -635,11 +612,9 @@ public class ElasticSearchRepository implements SearchRepository {
 
     protected void addAggregations(List<SearchAggregation> aggregations, SearchSourceBuilder builder) {
         for (SearchAggregation aggregation : aggregations) {
-            if (aggregation instanceof ComplexFieldAggregation) {
-                parseComplexFieldAggregation((ComplexFieldAggregation) aggregation, builder);
-            } else if (aggregation instanceof SimpleFieldAggregation) {
-                SimpleFieldAggregation simpleFieldAgg = (SimpleFieldAggregation) aggregation;
-
+            if (aggregation instanceof ComplexFieldAggregation complexFieldAggregation) {
+                parseComplexFieldAggregation(complexFieldAggregation, builder);
+            } else if (aggregation instanceof SimpleFieldAggregation simpleFieldAgg) {
                 builder.aggregation(getAggregationBuilder(
                         simpleFieldAgg.getAggregationType(),
                         simpleFieldAgg.getName()).field(simpleFieldAgg.getFieldName()));
@@ -680,20 +655,14 @@ public class ElasticSearchRepository implements SearchRepository {
 
     protected ValuesSourceAggregationBuilder getAggregationBuilder(SearchAggregation.AggregationType aggregationType,
             String aggregationName) {
-        switch (aggregationType) {
-        case MAX:
-            return AggregationBuilders.max(aggregationName);
-        case AVG:
-            return AggregationBuilders.avg(aggregationName);
-        case MIN:
-            return AggregationBuilders.min(aggregationName);
-        case SUM:
-            return AggregationBuilders.sum(aggregationName);
-        case CARDINALITY:
-            return AggregationBuilders.cardinality(aggregationName);
-        default:
-            return AggregationBuilders.count(aggregationName);
-        }
+        return switch (aggregationType) {
+            case MAX -> AggregationBuilders.max(aggregationName);
+            case AVG -> AggregationBuilders.avg(aggregationName);
+            case MIN -> AggregationBuilders.min(aggregationName);
+            case SUM -> AggregationBuilders.sum(aggregationName);
+            case CARDINALITY -> AggregationBuilders.cardinality(aggregationName);
+            default -> AggregationBuilders.count(aggregationName);
+        };
     }
 
     protected SearchResult parseSearchResponse(SearchQuery parameters, SearchResponse response) {
@@ -730,9 +699,9 @@ public class ElasticSearchRepository implements SearchRepository {
 
         if (list != null) {
             for (SearchAggregation searchAgg : list) {
-                if (searchAgg instanceof ComplexFieldAggregation) {
+                if (searchAgg instanceof ComplexFieldAggregation complexFieldAggregation) {
                     aggregationColumnNames.put(searchAgg.getName(),
-                            ((ComplexFieldAggregation) searchAgg).getGroupFields());
+                            complexFieldAggregation.getGroupFields());
                 }
             }
         }
@@ -741,18 +710,18 @@ public class ElasticSearchRepository implements SearchRepository {
             for (Aggregation agg : aggregations.asList()) {
                 String aggName = agg.getName();
 
-                if (agg instanceof InternalValueCount) {
+                if (agg instanceof InternalValueCount internalValueCount) {
 
-                    aggregationResults.put(aggName, new SimpleAggregationResult(aggName, ((InternalValueCount) agg).getValue()));
-                } else if (agg instanceof NumericMetricsAggregation.SingleValue) {
+                    aggregationResults.put(aggName, new SimpleAggregationResult(aggName, internalValueCount.getValue()));
+                } else if (agg instanceof NumericMetricsAggregation.SingleValue singleValue) {
 
-                    aggregationResults.put(aggName, new SimpleAggregationResult(aggName, ((NumericMetricsAggregation.SingleValue) agg).value()));
-                } else if (agg instanceof StringTerms) {
+                    aggregationResults.put(aggName, new SimpleAggregationResult(aggName, singleValue.value()));
+                } else if (agg instanceof StringTerms stringTerms) {
 
-                    parseStringAggregation(aggregationResults, aggregationColumnNames, agg, ((StringTerms) agg).getBuckets());
-                } else if (agg instanceof ParsedStringTerms) {
+                    parseStringAggregation(aggregationResults, aggregationColumnNames, agg, stringTerms.getBuckets());
+                } else if (agg instanceof ParsedStringTerms parsedStringTerms) {
 
-                    parseStringAggregation(aggregationResults, aggregationColumnNames, agg, ((ParsedStringTerms) agg).getBuckets());
+                    parseStringAggregation(aggregationResults, aggregationColumnNames, agg, parsedStringTerms.getBuckets());
                 }
             }
         }
@@ -783,8 +752,8 @@ public class ElasticSearchRepository implements SearchRepository {
             Aggregation innerAggregation = bucket.getAggregations().asList().get(0);
             String secondColumnName = innerAggregation.getName();
 
-            if (innerAggregation instanceof Terms) {
-                for (Terms.Bucket innerBucket : ((Terms) innerAggregation).getBuckets()) {
+            if (innerAggregation instanceof Terms teams) {
+                for (Terms.Bucket innerBucket : teams.getBuckets()) {
                     String secondValue = innerBucket.getKeyAsString();
                     columnValues.put(secondColumnName, secondValue);
 
@@ -804,25 +773,17 @@ public class ElasticSearchRepository implements SearchRepository {
         }
     }
 
-    public Object getValueOfAggregation(Aggregation innerAggregation) {
-        if (innerAggregation instanceof InternalSum) {
-            return String.valueOf(((InternalSum) innerAggregation).getValue());
-        } else if (innerAggregation instanceof InternalValueCount) {
-            return ((InternalValueCount) innerAggregation).getValue();
-        } else if (innerAggregation instanceof ParsedAvg) {
-            return ((ParsedAvg) innerAggregation).getValue();
-        } else if (innerAggregation instanceof ParsedValueCount) {
-            return ((ParsedValueCount) innerAggregation).getValue();
-        } else if (innerAggregation instanceof ParsedSum) {
-            return ((ParsedSum) innerAggregation).getValue();
-        } else if (innerAggregation instanceof ParsedMin) {
-            return ((ParsedMin) innerAggregation).getValue();
-        } else if (innerAggregation instanceof ParsedMax) {
-            return ((ParsedMax) innerAggregation).getValue();
-        } else if (innerAggregation instanceof ParsedCardinality) {
-            return ((ParsedCardinality) innerAggregation).getValue();
-        }
-        return null;
+    protected Object getValueOfAggregation(Aggregation innerAggregation) {
+        return switch (innerAggregation) {
+            case InternalSum internalSum -> String.valueOf((internalSum.getValue()));
+            case InternalValueCount internalValueCount -> internalValueCount.getValue();
+            case ParsedAvg parsedAvg -> parsedAvg.getValue();
+            case ParsedSum parsedSum -> parsedSum.getValue();
+            case ParsedMin parsedMin -> parsedMin.getValue();
+            case ParsedMax parsedMax -> parsedMax.getValue();
+            case ParsedCardinality parsedCardinality -> parsedCardinality.getValue();
+            default -> null;
+        };
     }
 
     protected void addToBulkProcessor(DocWriteRequest<?> request) {
@@ -943,25 +904,20 @@ public class ElasticSearchRepository implements SearchRepository {
      * Checks the message of the exception if its an {@link ElasticsearchException} otherwise it will be retried
      */
     public boolean exceptionIsToBeRetried(Exception e) {
-        if (e instanceof ElasticsearchException) {
-            ElasticsearchException elasticEx = (ElasticsearchException) e;
-            if (FILTER_REST_STATUS.contains(elasticEx.status()) ||
-                    Arrays.stream(FILTER_MESSAGES).anyMatch(elasticEx.getDetailedMessage()::contains)) {
-                return false;
-            }
+        if (e instanceof ElasticsearchException elasticEx) {
+            return !FILTER_REST_STATUS.contains(elasticEx.status()) && Arrays.stream(FILTER_MESSAGES)
+                    .noneMatch(elasticEx.getDetailedMessage()::contains);
         }
         return true;
     }
 
     protected QueueableSearchable generateQueueableSearchable(DocWriteRequest<?> request) {
-        if (request instanceof UpdateRequest) {
-            return generateQueueableSearchable((UpdateRequest) request);
-        } else if (request instanceof IndexRequest) {
-            return generateQueueableSearchable((IndexRequest) request);
-        } else if (request instanceof DeleteRequest) {
-            return generateQueueableSearchable((DeleteRequest) request);
-        }
-        throw new IllegalArgumentException("Unknown request type: " + request.getClass().getName());
+        return switch (request) {
+            case UpdateRequest updateRequest -> generateQueueableSearchable(updateRequest);
+            case IndexRequest indexRequest -> generateQueueableSearchable(indexRequest);
+            case DeleteRequest deleteRequest -> generateQueueableSearchable(deleteRequest);
+            default -> throw new IllegalArgumentException("Unknown request type: " + request.getClass().getName());
+        };
     }
 
     protected QueueableSearchable generateQueueableSearchable(IndexRequest request) {

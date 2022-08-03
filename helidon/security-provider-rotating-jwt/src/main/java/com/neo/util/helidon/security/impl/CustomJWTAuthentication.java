@@ -187,7 +187,7 @@ public class CustomJWTAuthentication extends SynchronousProvider implements Auth
 
     protected void checkForBlockedJWT(Header header, Claims claims) {
         BlockedJWT blockedJWT = blockedJWTToken.get(claims.getSubject());
-        if (blockedJWT != null && blockedJWT.getInvalidUntil() > claims.getExpiration().getTime()) {
+        if (blockedJWT != null && blockedJWT.invalidUntil() > claims.getExpiration().getTime()) {
             LOGGER.info("Provided JWT Token has been marked as invalid");
             throw new ExpiredJwtException(header, claims, "JWT Token is marked as blocked");
         }

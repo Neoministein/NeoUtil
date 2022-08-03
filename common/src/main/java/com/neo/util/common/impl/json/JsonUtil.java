@@ -210,8 +210,8 @@ public class JsonUtil {
             } else if (valueToBeUpdated != null && valueToBeUpdated.isObject()) {
                 merge(valueToBeUpdated, updatedValue);
             } else {
-                if (mainNode instanceof ObjectNode) {
-                    ((ObjectNode) mainNode).replace(updatedFieldName, updatedValue);
+                if (mainNode instanceof ObjectNode objectNode) {
+                    objectNode.replace(updatedFieldName, updatedValue);
                 }
             }
         }

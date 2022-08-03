@@ -17,11 +17,6 @@ public final class StopWatch {
     Date stop = null;
 
     /**
-     * create trivial object to count a start and stop time point.
-     */
-    public StopWatch() {}
-
-    /**
      * sets the start date and resets the stop date.
      */
     public void start() {

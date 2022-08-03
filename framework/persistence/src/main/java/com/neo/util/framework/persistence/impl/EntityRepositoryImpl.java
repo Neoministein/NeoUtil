@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-
 @Transactional
 @RequestScoped
 public class EntityRepositoryImpl implements EntityRepository {
@@ -32,7 +31,7 @@ public class EntityRepositoryImpl implements EntityRepository {
     protected static final Logger LOGGER = LoggerFactory.getLogger(EntityRepositoryImpl.class);
 
     @Inject
-    PersistenceContextService pcs;
+    protected PersistenceContextService pcs;
 
     @Override
     public void create(DataBaseEntity entity) {
@@ -177,29 +176,15 @@ public class EntityRepositoryImpl implements EntityRepository {
     }
 
     protected Predicate buildInnerQuery(SearchCriteria filter, CriteriaBuilder cb, Root<?> root) {
-        if (filter instanceof DoubleRangeSearchCriteria) {
-            return buildRangeQuery((DoubleRangeSearchCriteria) filter, cb, root);
-        }
-        if (filter instanceof LongRangeSearchCriteria) {
-            return buildRangeQuery((LongRangeSearchCriteria) filter, cb, root);
-        }
-
-        if (filter instanceof ExplicitSearchCriteria) {
-            return buildExplicitSearchQuery((ExplicitSearchCriteria) filter, cb, root);
-        }
-
-        if (filter instanceof ContainsSearchCriteria) {
-            return buildContainsSearchQuery((ContainsSearchCriteria) filter, cb, root);
-        }
-
-        if (filter instanceof ExistingFieldSearchCriteria) {
-            return buildAnyNoneQuery((ExistingFieldSearchCriteria) filter, cb, root);
-        }
-        if (filter instanceof  CombinedSearchCriteria) {
-            return buildCombinedQuery((CombinedSearchCriteria) filter, cb, root);
-        }
-
-        throw new InternalLogicException("Criteria not supported " + filter.getClass().getName());
+        return switch (filter) {
+            case DoubleRangeSearchCriteria criteria -> buildRangeQuery(criteria, cb, root);
+            case LongRangeSearchCriteria criteria -> buildRangeQuery(criteria, cb, root);
+            case ExplicitSearchCriteria criteria -> buildExplicitSearchQuery(criteria, cb, root);
+            case ContainsSearchCriteria criteria -> buildContainsSearchQuery(criteria, cb, root);
+            case ExistingFieldSearchCriteria criteria ->buildAnyNoneQuery(criteria, cb, root);
+            case CombinedSearchCriteria criteria -> buildCombinedQuery(criteria, cb, root);
+            default -> throw new InternalLogicException("Criteria not supported " + filter.getClass().getName());
+        };
     }
 
     protected Predicate buildRangeQuery(LongRangeSearchCriteria criteria, CriteriaBuilder cb, Root<?> root) {
