@@ -12,20 +12,21 @@ import com.neo.util.framework.persistence.api.PersistenceContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Transactional
-@RequestScoped
+@ApplicationScoped
 public class EntityRepositoryImpl implements EntityRepository {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(EntityRepositoryImpl.class);
