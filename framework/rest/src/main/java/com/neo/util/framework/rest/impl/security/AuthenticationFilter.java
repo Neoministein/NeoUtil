@@ -54,20 +54,20 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext containerRequest) {
-        LOGGER.debug("Authentication attempt");
+        LOGGER.trace("Authentication attempt");
         String authorizationHeader = containerRequest.getHeaderString(HttpHeaders.AUTHORIZATION);
 
         try {
             Credential credential = credentialsGenerator.generate(authorizationHeader);
             Optional<RolePrincipal> principalOptional = authenticationProvider.authenticate(credential);
             if (principalOptional.isPresent()) {
-                LOGGER.debug("Authentication success");
+                LOGGER.trace("Authentication success");
                 requestDetails.setUser(principalOptional.get());
                 return;
             }
-            LOGGER.debug("Authentication failure");
+            LOGGER.info("Authentication failure");
         } catch (IllegalArgumentException | IllegalStateException ex) {
-            LOGGER.debug("Invalid authorization header");
+            LOGGER.info("Invalid authorization header");
         }
         abortWithUnauthorized(containerRequest);
     }
