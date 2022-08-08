@@ -95,6 +95,6 @@ public class StringUtils {
         for (int length; (length = inputStream.read(buffer)) != -1; ) {
             result.write(buffer, 0, length);
         }
-        return result.toString(charset.name());
+        return result.toString(charset);
     }
 }

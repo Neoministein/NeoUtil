@@ -2,6 +2,7 @@ package com.neo.util.helidon.security.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.KeyUtils;
+import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.exception.InternalJsonException;
@@ -21,7 +22,6 @@ import org.slf4j.MDC;
 import java.io.*;
 import java.lang.SecurityException;
 import java.lang.annotation.Annotation;
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
 
@@ -195,18 +195,10 @@ public class CustomJWTAuthentication extends SynchronousProvider implements Auth
 
     protected Key retrievePrivateKeyFromFile() {
         try {
-            StringBuilder sb = new StringBuilder();
-            InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("jwt-keys.json");
-            InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-            BufferedReader reader = new BufferedReader(streamReader);
-            for (String line; (line = reader.readLine()) != null;) {
-                sb.append(line);
-            }
-
-            JsonNode node = JsonUtil.fromJson(sb.toString());
+            JsonNode node = JsonUtil.fromJson(ResourceUtil.getResourceFileAsString("jwt-keys.json"));
             return KeyUtils.parseRSAPrivateKey(node.get("private").asText());
-        } catch (NullPointerException | IOException | InternalJsonException ex) {
-            LOGGER.error("Unable to retrieve private key from resources");
+        } catch (IOException | InternalJsonException ex) {
+            LOGGER.error("Unable to retrieve private key from resources [{}]", ex.getMessage());
         }
         throw new InternalLogicException();
     }
