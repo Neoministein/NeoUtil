@@ -67,7 +67,7 @@ class JsonParsingIT extends AbstractIntegrationTest {
 
         Assertions.assertEquals(400, response.getStatus());
         JsonNode responseBoy = JsonUtil.fromJson(response.readEntity(String.class));
-        Assertions.assertEquals("Invalid json format in the request body: $.boolean: is missing but it is required", responseBoy.get("error").get("message").asText());
+        Assertions.assertTrue(responseBoy.get("error").get("message").asText().contains("Invalid json format in the request body: $.boolean"));
     }
 
     protected static final String RANDOM_JSON = "[\n" + "  {\n" + "    \"_id\": \"62d3ec24d160c5a72a37ccf2\",\n"
