@@ -185,7 +185,7 @@ public class CustomJWTAuthentication extends SynchronousProvider implements Auth
         return cookieMap;
     }
 
-    protected void checkForBlockedJWT(Header header, Claims claims) {
+    protected void checkForBlockedJWT(Header<?> header, Claims claims) {
         BlockedJWT blockedJWT = blockedJWTToken.get(claims.getSubject());
         if (blockedJWT != null && blockedJWT.invalidUntil() > claims.getExpiration().getTime()) {
             LOGGER.info("Provided JWT Token has been marked as invalid");

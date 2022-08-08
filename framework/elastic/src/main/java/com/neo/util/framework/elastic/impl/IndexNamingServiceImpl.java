@@ -9,8 +9,6 @@ import com.neo.util.framework.elastic.api.IndexNamingService;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -22,8 +20,6 @@ import java.util.Map;
 
 @ApplicationScoped
 public class IndexNamingServiceImpl implements IndexNamingService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(IndexNamingServiceImpl.class);
 
     protected static final String INDEX_SEPARATOR = "-";
     protected static final String SEARCH_PROVIDER_NO_DATE_INDEX_POSTFIX = "no-date";
@@ -45,13 +41,13 @@ public class IndexNamingServiceImpl implements IndexNamingService {
     protected String indexPostFix;
 
     @Inject
-    ConfigService configService;
+    protected ConfigService configService;
 
     /** Cache that saves the annotation information of each searchable in regards to its index prefix */
-    Map<Class<?>, String> indexNamePrefixes;
+    protected Map<Class<?>, String> indexNamePrefixes;
 
     /** Cache that saves the annotation information of each searchable in regards to its index period */
-    Map<Class<?>, IndexPeriod> indexPeriods;
+    protected Map<Class<?>, IndexPeriod> indexPeriods;
 
     /**
      * Create a new IndexNameServiceImpl.
