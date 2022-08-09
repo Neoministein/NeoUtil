@@ -48,7 +48,7 @@
 						<version>3.0.0-M7</version>
 						<configuration>
 							<!-- the 2gb of memory are needed by the tests of resource optimization, since they load a 30mb xml file for testdata -->
-							<argLine>-Xms384m -Xmx4g -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow</argLine>
+							<argLine>-Xms384m -Xmx4g -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow --enable-preview</argLine>
 							<includes>
 								<include>**/Test*.java</include>
 								<include>**/*Test.java</include>
@@ -56,6 +56,7 @@
 								<include>**/*IT.java</include>
 							</includes>
 						</configuration>
+
 					</plugin>
 				</plugins>
 			</build>
