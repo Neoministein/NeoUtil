@@ -1,6 +1,5 @@
 package com.neo.util.framework.rest.impl.entity;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.api.json.Views;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.connection.RequestDetails;
@@ -14,7 +13,6 @@ import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import jakarta.transaction.RollbackException;
@@ -32,12 +30,6 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEntityRestEndpoint.class);
 
-    protected ObjectNode errorNotFound;
-    protected ObjectNode errorCannotParse;
-    protected ObjectNode errorMissingFields;
-    protected ObjectNode errorNotUnique;
-    protected ObjectNode errorInvalidResourcePermission;
-
     public static final String ENTITY_PERM = "CRUD_";
 
     public static final String PERM_INTERNAL = "internal";
@@ -51,18 +43,12 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
     @Inject
     protected ResponseGenerator responseGenerator;
 
+    @Inject
+    protected EntityRestResponse entityRestResponse;
+
     protected abstract Object convertToPrimaryKey(String primaryKey);
 
     protected abstract Class<T> getEntityClass();
-
-    @PostConstruct
-    protected void init() {
-        errorNotFound = responseGenerator.errorObject("resources/000","Entity not found");
-        errorCannotParse = responseGenerator.errorObject("resources/001","Unable to retrieve entity");
-        errorMissingFields = responseGenerator.errorObject("resources/002","Entity is missing mandatory fields");
-        errorNotUnique = responseGenerator.errorObject("resources/003","Provided value isn't unique");
-        errorInvalidResourcePermission = responseGenerator.errorObject("resources/004","Invalid resource permission");
-    }
 
     protected Response getByPrimaryKey(String primaryKey) {
         return entityByColumn(DataBaseEntity.C_ID, convertToPrimaryKey(primaryKey));
@@ -79,10 +65,10 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
             LOGGER.info("Created new [{},{}]",getEntityClass().getSimpleName(), entity.getPrimaryKey());
         } catch (RollbackException ex) {
             LOGGER.debug("Provided value isn't unique");
-            return responseGenerator.error(400, errorNotUnique);
+            return responseGenerator.error(400, entityRestResponse.getNotUniqueError());
         } catch (PersistenceException ex) {
             LOGGER.debug("Entity is missing mandatory fields");
-            return responseGenerator.error(400, errorMissingFields);
+            return responseGenerator.error(400, entityRestResponse.getMissingFieldsError());
         }
         return parseEntityToResponse(entity,Views.Owner.class);
     }
@@ -96,7 +82,7 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
 
         if (entity.isEmpty()) {
             LOGGER.debug("Entity not found [{},{}]", getEntityClass().getSimpleName() ,primaryKey);
-            return responseGenerator.error(404, errorNotFound);
+            return responseGenerator.error(404, entityRestResponse.getNotFoundError());
         }
 
         try {
@@ -104,7 +90,7 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
             LOGGER.info("Deleted entity [{},{}]",getEntityClass().getSimpleName(), entity.get().getPrimaryKey());
             return responseGenerator.success();
         } catch (RollbackException ex) {
-            return responseGenerator.error(400, errorMissingFields);
+            return responseGenerator.error(400, entityRestResponse.getMissingFieldsError());
         }
     }
 
@@ -121,7 +107,7 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
         EntityResult<T> entity = entityRepository.find(entityParameters);
         if (entity.getHitSize() == 0) {
             LOGGER.debug("Entity not found [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
-            return responseGenerator.error(404, errorNotFound);
+            return responseGenerator.error(404, entityRestResponse.getNotFoundError());
         }
         LOGGER.trace("Entity lookup success [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
         return parseEntityToResponse(entity.getHits().get(0), getSerializationScope());
@@ -133,10 +119,10 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
             LOGGER.info("Created new [{},{}]",getEntityClass().getSimpleName(), entity.getPrimaryKey());
         } catch (RollbackException ex) {
             LOGGER.debug("Provided value isn't unique");
-            return responseGenerator.error(400, errorNotUnique);
+            return responseGenerator.error(400, entityRestResponse.getNotUniqueError());
         } catch (PersistenceException ex) {
             LOGGER.debug("Entity is missing mandatory fields");
-            return responseGenerator.error(400, errorMissingFields);
+            return responseGenerator.error(400, entityRestResponse.getMissingFieldsError());
         }
         return parseEntityToResponse(entity, serializationScope);
     }
@@ -155,7 +141,7 @@ public abstract class AbstractEntityRestEndpoint<T extends DataBaseEntity> {
             return responseGenerator.success(JsonUtil.fromJson(result));
         } catch (InternalJsonException ex) {
             LOGGER.error("Unable to parse database entity to JSON {}", ex.getMessage());
-            return responseGenerator.error(500, errorCannotParse);
+            return responseGenerator.error(500, entityRestResponse.getCannotParseError());
         }
     }
 
