@@ -2,13 +2,16 @@ package com.neo.util.framework.rest.impl.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.StringUtils;
+import com.neo.util.common.impl.exception.InternalConfigurationException;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.common.impl.json.JsonUtil;
+import com.neo.util.framework.impl.json.JsonSchemaLoader;
 import com.neo.util.framework.rest.api.parser.ValidateJsonSchema;
 import com.networknt.schema.JsonSchema;
 
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.WebApplicationException;
@@ -23,8 +26,8 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Provider
 @ApplicationScoped
@@ -32,7 +35,12 @@ import java.util.Map;
 @Consumes({MediaType.APPLICATION_JSON, "text/json"})
 public class JsonNodeParser implements MessageBodyReader<JsonNode> {
 
-    protected final Map<String, JsonSchema> schemaMap = new HashMap<>();
+    protected final Map<String, JsonSchema> schemaMap;
+
+    @Inject
+    public JsonNodeParser(JsonSchemaLoader jsonSchemaLoader) {
+        schemaMap = jsonSchemaLoader.getUnmodifiableMap();
+    }
 
     @Context
     protected ResourceInfo resourceInfo;
@@ -60,6 +68,7 @@ public class JsonNodeParser implements MessageBodyReader<JsonNode> {
     }
 
     protected JsonSchema retrieveSchemaFromString(String schemaLocation) {
-        return schemaMap.computeIfAbsent(schemaLocation, JsonSchemaUtil::generateSchemaFromResource);
+        return Optional.ofNullable(schemaMap.get(schemaLocation))
+                .orElseThrow(() -> new InternalConfigurationException("Invalid json schema to check against [" + schemaLocation + "]"));
     }
 }

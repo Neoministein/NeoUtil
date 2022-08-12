@@ -28,7 +28,7 @@ public class JsonEndpointResource {
 
     @POST
     @Path(P_SCHEMA)
-    @ValidateJsonSchema("schema/ITSchema.json")
+    @ValidateJsonSchema("ITSchema.json")
     public Response jsonScheme(JsonNode jsonNode) {
         return Response.ok().entity(JsonUtil.toJson(jsonNode)).build();
     }
