@@ -1,7 +1,8 @@
 package com.neo.util.framework.api.persistence.search;
 
-import com.neo.util.framework.api.persistence.criteria.SearchCriteria;
 import com.neo.util.framework.api.persistence.aggregation.SearchAggregation;
+import com.neo.util.framework.api.persistence.criteria.SearchCriteria;
+import com.neo.util.framework.api.persistence.aggregation.AbstractSearchAggregation;
 
 import java.io.Serializable;
 import java.util.*;
@@ -67,7 +68,7 @@ public class SearchQuery implements Serializable {
      * Create a new SearchParameters.
      */
     public SearchQuery(List<String> fields, int offset, Integer maxResults, Long timeout, List<SearchCriteria> filters,
-            Map<String, Boolean> sorting, List<SearchAggregation> aggregations, boolean onlySource) {
+                       Map<String, Boolean> sorting, List<SearchAggregation> aggregations, boolean onlySource) {
         super();
         this.fields = fields;
         this.offset = offset;

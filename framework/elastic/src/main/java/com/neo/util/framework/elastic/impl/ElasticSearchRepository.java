@@ -42,6 +42,8 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.filter.FiltersAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.filter.FiltersAggregator;
 import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
@@ -618,6 +620,20 @@ public class ElasticSearchRepository implements SearchRepository {
                 builder.aggregation(getAggregationBuilder(
                         simpleFieldAgg.getAggregationType(),
                         simpleFieldAgg.getName()).field(simpleFieldAgg.getFieldName()));
+            } else if (aggregation instanceof CriteriaAggregation criteriaAggregation) {
+                if (criteriaAggregation.getSearchCriteriaList().size() > 1) {
+                    List<FiltersAggregator.KeyedFilter> keyedFilters = new ArrayList<>();
+                    for (CriteriaAggregation.KeyedCriteria keyedCriteria: criteriaAggregation.getSearchCriteriaList()) {
+                        keyedFilters.add(new FiltersAggregator.KeyedFilter(keyedCriteria.key(), buildInnerQuery(keyedCriteria.searchCriteria())));
+                    }
+                    FiltersAggregator.KeyedFilter[] keyedFilterArray = new FiltersAggregator.KeyedFilter[keyedFilters.size()];
+                    keyedFilterArray = keyedFilters.toArray(keyedFilterArray);
+                    FiltersAggregationBuilder filtersAggregationBuilder = AggregationBuilders.filters(criteriaAggregation.getName(), keyedFilterArray);
+                    filtersAggregationBuilder.subAggregation(getAggregationBuilder(
+                            criteriaAggregation.getAggregation().getAggregationType(),
+                            criteriaAggregation.getAggregation().getFieldName()));
+                    builder.aggregation(filtersAggregationBuilder);
+                }
             }
         }
     }
@@ -653,8 +669,8 @@ public class ElasticSearchRepository implements SearchRepository {
         builder.aggregation(rootAggregation);
     }
 
-    protected ValuesSourceAggregationBuilder getAggregationBuilder(SearchAggregation.AggregationType aggregationType,
-            String aggregationName) {
+    protected ValuesSourceAggregationBuilder getAggregationBuilder(AbstractSearchAggregation.AggregationType aggregationType,
+                                                                   String aggregationName) {
         return switch (aggregationType) {
             case MAX -> AggregationBuilders.max(aggregationName);
             case AVG -> AggregationBuilders.avg(aggregationName);

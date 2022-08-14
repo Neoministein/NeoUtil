@@ -3,7 +3,7 @@ package com.neo.util.framework.api.persistence.aggregation;
 /**
  * Defines a simple aggregation over a given field.
  */
-public class SimpleFieldAggregation extends SearchAggregation {
+public class SimpleFieldAggregation extends AbstractSearchAggregation {
 
     private final String fieldName;
 
