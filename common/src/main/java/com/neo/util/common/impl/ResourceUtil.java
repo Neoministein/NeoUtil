@@ -40,10 +40,11 @@ public class ResourceUtil {
                 return new File(folderURL.toURI()).listFiles();
             } catch (URISyntaxException ex) {
                 throw new InternalConfigurationException(ex);
+            } catch (IllegalArgumentException ex) {
+                return new File[0];
             }
         }
-        throw new InternalConfigurationException("Invalid folder path provided [" + folderLocation + "]");
-
+        return new File[0];
     }
 
     protected static ClassLoader classLoader() {

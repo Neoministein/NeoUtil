@@ -33,7 +33,7 @@ public class JsonSchemaLoader {
     protected ConfigService configService;
 
     @PostConstruct
-    protected void init() {
+    public void init() {
         LOGGER.info("Pre-loading json schemas");
         String jsonSchemaFolder = configService.get("json").get("schemaFolder").asString().orElse("schema");
 
