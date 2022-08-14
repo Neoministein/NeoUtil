@@ -74,7 +74,7 @@ public class EntityRepositoryImpl implements EntityRepository {
     public <X extends DataBaseEntity> Optional<X> find(Object primaryKey, Class<X> entityClazz) {
         try {
             LOGGER.trace("Searching for entity {}:{}", primaryKey, entityClazz.getSimpleName());
-            return Optional.of(pcs.getEntityManager().find(entityClazz, primaryKey));
+            return Optional.ofNullable(pcs.getEntityManager().find(entityClazz, primaryKey));
         } catch (NoResultException | IllegalArgumentException  ex) {
             LOGGER.trace("Unable to find entity {}:{}", primaryKey, entityClazz.getSimpleName());
             return Optional.empty();
