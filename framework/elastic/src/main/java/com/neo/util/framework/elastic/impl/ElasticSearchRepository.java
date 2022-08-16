@@ -1,10 +1,20 @@
 package com.neo.util.framework.elastic.impl;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.FieldSort;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.aggregations.*;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.common.impl.exception.InternalLogicException;
-import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.persistence.aggregation.*;
@@ -13,8 +23,6 @@ import com.neo.util.framework.api.persistence.search.*;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionRepository;
 import com.neo.util.framework.elastic.api.IndexNamingService;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
@@ -23,8 +31,6 @@ import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -35,23 +41,8 @@ import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.VersionType;
-import org.elasticsearch.index.query.*;
 import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.aggregations.Aggregation;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.bucket.filter.FiltersAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.filter.FiltersAggregator;
-import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.*;
-import org.elasticsearch.search.aggregations.support.ValuesSourceAggregationBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.elasticsearch.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,6 +157,10 @@ public class ElasticSearchRepository implements SearchRepository {
 
     protected RestHighLevelClient getClient() {
         return connection.getClient();
+    }
+
+    protected ElasticsearchClient getApiClient() {
+        return connection.getApiClient();
     }
 
     public void index(Searchable searchable) {
@@ -328,52 +323,64 @@ public class ElasticSearchRepository implements SearchRepository {
 
     @Override
     public SearchResult fetch(String index, SearchQuery parameters) {
-        SearchRequest searchRequest = new SearchRequest(index);
-
-        SearchSourceBuilder builder = new SearchSourceBuilder();
+        SearchRequest.Builder builder = new SearchRequest.Builder();
+        builder.index(index);
         builder.size(parameters.getMaxResults());
-        builder.query(QueryBuilders.matchAllQuery());
-
+        builder.query(QueryBuilders.matchAll().build()._toQuery());
         if (parameters.getTimeout().isPresent()) {
-            builder.timeout(new TimeValue(parameters.getTimeout().get()));
+            builder.timeout(parameters.getTimeout().get().toString());
         }
 
         addSearchFilters(parameters.getFilters(), builder);
-
         if (parameters.getFields().isPresent()) {
             if (parameters.getFields().get().isEmpty()) {
                 //If no fields are requested, then the result doesn't need any hits
                 builder.size(0);
 
             } else {
-                builder.fetchSource(parameters.getFields().get().toArray(new String[0]), new String[0]);
+                builder.source(
+                        new SourceConfig.Builder()
+                                .filter(new SourceFilter.Builder()
+                                                .includes(parameters.getFields().get())
+                                                .build())
+                                .build());
             }
-        } else {
-            builder.fetchSource(true);
+        } /*else {
+            builder.source(true);
         }
+        */
 
 
         if (!parameters.getSorting().isEmpty()) {
+            //new SortOptions.Builder().field(new FieldSort.Builder().field())
+            List<SortOptions> sortOptions = new ArrayList<>();
             Map<String, Class<?>> mapping = getFlatTypeMapping(readTypeMapping(index));
             for (Map.Entry<String, Boolean> sorting : parameters.getSorting().entrySet()) {
                 // if the sorting field is of type string we need to sort on the keyword
                 // property of that field
+                String fieldName = sorting.getKey();
                 if (mapping.get(sorting.getKey()).isAssignableFrom(String.class)) {
-                    builder.sort(sorting.getKey().concat(Searchable.INDEX_SEARCH_KEYWORD),
-                            sorting.getValue().booleanValue() ? SortOrder.ASC : SortOrder.DESC);
-                } else {
-                    builder.sort(sorting.getKey(), sorting.getValue().booleanValue() ? SortOrder.ASC : SortOrder.DESC);
+                    fieldName = fieldName.concat(Searchable.INDEX_SEARCH_KEYWORD);
                 }
+                sortOptions.add(
+                        new SortOptions.Builder()
+                                .field(new FieldSort.Builder()
+                                        .field(fieldName)
+                                        .order(sorting.getValue().booleanValue() ? SortOrder.Asc : SortOrder.Desc)
+                                        .build()
+                                ).build()
+                );
             }
+            builder.sort(sortOptions);
         }
 
         addAggregations(parameters.getAggregations(), builder);
-        searchRequest.source(builder);
 
         LOGGER.debug("Executing search on index {} with parameters {}, builder {}", index, parameters, builder);
 
         try {
-            SearchResponse response = getClient().search(searchRequest, RequestOptions.DEFAULT);
+
+            SearchResponse<ObjectNode> response = getApiClient().search(builder.build(), ObjectNode.class);
             return parseSearchResponse(parameters, response);
         } catch (IOException | IllegalStateException e) {
             LOGGER.error("Failed to fetch {} entries for index {} because of {}", parameters.getMaxResults(), index,
@@ -383,7 +390,7 @@ public class ElasticSearchRepository implements SearchRepository {
     }
 
     protected Map<String, Object> readTypeMapping(String index) {
-        Map<String, Object> results = new HashMap<>();
+        Map<String, Object> results = new HashMap<>(); //TODO
 
         GetMappingsRequest request = new GetMappingsRequest();
         request.setMasterTimeout(TimeValue.timeValueMinutes(1));
@@ -504,25 +511,20 @@ public class ElasticSearchRepository implements SearchRepository {
         }
     }
 
-    protected void addSearchFilters(List<SearchCriteria> searchFilters, SearchSourceBuilder builder) {
+    protected void addSearchFilters(List<SearchCriteria> searchFilters, SearchRequest.Builder builder) {
         if (!searchFilters.isEmpty()) {
-
-            if (searchFilters.size() > 1) {
-                BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
-
-                for (SearchCriteria filter : searchFilters) {
-                    // all filters are added with AND (means must)
-                    boolQuery.must(buildInnerQuery(filter));
-                }
-
-                builder.query(boolQuery);
-            } else {
-                builder.query(buildInnerQuery(searchFilters.get(0)));
+            BoolQuery.Builder boolQuery = co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders.bool();
+            List<Query> queryList = new ArrayList<>();
+            for (SearchCriteria filter : searchFilters) {
+                // all filters are added with AND (means must)
+                queryList.add(buildInnerQuery(filter));
             }
+            boolQuery.must(queryList);
+            builder.query(boolQuery.build()._toQuery());
         }
     }
 
-    protected QueryBuilder buildInnerQuery(SearchCriteria filter) {
+    protected Query buildInnerQuery(SearchCriteria filter) {
         return switch (filter) {
             case DateSearchCriteria criteria -> buildDateQuery(criteria);
             case RangeBasedSearchCriteria criteria -> buildRangeRangeBasedQuery(criteria);
@@ -534,174 +536,164 @@ public class ElasticSearchRepository implements SearchRepository {
         };
     }
 
-    protected QueryBuilder buildDateQuery(DateSearchCriteria criteria) {
-        RangeQueryBuilder rangeQuery = buildBasicRangeQuery(criteria);
+    protected Query buildDateQuery(DateSearchCriteria criteria) {
+        RangeQuery.Builder rangeQuery = buildBasicRangeQuery(criteria);
         if (criteria.getTimeZone() != null) {
             rangeQuery.timeZone(criteria.getTimeZone());
         }
-        return searchQueryNot(criteria, rangeQuery);
+        return searchQueryNot(criteria, rangeQuery.build()._toQuery());
     }
 
-    protected QueryBuilder buildRangeRangeBasedQuery(RangeBasedSearchCriteria criteria) {
-        return searchQueryNot(criteria, buildBasicRangeQuery(criteria));
+    protected Query buildRangeRangeBasedQuery(RangeBasedSearchCriteria criteria) {
+        return searchQueryNot(criteria, buildBasicRangeQuery(criteria).build()._toQuery());
     }
 
-    protected RangeQueryBuilder buildBasicRangeQuery(RangeBasedSearchCriteria criteria) {
-        RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery(criteria.getFieldName());
+    protected RangeQuery.Builder buildBasicRangeQuery(RangeBasedSearchCriteria criteria) {
+        RangeQuery.Builder rangeQuery = co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders.range();
 
         if (criteria.getFrom() != null) {
-            rangeQuery.from(criteria.getFrom());
-            rangeQuery.includeLower(criteria.isIncludeFrom());
+            rangeQuery.from(criteria.getFrom().toString());
+            //rangeQuery.includeLower(criteria.isIncludeFrom());
         }
 
         if (criteria.getTo() != null) {
-            rangeQuery.to(criteria.getTo());
-            rangeQuery.includeUpper(criteria.isIncludeTo());
+            rangeQuery.to(criteria.getTo().toString());
+            //rangeQuery.includeUpper(criteria.isIncludeTo());
         }
         return rangeQuery;
     }
 
-    protected QueryBuilder buildExplicitSearchQuery(ExplicitSearchCriteria criteria) {
+    protected Query buildExplicitSearchQuery(ExplicitSearchCriteria criteria) {
 
         if (criteria.getFieldValue() instanceof String) {
             String fieldValue = criteria.getFieldValue().toString();
 
             if (fieldValue.contains("*") || fieldValue.contains("?")) {
                 // wildcard
-                QueryBuilder queryBuilder = QueryBuilders.wildcardQuery(criteria.getFieldName(), fieldValue);
-                return searchQueryNot(criteria, queryBuilder);
+                WildcardQuery.Builder queryBuilder = QueryBuilders.wildcard()
+                        .field(criteria.getFieldName())
+                        .value(fieldValue);
+                return searchQueryNot(criteria, queryBuilder.build()._toQuery());
             }
         }
 
-        MatchQueryBuilder termQuery = QueryBuilders.matchQuery(criteria.getFieldName(), criteria.getFieldValue());
-        return searchQueryNot(criteria, termQuery);
+        TermQuery.Builder term = QueryBuilders.term()
+                .field(criteria.getFieldName())
+                .value(objectToFieldValue(criteria.getFieldValue()));
+
+        return searchQueryNot(criteria, term.build()._toQuery());
     }
 
-    protected QueryBuilder buildContainsSearchQuery(ContainsSearchCriteria criteria) {
-        TermsQueryBuilder termQuery = QueryBuilders.termsQuery(criteria.getFieldName(), criteria.getFieldValues());
-        return searchQueryNot(criteria, termQuery);
+    protected Query buildContainsSearchQuery(ContainsSearchCriteria criteria) {
+        MatchQuery.Builder termQuery = QueryBuilders.match().query(criteria.getFieldName());
+        return searchQueryNot(criteria, termQuery.build()._toQuery());
     }
 
-    protected QueryBuilder buildExistingFieldQuery(ExistingFieldSearchCriteria criteria) {
-        ExistsQueryBuilder existsQuery = QueryBuilders.existsQuery(criteria.getFieldName());
+    protected Query buildExistingFieldQuery(ExistingFieldSearchCriteria criteria) {
+        ExistsQuery.Builder existsQuery = QueryBuilders.exists().field(criteria.getFieldName());
 
         if (criteria.getExists() ^ criteria.isNot()) {
-            return existsQuery;
+            return existsQuery.build()._toQuery();
         } else {
-            return QueryBuilders.boolQuery().mustNot(existsQuery);
+            return QueryBuilders.bool().mustNot(existsQuery.build()._toQuery()).build()._toQuery();
         }
     }
 
-    protected QueryBuilder buildCombinedQuery(CombinedSearchCriteria criteria) {
-        BoolQueryBuilder innerQuery = QueryBuilders.boolQuery();
+    protected Query buildCombinedQuery(CombinedSearchCriteria criteria) {
+        BoolQuery.Builder boolQuery = QueryBuilders.bool();
         for (SearchCriteria searchCriteria : criteria.getSearchCriteriaList()) {
             if (criteria.isAnd()) {
-                innerQuery.must(buildInnerQuery(searchCriteria));
+                boolQuery.must(buildInnerQuery(searchCriteria));
             } else {
-                innerQuery.should(buildInnerQuery(searchCriteria));
+                boolQuery.should(buildInnerQuery(searchCriteria));
             }
         }
-        return innerQuery;
+        return boolQuery.build()._toQuery();
     }
 
-    protected QueryBuilder searchQueryNot(FieldSearchCriteria fieldSearchCriteria, QueryBuilder query) {
+    protected Query searchQueryNot(FieldSearchCriteria fieldSearchCriteria, Query query) {
         if (fieldSearchCriteria.isNot()) {
-            return QueryBuilders.boolQuery().mustNot(query);
+            return QueryBuilders.bool().mustNot(query).build()._toQuery();
         } else {
             return query;
         }
     }
 
-    protected void addAggregations(List<SearchAggregation> aggregations, SearchSourceBuilder builder) {
-        for (SearchAggregation aggregation : aggregations) {
-            if (aggregation instanceof ComplexFieldAggregation complexFieldAggregation) {
-                parseComplexFieldAggregation(complexFieldAggregation, builder);
-            } else if (aggregation instanceof SimpleFieldAggregation simpleFieldAgg) {
-                builder.aggregation(getAggregationBuilder(
-                        simpleFieldAgg.getAggregationType(),
-                        simpleFieldAgg.getName()).field(simpleFieldAgg.getFieldName()));
-            } else if (aggregation instanceof CriteriaAggregation criteriaAggregation) {
-                if (criteriaAggregation.getSearchCriteriaList().size() > 1) {
-                    List<FiltersAggregator.KeyedFilter> keyedFilters = new ArrayList<>();
-                    for (CriteriaAggregation.KeyedCriteria keyedCriteria: criteriaAggregation.getSearchCriteriaList()) {
-                        keyedFilters.add(new FiltersAggregator.KeyedFilter(keyedCriteria.key(), buildInnerQuery(keyedCriteria.searchCriteria())));
-                    }
-                    FiltersAggregator.KeyedFilter[] keyedFilterArray = new FiltersAggregator.KeyedFilter[keyedFilters.size()];
-                    keyedFilterArray = keyedFilters.toArray(keyedFilterArray);
-                    FiltersAggregationBuilder filtersAggregationBuilder = AggregationBuilders.filters(criteriaAggregation.getName(), keyedFilterArray);
-                    filtersAggregationBuilder.subAggregation(getAggregationBuilder(
-                            criteriaAggregation.getAggregation().getAggregationType(),
-                            criteriaAggregation.getAggregation().getFieldName()));
-                    builder.aggregation(filtersAggregationBuilder);
-                }
-            }
-        }
-    }
-    protected void parseComplexFieldAggregation(ComplexFieldAggregation aggregation, SearchSourceBuilder builder) {
-        TermsAggregationBuilder rootAggregation = null;
-        TermsAggregationBuilder currentAggregation = null;
-
-        if (aggregation.getGroupFields().isEmpty()) {
-            LOGGER.warn("An aggregation with name {} was added, but it did not contain any fields to aggregate on, so it will be ignored", aggregation.getName());
-            return;
-        }
-
-        for (String fieldName : aggregation.getGroupFields()) {
-
-            if (rootAggregation == null) {
-                rootAggregation = AggregationBuilders.terms(aggregation.getName()).field(fieldName)
-                        .size(aggregation.getSize());
-                currentAggregation = rootAggregation;
-            } else {
-                TermsAggregationBuilder newAggregation = AggregationBuilders.terms(fieldName)
-                        .field(fieldName);
-                currentAggregation.subAggregation(newAggregation);
-                currentAggregation = newAggregation;
-            }
-        }
-
-        if (currentAggregation != null) {
-            currentAggregation
-                    .subAggregation(getAggregationBuilder(aggregation.getAggregationType(), "lastAgg")
-                            .field(aggregation.getFieldName()));
-        }
-        builder.size(aggregation.getSize());
-        builder.aggregation(rootAggregation);
-    }
-
-    protected ValuesSourceAggregationBuilder getAggregationBuilder(AbstractSearchAggregation.AggregationType aggregationType,
-                                                                   String aggregationName) {
-        return switch (aggregationType) {
-            case MAX -> AggregationBuilders.max(aggregationName);
-            case AVG -> AggregationBuilders.avg(aggregationName);
-            case MIN -> AggregationBuilders.min(aggregationName);
-            case SUM -> AggregationBuilders.sum(aggregationName);
-            case CARDINALITY -> AggregationBuilders.cardinality(aggregationName);
-            default -> AggregationBuilders.count(aggregationName);
+    protected FieldValue objectToFieldValue(Object o) {
+        return switch (o) {
+            case String string -> FieldValue.of(string);
+            case Integer integer -> FieldValue.of(integer);
+            case Long longVal -> FieldValue.of(longVal);
+            case Float floatVal -> FieldValue.of(floatVal);
+            case Double doubleVal -> FieldValue.of(doubleVal);
+            case Boolean bool -> FieldValue.of(bool);
+            case Date date -> FieldValue.of(date.getTime());
+            case null -> FieldValue.NULL;
+            default -> throw new IllegalStateException("ExplicitSearchCriteria unexpected value class: " + o.getClass().getName());
         };
     }
 
-    protected SearchResult parseSearchResponse(SearchQuery parameters, SearchResponse response) {
-        return new SearchResult(
-                response.getHits().getTotalHits().value,
-                response.getHits().getMaxScore(),
-                response.getTook().getMillis(),
-                response.isTerminatedEarly() != null ? response.isTerminatedEarly() : false,
-                response.isTimedOut(),
-                response.getScrollId(),
-                parseHits(response.getHits(), parameters.getOnlySource()),
-                parseAggregations(response.getAggregations(), parameters.getAggregations()),
-                TotalHits.Relation.GREATER_THAN_OR_EQUAL_TO.equals(response.getHits().getTotalHits().relation));
+    protected void addAggregations(List<SearchAggregation> aggregations, SearchRequest.Builder builder) {
+        Map<String, Aggregation> aggregationMap = new HashMap<>();
+        for (SearchAggregation aggregation : aggregations) {
+             if (aggregation instanceof SimpleFieldAggregation simpleFieldAgg) {
+                 aggregationMap.put(simpleFieldAgg.getFieldName(),
+                         getAggregationBuilder(
+                                 simpleFieldAgg.getAggregationType(),
+                                 simpleFieldAgg.getName()));
+            } else if (aggregation instanceof CriteriaAggregation criteriaAggregation) {
+                if (criteriaAggregation.getSearchCriteriaMap().size() > 1) {
+                    //List<FiltersAggregator.KeyedFilter> keyedFilters = new ArrayList<>();
+
+                    Map<String, Query> filterMap = new HashMap<>();
+                    for (Map.Entry<String, SearchCriteria> entry: criteriaAggregation.getSearchCriteriaMap().entrySet()) {
+                        filterMap.put(entry.getKey(), buildInnerQuery(entry.getValue()));
+                    }
+                    FiltersAggregation filtersAggregate = AggregationBuilders.filters().filters(new Buckets.Builder<Query>().keyed(filterMap).build()).build();
+
+                    Aggregation subAggregationMap = getAggregationBuilder(
+                                    criteriaAggregation.getAggregation().getAggregationType(),
+                                    criteriaAggregation.getAggregation().getFieldName());
+                    aggregationMap.put(
+                            criteriaAggregation.getName(),
+                            new Aggregation.Builder().filters(filtersAggregate).aggregations(Map.of(criteriaAggregation.getName(), subAggregationMap)).build());
+                }
+            }
+        }
+        builder.aggregations(aggregationMap);
     }
 
-    protected List<JsonNode> parseHits(SearchHits searchHits, boolean onlySource) {
-        List<JsonNode> hitList = new ArrayList<>();
+    protected Aggregation getAggregationBuilder(AbstractSearchAggregation.AggregationType aggregationType, String fieldName) {
+        return switch (aggregationType) {
+            case MAX -> AggregationBuilders.max(agg -> agg.field(fieldName));
+            case AVG -> AggregationBuilders.avg(agg -> agg.field(fieldName));
+            case MIN -> AggregationBuilders.min(agg -> agg.field(fieldName));
+            case SUM -> AggregationBuilders.sum(agg -> agg.field(fieldName));
+            case CARDINALITY -> AggregationBuilders.cardinality(agg -> agg.field(fieldName));
+            default -> AggregationBuilders.valueCount(agg -> agg.field(fieldName));
+        };
+    }
 
-        for (SearchHit hit : searchHits.getHits()) {
+    protected SearchResult parseSearchResponse(SearchQuery parameters, SearchResponse<ObjectNode> response) {
+        return new SearchResult(
+                response.hits().total() != null ? response.hits().total().value() : -1,
+                response.hits().maxScore(),
+                response.took(),
+                response.terminatedEarly(),
+                response.timedOut(),
+                response.scrollId(),
+                parseHits(response.hits(), parameters.getOnlySource()),
+                parseAggregations(response.aggregations(), parameters.getAggregations()),
+                TotalHitsRelation.Gte.equals(response.hits().total().relation()));
+    }
+
+    protected List<JsonNode> parseHits(HitsMetadata<ObjectNode> hitsMetadata, boolean onlySource) {
+        List<JsonNode> hitList = new ArrayList<>();
+        for (Hit<ObjectNode> hit : hitsMetadata.hits()) {
             if (onlySource) {
-                hitList.add(JsonUtil.fromJson(hit.toString()).get("_source"));
+                hitList.add(hit.source());
             } else {
-                hitList.add(JsonUtil.fromJson(hit.toString()));
+                hitList.add(hit.source()); //TODO GET METADATA
             }
 
         }
@@ -709,35 +701,31 @@ public class ElasticSearchRepository implements SearchRepository {
         return hitList;
     }
 
-    protected Map<String, AggregationResult> parseAggregations(Aggregations aggregations, List<SearchAggregation> list) {
+    protected Map<String, AggregationResult> parseAggregations(Map<String, Aggregate> aggregations, List<SearchAggregation> list) {
         Map<String, AggregationResult> aggregationResults = new HashMap<>();
-        Map<String, List<String>> aggregationColumnNames = new HashMap<>();
+        Map<String, Set<String>> aggregationColumnNames = new HashMap<>();
 
         if (list != null) {
             for (SearchAggregation searchAgg : list) {
-                if (searchAgg instanceof ComplexFieldAggregation complexFieldAggregation) {
+                if (searchAgg instanceof CriteriaAggregation criteriaAggregation) {
                     aggregationColumnNames.put(searchAgg.getName(),
-                            complexFieldAggregation.getGroupFields());
+                            criteriaAggregation.getSearchCriteriaMap().keySet());
                 }
             }
         }
 
         if (aggregations != null) {
-            for (Aggregation agg : aggregations.asList()) {
-                String aggName = agg.getName();
+            for (Map.Entry<String, Aggregate> agg : aggregations.entrySet()) {
 
-                if (agg instanceof InternalValueCount internalValueCount) {
+                if (agg instanceof ValueCountAggregate valueCountAggregate) {
 
-                    aggregationResults.put(aggName, new SimpleAggregationResult(aggName, internalValueCount.getValue()));
-                } else if (agg instanceof NumericMetricsAggregation.SingleValue singleValue) {
+                    aggregationResults.put(agg.getKey(), new SimpleAggregationResult(agg.getKey(), valueCountAggregate.value()));
+                } else if (agg instanceof SingleMetricAggregateBase singleValue) {
 
-                    aggregationResults.put(aggName, new SimpleAggregationResult(aggName, singleValue.value()));
-                } else if (agg instanceof StringTerms stringTerms) {
+                    aggregationResults.put(agg.getKey(), new SimpleAggregationResult(agg.getKey(), singleValue.value()));
+                } else if (agg instanceof TermsAggregateBase stringTerms) {
 
-                    parseStringAggregation(aggregationResults, aggregationColumnNames, agg, stringTerms.getBuckets());
-                } else if (agg instanceof ParsedStringTerms parsedStringTerms) {
-
-                    parseStringAggregation(aggregationResults, aggregationColumnNames, agg, parsedStringTerms.getBuckets());
+                    parseStringAggregation(aggregationResults, aggregationColumnNames, agg.getValue(), stringTerms.buckets());
                 }
             }
         }
@@ -745,7 +733,8 @@ public class ElasticSearchRepository implements SearchRepository {
     }
 
     protected void parseStringAggregation(Map<String, AggregationResult> aggregationResults,
-            Map<String, List<String>> aggregationColumnNames, Aggregation agg, List<? extends Terms.Bucket> buckets) {
+            Map<String, Set<String>> aggregationColumnNames, Aggregate agg, Buckets buckets) {
+        /*
         for (Terms.Bucket bucket : buckets) {
             // first column name
             String firstColumnName = aggregationColumnNames.get(agg.getName()).get(0);
@@ -758,11 +747,13 @@ public class ElasticSearchRepository implements SearchRepository {
             analyzeInnerAggregation(aggregationResults, columnValues, agg.getName(), bucket);
 
         }
+
+         */
     }
 
     protected void analyzeInnerAggregation(Map<String, AggregationResult> aggregationResults,
             Map<String, Object> columnValues, String aggName, Terms.Bucket bucket) {
-
+        /*
         // there should only ever be one inner aggregation
         if (bucket.getAggregations().asList().size() == 1) {
             Aggregation innerAggregation = bucket.getAggregations().asList().get(0);
@@ -787,8 +778,10 @@ public class ElasticSearchRepository implements SearchRepository {
                 }
             }
         }
-    }
 
+         */
+    }
+    /*
     protected Object getValueOfAggregation(Aggregation innerAggregation) {
         return switch (innerAggregation) {
             case InternalSum internalSum -> String.valueOf((internalSum.getValue()));
@@ -801,6 +794,8 @@ public class ElasticSearchRepository implements SearchRepository {
             default -> null;
         };
     }
+
+     */
 
     protected void addToBulkProcessor(DocWriteRequest<?> request) {
         try {
@@ -909,7 +904,7 @@ public class ElasticSearchRepository implements SearchRepository {
         IndexRequest request = new IndexRequest(queueableSearchable.getIndex()).id(queueableSearchable.getId())
                 .routing(queueableSearchable.getRouting())
                 .source(queueableSearchable.getJsonSource(), XContentType.JSON);
-        if (queueableSearchable.getVersion() != null && StringUtils.isNotEmpty(queueableSearchable.getId())) {
+        if (queueableSearchable.getVersion() != null && !StringUtils.isEmpty(queueableSearchable.getId())) {
             request.versionType(VersionType.EXTERNAL_GTE).version(queueableSearchable.getVersion());
         }
 

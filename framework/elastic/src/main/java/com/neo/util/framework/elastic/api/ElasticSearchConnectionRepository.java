@@ -1,5 +1,6 @@
 package com.neo.util.framework.elastic.api;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.neo.util.framework.elastic.impl.ElasticSearchConnectionStatusEvent;
 import org.elasticsearch.client.RestHighLevelClient;
 
@@ -17,6 +18,12 @@ public interface ElasticSearchConnectionRepository extends Serializable {
      * Returns a connected client. If there isn't one yer one is created.
      */
     RestHighLevelClient getClient();
+
+    //FIXME
+    /**
+     *
+     */
+    ElasticsearchClient getApiClient();
 
     /**
      * Check if elasticsearch is enabled

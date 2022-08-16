@@ -1,5 +1,9 @@
 package com.neo.util.framework.elastic.impl;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
@@ -12,6 +16,7 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.RestHighLevelClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,11 +58,12 @@ public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConne
     @Inject
     protected Event<ElasticSearchConnectionStatusEvent> connectionStatusEvent;
 
-    private volatile RestHighLevelClient client;
+    protected volatile RestHighLevelClient client;
+    protected volatile ElasticsearchClient elasticsearchClient;
 
-    private List<String> nodeList = new ArrayList<>();
+    protected List<String> nodeList = new ArrayList<>();
 
-    private final AtomicBoolean connectorInitializationOngoing = new AtomicBoolean(false);
+    protected final AtomicBoolean connectorInitializationOngoing = new AtomicBoolean(false);
 
     @PostConstruct
     public void postConstruct() {
@@ -105,6 +111,10 @@ public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConne
         throw new IllegalStateException("Elastic client is not yet ready");
     }
 
+    public ElasticsearchClient getApiClient() {
+        return null;
+    }
+
     public boolean enabled() {
         return enabled;
     }
@@ -113,7 +123,7 @@ public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConne
      * Disconnects the client from elasticsearch
      */
     public synchronized void disconnect() {
-        if (client == null) {
+        if (client == null && elasticsearchClient == null) {
             return;
         }
 
@@ -123,6 +133,7 @@ public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConne
             LOGGER.warn("Unable to close connection to elasticsearch correctly. Setting client to null");
         } finally {
             client = null;
+            elasticsearchClient = null;
             connectorInitializationOngoing.set(false);
         }
     }
@@ -131,7 +142,7 @@ public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConne
      * Connects the client to elasticsearch and fires a {@link ElasticSearchConnectionStatusEvent}
      */
     public synchronized void connect() {
-        if (client != null) {
+        if (client != null && elasticsearchClient != null) {
             return;
         }
 
@@ -158,13 +169,25 @@ public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConne
                     node.getSchemeName());
         }
 
+        RestClient restClient;
+
         if (credentialsProvider != null) {
-            client = new RestHighLevelClient(RestClient.builder(nodes.toArray(new HttpHost[nodes.size()]))
+            restClient = RestClient.builder(nodes.toArray(new HttpHost[nodes.size()]))
                     .setHttpClientConfigCallback(
-                            httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)));
+                            httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
+                    .build();
         } else {
-            client = new RestHighLevelClient(RestClient.builder(nodes.toArray(new HttpHost[nodes.size()])));
+            restClient = RestClient.builder(nodes.toArray(new HttpHost[nodes.size()]))
+                    .build();
         }
+
+        client = new RestHighLevelClientBuilder(restClient).setApiCompatibilityMode(true).build();
+
+        ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+
+        elasticsearchClient = new ElasticsearchClient(transport);
+
+        // hlrc and esClient share the same httpClient
 
         LOGGER.debug("Initializing elasticsearch complete");
         connectionStatusEvent.fire(new ElasticSearchConnectionStatusEvent(ElasticSearchConnectionStatusEvent.STATUS_EVENT_CONNECTED));
