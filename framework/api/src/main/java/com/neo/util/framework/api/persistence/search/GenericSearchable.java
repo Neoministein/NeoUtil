@@ -20,6 +20,9 @@ public class GenericSearchable implements Searchable {
     @JsonIgnore
     private String businessId;
 
+    @JsonIgnore
+    private long version = 0L;
+
     @Override
     public String getBusinessId() {
         return businessId;
@@ -55,6 +58,14 @@ public class GenericSearchable implements Searchable {
     @Override
     public Date getCreationDate() {
         return creationDate;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
+    }
+
+    @Override public long getVersion() {
+        return version;
     }
 
     protected void setJsonNode(ObjectNode jsonNode) {

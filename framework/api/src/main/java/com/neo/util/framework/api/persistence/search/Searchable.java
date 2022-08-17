@@ -51,6 +51,11 @@ public interface Searchable {
     Date getCreationDate();
 
     /**
+     * The transaction count
+     */
+    long getVersion();
+
+    /**
      * The Object in json format
      *
      * @return the Object in json format
