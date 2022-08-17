@@ -3,6 +3,7 @@ package com.neo.util.framework.helidon.impl.config;
 import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigValue;
+import io.helidon.config.ConfigValues;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class ConfigHelidonWrapper implements Config {
 
     @Override
     public Type type() {
-        return null;
+        return null; //FIXME;
     }
 
     @Override
@@ -51,12 +52,14 @@ public class ConfigHelidonWrapper implements Config {
 
     @Override
     public <T> ConfigValue<T> as(Class<T> clazz) {
-        return as(clazz);
+        return new ConfigValueHelidonWrapper<>(config.as(clazz));
     }
 
     @Override
     public <T> ConfigValue<T> as(Function<Config, T> var1) {
-        return as(var1);
+        return this.type() == Type.MISSING ?
+                new ConfigValueHelidonWrapper<>(ConfigValues.empty()) :
+                new ConfigValueHelidonWrapper<>(ConfigValues.simpleValue(var1.apply(this)));
     }
 
     @Override
