@@ -42,7 +42,6 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.VersionType;
 import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +70,7 @@ public class ElasticSearchRepository implements SearchRepository {
     protected static final List<RestStatus> FILTER_REST_STATUS = Arrays.asList(RestStatus.CONFLICT,
             RestStatus.NOT_FOUND);
 
-    //{"I/O reactor status: STOPPED","I/O reactor has been shut down"}
+    //Response looks like this: I/O reactor status: STOPPED","I/O reactor has been shut down"
     protected static final String[] FILTER_HTTPCLIENT_MESSAGES = new String[] { "I/O reactor" };
 
     protected static final String[] FILTER_MESSAGES = new String[] { "type=version_conflict_engine_exception" };
@@ -79,7 +78,12 @@ public class ElasticSearchRepository implements SearchRepository {
     protected static final String TYPE = "type";
     protected static final String PROPERTIES = "properties";
 
-    protected long flushInterval = 0;
+    protected static final String CONFIG_PREFIX = "elastic";
+
+    public static final String FLUSH_INTERVAL_CONFIG = CONFIG_PREFIX + ".FlushInterval";
+    public static final String BULK_ACTION_CONFIG = CONFIG_PREFIX + ".BulkActions";
+    public static final String CONCURRENT_REQUEST_CONFIG = CONFIG_PREFIX + ".ConcurrentRequests";
+    public static final String BULK_SIZE = CONFIG_PREFIX + ".BulkSize";
 
     @Inject
     protected ConfigService configService;
@@ -379,8 +383,9 @@ public class ElasticSearchRepository implements SearchRepository {
         LOGGER.debug("Executing search on index {} with parameters {}, builder {}", index, parameters, builder);
 
         try {
-
-            SearchResponse<ObjectNode> response = getApiClient().search(builder.build(), ObjectNode.class);
+            SearchRequest searchRequest = builder.build();
+            LOGGER.info(searchRequest.toString());
+            SearchResponse<ObjectNode> response = getApiClient().search(searchRequest, ObjectNode.class);
             return parseSearchResponse(parameters, response);
         } catch (IOException | IllegalStateException e) {
             LOGGER.error("Failed to fetch {} entries for index {} because of {}", parameters.getMaxResults(), index,
@@ -389,9 +394,16 @@ public class ElasticSearchRepository implements SearchRepository {
         }
     }
 
-    protected Map<String, Object> readTypeMapping(String index) {
-        Map<String, Object> results = new HashMap<>(); //TODO
 
+    protected Map<String, Object> readTypeMapping(String index) {
+        /*
+        --NOTE--
+        If I want to fully migrate of from HighLevel RestClient I would need to get the mapping another way.
+
+        This blog post describes getting the mapping manually with a request using the RestClient
+        https://spinscale.de/posts/2022-03-03-running-the-elasticcc-platform-part-2.html#testing
+         */
+        Map<String, Object> results = new HashMap<>();
         GetMappingsRequest request = new GetMappingsRequest();
         request.setMasterTimeout(TimeValue.timeValueMinutes(1));
         request.indices(index);
@@ -550,7 +562,7 @@ public class ElasticSearchRepository implements SearchRepository {
 
     protected RangeQuery.Builder buildBasicRangeQuery(RangeBasedSearchCriteria criteria) {
         RangeQuery.Builder rangeQuery = co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders.range();
-
+        rangeQuery.field(criteria.getFieldName());
         if (criteria.getFrom() != null) {
             rangeQuery.from(criteria.getFrom().toString());
             //rangeQuery.includeLower(criteria.isIncludeFrom());
@@ -560,6 +572,7 @@ public class ElasticSearchRepository implements SearchRepository {
             rangeQuery.to(criteria.getTo().toString());
             //rangeQuery.includeUpper(criteria.isIncludeTo());
         }
+
         return rangeQuery;
     }
 
@@ -634,36 +647,33 @@ public class ElasticSearchRepository implements SearchRepository {
     }
 
     protected void addAggregations(List<SearchAggregation> aggregations, SearchRequest.Builder builder) {
-        Map<String, Aggregation> aggregationMap = new HashMap<>();
+        Map<String, Aggregation> aggregationMap = new TreeMap<>();
         for (SearchAggregation aggregation : aggregations) {
              if (aggregation instanceof SimpleFieldAggregation simpleFieldAgg) {
-                 aggregationMap.put(simpleFieldAgg.getFieldName(),
-                         getAggregationBuilder(
-                                 simpleFieldAgg.getAggregationType(),
-                                 simpleFieldAgg.getName()));
-            } else if (aggregation instanceof CriteriaAggregation criteriaAggregation) {
-                if (criteriaAggregation.getSearchCriteriaMap().size() > 1) {
-                    //List<FiltersAggregator.KeyedFilter> keyedFilters = new ArrayList<>();
+                 aggregationMap.put(simpleFieldAgg.getName(),
+                         buildAggregation(
+                                 simpleFieldAgg.getType(),
+                                 simpleFieldAgg.getFieldName()));
+            } else if (aggregation instanceof CriteriaAggregation criteriaAggregation
+                     && criteriaAggregation.getSearchCriteriaMap().size() > 1) {
+                 Map<String, Query> filterMap = new TreeMap<>();
+                 for (Map.Entry<String, SearchCriteria> entry: criteriaAggregation.getSearchCriteriaMap().entrySet()) {
+                     filterMap.put(entry.getKey(), buildInnerQuery(entry.getValue()));
+                 }
+                 FiltersAggregation filtersAggregate = AggregationBuilders.filters().filters(new Buckets.Builder<Query>().keyed(filterMap).build()).build();
 
-                    Map<String, Query> filterMap = new HashMap<>();
-                    for (Map.Entry<String, SearchCriteria> entry: criteriaAggregation.getSearchCriteriaMap().entrySet()) {
-                        filterMap.put(entry.getKey(), buildInnerQuery(entry.getValue()));
-                    }
-                    FiltersAggregation filtersAggregate = AggregationBuilders.filters().filters(new Buckets.Builder<Query>().keyed(filterMap).build()).build();
-
-                    Aggregation subAggregationMap = getAggregationBuilder(
-                                    criteriaAggregation.getAggregation().getAggregationType(),
-                                    criteriaAggregation.getAggregation().getFieldName());
-                    aggregationMap.put(
-                            criteriaAggregation.getName(),
-                            new Aggregation.Builder().filters(filtersAggregate).aggregations(Map.of(criteriaAggregation.getName(), subAggregationMap)).build());
-                }
+                 Aggregation subAggregationMap = buildAggregation(
+                         criteriaAggregation.getAggregation().getType(),
+                         criteriaAggregation.getAggregation().getFieldName());
+                 aggregationMap.put(
+                         criteriaAggregation.getName(),
+                         new Aggregation.Builder().filters(filtersAggregate).aggregations(criteriaAggregation.getName(), subAggregationMap).build());
             }
         }
         builder.aggregations(aggregationMap);
     }
 
-    protected Aggregation getAggregationBuilder(AbstractSearchAggregation.AggregationType aggregationType, String fieldName) {
+    protected Aggregation buildAggregation(SimpleFieldAggregation.Type aggregationType, String fieldName) {
         return switch (aggregationType) {
             case MAX -> AggregationBuilders.max(agg -> agg.field(fieldName));
             case AVG -> AggregationBuilders.avg(agg -> agg.field(fieldName));
@@ -677,13 +687,13 @@ public class ElasticSearchRepository implements SearchRepository {
     protected SearchResult parseSearchResponse(SearchQuery parameters, SearchResponse<ObjectNode> response) {
         return new SearchResult(
                 response.hits().total() != null ? response.hits().total().value() : -1,
-                response.hits().maxScore(),
+                response.hits().maxScore() != null ? response.hits().maxScore().doubleValue() : -1,
                 response.took(),
-                response.terminatedEarly(),
+                Boolean.TRUE.equals(response.terminatedEarly()),
                 response.timedOut(),
                 response.scrollId(),
                 parseHits(response.hits(), parameters.getOnlySource()),
-                parseAggregations(response.aggregations(), parameters.getAggregations()),
+                parseAggregations(response.aggregations()),
                 TotalHitsRelation.Gte.equals(response.hits().total().relation()));
     }
 
@@ -701,101 +711,46 @@ public class ElasticSearchRepository implements SearchRepository {
         return hitList;
     }
 
-    protected Map<String, AggregationResult> parseAggregations(Map<String, Aggregate> aggregations, List<SearchAggregation> list) {
+    protected Map<String, AggregationResult> parseAggregations(Map<String, Aggregate> aggregations) {
         Map<String, AggregationResult> aggregationResults = new HashMap<>();
-        Map<String, Set<String>> aggregationColumnNames = new HashMap<>();
-
-        if (list != null) {
-            for (SearchAggregation searchAgg : list) {
-                if (searchAgg instanceof CriteriaAggregation criteriaAggregation) {
-                    aggregationColumnNames.put(searchAgg.getName(),
-                            criteriaAggregation.getSearchCriteriaMap().keySet());
-                }
-            }
-        }
 
         if (aggregations != null) {
             for (Map.Entry<String, Aggregate> agg : aggregations.entrySet()) {
+                AggregateVariant variant = agg.getValue()._get();
+                String key = agg.getKey();
 
-                if (agg instanceof ValueCountAggregate valueCountAggregate) {
-
-                    aggregationResults.put(agg.getKey(), new SimpleAggregationResult(agg.getKey(), valueCountAggregate.value()));
-                } else if (agg instanceof SingleMetricAggregateBase singleValue) {
-
-                    aggregationResults.put(agg.getKey(), new SimpleAggregationResult(agg.getKey(), singleValue.value()));
-                } else if (agg instanceof TermsAggregateBase stringTerms) {
-
-                    parseStringAggregation(aggregationResults, aggregationColumnNames, agg.getValue(), stringTerms.buckets());
+                if (variant instanceof SingleMetricAggregateBase singleValue) {
+                    aggregationResults.put(key, new SimpleAggregationResult(key, singleValue.value()));
+                } else if (variant instanceof FiltersAggregate filtersAggregate) {
+                    parseFilterAggregation(aggregationResults, filtersAggregate, filtersAggregate.buckets(), key);
+                } else {
+                    LOGGER.warn("Unsupported simpleFieldAggregation variant received [{}]", variant._aggregateKind());
                 }
             }
         }
         return aggregationResults;
     }
 
-    protected void parseStringAggregation(Map<String, AggregationResult> aggregationResults,
-            Map<String, Set<String>> aggregationColumnNames, Aggregate agg, Buckets buckets) {
-        /*
-        for (Terms.Bucket bucket : buckets) {
-            // first column name
-            String firstColumnName = aggregationColumnNames.get(agg.getName()).get(0);
-            // first column value
-            String firstValue = bucket.getKeyAsString();
-
-            Map<String, Object> columnValues = new LinkedHashMap<>();
-            columnValues.put(firstColumnName, firstValue);
-
-            analyzeInnerAggregation(aggregationResults, columnValues, agg.getName(), bucket);
-
-        }
-
-         */
-    }
-
-    protected void analyzeInnerAggregation(Map<String, AggregationResult> aggregationResults,
-            Map<String, Object> columnValues, String aggName, Terms.Bucket bucket) {
-        /*
-        // there should only ever be one inner aggregation
-        if (bucket.getAggregations().asList().size() == 1) {
-            Aggregation innerAggregation = bucket.getAggregations().asList().get(0);
-            String secondColumnName = innerAggregation.getName();
-
-            if (innerAggregation instanceof Terms teams) {
-                for (Terms.Bucket innerBucket : teams.getBuckets()) {
-                    String secondValue = innerBucket.getKeyAsString();
-                    columnValues.put(secondColumnName, secondValue);
-
-                    analyzeInnerAggregation(aggregationResults, columnValues, aggName, innerBucket);
-                }
-            } else {
-                Object value = getValueOfAggregation(innerAggregation);
-                if (aggregationResults.containsKey(aggName)) {
-                    ComplexAggregationResult result = (ComplexAggregationResult) aggregationResults.get(aggName);
-                    result.addValue(new AggregationResultValue(columnValues, value));
-                } else {
-                    ComplexAggregationResult result = new ComplexAggregationResult(aggName);
-                    result.addValue(new AggregationResultValue(columnValues, value));
-                    aggregationResults.put(aggName, result);
+    protected void parseFilterAggregation(Map<String, AggregationResult> toAddTo,
+            FiltersAggregate filtersAggregate, Buckets<FiltersBucket> buckets, String key) {
+        switch (filtersAggregate.buckets()._kind()) {
+        case Keyed:
+            Map<String, Object> result = new HashMap<>(buckets.keyed().size());
+            for (Map.Entry<String, FiltersBucket> bucket: buckets.keyed().entrySet()) {
+                for (Map.Entry<String, Aggregate> aggregate: bucket.getValue().aggregations().entrySet()) {
+                    if (aggregate.getValue()._get() instanceof SingleMetricAggregateBase singleValue) {
+                        result.put(bucket.getKey(), singleValue.value());
+                    } else {
+                        LOGGER.warn("Unsupported simpleFieldAggregation variant received [{}]", aggregate.getValue()._kind());
+                    }
                 }
             }
+            toAddTo.put(key, new CriteriaAggregationResult(key, result));
+            break;
+        case default:
+            LOGGER.warn("Unsupported filter value type [{}]", filtersAggregate.buckets()._kind());
         }
-
-         */
     }
-    /*
-    protected Object getValueOfAggregation(Aggregation innerAggregation) {
-        return switch (innerAggregation) {
-            case InternalSum internalSum -> String.valueOf((internalSum.getValue()));
-            case InternalValueCount internalValueCount -> internalValueCount.getValue();
-            case ParsedAvg parsedAvg -> parsedAvg.getValue();
-            case ParsedSum parsedSum -> parsedSum.getValue();
-            case ParsedMin parsedMin -> parsedMin.getValue();
-            case ParsedMax parsedMax -> parsedMax.getValue();
-            case ParsedCardinality parsedCardinality -> parsedCardinality.getValue();
-            default -> null;
-        };
-    }
-
-     */
 
     protected void addToBulkProcessor(DocWriteRequest<?> request) {
         try {
@@ -810,7 +765,7 @@ public class ElasticSearchRepository implements SearchRepository {
         String indexName = indexNameService.getIndexName(searchable);
         return new IndexRequest(indexName)
                 .source(parseSearchableToObjectNode(searchable).toString(), XContentType.JSON)
-                .id(searchable.getBusinessId());
+                .id(searchable.getBusinessId()).versionType(VersionType.EXTERNAL_GTE).version(searchable.getVersion());
     }
 
     protected ObjectNode parseSearchableToObjectNode(Searchable searchable) {
@@ -868,6 +823,7 @@ public class ElasticSearchRepository implements SearchRepository {
             }
         } catch (InterruptedException ex) {
             LOGGER.warn("exception while closing bulkProcessor, error: {}", ex.getMessage());
+            Thread.currentThread().interrupt();
         }
         bulkProcessor = null;
     }
@@ -878,21 +834,20 @@ public class ElasticSearchRepository implements SearchRepository {
                         getClient().bulkAsync(request, RequestOptions.DEFAULT, bulkListener),
                 listener);
 
-        configService.get(ElasticSearchConnectionRepositoryImpl.ELASTIC_CONFIG);
 
-        flushInterval = configService.get("FlushInterval").asInt().orElse(10);
+        long flushInterval = configService.get(FLUSH_INTERVAL_CONFIG).asInt().orElse(10);
         LOGGER.info("BulkProcessor.Builder FlushInterval: {}", flushInterval);
         builder.setFlushInterval(TimeValue.timeValueSeconds(flushInterval));
 
-        int bulkAction = configService.get("BulkActions").asInt().orElse(2500);
+        int bulkAction = configService.get(BULK_ACTION_CONFIG).asInt().orElse(2500);
         LOGGER.info("BulkProcessor.Builder BulkActions: {}", bulkAction);
         builder.setBulkActions(bulkAction);
 
-        int concurrentRequests = configService.get("ConcurrentRequests").asInt().orElse(3);
+        int concurrentRequests = configService.get(CONCURRENT_REQUEST_CONFIG).asInt().orElse(3);
         LOGGER.info("BulkProcessor.Builder ConcurrentRequests: {}", concurrentRequests);
         builder.setConcurrentRequests(concurrentRequests);
 
-        int bulkSize = configService.get("BulkSize").asInt().orElse(10);
+        int bulkSize = configService.get(BULK_SIZE).asInt().orElse(10);
         LOGGER.info("BulkProcessor.Builder BulkSize: {}", bulkSize);
         builder.setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.MB));
 

@@ -45,10 +45,10 @@ public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConne
 
     protected static final String DEFAULT_URL = DEFAULT_SCHEME + "://" + LOCALHOST_HOST_NAME + ":" + DEFAULT_PORT;
 
-    protected static final String ELASTIC_CONFIG = "elastic";
-    protected static final String NODE_CONFIG = "nodes";
-    protected static final String CREDENTIALS_CONFIG = "credentials";
-    protected static final String ENABLED_CONFIG = "enabled";
+    protected static final String CONFIG_PREFIX = ElasticSearchRepository.CONFIG_PREFIX;
+    protected static final String ENABLED_CONFIG = CONFIG_PREFIX + ".enabled";
+    protected static final String NODE_CONFIG = CONFIG_PREFIX + ".nodes";
+    protected static final String CREDENTIALS_CONFIG = CONFIG_PREFIX + ".credentials";
 
     protected boolean enabled = false;
 
@@ -72,12 +72,11 @@ public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConne
 
     public void reloadConfig() {
         LOGGER.debug("Loading elastic search configuration");
-        Config elasticConfig = configService.get(ELASTIC_CONFIG);
-        List<String> nodes = elasticConfig.get(NODE_CONFIG).asList(String.class).orElse(List.of(DEFAULT_URL));
+        List<String> nodes = configService.get(NODE_CONFIG).asList(String.class).orElse(List.of(DEFAULT_URL));
 
         nodeList = nodes;
         LOGGER.debug("Elasticsearch nodes {}", nodes);
-        this.enabled = elasticConfig.get(ENABLED_CONFIG).asBoolean().orElse(false);
+        this.enabled = configService.get(ENABLED_CONFIG).asBoolean().orElse(false);
         if (enabled) {
             connect();
         } else {
@@ -93,26 +92,30 @@ public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConne
      * Returns a connected client. If there isn't one yer one is created.
      */
     public RestHighLevelClient getClient() {
-        RestHighLevelClient c = client;
+        throwIfNotConnected(client);
+        return client;
+    }
 
-        if (c != null) {
-            return c;
+    public ElasticsearchClient getApiClient() {
+        throwIfNotConnected(elasticsearchClient);
+        return elasticsearchClient;
+    }
+
+    protected void throwIfNotConnected(Object client) {
+        if (client != null) {
+            return;
         }
 
         if (connectorInitializationOngoing.compareAndSet(false, true)) {
             try {
                 connect();
-                return client;
+                return;
             } catch (Exception e) {
                 connectorInitializationOngoing.set(false);
             }
         }
         LOGGER.error("Elastic client is not yet ready yet");
         throw new IllegalStateException("Elastic client is not yet ready");
-    }
-
-    public ElasticsearchClient getApiClient() {
-        return null;
     }
 
     public boolean enabled() {
@@ -200,7 +203,7 @@ public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConne
      * @return credentialsProvider
      */
     protected CredentialsProvider getCredentialsProvider() {
-        Config config = configService.get(ELASTIC_CONFIG).get(CREDENTIALS_CONFIG);
+        Config config = configService.get(CREDENTIALS_CONFIG);
 
 
         String username = config.get("username").asString().orElse(null);

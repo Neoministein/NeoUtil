@@ -1,23 +1,28 @@
 package com.neo.util.framework.api.persistence.aggregation;
 
 /**
- * Defines a simple aggregation over a given field.
+ * Defines a simple simpleFieldAggregation over a given field.
  */
-public class SimpleFieldAggregation extends AbstractSearchAggregation {
+public record SimpleFieldAggregation(String name, String fieldName, Type type) implements SearchAggregation {
 
-    private final String fieldName;
-
-    public SimpleFieldAggregation(String name, String fieldName) {
-        this(name, fieldName, AggregationType.COUNT);
+    /**
+     * The simpleFieldAggregation types that are supported by the search provider.
+     */
+    public enum Type {
+        COUNT, SUM, AVG, MIN, MAX, CARDINALITY;
     }
 
-    public SimpleFieldAggregation(String name, String fieldName, AggregationType type) {
-        super(name, type);
-        this.fieldName = fieldName;
+    @Override
+    public String getName() {
+        return name;
     }
 
     public String getFieldName() {
         return fieldName;
+    }
+
+    public Type getType() {
+        return type;
     }
 
 }

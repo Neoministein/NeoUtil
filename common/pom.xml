@@ -10,15 +10,6 @@
     <name>Neo Util Common JAR</name>
     <packaging>jar</packaging>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <jackson.version>2.13.3</jackson.version>
-        <junit.version>5.6.2</junit.version>
-        <mockito.version>3.12.4</mockito.version>
-    </properties>
-
     <dependencies>
         <!-- Http Client -->
         <dependency>
@@ -48,6 +39,12 @@
             <artifactId>json-schema-validator</artifactId>
             <version>1.0.69</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Logging -->
         <dependency>
@@ -58,12 +55,6 @@
 
 
         <!-- Test Framework  -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>

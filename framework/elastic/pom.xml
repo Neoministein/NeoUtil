@@ -13,10 +13,8 @@
     <packaging>jar</packaging>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <elastic.version>8.3.3</elastic.version>
+        <elastic.version>7.17.5</elastic.version>
+        <elastic.high-level-rest.version>7.17.5</elastic.high-level-rest.version>
     </properties>
 
     <dependencies>
@@ -30,7 +28,7 @@
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
-            <version>7.17.5</version>
+            <version>${elastic.high-level-rest.version}</version>
         </dependency>
 
         <dependency>
@@ -39,12 +37,16 @@
             <version>${elastic.version}</version>
         </dependency>
 
-        <!-- -->
-
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.elasticsearch.test</groupId>
             <artifactId>framework</artifactId>
-            <version>7.17.5</version>
+            <version>${elastic.version}</version>
             <scope>test</scope>
             <!-- Exlusion to avoid (incompatible types: inferred type does not conform to upper bound(s)) issue for mock
                 test -->
@@ -58,8 +60,44 @@
         <dependency>
             <groupId>org.elasticsearch.plugin</groupId>
             <artifactId>transport-netty4-client</artifactId>
-            <version>7.17.5</version>
+            <version>${elastic.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Need to use System class loader, else will hit into jar hell issue caused by maven sure fire plugin -->
+                    <useSystemClassLoader>true</useSystemClassLoader>
+                    <!-- -Dtests.security.manager=false is needed otherwise the ESTestCase fails to initialize -->
+                    <argLine>-Xms384m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError
+                        -Dtests.security.manager=false
+                        --enable-preview</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

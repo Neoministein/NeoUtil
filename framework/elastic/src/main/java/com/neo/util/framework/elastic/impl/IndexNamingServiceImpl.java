@@ -1,7 +1,6 @@
 package com.neo.util.framework.elastic.impl;
 
 import com.neo.util.common.impl.StringUtils;
-import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.Searchable;
@@ -24,9 +23,11 @@ public class IndexNamingServiceImpl implements IndexNamingService {
     protected static final String INDEX_SEPARATOR = "-";
     protected static final String SEARCH_PROVIDER_NO_DATE_INDEX_POSTFIX = "no-date";
 
-    protected static final String PROJECT_PREFIX_CONFIG = "prefix";
-    protected static final String PROJECT_POSTFIX_CONFIG = "postfix";
-    protected static final String MAPPING_VERSION_CONFIG = "mappingVersion";
+    public static final String CONFIG_PREFIX = ElasticSearchRepository.CONFIG_PREFIX;
+
+    protected static final String PROJECT_PREFIX_CONFIG = CONFIG_PREFIX + "prefix";
+    protected static final String PROJECT_POSTFIX_CONFIG = CONFIG_PREFIX + "postfix";
+    protected static final String MAPPING_VERSION_CONFIG = CONFIG_PREFIX + "mappingVersion";
 
     protected static final String DEFAULT_MAPPING_VERSION = "v1";
 
@@ -61,17 +62,16 @@ public class IndexNamingServiceImpl implements IndexNamingService {
      */
     @PostConstruct
     public void postConstruct() {
-        Config config = configService.get(ElasticSearchConnectionRepositoryImpl.ELASTIC_CONFIG);
 
-        mappingVersion = config.get(MAPPING_VERSION_CONFIG).asString().orElse(DEFAULT_MAPPING_VERSION);
+        mappingVersion = configService.get(MAPPING_VERSION_CONFIG).asString().orElse(DEFAULT_MAPPING_VERSION);
 
-        String prefix = config.get(PROJECT_PREFIX_CONFIG).asString().orElse(StringUtils.EMPTY);
+        String prefix = configService.get(PROJECT_PREFIX_CONFIG).asString().orElse(StringUtils.EMPTY);
 
         if (!StringUtils.isEmpty(prefix)) {
             prefix = prefix.toLowerCase() + INDEX_SEPARATOR;
         }
         this.indexPrefix = prefix;
-        String postfix = config.get(PROJECT_POSTFIX_CONFIG).asString().orElse(StringUtils.EMPTY);
+        String postfix = configService.get(PROJECT_POSTFIX_CONFIG).asString().orElse(StringUtils.EMPTY);
 
         if (!StringUtils.isEmpty(postfix)) {
             postfix = INDEX_SEPARATOR + postfix.toLowerCase();
@@ -145,24 +145,15 @@ public class IndexNamingServiceImpl implements IndexNamingService {
      * Returns the appropriate date formatter for the given index period.
      */
     protected DateTimeFormatter getDateFormatter(IndexPeriod indexPeriod) {
-        switch (indexPeriod) {
-        case DAILY:
-            return INDEX_DATE_FORMAT_DAY;
-        case WEEKLY:
-            return INDEX_DATE_FORMAT_WEEK;
-        case MONTHLY:
-            return INDEX_DATE_FORMAT_MONTH;
-        case YEARLY:
-            return INDEX_DATE_FORMAT_YEAR;
-        case ALL:
-            return null;
-        case EXTERNAL:
-            return null;
-        case DEFAULT:
-            return getDateFormatter(IndexPeriod.getDefault());
-        default:
-            return getDateFormatter(IndexPeriod.getDefault());
-        }
+        return switch (indexPeriod) {
+            case DAILY -> INDEX_DATE_FORMAT_DAY;
+            case WEEKLY -> INDEX_DATE_FORMAT_WEEK;
+            case MONTHLY -> INDEX_DATE_FORMAT_MONTH;
+            case YEARLY -> INDEX_DATE_FORMAT_YEAR;
+            case ALL, EXTERNAL -> null;
+            case DEFAULT -> getDateFormatter(IndexPeriod.getDefault());
+            default -> getDateFormatter(IndexPeriod.getDefault());
+        };
     }
 
     /**

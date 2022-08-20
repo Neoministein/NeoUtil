@@ -15,19 +15,17 @@ public interface ElasticSearchConnectionRepository extends Serializable {
     void reloadConfig();
 
     /**
-     * Returns a connected client. If there isn't one yer one is created.
+     * Returns a connected client. If there isn't one yet one is created.
      */
     RestHighLevelClient getClient();
 
-    //FIXME
     /**
-     *
+     *  Returns a connected ElasticSearch client. If there isn't one yet one is created.
      */
     ElasticsearchClient getApiClient();
 
     /**
      * Check if elasticsearch is enabled
-     * @return
      */
     boolean enabled();
 

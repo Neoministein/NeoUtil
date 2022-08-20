@@ -2,7 +2,6 @@ package com.neo.util.framework.api.persistence.search;
 
 import com.neo.util.framework.api.persistence.aggregation.SearchAggregation;
 import com.neo.util.framework.api.persistence.criteria.SearchCriteria;
-import com.neo.util.framework.api.persistence.aggregation.AbstractSearchAggregation;
 
 import java.io.Serializable;
 import java.util.*;

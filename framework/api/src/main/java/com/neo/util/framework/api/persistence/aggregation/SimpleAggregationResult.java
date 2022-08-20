@@ -1,19 +1,16 @@
 package com.neo.util.framework.api.persistence.aggregation;
 
 /**
- * Defines aggregation result from a {@link SimpleFieldAggregation}
+ * Defines simpleFieldAggregation result from a {@link SimpleFieldAggregation}
  */
-public class SimpleAggregationResult extends AggregationResult {
+public record SimpleAggregationResult(String name, Object value) implements AggregationResult {
 
-    private final Object value;
-
-    public SimpleAggregationResult(String name, Object value) {
-        super(name);
-        this.value = value;
+    @Override
+    public String getName() {
+        return name;
     }
 
     public Object getValue() {
         return value;
     }
-
 }

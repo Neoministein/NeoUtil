@@ -1,18 +1,13 @@
 package com.neo.util.framework.api.persistence.aggregation;
 
 /**
- * Defines aggregation result from a search provider
+ * Defines aggregations result from a search provider
  */
-public abstract class AggregationResult {
+public interface AggregationResult {
 
-    private final String name;
-
-    protected AggregationResult(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+    /**
+     * The name of the aggregations
+     */
+    String getName();
 }
 
