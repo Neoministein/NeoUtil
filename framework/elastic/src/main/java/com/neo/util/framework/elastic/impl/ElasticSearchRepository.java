@@ -332,7 +332,7 @@ public class ElasticSearchRepository implements SearchRepository {
         builder.size(parameters.getMaxResults());
         builder.query(QueryBuilders.matchAll().build()._toQuery());
         if (parameters.getTimeout().isPresent()) {
-            builder.timeout(parameters.getTimeout().get().toString());
+            builder.timeout(new TimeValue(parameters.getTimeout().get(), TimeUnit.MILLISECONDS).toString());
         }
 
         addSearchFilters(parameters.getFilters(), builder);
@@ -349,11 +349,7 @@ public class ElasticSearchRepository implements SearchRepository {
                                                 .build())
                                 .build());
             }
-        } /*else {
-            builder.source(true);
         }
-        */
-
 
         if (!parameters.getSorting().isEmpty()) {
             //new SortOptions.Builder().field(new FieldSort.Builder().field())
@@ -384,7 +380,6 @@ public class ElasticSearchRepository implements SearchRepository {
 
         try {
             SearchRequest searchRequest = builder.build();
-            LOGGER.info(searchRequest.toString());
             SearchResponse<ObjectNode> response = getApiClient().search(searchRequest, ObjectNode.class);
             return parseSearchResponse(parameters, response);
         } catch (IOException | IllegalStateException e) {
