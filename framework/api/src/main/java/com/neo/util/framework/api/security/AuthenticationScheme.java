@@ -2,9 +2,9 @@ package com.neo.util.framework.api.security;
 
 /**
  * The general HTTP authentication framework is the base for a number of authentication schemes.
- *
+ * <p/>
  * IANA maintains a list of authentication schemes, but there are other schemes offered by host services, such as Amazon AWS.
- *
+ * <p/>
  * Some common authentication schemes include:
  */
 public final class AuthenticationScheme {
