@@ -1,9 +1,20 @@
 package com.neo.util.framework.api.connection;
 
-public record RequestContext(String httpMethod, String uri) {
+public sealed interface RequestContext permits RequestContext.Http, RequestContext.Queue {
 
-    @Override
-    public String toString() {
-        return httpMethod + " " + uri;
+    String toString();
+
+    record Http(String httpMethod, String uri) implements RequestContext {
+        @Override
+        public String toString() {
+            return httpMethod + " " + uri;
+        }
+    }
+
+    record Queue(String queueName) implements RequestContext {
+        @Override
+        public String toString() {
+            return queueName;
+        }
     }
 }

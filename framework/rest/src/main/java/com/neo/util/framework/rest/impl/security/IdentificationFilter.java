@@ -20,7 +20,7 @@ public class IdentificationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext containerRequest) {
-        requestDetails.setRequestContext(new RequestContext(containerRequest.getMethod(), getUri(containerRequest.getUriInfo())));
+        requestDetails.setRequestContext(new RequestContext.Http(containerRequest.getMethod(), getUri(containerRequest.getUriInfo())));
         MDC.put("traceId", requestDetails.getRequestId());
     }
 
