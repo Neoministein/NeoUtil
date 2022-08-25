@@ -8,6 +8,8 @@ import com.neo.util.framework.api.queue.OutgoingQueueConnection;
 import com.neo.util.framework.api.queue.QueueListener;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.squareup.javapoet.*;
+import jakarta.enterprise.context.control.RequestContextController;
+import jakarta.inject.Provider;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -113,11 +115,23 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
         return classList;
     }
 
+    /**
+     * Add temporary fix for
+     * https://github.com/oracle/helidon/issues/4681#issuecomment-1223772685
+     *
+     * @param queueName
+     * @param typeElement
+     */
     protected void createConsumeClass(String queueName, TypeElement typeElement) {
         try {
             FieldSpec logger = FieldSpec.builder(Logger.class, "LOGGER")
                     .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
                     .initializer("$T.getLogger(" + typeElement.getSimpleName().toString() + "Caller.class)",LoggerFactory.class)
+                    .build();
+
+            FieldSpec requestContextFactory = FieldSpec.builder(ParameterizedTypeName.get(Provider.class, RequestContextController.class), "requestContextControllerFactory")
+                    .addModifiers(Modifier.PROTECTED)
+                    .addAnnotation(Inject.class)
                     .build();
             FieldSpec queueConsumer = FieldSpec.builder(TypeName.get(typeElement.asType()), "queueConsumer")
                     .addModifiers(Modifier.PROTECTED)
@@ -128,10 +142,14 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
                     .addAnnotation(AnnotationSpec.builder(Incoming.class)
                             .addMember(BASIC_ANNOTATION_FIELD_NAME,"$S" , QUEUE_PREFIX + queueName).build())
                     .addParameter(String.class, "msg")
+                    .addStatement("final var requestContextController = requestContextControllerFactory.get()")
+                    .addStatement("requestContextController.activate()")
                     .beginControlFlow("try")
                     .addStatement("queueConsumer.onMessage($T.fromJson(msg, $T.class))", JsonUtil.class, QueueMessage.class)
                     .nextControlFlow("catch($T ex)", Exception.class)
                     .addStatement("LOGGER.error($S, ex.getMessage())","Unexpected error occurred while processing a queue [{}], action won't be retried.")
+                    .nextControlFlow("finally")
+                    .addStatement("requestContextController.deactivate()")
                     .endControlFlow()
                     .build();
 
@@ -141,6 +159,7 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
                     .addMethod(consumeMethodBuilder)
                     .addField(queueConsumer)
                     .addField(logger)
+                    .addField(requestContextFactory)
                     .build();
 
             JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();
