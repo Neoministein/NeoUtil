@@ -700,9 +700,7 @@ public class ElasticSearchRepository implements SearchRepository {
             } else {
                 hitList.add(hit.source()); //TODO GET METADATA
             }
-
         }
-
         return hitList;
     }
 
@@ -752,7 +750,9 @@ public class ElasticSearchRepository implements SearchRepository {
             getBulkProcessor().add(request);
         } catch (IllegalStateException ex) {
             LOGGER.info("Error while adding to BulkProcessor, message: {}", ex.getMessage());
-            //TODO add to retry que
+            QueueableSearchable searchable = generateQueueableSearchable(request);
+            indexerQueueService.addToIndexingQueue(new QueueMessage(
+                    searchable.getRequestType().toString(), searchable));
         }
     }
 

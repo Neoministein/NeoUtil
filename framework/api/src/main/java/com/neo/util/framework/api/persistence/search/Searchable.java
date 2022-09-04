@@ -17,36 +17,26 @@ public interface Searchable {
 
     /**
      * A value which is unique to this searchable
-     *
-     * @return a value which is unique to this searchable
      */
     String getBusinessId();
 
     /**
      * The index name in which the searchable should be stored
-     *
-     * @return the index name in which the searchable should be stored
      */
     String getIndexName();
 
     /**
      * The simple class name of the Searchable
-     *
-     * @return the simple class name of the Searchable
      */
     String getClassName();
 
     /**
      * The index period
-     *
-     * @return the index period
      */
     IndexPeriod getIndexPeriod();
 
     /**
      * The creation date
-     *
-     * @return the creation date
      */
     Date getCreationDate();
 
@@ -57,8 +47,6 @@ public interface Searchable {
 
     /**
      * The Object in json format
-     *
-     * @return the Object in json format
      */
     ObjectNode getJsonNode();
 }
