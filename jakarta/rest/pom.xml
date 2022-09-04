@@ -3,24 +3,34 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.neo.util</groupId>
-        <artifactId>neoutil-helidon-root</artifactId>
+        <artifactId>neoutil-root</artifactId>
         <version>1.0.0</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-helidon-config</artifactId>
-    <name>Neo Util Helidon Config Jar</name>
+    <artifactId>neoutil-rest</artifactId>
+    <version>1.0.0</version>
+
+    <name>Neo Util Framework Rest JAR</name>
     <packaging>jar</packaging>
 
     <dependencies>
+        <!-- Module specific -->
         <dependency>
             <groupId>com.neo.util</groupId>
             <artifactId>neoutil-framework</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>io.helidon.config</groupId>
-            <artifactId>helidon-config</artifactId>
-            <version>${helidon.version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

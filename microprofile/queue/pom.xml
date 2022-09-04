@@ -2,11 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.neo.util.microprofile</groupId>
-        <artifactId>root</artifactId>
+        <groupId>com.neo.util</groupId>
+        <artifactId>neoutil-mp-root</artifactId>
         <version>1.0.0</version>
     </parent>
-    <artifactId>queue</artifactId>
+    <artifactId>neoutil-mp-queue</artifactId>
     <name>Neo Util Microprofile Queue Jar</name>
     <packaging>jar</packaging>
     <version>1.0.0</version>
@@ -14,9 +14,9 @@
     <dependencies>
         <!-- Internal Modules -->
         <dependency>
-            <groupId>com.neo.util.framework</groupId>
-            <artifactId>api</artifactId>
-            <version>1.0.0</version>
+            <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-framework</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <!-- Micro profile-->
         <dependency>

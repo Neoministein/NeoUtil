@@ -3,10 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.neo.util</groupId>
-        <artifactId>root</artifactId>
+        <artifactId>neoutil-root</artifactId>
         <version>1.0.0</version>
     </parent>
-    <artifactId>common</artifactId>
+    <artifactId>neoutil-common</artifactId>
     <name>Neo Util Common JAR</name>
     <packaging>jar</packaging>
 
@@ -39,22 +39,22 @@
             <artifactId>json-schema-validator</artifactId>
             <version>1.0.72</version>
         </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+
+        <!-- Test Framework  -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.32</version>
-        </dependency>
-
-
-        <!-- Test Framework  -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>

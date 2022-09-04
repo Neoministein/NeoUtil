@@ -3,11 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.neo.util</groupId>
-        <artifactId>root</artifactId>
+        <artifactId>neoutil-root</artifactId>
         <version>1.0.0</version>
     </parent>
-    <groupId>com.neo.util.helidon</groupId>
-    <artifactId>root</artifactId>
+    <artifactId>neoutil-helidon-root</artifactId>
     <name>Neo Util Helidon pom</name>
     <packaging>pom</packaging>
 
@@ -19,6 +18,6 @@
     <modules>
         <module>config</module>
         <module>security-provider-rotating-jwt</module>
-        <module>rest-integration</module>
+        <module>rest</module>
     </modules>
 </project>
