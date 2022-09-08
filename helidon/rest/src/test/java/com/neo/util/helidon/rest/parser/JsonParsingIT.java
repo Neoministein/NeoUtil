@@ -14,10 +14,14 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @HelidonTest
 @AddBean(JsonEndpointResource.class)
 class JsonParsingIT extends AbstractIntegrationTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonParsingIT.class);
 
     @Inject
     protected WebTarget webTarget;
@@ -67,7 +71,10 @@ class JsonParsingIT extends AbstractIntegrationTest {
 
         Assertions.assertEquals(400, response.getStatus());
         JsonNode responseBoy = JsonUtil.fromJson(response.readEntity(String.class));
-        Assertions.assertTrue(responseBoy.get("error").get("message").asText().contains("Invalid json format in the request body: $.boolean"));
+        String errorBody = responseBoy.get("error").get("message").asText();
+
+        LOGGER.info("Error body: [{}]", errorBody);
+        Assertions.assertTrue(errorBody.contains("Invalid json format in the request body: $.boolean"));
     }
 
     protected static final String RANDOM_JSON = "[\n" + "  {\n" + "    \"_id\": \"62d3ec24d160c5a72a37ccf2\",\n"

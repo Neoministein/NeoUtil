@@ -15,9 +15,9 @@ import jakarta.ws.rs.ext.Provider;
 
 @Provider
 @ApplicationScoped
-public class InternalLogicMapper implements ExceptionMapper<InternalLogicException> {
+public class InternalLogicExceptionMapper implements ExceptionMapper<InternalLogicException> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InternalLogicMapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InternalLogicExceptionMapper.class);
 
     protected ObjectNode errorObject;
 

@@ -1,8 +1,8 @@
 package com.neo.util.helidon.rest.exception;
 
-import com.neo.util.common.impl.exception.InternalJsonException;
 import com.neo.util.common.impl.exception.InternalLogicException;
 
+import com.neo.util.common.impl.exception.ExternalJsonException;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -19,7 +19,7 @@ public class ExceptionResource {
     public static final String P_SUCCESS = "/success";
     public static final String P_RUNTIME = "/runtime";
     public static final String P_INTERNAL_LOGIC = "/internalLogic";
-    public static final String P_INTERNAL_JSON = "/internalJson";
+    public static final String P_EXTERNAL_JSON = "/externalJsonInput";
     public static final String P_CLIENT_ERROR = "/clientError";
 
     @GET
@@ -41,9 +41,9 @@ public class ExceptionResource {
     }
 
     @GET
-    @Path(P_INTERNAL_JSON)
-    public Response internalJson() {
-        throw new InternalJsonException("Test Internal Json Exception");
+    @Path(P_EXTERNAL_JSON)
+    public Response externalJsonInput() {
+        throw new ExternalJsonException("Test Internal Json Exception");
     }
 
     @GET

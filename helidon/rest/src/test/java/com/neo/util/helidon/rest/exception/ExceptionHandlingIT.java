@@ -63,7 +63,7 @@ class ExceptionHandlingIT extends AbstractIntegrationTest {
     void internalJson() {
         //Arrange
         //Act
-        Response response = webTarget.path(ExceptionResource.RESOURCE_LOCATION + ExceptionResource.P_INTERNAL_JSON).request().method("GET");
+        Response response = webTarget.path(ExceptionResource.RESOURCE_LOCATION + ExceptionResource.P_EXTERNAL_JSON).request().method("GET");
         //Assert
 
         Assertions.assertEquals(400, response.getStatus());

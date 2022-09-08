@@ -3,6 +3,8 @@ package com.neo.util.framework.rest.impl.parser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.exception.InternalConfigurationException;
+import com.neo.util.common.impl.exception.InternalJsonException;
+import com.neo.util.common.impl.exception.ExternalJsonException;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.impl.json.JsonSchemaLoader;
@@ -54,10 +56,13 @@ public class JsonNodeParser implements MessageBodyReader<JsonNode> {
     public JsonNode readFrom(Class<JsonNode> aClass, Type type, Annotation[] annotations, MediaType mediaType,
             MultivaluedMap<String, String> multivaluedMap, InputStream inputStream)
             throws IOException, WebApplicationException {
-        JsonNode input = JsonUtil.fromJson(StringUtils.toString(inputStream, StandardCharsets.UTF_8));
-        checkForSchema(input);
-
-        return input;
+        try {
+            JsonNode input = JsonUtil.fromJson(StringUtils.toString(inputStream, StandardCharsets.UTF_8));
+            checkForSchema(input);
+            return input;
+        } catch (InternalJsonException ex) {
+            throw new ExternalJsonException(ex);
+        }
     }
 
     protected void checkForSchema(JsonNode input) {
