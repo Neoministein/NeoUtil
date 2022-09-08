@@ -46,7 +46,7 @@ public class JsonSchemaUtil {
      * @param jsonNode the node to check for validity
      * @param jsonSchema the schema to check against
      *
-     * @return an optional that contains the error message if the validation vailed
+     * @return an optional that contains the error message if the validation failed
      */
     public static Optional<String> isValid(JsonNode jsonNode, JsonSchema jsonSchema) {
         try {

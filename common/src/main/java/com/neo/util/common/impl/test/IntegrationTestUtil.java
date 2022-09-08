@@ -21,7 +21,7 @@ public final class IntegrationTestUtil {
      * If the max number of tries are exceeded, {@link  Assertions#fail()} will be invoked.
      */
     public static void sleepUntil(int millisToSleep, int tries, WakeupCondition wakeUpCondition) {
-        String exceptionMessage = "No exception occured";
+        String exceptionMessage = "No exception occurred";
 
         try {
             if (ThreadUtil.fluentWait(millisToSleep, tries, wakeUpCondition)) {
