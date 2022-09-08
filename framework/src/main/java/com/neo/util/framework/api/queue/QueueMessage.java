@@ -19,7 +19,7 @@ public class QueueMessage implements Serializable {
      */
     protected String messageType;
 
-    protected String methodClass;
+    protected String messageClass;
 
     /**
      * An arbitrary serializable data structure. Which will be parsed to json.
@@ -29,14 +29,12 @@ public class QueueMessage implements Serializable {
     public QueueMessage(String messageType, Serializable payload) {
         this.messageType = messageType;
         this.message = JsonUtil.toJson(payload);
-        this.methodClass = payload.getClass().getName();
+        this.messageClass = payload.getClass().getName();
     }
-
-    public QueueMessage() {}
 
     public Serializable getPayload() {
         try {
-            return (Serializable) JsonUtil.fromJson(message, Class.forName(methodClass));
+            return (Serializable) JsonUtil.fromJson(message, Class.forName(messageClass));
         } catch (ClassNotFoundException ex) {
             return null;
         }
@@ -46,23 +44,7 @@ public class QueueMessage implements Serializable {
         return messageType;
     }
 
-    public void setMessageType(String messageType) {
-        this.messageType = messageType;
-    }
-
-    public String getMethodClass() {
-        return methodClass;
-    }
-
-    public void setMethodClass(String methodClass) {
-        this.methodClass = methodClass;
-    }
-
     public String getMessage() {
         return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 }
