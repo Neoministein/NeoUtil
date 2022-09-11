@@ -33,17 +33,16 @@ public class QueueMessage implements Serializable {
         this.messageType = messageType;
         this.message = JsonUtil.toJson(payload);
 
-        switch (payload) {
-        case List<?> list -> {
+        if (payload == null) {
+            throw new NullPointerException("QueueMessage payload cannot be null");
+        } else if (payload instanceof List<?> list) {
             this.messageClass = list.iterator().next().getClass().arrayType().getName();
             this.collectionClass = "LIST";
-        }
-        case Set<?> set -> {
+        } else if (payload instanceof Set<?> set) {
             this.messageClass = set.iterator().next().getClass().arrayType().getName();
             this.collectionClass = "SET";
-        }
-        case null -> throw new NullPointerException("QueueMessage payload cannot be null");
-        default -> this.messageClass = payload.getClass().getName();
+        } else {
+            this.messageClass = payload.getClass().getName();
         }
     }
 
@@ -54,11 +53,13 @@ public class QueueMessage implements Serializable {
     public Serializable getPayload() {
         try {
             Serializable serializedPayload = (Serializable) JsonUtil.fromJson(message, Class.forName(messageClass));
-            return switch (collectionClass) {
-                case "SET" -> new HashSet<>(Arrays.asList((Serializable[]) serializedPayload));
-                case "LIST" -> new ArrayList<>(Arrays.asList((Serializable[]) serializedPayload));
-                case null, default -> serializedPayload;
-            };
+            if ("SET".equals(collectionClass)) {
+                return new HashSet<>(Arrays.asList((Serializable[]) serializedPayload));
+            } else if ("LIST".equals(collectionClass)) {
+                return new ArrayList<>(Arrays.asList((Serializable[]) serializedPayload));
+            } else {
+                return serializedPayload;
+            }
         } catch (ClassNotFoundException ex) {
             return null;
         }
