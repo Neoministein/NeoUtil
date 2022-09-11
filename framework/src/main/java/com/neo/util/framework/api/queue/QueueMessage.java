@@ -3,6 +3,7 @@ package com.neo.util.framework.api.queue;
 import com.neo.util.common.impl.json.JsonUtil;
 
 import java.io.Serializable;
+import java.util.*;
 
 /**
  * The Queue Message
@@ -21,6 +22,8 @@ public class QueueMessage implements Serializable {
 
     protected String messageClass;
 
+    protected String collectionClass = null;
+
     /**
      * An arbitrary serializable data structure. Which will be parsed to json.
      */
@@ -29,12 +32,33 @@ public class QueueMessage implements Serializable {
     public QueueMessage(String messageType, Serializable payload) {
         this.messageType = messageType;
         this.message = JsonUtil.toJson(payload);
-        this.messageClass = payload.getClass().getName();
+
+        switch (payload) {
+        case List<?> list -> {
+            this.messageClass = list.iterator().next().getClass().arrayType().getName();
+            this.collectionClass = "LIST";
+        }
+        case Set<?> set -> {
+            this.messageClass = set.iterator().next().getClass().arrayType().getName();
+            this.collectionClass = "SET";
+        }
+        case null -> throw new NullPointerException("QueueMessage payload cannot be null");
+        default -> this.messageClass = payload.getClass().getName();
+        }
+    }
+
+    protected QueueMessage() {
+        //Required by Jackson
     }
 
     public Serializable getPayload() {
         try {
-            return (Serializable) JsonUtil.fromJson(message, Class.forName(messageClass));
+            Serializable serializedPayload = (Serializable) JsonUtil.fromJson(message, Class.forName(messageClass));
+            return switch (collectionClass) {
+                case "SET" -> new HashSet<>(Arrays.asList((Serializable[]) serializedPayload));
+                case "LIST" -> new ArrayList<>(Arrays.asList((Serializable[]) serializedPayload));
+                case null, default -> serializedPayload;
+            };
         } catch (ClassNotFoundException ex) {
             return null;
         }

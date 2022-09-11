@@ -77,6 +77,10 @@ public class QueueableSearchable implements Serializable {
         this.requestType = requestType;
     }
 
+    protected QueueableSearchable() {
+        //Required be Jackson
+    }
+
     public Date getCreationDate() {
         return creationDate;
     }
