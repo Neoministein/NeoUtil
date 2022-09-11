@@ -11,7 +11,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <helidon.version>3.0.0</helidon.version>
+        <helidon.version>3.0.1</helidon.version>
     </properties>
 
 
