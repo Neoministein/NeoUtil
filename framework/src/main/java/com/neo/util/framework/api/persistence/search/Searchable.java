@@ -43,7 +43,7 @@ public interface Searchable {
     /**
      * The transaction count
      */
-    long getVersion();
+    Long getVersion();
 
     /**
      * The Object in json format

@@ -21,7 +21,7 @@ public class GenericSearchable implements Searchable {
     private String businessId;
 
     @JsonIgnore
-    private long version = 0L;
+    private Long version = null;
 
     @Override
     public String getBusinessId() {
@@ -60,11 +60,11 @@ public class GenericSearchable implements Searchable {
         return creationDate;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(Long version) {
         this.version = version;
     }
 
-    @Override public long getVersion() {
+    @Override public Long getVersion() {
         return version;
     }
 

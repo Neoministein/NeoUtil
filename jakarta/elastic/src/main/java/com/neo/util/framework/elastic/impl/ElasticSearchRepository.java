@@ -758,9 +758,14 @@ public class ElasticSearchRepository implements SearchRepository {
 
     protected IndexRequest generateIndexRequest(Searchable searchable) {
         String indexName = indexNameService.getIndexName(searchable);
-        return new IndexRequest(indexName)
+        IndexRequest indexRequest = new IndexRequest(indexName)
                 .source(parseSearchableToObjectNode(searchable).toString(), XContentType.JSON)
-                .id(searchable.getBusinessId()).versionType(VersionType.EXTERNAL_GTE).version(searchable.getVersion());
+                .id(searchable.getBusinessId());
+
+        if (searchable.getVersion() != null) {
+            indexRequest.version(searchable.getVersion()).versionType(VersionType.EXTERNAL_GTE);
+        }
+        return indexRequest;
     }
 
     protected ObjectNode parseSearchableToObjectNode(Searchable searchable) {
