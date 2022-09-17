@@ -576,7 +576,7 @@ public class ElasticSearchRepository implements SearchRepository {
         if (criteria.getFieldValue() instanceof String) {
             String fieldValue = criteria.getFieldValue().toString();
 
-            if (fieldValue.contains("*") || fieldValue.contains("?")) {
+            if (criteria.getAllowWildcards() && (fieldValue.contains("*") || fieldValue.contains("?"))) {
                 // wildcard
                 WildcardQuery.Builder queryBuilder = QueryBuilders.wildcard()
                         .field(criteria.getFieldName())

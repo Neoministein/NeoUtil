@@ -220,10 +220,11 @@ public class DatabaseRepositoryImpl implements EntityRepository {
         Predicate predicate;
         String fieldValue = criteria.getFieldValue().toString();
 
-        if (fieldValue.contains("*")) {
-            predicate = cb.like(root.get(criteria.getFieldName()), criteria.getFieldValue().toString().replace("*", ""));
+        if (criteria.getAllowWildcards() && (fieldValue.contains("*") || fieldValue.contains("?"))) {
+            predicate = cb.like(root.get(criteria.getFieldName()),
+                    fieldValue.replace('*','%').replace('?','_'));
         } else {
-            predicate = cb.equal(root.get(criteria.getFieldName()), criteria.getFieldValue());
+            predicate = cb.equal(root.get(criteria.getFieldName()), fieldValue);
         }
 
         return predicateNot(criteria, predicate);
