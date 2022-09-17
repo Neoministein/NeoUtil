@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.neo.util</groupId>
             <artifactId>neoutil-framework</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Helidon -->
