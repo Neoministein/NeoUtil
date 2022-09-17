@@ -14,6 +14,10 @@ public class DoubleRangeSearchCriteria extends RangeBasedSearchCriteria {
         this.to = to;
     }
 
+    public DoubleRangeSearchCriteria(String fieldName, Double from, Double to) {
+        this(fieldName, from, to, false);
+    }
+
     @Override
     public Double getFrom() {
         return from;

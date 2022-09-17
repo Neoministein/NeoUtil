@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * If this Criteria is applied to a field, the field must must match one of the given values or is not allowed to match any exist with a values,
+ * If this Criteria is applied to a field, the field must match one of the given values or is not allowed to match any exist with a values,
  * depending on the booleans state.
  */
 public class ContainsSearchCriteria extends FieldSearchCriteria {
@@ -22,9 +22,9 @@ public class ContainsSearchCriteria extends FieldSearchCriteria {
         this.fieldValues = Arrays.asList(fieldValues);
     }
 
-    public ContainsSearchCriteria(String fieldName, boolean not, List<Serializable> fieldValueSerializables) {
+    public ContainsSearchCriteria(String fieldName, boolean not, List<Serializable> fieldValueSerializableList) {
         super(fieldName, not);
-        this.fieldValues = fieldValueSerializables;
+        this.fieldValues = fieldValueSerializableList;
     }
 
     public List<Serializable> getFieldValues() {

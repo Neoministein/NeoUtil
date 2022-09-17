@@ -14,6 +14,10 @@ public class ExistingFieldSearchCriteria extends FieldSearchCriteria {
         this.exists = exists;
     }
 
+    public ExistingFieldSearchCriteria(String fieldName) {
+        this(fieldName, false);
+    }
+
     public boolean getExists() {
         return exists;
     }

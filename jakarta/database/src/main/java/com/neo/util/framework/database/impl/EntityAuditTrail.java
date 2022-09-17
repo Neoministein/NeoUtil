@@ -41,10 +41,6 @@ public class EntityAuditTrail extends AuditableDataBaseEntity implements Persist
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getObjectKey() {
         return objectKey;
     }

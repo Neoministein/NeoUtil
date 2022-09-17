@@ -8,6 +8,10 @@ public class LongRangeSearchCriteria extends RangeBasedSearchCriteria {
     protected Long from;
     protected Long to;
 
+    public LongRangeSearchCriteria(String fieldName, Long from, Long to) {
+        this(fieldName, from, to, false);
+    }
+
     public LongRangeSearchCriteria(String fieldName, Long from, Long to, boolean not) {
         super(fieldName, not);
         this.from = from;

@@ -27,9 +27,9 @@ import java.util.Optional;
 
 @Transactional
 @ApplicationScoped
-public class DatabaseRepositoryImpl implements EntityRepository {
+public class DatabaseRepository implements EntityRepository {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(DatabaseRepositoryImpl.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(DatabaseRepository.class);
 
     @Inject
     protected PersistenceContextService pcs;
@@ -101,10 +101,6 @@ public class DatabaseRepositoryImpl implements EntityRepository {
         CriteriaQuery<X> cQuery = ((CriteriaQuery<X>) aQuery).select(root);
         cQuery.orderBy(mapOrders(parameters.getSorting(), cb, root));
 
-        if (parameters.getFields().isPresent()) {
-            cQuery.multiselect(buildSelection(parameters.getFields().get(), root));
-        }
-
         TypedQuery<X> typedQuery = pcs.getEntityManager().createQuery(cQuery);
 
         if (parameters.getMaxResults().isPresent()) {
@@ -140,14 +136,6 @@ public class DatabaseRepositoryImpl implements EntityRepository {
         return ((Long) q.getSingleResult()).intValue();
     }
 
-    protected List<Selection<?>> buildSelection(List<String> fields, Root<?> root) {
-        List<Selection<?>> selectionList = new ArrayList<>();
-        for (String field: fields) {
-            selectionList.add(root.get(field));
-        }
-        return selectionList;
-    }
-
     protected List<Order> mapOrders(Map<String, Boolean> orders, CriteriaBuilder cb, Root<?> root) {
         List<Order> orderList = new ArrayList<>();
         for (Map.Entry<String, Boolean> order: orders.entrySet()) {
@@ -178,6 +166,7 @@ public class DatabaseRepositoryImpl implements EntityRepository {
 
     protected Predicate buildInnerQuery(SearchCriteria filter, CriteriaBuilder cb, Root<?> root) {
         return switch (filter) {
+            case DateSearchCriteria criteria -> buildDateRangeQuery(criteria, cb, root);
             case DoubleRangeSearchCriteria criteria -> buildRangeQuery(criteria, cb, root);
             case LongRangeSearchCriteria criteria -> buildRangeQuery(criteria, cb, root);
             case ExplicitSearchCriteria criteria -> buildExplicitSearchQuery(criteria, cb, root);
@@ -198,6 +187,20 @@ public class DatabaseRepositoryImpl implements EntityRepository {
         }
         if (criteria.isIncludeTo()) {
             return cb.le(root.get(criteria.getFieldName()), criteria.getTo());
+        }
+        return cb.isTrue(cb.literal(true));
+    }
+
+    protected Predicate buildDateRangeQuery(DateSearchCriteria criteria, CriteriaBuilder cb, Root<?> root) {
+        if (criteria.isIncludeFrom()) {
+            if (criteria.isIncludeTo()) {
+                return cb.between(root.get(criteria.getFieldName()), criteria.getFromDate(), criteria.getToDate());
+            } else {
+                return cb.greaterThanOrEqualTo(root.get(criteria.getFieldName()), criteria.getFromDate());
+            }
+        }
+        if (criteria.isIncludeTo()) {
+            return cb.lessThanOrEqualTo(root.get(criteria.getFieldName()), criteria.getToDate());
         }
         return cb.isTrue(cb.literal(true));
     }
@@ -253,9 +256,9 @@ public class DatabaseRepositoryImpl implements EntityRepository {
         Predicate predicate = buildInnerQuery(criteria.getSearchCriteriaList().get(0), cb,root);
         for (int i = 1; i < criteria.getSearchCriteriaList().size();i++) {
             if (CombinedSearchCriteria.Association.AND.equals(criteria.getAssociation())) {
-                predicate = cb.and(buildInnerQuery(criteria.getSearchCriteriaList().get(i), cb,root));
+                predicate = cb.and(buildInnerQuery(criteria.getSearchCriteriaList().get(i), cb,root), predicate);
             } else {
-                predicate = cb.or(buildInnerQuery(criteria.getSearchCriteriaList().get(i), cb,root));
+                predicate = cb.or(buildInnerQuery(criteria.getSearchCriteriaList().get(i), cb,root), predicate);
             }
         }
 

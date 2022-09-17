@@ -22,6 +22,10 @@ public class DateSearchCriteria extends LongRangeSearchCriteria {
                 not);
     }
 
+    public DateSearchCriteria(String fieldName, Date from, Date to) {
+        this(fieldName, from, to, false);
+    }
+
     public Date getFromDate() {
         return isIncludeFrom() ? new Date(getFrom()) : null;
     }
