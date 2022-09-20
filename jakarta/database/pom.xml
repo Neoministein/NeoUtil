@@ -91,7 +91,21 @@
                     <artifactId>jboss-logging-spi</artifactId>
                 </exclusion>
             </exclusions>
-            <scope>test</scope>
         </dependency>
     </dependencies>
+    <repositories>
+        <repository>
+            <id>jboss-maven2-brew</id>
+            <name>JBoss Maven 2 Brew Repository</name>
+            <url>https://repository.jboss.org/maven2-brew/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>
