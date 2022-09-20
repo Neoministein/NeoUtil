@@ -10,11 +10,6 @@
     <name>Neo Util Helidon pom</name>
     <packaging>pom</packaging>
 
-    <properties>
-        <helidon.version>3.0.1</helidon.version>
-    </properties>
-
-
     <modules>
         <module>config</module>
         <module>security-provider-rotating-jwt</module>

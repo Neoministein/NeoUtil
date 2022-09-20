@@ -25,6 +25,9 @@
 		<log4j.version>2.18.0</log4j.version>
 		<!-- Jackson -->
 		<jackson.version>2.13.3</jackson.version>
+
+		<!-- MP Implementation -->
+		<helidon.version>3.0.1</helidon.version>
 		<!-- Testing -->
 		<junit.version>5.6.2</junit.version>
 		<mockito.version>3.12.4</mockito.version>
