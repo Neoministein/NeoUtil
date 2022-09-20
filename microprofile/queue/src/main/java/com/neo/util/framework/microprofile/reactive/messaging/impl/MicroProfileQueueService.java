@@ -1,4 +1,4 @@
-package com.neo.util.framework.microprofile.impl.queue;
+package com.neo.util.framework.microprofile.reactive.messaging.impl;
 
 import com.neo.util.common.impl.exception.InternalConfigurationException;
 import com.neo.util.common.impl.json.JsonUtil;
@@ -22,9 +22,9 @@ import java.util.Map;
 @Priority(PriorityConstants.APPLICATION)
 @Alternative
 @ApplicationScoped
-public class QueueServiceImpl implements QueueService {
+public class MicroProfileQueueService implements QueueService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(QueueServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MicroProfileQueueService.class);
 
     protected Map<String, QueueProducer> queueProducerMap = new HashMap<>();
 

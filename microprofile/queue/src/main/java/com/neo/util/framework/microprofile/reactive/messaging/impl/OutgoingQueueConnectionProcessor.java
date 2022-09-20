@@ -1,4 +1,4 @@
-package com.neo.util.framework.microprofile.impl.queue;
+package com.neo.util.framework.microprofile.reactive.messaging.impl;
 
 import com.google.auto.service.AutoService;
 import com.neo.util.common.impl.annotation.AnnotationProcessorUtils;
