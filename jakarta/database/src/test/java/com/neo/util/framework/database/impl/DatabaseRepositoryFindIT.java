@@ -23,7 +23,7 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
         personOne = new PersonEntity("Heaven Schneider",10,40.0,false);
         personTwo = new PersonEntity("Catherine Leon",20,45.0, false);
         personThree = new PersonEntity("Davian Chang",30,50.0,false);
-        personFour = new PersonEntity("Gabriel Ryan",40,55.0,false);
+        personFour = new PersonEntity("Gabriel Ryan",40,55.0,true);
 
         subject.create(personOne);
         subject.create(personTwo);
@@ -98,11 +98,26 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void explicitSearchTest() {
+    void explicitBooleanSearchSearchTest() {
         //Arrange
-
         EntityQuery<PersonEntity> entityQuery = new EntityQuery<>(PersonEntity.class, List.of(
-                new ExplicitSearchCriteria(PersonEntity.C_NAME, "Catherine Leon")
+                new ExplicitSearchCriteria(PersonEntity.C_TWO_ARMS, true)
+        ));
+        //Act
+
+        EntityResult<PersonEntity> result = subject.find(entityQuery);
+        List<PersonEntity> resultList = result.getHits();
+        //Assert
+
+        Assertions.assertEquals(1, result.getHitSize());
+        Assertions.assertEquals(resultList.get(0).getId(), personFour.getId());
+    }
+
+    @Test
+    void explicitIntegerSearchSearchTest() {
+        //Arrange
+        EntityQuery<PersonEntity> entityQuery = new EntityQuery<>(PersonEntity.class, List.of(
+                new ExplicitSearchCriteria(PersonEntity.C_AGE, 20)
         ));
         //Act
 
@@ -136,6 +151,23 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
 
         Assertions.assertEquals(1, questionResult.getHitSize());
         Assertions.assertEquals(personOne.getId() ,questionResult.getHits().get(0).getId());
+    }
+
+    @Test
+    void explicitStringSearchSearchTest() {
+        //Arrange
+
+        EntityQuery<PersonEntity> entityQuery = new EntityQuery<>(PersonEntity.class, List.of(
+                new ExplicitSearchCriteria(PersonEntity.C_NAME, "Catherine Leon")
+        ));
+        //Act
+
+        EntityResult<PersonEntity> result = subject.find(entityQuery);
+        List<PersonEntity> resultList = result.getHits();
+        //Assert
+
+        Assertions.assertEquals(1, result.getHitSize());
+        Assertions.assertEquals(resultList.get(0).getId(), personTwo.getId());
     }
 
     @Test
