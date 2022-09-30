@@ -1,7 +1,8 @@
 package com.neo.util.framework.rest.impl.security;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.api.connection.HttpDetails;
+import com.neo.util.framework.api.connection.HttpRequestDetails;
 import com.neo.util.framework.api.security.CredentialsGenerator;
 import com.neo.util.framework.api.security.RolePrincipal;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
@@ -45,7 +46,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     protected CredentialsGenerator credentialsGenerator;
 
     @Inject
-    protected RequestDetails requestDetails;
+    @HttpDetails
+    protected HttpRequestDetails requestDetails;
 
     @PostConstruct
     protected void init() {

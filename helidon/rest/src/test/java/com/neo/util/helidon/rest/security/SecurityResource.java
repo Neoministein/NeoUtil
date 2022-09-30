@@ -1,5 +1,7 @@
 package com.neo.util.helidon.rest.security;
 
+import com.neo.util.framework.api.connection.HttpDetails;
+import com.neo.util.framework.api.connection.HttpRequestDetails;
 import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.rest.api.security.Secured;
 
@@ -22,7 +24,8 @@ public class SecurityResource {
     public static final String P_ROLE = "/role";
 
     @Inject
-    protected RequestDetails requestDetails;
+    @HttpDetails
+    protected HttpRequestDetails requestDetails;
 
     @GET
     @Secured

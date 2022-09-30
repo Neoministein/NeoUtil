@@ -100,17 +100,7 @@ class DatabaseRepositoryAuditIT extends AbstractIntegrationTest {
         //Arrange
         String expectedUser = "ExpectedUserName";
         RequestDetailsDummy requestDetailsMock = weld.select(RequestDetailsDummy.class).get();
-        requestDetailsMock.setUser(new RolePrincipal() {
-            @Override
-            public Set<String> getRoles() {
-                return Set.of();
-            }
-
-            @Override
-            public String getName() {
-                return expectedUser;
-            }
-        });
+        requestDetailsMock.setCaller(expectedUser);
 
 
         PersonEntity person = new PersonEntity("Jaylene Leach",32,50.0, true);

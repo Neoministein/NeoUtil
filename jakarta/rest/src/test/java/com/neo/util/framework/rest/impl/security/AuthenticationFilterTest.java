@@ -1,5 +1,6 @@
 package com.neo.util.framework.rest.impl.security;
 
+import com.neo.util.framework.api.connection.HttpRequestDetails;
 import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.CredentialsGenerator;
@@ -22,7 +23,7 @@ class AuthenticationFilterTest {
     AuthenticationProvider authenticationProvider;
     ResponseGenerator responseGenerator;
     CredentialsGenerator credentialsGenerator;
-    RequestDetails requestDetails;
+    HttpRequestDetails requestDetails;
 
     @BeforeEach
     void init() {
@@ -37,7 +38,7 @@ class AuthenticationFilterTest {
         credentialsGenerator = Mockito.mock(CredentialsGenerator.class);
         subject.credentialsGenerator = credentialsGenerator;
 
-        requestDetails = Mockito.mock(RequestDetails.class);
+        requestDetails = Mockito.mock(HttpRequestDetails.class);
         subject.requestDetails = requestDetails;
     }
 

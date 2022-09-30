@@ -1,7 +1,8 @@
 package com.neo.util.helidon.rest.security;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.api.connection.HttpDetails;
+import com.neo.util.framework.api.connection.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import com.neo.util.framework.rest.api.security.Secured;
 
@@ -27,7 +28,8 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     protected ObjectNode unauthorized;
 
     @Inject
-    protected RequestDetails requestDetails;
+    @HttpDetails
+    protected HttpRequestDetails requestDetails;
 
     @Context
     protected ResourceInfo resourceInfo;

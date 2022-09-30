@@ -1,6 +1,6 @@
 package com.neo.util.framework.api.connection;
 
-public sealed interface RequestContext permits RequestContext.Http, RequestContext.Queue {
+public sealed interface RequestContext permits RequestContext.Http, RequestContext.Queue, RequestContext.Timer {
 
     String toString();
 
@@ -15,6 +15,13 @@ public sealed interface RequestContext permits RequestContext.Http, RequestConte
         @Override
         public String toString() {
             return queueName;
+        }
+    }
+
+    record Timer(String timerName) implements RequestContext {
+        @Override
+        public String toString() {
+            return timerName;
         }
     }
 }

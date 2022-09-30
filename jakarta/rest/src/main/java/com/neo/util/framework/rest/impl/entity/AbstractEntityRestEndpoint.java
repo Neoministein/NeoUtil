@@ -2,6 +2,7 @@ package com.neo.util.framework.rest.impl.entity;
 
 import com.neo.util.common.api.json.Views;
 import com.neo.util.common.impl.json.JsonUtil;
+import com.neo.util.framework.api.connection.HttpRequestDetails;
 import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.api.persistence.criteria.ExplicitSearchCriteria;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
@@ -155,13 +156,14 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
 
     protected Class<?> getSerializationScope() {
         Class<?> serializationScope = Views.Public.class;
+        HttpRequestDetails httpRequestDetails = (HttpRequestDetails) requestDetails;
 
-        if (requestDetails.getUser().isPresent()) {
-            if (requestDetails.isInRole(ENTITY_PERM + getEntityClass().getSimpleName())) {
+        if (httpRequestDetails.getUser().isPresent()) {
+            if (httpRequestDetails.isInRole(ENTITY_PERM + getEntityClass().getSimpleName())) {
                 serializationScope = Views.Owner.class;
             }
 
-            if (requestDetails.isInRole(PERM_INTERNAL)) {
+            if (httpRequestDetails.isInRole(PERM_INTERNAL)) {
                 serializationScope = Views.Internal.class;
             }
         }
