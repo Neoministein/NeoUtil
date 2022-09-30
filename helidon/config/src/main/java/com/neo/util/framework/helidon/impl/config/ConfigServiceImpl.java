@@ -3,6 +3,7 @@ package com.neo.util.framework.helidon.impl.config;
 import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
+import com.neo.util.framework.api.config.ConfigValue;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -10,12 +11,7 @@ import jakarta.inject.Inject;
 public class ConfigServiceImpl implements ConfigService {
 
     @Inject
-    io.helidon.config.Config config;
-
-    @Override
-    public Config empty() {
-        throw new InternalLogicException("Retrieving an empty config is not supported in the Helidon implementation");
-    }
+    protected io.helidon.config.Config config;
 
     @Override
     public Config get(String key) {
@@ -23,7 +19,7 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     @Override
-    public void save(Config config) {
+    public void save(ConfigValue<?> config) {
         throw new InternalLogicException("Saving config is not supported in the Helidon implementation");
     }
 }

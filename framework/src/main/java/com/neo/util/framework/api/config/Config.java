@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * A ConfigNode
+ */
 public interface Config {
 
     /**
      * Returns the key of the config
-     * @return the key of the config
      */
     String key();
 
@@ -16,38 +18,32 @@ public interface Config {
      * Retrieves a subconfig based on the key
      *
      * @param key key
+     *
      * @return subconfig
      */
     Config get(String key);
 
     /**
      * The config type of the current config
-     * @return config
      */
     Config.Type type();
 
     /**
-     * Checks if this config exists
-     *
-     * @return true if it exists
+     * True if this config exists
      */
     default boolean exists() {
         return this.type().exists();
     }
 
     /**
-     * Checks if this config is a leaf
-     *
-     * @return true if it is a leaf
+     * True if this config is a leaf
      */
     default boolean isLeaf() {
         return this.type().isLeaf();
     }
 
     /**
-     * Checks if this config has a designated value
-     *
-     * @return true if it has a designated value
+     * True if this config has a designated value
      */
     boolean hasValue();
 
@@ -55,40 +51,64 @@ public interface Config {
      * Returns the {@link ConfigValue} of this config
      *
      * @param clazz the class which the {@link ConfigValue} should be
-     * @param <T> the lass
+     * @param <T> the class
      * @return the config value of the config
      */
     <T> ConfigValue<T> as(Class<T> clazz);
 
-    <T> ConfigValue<T> as(Function<Config, T> var1);
+    /**
+     * Config convert from String, you can use
+     *
+     * @param mapper method to create an instance from config
+     * @param <T>    type
+     * @return typed value
+     */
+    <T> ConfigValue<T> as(Function<Config, T> mapper);
 
+    /**
+     * The {@link ConfigValue} as a {@link Boolean}
+     */
     default ConfigValue<Boolean> asBoolean() {
         return this.as(Boolean.class);
     }
 
+    /**
+     * The {@link ConfigValue} as a {@link String}
+     */
     default ConfigValue<String> asString() {
         return this.as(String.class);
     }
 
+    /**
+     * The {@link ConfigValue} as a {@link Integer}
+     */
     default ConfigValue<Integer> asInt() {
         return this.as(Integer.class);
     }
 
+    /**
+     * The {@link ConfigValue} as a {@link Long}
+     */
     default ConfigValue<Long> asLong() {
         return this.as(Long.class);
     }
 
+    /**
+     * The {@link ConfigValue} as a {@link Double}
+     */
     default ConfigValue<Double> asDouble() {
         return this.as(Double.class);
     }
 
-    <T> ConfigValue<List<T>> asList(Class<T> var1);
+    /**
+     * The {@link ConfigValue} as a {@link List} of the provided class
+     */
+    <T> ConfigValue<List<T>> asList(Class<T> clazz);
 
+    /**
+     * The {@link ConfigValue} as a {@link Map}
+     */
     ConfigValue<Map<String, String>> asMap();
-
-    void put(Config config);
-
-    <T> void set(ConfigValue<T> configValue);
 
     enum Type {
         OBJECT(true, false),

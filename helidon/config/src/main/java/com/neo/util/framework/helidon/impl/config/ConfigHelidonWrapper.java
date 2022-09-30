@@ -1,6 +1,5 @@
 package com.neo.util.framework.helidon.impl.config;
 
-import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigValue;
 import io.helidon.config.ConfigValues;
@@ -32,7 +31,12 @@ public class ConfigHelidonWrapper implements Config {
 
     @Override
     public Type type() {
-        return null; //FIXME;
+        return switch (config.type()) {
+        case VALUE -> Type.VALUE;
+            case OBJECT -> Type.OBJECT;
+            case LIST -> Type.LIST;
+            case MISSING, null -> Type.MISSING;
+        };
     }
 
     @Override
@@ -88,22 +92,12 @@ public class ConfigHelidonWrapper implements Config {
     }
 
     @Override
-    public <T> ConfigValue<List<T>> asList(Class<T> var1) {
-        return new ConfigValueHelidonWrapper<>(config.asList(var1));
+    public <T> ConfigValue<List<T>> asList(Class<T> clazz) {
+        return new ConfigValueHelidonWrapper<>(config.asList(clazz));
     }
 
     @Override
     public ConfigValue<Map<String, String>> asMap() {
         return new ConfigValueHelidonWrapper<>(config.asMap());
-    }
-
-    @Override
-    public void put(Config config) {
-        throw new InternalLogicException("Adding config is not supported in the Helion implementation");
-    }
-
-    @Override
-    public <T> void set(ConfigValue<T> configValue) {
-        throw new InternalLogicException("Setting config is not supported in the Helion implementation");
     }
 }
