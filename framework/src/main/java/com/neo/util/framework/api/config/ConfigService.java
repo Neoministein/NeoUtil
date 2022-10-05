@@ -1,27 +1,20 @@
 package com.neo.util.framework.api.config;
 
 /**
- * This class provided is a interface for the implementation of a CDI config system
+ * This class provided is an interface for the implementation of a tree-structured config system
+ * <p>
+ * The config is tree
  */
 public interface ConfigService {
 
     /**
-     * Returns new empty config
-     * @return an empty Config
-     */
-    Config empty();
-
-    /**
-     * Returns the config associated to the key
-     * @param key the key
-     * @return the config
+     * Returns a {@link Config} associated to the key.
      */
     Config get(String key);
 
     /**
-     * Persists the given config
-     * @param config the config to persist
+     * Persists the given {@link ConfigValue}.
      */
-    void save(Config config);
+    void save(ConfigValue<?> configValue);
 
 }

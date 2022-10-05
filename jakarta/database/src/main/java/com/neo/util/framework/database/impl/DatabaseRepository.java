@@ -128,7 +128,7 @@ public class DatabaseRepository implements EntityRepository {
 
     public <X> int count(List<? extends SearchCriteria> filters, Class<X> entityClass) {
         CriteriaBuilder cb = pcs.getEntityManager().getCriteriaBuilder();
-        CriteriaQuery cq = cb.createQuery();
+        CriteriaQuery<Object> cq = cb.createQuery();
         Root<X> root = cq.from(entityClass);
         cq.select(cb.count(root));
         Query q = pcs.getEntityManager().createQuery(cq);
@@ -221,13 +221,12 @@ public class DatabaseRepository implements EntityRepository {
 
     protected Predicate buildExplicitSearchQuery(ExplicitSearchCriteria criteria, CriteriaBuilder cb, Root<?> root) {
         Predicate predicate;
-        String fieldValue = criteria.getFieldValue().toString();
-
-        if (criteria.getAllowWildcards() && (fieldValue.contains("*") || fieldValue.contains("?"))) {
+        if (criteria.getFieldValue() instanceof String fieldValue
+                && criteria.getAllowWildcards() && (fieldValue.contains("*") || fieldValue.contains("?"))) {
             predicate = cb.like(root.get(criteria.getFieldName()),
                     fieldValue.replace('*','%').replace('?','_'));
         } else {
-            predicate = cb.equal(root.get(criteria.getFieldName()), fieldValue);
+            predicate = cb.equal(root.get(criteria.getFieldName()), criteria.getFieldValue());
         }
 
         return predicateNot(criteria, predicate);

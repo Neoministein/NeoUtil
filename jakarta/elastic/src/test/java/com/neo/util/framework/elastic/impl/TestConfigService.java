@@ -19,17 +19,12 @@ public class TestConfigService implements ConfigService {
     }
 
     @Override
-    public Config empty() {
-        return get("");
-    }
-
-    @Override
     public Config get(String key) {
         return new ConfigImpl(key, configStore);
     }
 
     @Override
-    public void save(Config config) {
+    public void save(ConfigValue<?> configValue) {
 
     }
 
@@ -78,23 +73,13 @@ public class TestConfigService implements ConfigService {
         }
 
         @Override
-        public <T> ConfigValue<List<T>> asList(Class<T> var1) {
+        public <T> ConfigValue<List<T>> asList(Class<T> clazz) {
             return new ConfigValueImpl<List<T>>(key, List.class.cast(configStore.get(key)));
         }
 
         @Override
         public ConfigValue<Map<String, String>> asMap() {
             return null;
-        }
-
-        @Override
-        public void put(Config config) {
-            throw new IllegalArgumentException("Should not be called");
-        }
-
-        @Override
-        public <T> void set(ConfigValue<T> configValue) {
-            throw new IllegalArgumentException("Should not be called");
         }
     }
 
@@ -121,6 +106,11 @@ public class TestConfigService implements ConfigService {
         @Override
         public T get() {
             return value;
+        }
+
+        @Override
+        public void set(T value) {
+            this.value = value;
         }
     }
 }
