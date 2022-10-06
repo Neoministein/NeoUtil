@@ -3,10 +3,13 @@ package com.neo.util.framework.microprofile.reactive.messaging.impl;
 import com.google.auto.service.AutoService;
 import com.neo.util.common.impl.annotation.AnnotationProcessorUtils;
 import com.neo.util.common.impl.json.JsonUtil;
+import com.neo.util.framework.api.connection.RequestContext;
 import com.neo.util.framework.api.queue.IncomingQueueConnection;
 import com.neo.util.framework.api.queue.OutgoingQueueConnection;
 import com.neo.util.framework.api.queue.QueueListener;
 import com.neo.util.framework.api.queue.QueueMessage;
+import com.neo.util.framework.impl.connection.QueueRequestDetails;
+import com.neo.util.framework.impl.connection.RequestDetailsProducer;
 import com.squareup.javapoet.*;
 import jakarta.enterprise.context.control.RequestContextController;
 import jakarta.inject.Provider;
@@ -133,6 +136,10 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
                     .addModifiers(Modifier.PROTECTED)
                     .addAnnotation(Inject.class)
                     .build();
+            FieldSpec requestDetailsProducer = FieldSpec.builder(RequestDetailsProducer.class, "requestDetailsProducer")
+                    .addModifiers(Modifier.PROTECTED)
+                    .addAnnotation(Inject.class)
+                    .build();
             FieldSpec queueConsumer = FieldSpec.builder(TypeName.get(typeElement.asType()), "queueConsumer")
                     .addModifiers(Modifier.PROTECTED)
                     .addAnnotation(Inject.class)
@@ -145,7 +152,10 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
                     .addStatement("final var requestContextController = requestContextControllerFactory.get()")
                     .addStatement("requestContextController.activate()")
                     .beginControlFlow("try")
-                    .addStatement("queueConsumer.onMessage($T.fromJson(msg, $T.class))", JsonUtil.class, QueueMessage.class)
+                    .addStatement("final var queueMessage = $T.fromJson(msg, $T.class)", JsonUtil.class, QueueMessage.class)
+                    .addStatement("requestDetailsProducer.setRequestDetails(new $T(queueMessage, new $T($S)))",
+                            QueueRequestDetails.class, RequestContext.Queue.class, queueName)
+                    .addStatement("queueConsumer.onMessage(queueMessage)")
                     .nextControlFlow("catch($T ex)", Exception.class)
                     .addStatement("LOGGER.error($S, ex.getMessage())","Unexpected error occurred while processing a queue [{}], action won't be retried.")
                     .nextControlFlow("finally")
@@ -160,6 +170,7 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
                     .addField(queueConsumer)
                     .addField(logger)
                     .addField(requestContextFactory)
+                    .addField(requestDetailsProducer)
                     .build();
 
             JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();

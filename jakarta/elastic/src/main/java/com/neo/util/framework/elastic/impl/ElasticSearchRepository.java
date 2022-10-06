@@ -17,12 +17,14 @@ import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.config.ConfigService;
+import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.api.persistence.aggregation.*;
 import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.search.*;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionRepository;
 import com.neo.util.framework.elastic.api.IndexNamingService;
+import jakarta.inject.Provider;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
@@ -89,6 +91,9 @@ public class ElasticSearchRepository implements SearchRepository {
     protected ConfigService configService;
 
     @Inject
+    protected Provider<RequestDetails> requestDetailsProvider;
+
+    @Inject
     protected IndexingQueueService indexerQueueService;
 
     @Inject
@@ -123,7 +128,7 @@ public class ElasticSearchRepository implements SearchRepository {
                 for (DocWriteRequest<?> request : bulkRequest.requests()) {
                     bulkQueueableSearchableList.add(generateQueueableSearchable(request));
                 }
-                indexerQueueService.addToIndexingQueue(new QueueMessage(
+                indexerQueueService.addToIndexingQueue(new QueueMessage(requestDetailsProvider.get(),
                         QueueableSearchable.RequestType.BULK.toString(), bulkQueueableSearchableList));
                 if (failure instanceof IllegalStateException illegalStateException) {
                     reconnectClientIfNeeded(illegalStateException);
@@ -287,7 +292,7 @@ public class ElasticSearchRepository implements SearchRepository {
         if (bulkResponse.hasFailures()) {
             List<QueueableSearchable> queueableSearchableList = handleFailedBulkProcess(bulkRequest, bulkResponse);
             for (QueueableSearchable queueableSearchable: queueableSearchableList) {
-                indexerQueueService.addToIndexingQueue(new QueueMessage(
+                indexerQueueService.addToIndexingQueue(new QueueMessage(requestDetailsProvider.get(),
                         queueableSearchable.getRequestType().toString(), queueableSearchable));
             }
         }
@@ -751,7 +756,7 @@ public class ElasticSearchRepository implements SearchRepository {
         } catch (IllegalStateException ex) {
             LOGGER.info("Error while adding to BulkProcessor, message: {}", ex.getMessage());
             QueueableSearchable searchable = generateQueueableSearchable(request);
-            indexerQueueService.addToIndexingQueue(new QueueMessage(
+            indexerQueueService.addToIndexingQueue(new QueueMessage(requestDetailsProvider.get(),
                     searchable.getRequestType().toString(), searchable));
         }
     }

@@ -1,6 +1,7 @@
 package com.neo.util.framework.api.queue;
 
 import com.neo.util.common.impl.json.JsonUtil;
+import com.neo.util.framework.api.connection.RequestDetails;
 
 import java.io.Serializable;
 import java.util.*;
@@ -16,6 +17,16 @@ import java.util.*;
 public class QueueMessage implements Serializable {
 
     /**
+     * The caller of the queue
+     */
+    protected String caller;
+
+    /**
+     * The request id
+     */
+    protected String requestId;
+
+    /**
      * The type of the queue message.
      */
     protected String messageType;
@@ -29,7 +40,13 @@ public class QueueMessage implements Serializable {
      */
     protected String message;
 
-    public QueueMessage(String messageType, Serializable payload) {
+    public QueueMessage(RequestDetails requestDetails, String messageType, Serializable payload) {
+        this(requestDetails.getCaller(), requestDetails.getRequestId(), messageType, payload);
+    }
+
+    public QueueMessage(String caller, String requestId, String messageType, Serializable payload) {
+        this.caller = caller;
+        this.requestId = requestId;
         this.messageType = messageType;
         this.message = JsonUtil.toJson(payload);
 
@@ -71,5 +88,13 @@ public class QueueMessage implements Serializable {
 
     public String getMessage() {
         return message;
+    }
+
+    public String getCaller() {
+        return caller;
+    }
+
+    public String getRequestId() {
+        return requestId;
     }
 }

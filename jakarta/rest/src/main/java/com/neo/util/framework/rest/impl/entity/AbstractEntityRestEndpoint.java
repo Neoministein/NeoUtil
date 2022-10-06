@@ -2,7 +2,6 @@ package com.neo.util.framework.rest.impl.entity;
 
 import com.neo.util.common.api.json.Views;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.api.connection.HttpRequestDetails;
 import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.api.persistence.criteria.ExplicitSearchCriteria;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
@@ -10,6 +9,7 @@ import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityRepository;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
 import com.neo.util.common.impl.exception.InternalJsonException;
+import com.neo.util.framework.impl.connection.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,18 +156,21 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
 
     protected Class<?> getSerializationScope() {
         Class<?> serializationScope = Views.Public.class;
-        HttpRequestDetails httpRequestDetails = (HttpRequestDetails) requestDetails;
 
-        if (httpRequestDetails.getUser().isPresent()) {
-            if (httpRequestDetails.isInRole(ENTITY_PERM + getEntityClass().getSimpleName())) {
+        if (getRequestDetails().getUser().isPresent()) {
+            if (getRequestDetails().isInRole(ENTITY_PERM + getEntityClass().getSimpleName())) {
                 serializationScope = Views.Owner.class;
             }
 
-            if (httpRequestDetails.isInRole(PERM_INTERNAL)) {
+            if (getRequestDetails().isInRole(PERM_INTERNAL)) {
                 serializationScope = Views.Internal.class;
             }
         }
         return serializationScope;
+    }
+
+    protected HttpRequestDetails getRequestDetails() {
+        return (HttpRequestDetails) requestDetails;
     }
 
     public void setEntityRepository(EntityRepository entityRepository) {

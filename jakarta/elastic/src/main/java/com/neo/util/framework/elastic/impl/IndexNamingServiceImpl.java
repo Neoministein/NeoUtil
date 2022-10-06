@@ -25,9 +25,9 @@ public class IndexNamingServiceImpl implements IndexNamingService {
 
     public static final String CONFIG_PREFIX = ElasticSearchRepository.CONFIG_PREFIX;
 
-    protected static final String PROJECT_PREFIX_CONFIG = CONFIG_PREFIX + "prefix";
-    protected static final String PROJECT_POSTFIX_CONFIG = CONFIG_PREFIX + "postfix";
-    protected static final String MAPPING_VERSION_CONFIG = CONFIG_PREFIX + "mappingVersion";
+    protected static final String PROJECT_PREFIX_CONFIG = CONFIG_PREFIX + ".prefix";
+    protected static final String PROJECT_POSTFIX_CONFIG = CONFIG_PREFIX + ".postfix";
+    protected static final String MAPPING_VERSION_CONFIG = CONFIG_PREFIX + ".mappingVersion";
 
     protected static final String DEFAULT_MAPPING_VERSION = "v1";
 

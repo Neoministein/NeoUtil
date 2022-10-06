@@ -1,8 +1,8 @@
-package com.neo.util.helidon.rest.security;
+package com.neo.util.framework.rest.impl.security;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.neo.util.framework.api.connection.HttpDetails;
-import com.neo.util.framework.api.connection.HttpRequestDetails;
+import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.impl.connection.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import com.neo.util.framework.rest.api.security.Secured;
 
@@ -17,6 +17,9 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.ext.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Set;
 
 @Secured
@@ -25,11 +28,12 @@ import java.util.Set;
 @Priority(Priorities.AUTHORIZATION)
 public class AuthorizationFilter implements ContainerRequestFilter {
 
-    protected ObjectNode unauthorized;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizationFilter.class);
+
+    protected ObjectNode forbidden;
 
     @Inject
-    @HttpDetails
-    protected HttpRequestDetails requestDetails;
+    protected RequestDetails requestDetails;
 
     @Context
     protected ResourceInfo resourceInfo;
@@ -39,17 +43,21 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
     @PostConstruct
     public void init() {
-        unauthorized = responseGenerator.errorObject("auth/001", "Forbidden");
+        forbidden = responseGenerator.errorObject("auth/001", "Forbidden");
     }
 
     @Override
     public void filter(ContainerRequestContext containerRequest) {
+        LOGGER.trace("Accessing secured endpoint");
         RolesAllowed rolesAllowed = resourceInfo.getResourceMethod().getAnnotation(RolesAllowed.class);
         if (rolesAllowed == null) {
             return;
         }
-        if (!requestDetails.isInRoles(Set.of(rolesAllowed.value()))) {
-            containerRequest.abortWith(responseGenerator.error(403,unauthorized));
+
+        Set<String> roles = Set.of(rolesAllowed.value());
+        if (!((HttpRequestDetails) requestDetails).hasOneOfTheRoles(roles)) {
+            LOGGER.info("Aborting request with forbidden, one of the permissions is required {}", roles);
+            containerRequest.abortWith(responseGenerator.error(403, forbidden));
         }
     }
 }

@@ -70,32 +70,6 @@ class DatabaseRepositoryAuditIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void requestIdFallOverTest() {
-        //Arrange
-        RequestDetailsDummy requestDetailsMock = weld.select(RequestDetailsDummy.class).get();
-        String originalRequestId = requestDetailsMock.getRequestId();
-
-
-        PersonEntity person = new PersonEntity("Amira Johns",32, 50.0, true);
-
-        //Act
-        subject.create(person);
-
-        requestDetailsMock.setRequestId(new RandomString().nextString());
-        person.setAge(33);
-        subject.edit(person);
-
-
-        EntityResult<PersonEntity> entityResult = subject.find(new EntityQuery<>(PersonEntity.class));
-        PersonEntity result = entityResult.getFirst().get();
-        //Assert
-
-        Assertions.assertEquals(originalRequestId, result.getCreatedBy());
-        Assertions.assertEquals(requestDetailsMock.getRequestId(), result.getUpdatedBy());
-        Assertions.assertTrue(result.getCreatedOn().before(result.getUpdatedOn()));
-    }
-
-    @Test
     void requestUserTest() {
         //Arrange
         String expectedUser = "ExpectedUserName";

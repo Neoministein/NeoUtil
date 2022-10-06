@@ -6,10 +6,14 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.carrotsearch.randomizedtesting.annotations.ThreadLeakScope;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.neo.util.common.impl.RandomString;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
 import com.neo.util.framework.api.config.ConfigService;
+import com.neo.util.framework.api.connection.RequestContext;
+import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.elastic.api.IndexNamingService;
+import com.neo.util.framework.impl.connection.SchedulerRequestDetails;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.event.NotificationOptions;
 import jakarta.enterprise.util.TypeLiteral;
@@ -57,6 +61,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
     ));
 
     protected static ElasticSearchConnectionRepositoryImpl connection = new ElasticSearchConnectionRepositoryImpl();
+    protected RequestDetails requestDetails = new SchedulerRequestDetails(new RandomString().nextString(), new RequestContext.Scheduler("integrationTest"));
     protected IndexNamingService indexNamingService = createIndexNameService(configService);
 
     IndexNamingService createIndexNameService(ConfigService cfg) {
@@ -148,6 +153,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         elasticSearchRepository.configService = configService;
         elasticSearchRepository.connection = connection;
         elasticSearchRepository.indexerQueueService = new PretendIndexerNotificationService();
+        elasticSearchRepository.requestDetailsProvider = () -> requestDetails;
         elasticSearchRepository.indexNameService = indexNamingService;
         elasticSearchRepository.setupBulkProcessor();
     }

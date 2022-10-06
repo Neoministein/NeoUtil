@@ -1,12 +1,11 @@
 package com.neo.util.helidon.rest.security;
 
 import com.neo.util.framework.api.connection.RequestContext;
+import com.neo.util.framework.impl.connection.HttpRequestDetails;
 import com.neo.util.framework.impl.connection.RequestDetailsProducer;
-import com.neo.util.helidon.rest.connection.HelidonHttpRequestDetails;
 import io.helidon.security.SecurityContext;
 import io.helidon.webserver.ServerRequest;
 import jakarta.ws.rs.core.Context;
-import org.slf4j.MDC;
 
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
@@ -30,9 +29,8 @@ public class IdentificationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext containerRequest) {
-        requestDetailsProvider.setRequestDetails(new HelidonHttpRequestDetails(serverRequest.remoteAddress(), securityContext.id(),
+        requestDetailsProvider.setRequestDetails(new HttpRequestDetails(serverRequest.remoteAddress(), securityContext.id(),
                 new RequestContext.Http(containerRequest.getMethod(), getUri(containerRequest.getUriInfo()))));
-        MDC.put("traceId", securityContext.id());
     }
 
     protected String getUri(UriInfo uriInfo) {

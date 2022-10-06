@@ -1,5 +1,7 @@
 package com.neo.util.framework.microprofile.reactive.messaging.impl;
 
+import com.neo.util.common.impl.RandomString;
+import com.neo.util.framework.impl.connection.RequestDetailsProducer;
 import com.neo.util.framework.microprofile.reactive.messaging.BasicQueueProducer; //IMPORTANT: IDE WON'T REFERENCE BUT IT IS COMPILABLE IN MAVEN AND INTELLIJ
 import com.neo.util.framework.microprofile.reactive.messaging.BasicQueueConsumerCaller; //IMPORTANT: IDE WON'T REFERENCE BUT IT IS COMPILABLE IN MAVEN AND INTELLIJ
 import com.neo.util.common.impl.test.IntegrationTestUtil;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.Test;
 @HelidonTest
 @DisableDiscovery
 @AddExtension(MessagingCdiExtension.class)
+@AddBean(RequestDetailsProducer.class)
 @AddBean(MicroProfileQueueService.class)
 @AddBean(BasicQueueConsumer.class)
 @AddBean(BasicQueueService.class)
@@ -26,7 +29,7 @@ import org.junit.jupiter.api.Test;
 @AddBean(BasicQueueConsumerCaller.class) //IMPORTANT: IDE WON'T REFERENCE BUT IT IS COMPILABLE IN MAVEN AND INTELLIJ
 public class BasicQueueFunctionalityIT {
 
-    protected static final QueueMessage BASIC_QUEUE_MESSAGE = new QueueMessage("A_TYPE", "A_PAYLOAD");
+    protected static final QueueMessage BASIC_QUEUE_MESSAGE = new QueueMessage("A_CALLER", new RandomString().nextString(),"A_TYPE", "A_PAYLOAD");
 
     @Inject
     BasicQueueService basicQueueService;
@@ -41,7 +44,8 @@ public class BasicQueueFunctionalityIT {
     }
 
     @Test
-    void test() {
+    @SuppressWarnings("java:S2699") //IntegrationTestUtil.sleepUntil contains Assertions.fail
+    void basicThroughPutTest() {
         basicQueueService.addToIndexingQueue(BASIC_QUEUE_MESSAGE);
         IntegrationTestUtil.sleepUntil(2000,10,() -> {
             if (basicQueueConsumer.getMessages().size() != 1) {
