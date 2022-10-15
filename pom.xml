@@ -21,16 +21,16 @@
 		<jakarta.security.enterprise-api.version>3.0.0</jakarta.security.enterprise-api.version>
 
 		<!-- Logging -->
-		<slf4j.version>2.0.0</slf4j.version>
-		<log4j.version>2.18.0</log4j.version>
+		<slf4j.version>2.0.3</slf4j.version>
+		<log4j.version>2.19.0</log4j.version>
 		<!-- Jackson -->
-		<jackson.version>2.13.3</jackson.version>
+		<jackson.version>2.13.4</jackson.version>
 
 		<!-- MP Implementation -->
 		<helidon.version>3.0.1</helidon.version>
 		<!-- Testing -->
-		<junit.version>5.6.2</junit.version>
-		<mockito.version>3.12.4</mockito.version>
+		<junit.version>5.9.0</junit.version>
+		<mockito.version>4.8.0</mockito.version>
 		<h2.version>2.1.214</h2.version>
 		<weld.version>4.0.3.Final</weld.version>
 		<weld-junit.version>3.1.0.Final</weld-junit.version>
