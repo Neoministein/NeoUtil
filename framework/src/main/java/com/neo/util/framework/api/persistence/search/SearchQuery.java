@@ -83,8 +83,12 @@ public class SearchQuery implements Serializable {
         this(fields, offset, maxResults, null, filters, new HashMap<>(), new ArrayList<>(), false);
     }
 
+    public SearchQuery(List<String> fields, Integer maxResults, List<SearchCriteria> filters) {
+        this(fields,0 ,maxResults, filters);
+    }
+
     public SearchQuery(Integer maxResults, List<SearchCriteria> filters) {
-        this(new ArrayList<>(),0 ,maxResults, filters);
+        this(new ArrayList<>(),maxResults, filters);
     }
 
     public SearchQuery(Integer maxResults) {

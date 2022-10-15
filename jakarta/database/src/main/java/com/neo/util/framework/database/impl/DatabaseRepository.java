@@ -245,7 +245,10 @@ public class DatabaseRepository implements EntityRepository {
     }
 
     protected Predicate buildAnyNoneQuery(ExistingFieldSearchCriteria criteria, CriteriaBuilder cb, Root<?> root) {
-        return predicateNot(criteria, cb.isNotNull(root.get(criteria.getFieldName())));
+        if (criteria.getExists() ^ criteria.isNot()) {
+            return cb.isNotNull(root.get(criteria.getFieldName()));
+        }
+        return cb.isNotNull(root.get(criteria.getFieldName())).not();
     }
 
     protected Predicate buildCombinedQuery(CombinedSearchCriteria criteria, CriteriaBuilder cb, Root<?> root) {

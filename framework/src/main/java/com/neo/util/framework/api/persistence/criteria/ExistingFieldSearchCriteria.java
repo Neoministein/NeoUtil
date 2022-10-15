@@ -15,7 +15,7 @@ public class ExistingFieldSearchCriteria extends FieldSearchCriteria {
     }
 
     public ExistingFieldSearchCriteria(String fieldName) {
-        this(fieldName, false);
+        this(fieldName, true);
     }
 
     public boolean getExists() {
