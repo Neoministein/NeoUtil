@@ -357,7 +357,6 @@ public class ElasticSearchRepository implements SearchRepository {
         }
 
         if (!parameters.getSorting().isEmpty()) {
-            //new SortOptions.Builder().field(new FieldSort.Builder().field())
             List<SortOptions> sortOptions = new ArrayList<>();
             Map<String, Class<?>> mapping = getFlatTypeMapping(readTypeMapping(index));
             for (Map.Entry<String, Boolean> sorting : parameters.getSorting().entrySet()) {
@@ -469,25 +468,18 @@ public class ElasticSearchRepository implements SearchRepository {
     }
 
     protected Class<?> getClassBasedOnTypeName(String typeName) {
-        if ("string".equals(typeName)) {
-            return String.class;
-        } else if ("boolean".equals(typeName)) {
-            return Boolean.class;
-        } else if ("date".equals(typeName)) {
-            return Date.class;
-        } else if ("long".equals(typeName)) {
-            return Long.class;
-        } else if ("double".equals(typeName)) {
-            return Double.class;
-        } else if ("short".equals(typeName)) {
-            return Short.class;
-        } else if ("byte".equals(typeName)) {
-            return Byte.class;
-        } else if ("integer".equals(typeName)) {
-            return Integer.class;
-        } else {
-            return String.class;
-        }
+        return switch (typeName) {
+            case "string" -> String.class;
+            case "boolean" -> Boolean.class;
+            case "date" -> Date.class;
+            case "long" -> Long.class;
+            case "double" -> Double.class;
+            case "short" -> Short.class;
+            case "byte" -> Byte.class;
+            case "integer" -> Integer.class;
+            case "float" -> Float.class;
+            case null, default -> String.class;
+        };
     }
 
     public Map<String, Class<?>> getFlatTypeMapping(Map<String, Object> readTypeMapping) {
@@ -577,7 +569,6 @@ public class ElasticSearchRepository implements SearchRepository {
     }
 
     protected Query buildExplicitSearchQuery(ExplicitSearchCriteria criteria) {
-
         if (criteria.getFieldValue() instanceof String) {
             String fieldValue = criteria.getFieldValue().toString();
 
@@ -598,14 +589,17 @@ public class ElasticSearchRepository implements SearchRepository {
     }
 
     protected Query buildContainsSearchQuery(ContainsSearchCriteria criteria) {
-        MatchQuery.Builder termQuery = QueryBuilders.match().query(criteria.getFieldName());
-        return searchQueryNot(criteria, termQuery.build()._toQuery());
+        CombinedSearchCriteria combinedSearchCriteria = new CombinedSearchCriteria(CombinedSearchCriteria.Association.OR);
+        criteria.getFieldValues().forEach(
+                value -> combinedSearchCriteria.addCriteria(new ExplicitSearchCriteria(criteria.getFieldName(), value)));
+
+        return searchQueryNot(criteria, buildCombinedQuery(combinedSearchCriteria));
     }
 
     protected Query buildExistingFieldQuery(ExistingFieldSearchCriteria criteria) {
         ExistsQuery.Builder existsQuery = QueryBuilders.exists().field(criteria.getFieldName());
 
-        if (criteria.getExists() ^ criteria.isNot()) {
+        if (criteria.getExists() ^ criteria.isNot()) { //Exclusive or: either A or B but not both.
             return existsQuery.build()._toQuery();
         } else {
             return QueryBuilders.bool().mustNot(existsQuery.build()._toQuery()).build()._toQuery();
@@ -714,7 +708,7 @@ public class ElasticSearchRepository implements SearchRepository {
 
         if (aggregations != null) {
             for (Map.Entry<String, Aggregate> agg : aggregations.entrySet()) {
-                AggregateVariant variant = agg.getValue()._get();
+                AggregateVariant variant = (AggregateVariant) agg.getValue()._get();
                 String key = agg.getKey();
 
                 if (variant instanceof SingleMetricAggregateBase singleValue) {

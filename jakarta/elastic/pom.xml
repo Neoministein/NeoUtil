@@ -14,8 +14,8 @@
     <packaging>jar</packaging>
 
     <properties>
-        <elastic.version>7.17.5</elastic.version>
-        <elastic.high-level-rest.version>7.17.5</elastic.high-level-rest.version>
+        <elastic.version>7.17.6</elastic.version>
+        <elastic.high-level-rest.version>7.17.6</elastic.high-level-rest.version>
     </properties>
 
     <dependencies>

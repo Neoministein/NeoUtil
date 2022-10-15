@@ -16,8 +16,8 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchRepositoryIT.class);
 
-	private static final String INDEX_NAME_FOR_QUERY = BasicSearchableImpl.INDEX_NAME + "-*";
-	private static final String FULL_INDEX_NAME_FOR_QUERY = BasicSearchableImpl.INDEX_NAME + "-no-date-v1";
+	private static final String INDEX_NAME_FOR_QUERY = BasicPersonSearchable.INDEX_NAME + "-*";
+	private static final String FULL_INDEX_NAME_FOR_QUERY = BasicPersonSearchable.INDEX_NAME + "-no-date-v1";
 
 	@Test
 	public void indexSearchableTest() {
@@ -125,12 +125,12 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 	public void bulkAsynchronousErrorNoRetryTest() {
 		String uuid1 = UUID.randomUUID().toString();
 		String uuid2 = UUID.randomUUID().toString();
-		BasicSearchableImpl dummySearchable1 = indexBasicSearchable(uuid1);
+		BasicPersonSearchable dummySearchable1 = indexBasicSearchable(uuid1);
 		Searchable dummySearchable2 = getBasicSearchable(uuid2);
 
 		elasticSearchRepository.index(List.of(dummySearchable1, dummySearchable2), new IndexParameter());
 
-		validateDocumentInIndex(uuid1, INDEX_NAME_FOR_QUERY, BasicSearchableImpl.FIELD_NAME_TEXT_FIELD, BasicSearchableImpl.TEXT_FIELD_VALUE);
+		validateDocumentInIndex(uuid1, INDEX_NAME_FOR_QUERY, BasicPersonSearchable.F_NAME, BasicPersonSearchable.NAME_VALUE);
 		validateDocumentInIndex(uuid2, INDEX_NAME_FOR_QUERY, true);
 	}
 
@@ -138,12 +138,12 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 	public void bulkSynchronousErrorNoRetryTest() {
 		String uuid1 = UUID.randomUUID().toString();
 		String uuid2 = UUID.randomUUID().toString();
-		BasicSearchableImpl dummySearchable1 = indexBasicSearchable(uuid1);
+		BasicPersonSearchable dummySearchable1 = indexBasicSearchable(uuid1);
 		Searchable dummySearchable2 = getBasicSearchable(uuid2);
 
 		elasticSearchRepository.index(List.of(dummySearchable1, dummySearchable2), new IndexParameter(Synchronization.SYNCHRONOUS));
 
-		validateDocumentInIndex(uuid1, INDEX_NAME_FOR_QUERY, BasicSearchableImpl.FIELD_NAME_TEXT_FIELD, BasicSearchableImpl.TEXT_FIELD_VALUE);
+		validateDocumentInIndex(uuid1, INDEX_NAME_FOR_QUERY, BasicPersonSearchable.F_NAME, BasicPersonSearchable.NAME_VALUE);
 		validateDocumentInIndex(uuid2, INDEX_NAME_FOR_QUERY, true);
 	}
 
@@ -168,9 +168,9 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 		String uuid1 = UUID.randomUUID().toString();
 		String uuid2 = UUID.randomUUID().toString();
 		String uuid3 = UUID.randomUUID().toString();
-		BasicSearchableImpl dummySearchable2 = getBasicSearchable(uuid2);
-		BasicSearchableImpl dummySearchable3 = getBasicSearchable(uuid3);
-		dummySearchable3.setTextField(uuid3);
+		BasicPersonSearchable dummySearchable2 = getBasicSearchable(uuid2);
+		BasicPersonSearchable dummySearchable3 = getBasicSearchable(uuid3);
+		dummySearchable3.setName(uuid3);
 
 		elasticSearchRepository.index(List.of(dummySearchable2, dummySearchable3));
 
@@ -185,7 +185,7 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 		elasticSearchRepository.process(bulk);
 
 		validateDocumentInIndex(uuid1, INDEX_NAME_FOR_QUERY, true);
-		validateDocumentInIndex(uuid2, INDEX_NAME_FOR_QUERY, BasicSearchableImpl.FIELD_NAME_TEXT_FIELD, BasicSearchableImpl.TEXT_FIELD_VALUE);
+		validateDocumentInIndex(uuid2, INDEX_NAME_FOR_QUERY, BasicPersonSearchable.F_NAME, BasicPersonSearchable.NAME_VALUE);
 	}
 
 	/*
@@ -213,11 +213,11 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 	@Test
 	public void indexAsynchronousErrorNoRetryTest() {
 		String uuid = UUID.randomUUID().toString();
-		BasicSearchableImpl dummySearchable = indexBasicSearchable(uuid);
+		BasicPersonSearchable dummySearchable = indexBasicSearchable(uuid);
 
 		elasticSearchRepository.index(dummySearchable, new IndexParameter());
 
-		validateDocumentInIndex(uuid, INDEX_NAME_FOR_QUERY, BasicSearchableImpl.FIELD_NAME_TEXT_FIELD, BasicSearchableImpl.TEXT_FIELD_VALUE);
+		validateDocumentInIndex(uuid, INDEX_NAME_FOR_QUERY, BasicPersonSearchable.F_NAME, BasicPersonSearchable.NAME_VALUE);
 	}
 
 	@Test
@@ -245,7 +245,7 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 	@Test
 	public void indexSynchronousErrorNoRetryTest() {
 		String uuid = UUID.randomUUID().toString();
-		BasicSearchableImpl dummySearchable = indexBasicSearchable(uuid);
+		BasicPersonSearchable dummySearchable = indexBasicSearchable(uuid);
 
 		try {
 			elasticSearchRepository.index(dummySearchable, new IndexParameter(Synchronization.SYNCHRONOUS));
@@ -253,17 +253,17 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 			Assert.assertFalse(elasticSearchRepository.exceptionIsToBeRetried(e));
 		}
 
-		validateDocumentInIndex(uuid, INDEX_NAME_FOR_QUERY, BasicSearchableImpl.FIELD_NAME_TEXT_FIELD, BasicSearchableImpl.TEXT_FIELD_VALUE);
+		validateDocumentInIndex(uuid, INDEX_NAME_FOR_QUERY, BasicPersonSearchable.F_NAME, BasicPersonSearchable.NAME_VALUE);
 	}
 
 	@Test
 	public void fetchSearchableFromIndexTest() {
 		String uuid = UUID.randomUUID().toString();
-		BasicSearchableImpl dummySearchable = indexBasicSearchable(uuid);
+		BasicPersonSearchable dummySearchable = indexBasicSearchable(uuid);
 
 		String indexName = dummySearchable.getIndexName().concat("-*");
 		SearchQuery query = new SearchQuery();
-		query.setFields(List.of(BasicSearchableImpl.FIELD_NAME_TEXT_FIELD));
+		query.setFields(List.of(BasicPersonSearchable.F_NAME));
 
 		LOGGER.info("---check--- {}, {}, {}", elasticSearchRepository, indexName, query);
 		SearchResult result = elasticSearchRepository.fetch(indexName, query);
@@ -273,7 +273,7 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 	@Test
 	public void readTypeMappingTest() {
 		String uuid = UUID.randomUUID().toString();
-		BasicSearchableImpl dummySearchable = indexBasicSearchable(uuid);
+		BasicPersonSearchable dummySearchable = indexBasicSearchable(uuid);
 
 		String indexName = dummySearchable.getIndexName().concat("-*");
 		Map<String, Object> mapping = elasticSearchRepository.readTypeMapping(indexName);
@@ -281,16 +281,16 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 
 		Map<String, Class<?>> flatMapping = elasticSearchRepository.getFlatTypeMapping(mapping);
 		Assert.assertFalse(flatMapping.isEmpty());
-		Assert.assertTrue(flatMapping.containsKey(BasicSearchableImpl.FIELD_NAME_TEXT_FIELD)
-				&& String.class.equals(flatMapping.get(BasicSearchableImpl.FIELD_NAME_TEXT_FIELD)));
+		Assert.assertTrue(flatMapping.containsKey(BasicPersonSearchable.F_NAME)
+				&& String.class.equals(flatMapping.get(BasicPersonSearchable.F_NAME)));
 	}
 
 	/*
 	Test Helper Methods
 	 */
 
-	private BasicSearchableImpl indexBasicSearchable(String uuid) {
-		BasicSearchableImpl dummySearchable = getBasicSearchable(uuid);
+	private BasicPersonSearchable indexBasicSearchable(String uuid) {
+		BasicPersonSearchable dummySearchable = getBasicSearchable(uuid);
 		elasticSearchRepository.index(dummySearchable);
 
 		validateDocumentInIndex(uuid, INDEX_NAME_FOR_QUERY, true);
@@ -298,8 +298,8 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 		return dummySearchable;
 	}
 
-	private BasicSearchableImpl getBasicSearchable(String uuid) {
-		BasicSearchableImpl dummySearchable = new BasicSearchableImpl();
+	private BasicPersonSearchable getBasicSearchable(String uuid) {
+		BasicPersonSearchable dummySearchable = new BasicPersonSearchable();
 		dummySearchable.setBusinessId(uuid);
 		return dummySearchable;
 	}
