@@ -71,7 +71,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
             LOGGER.debug("Entity is missing mandatory fields");
             return responseGenerator.error(400, entityRestResponse.getMissingFieldsError());
         }
-        return parseEntityToResponse(entity,Views.Owner.class);
+        return parseToResponse(entity,Views.Owner.class);
     }
 
     protected Response edit(String x) {
@@ -111,7 +111,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
             return responseGenerator.error(404, entityRestResponse.getNotFoundError());
         }
         LOGGER.trace("Entity lookup success [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
-        return parseEntityToResponse(entity.getHits().get(0), getSerializationScope());
+        return parseToResponse(entity.getHits().get(0), getSerializationScope());
     }
 
     protected Response editEntity(T entity, Class<?> serializationScope) {
@@ -125,23 +125,23 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
             LOGGER.debug("Entity is missing mandatory fields");
             return responseGenerator.error(400, entityRestResponse.getMissingFieldsError());
         }
-        return parseEntityToResponse(entity, serializationScope);
+        return parseToResponse(entity, serializationScope);
     }
 
     /**
      * Parsed the entity to a JSON response
      *
-     * @param entity the entity to parse
+     * @param object the object to parse
      * @param serializationScope the jackson serialization scope
      *
      * @return the response to be delivered to the client
      */
-    protected Response parseEntityToResponse(T entity, Class<?> serializationScope) {
+    protected Response parseToResponse(Object object, Class<?> serializationScope) {
         try {
-            String result = JsonUtil.toJson(entity, serializationScope);
+            String result = JsonUtil.toJson(object, serializationScope);
             return responseGenerator.success(JsonUtil.fromJson(result));
         } catch (InternalJsonException ex) {
-            LOGGER.error("Unable to parse database entity to JSON {}", ex.getMessage());
+            LOGGER.error("Unable to parse object to JSON {}", ex.getMessage());
             return responseGenerator.error(500, entityRestResponse.getCannotParseError());
         }
     }
