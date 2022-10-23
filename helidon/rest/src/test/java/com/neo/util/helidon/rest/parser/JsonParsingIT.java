@@ -71,7 +71,7 @@ class JsonParsingIT extends AbstractIntegrationTest {
 
         Assertions.assertEquals(400, response.getStatus());
         JsonNode responseBoy = JsonUtil.fromJson(response.readEntity(String.class));
-        String errorBody = responseBoy.get("error").get("message").asText();
+        String errorBody = responseBoy.get("message").asText();
 
         LOGGER.info("Error body: [{}]", errorBody);
         Assertions.assertTrue(errorBody.contains("Invalid json format in the request body: $.boolean"));

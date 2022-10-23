@@ -49,7 +49,7 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
 
         //Assert
         JsonNode responseBody = validateResponse(response,400);
-        Assertions.assertEquals("resources/003", responseBody.get("error").get("code").asText());
+        Assertions.assertEquals("resources/003", responseBody.get("code").asText());
     }
 
     @Test
@@ -63,9 +63,8 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
 
         //Assert
         JsonNode responseBody = validateResponse(response,200);
-        JsonNode responseEntity = responseBody.get("data");
 
-        Assertions.assertEquals(getPrimaryKey(), responseEntity.get("id").asInt());
+        Assertions.assertEquals(getPrimaryKey(), responseBody.get("id").asInt());
     }
 
     @Test
@@ -80,9 +79,7 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
         //Assert
         JsonNode responseBody = validateResponse(response,200);
 
-        JsonNode responseEntity = responseBody.get("data");
-
-        Assertions.assertEquals(editedJSONEntity().get("id").asInt(), responseEntity.get("id").asInt());
+        Assertions.assertEquals(editedJSONEntity().get("id").asInt(), responseBody.get("id").asInt());
     }
 
     @Test
@@ -109,7 +106,7 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
 
         //Assert
         JsonNode responseBody = validateResponse(response,400);
-        Assertions.assertEquals("resources/002", responseBody.get("error").get("code").asText());
+        Assertions.assertEquals("resources/002", responseBody.get("code").asText());
     }
 
     @Test

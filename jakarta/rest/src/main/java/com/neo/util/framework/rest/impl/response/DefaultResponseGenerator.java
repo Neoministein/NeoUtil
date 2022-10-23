@@ -3,62 +3,33 @@ package com.neo.util.framework.rest.impl.response;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 
 @ApplicationScoped
 public class DefaultResponseGenerator implements ResponseGenerator {
 
-    @Inject
-    protected RequestDetails requestDetails;
-
-    protected ObjectNode defaultResponse(int code) {
-        ObjectNode responseMessage = JsonUtil.emptyObjectNode();
-        responseMessage.put("status", code);
-        responseMessage.put("apiVersion", "1.0");
-        responseMessage.put("context", requestDetails.getRequestContext().toString());
-        return responseMessage;
-    }
-
     @Override
     public Response success() {
-        return Response.ok().entity(defaultResponse(200).toString()).build();
+        return Response.ok().build();
     }
 
     @Override
     public Response success(JsonNode data) {
-        ObjectNode responseMessage = defaultResponse(200);
-        responseMessage.set("data", data);
-
-        return Response.ok().entity(responseMessage.toString()).build();
-    }
-
-    @Override
-    public Response partialSuccess(int code, JsonNode data, ObjectNode error) {
-        ObjectNode response = defaultResponse(code);
-        response.set("data", data);
-        response.set("error", error);
-        return Response.ok().entity(response).build();
+        return Response.ok().entity(data.toString()).build();
     }
 
     @Override
     public Response error(int code, String errorCode, String message) {
-        ObjectNode response = defaultResponse(code);
-        response.set("error", errorObject(errorCode, message));
-
-        return Response.status(code).entity(response.toString()).build();
+        return Response.status(code).entity(errorObject(errorCode, message).toString()).build();
     }
 
     @Override
     public Response error(int code, ObjectNode error) {
-        ObjectNode response = defaultResponse(code);
-        response.set("error", error);
 
-        return Response.status(code).entity(response.toString()).build();
+        return Response.status(code).entity(error.toString()).build();
     }
 
     @Override

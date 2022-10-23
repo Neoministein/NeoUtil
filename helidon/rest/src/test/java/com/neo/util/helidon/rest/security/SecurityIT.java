@@ -41,7 +41,7 @@ class SecurityIT extends AbstractIntegrationTest {
                 .method("GET");
         //Assert
         Assertions.assertEquals(401, response.getStatus());
-        JsonNode responseBody = JsonUtil.fromJson(response.readEntity(String.class)).get("error");
+        JsonNode responseBody = JsonUtil.fromJson(response.readEntity(String.class));
         Assertions.assertEquals("auth/000", responseBody.get("code").asText());
         Assertions.assertEquals("Unauthorized", responseBody.get("message").asText());
     }
@@ -67,7 +67,7 @@ class SecurityIT extends AbstractIntegrationTest {
                 .method("GET");
         //Assert
         Assertions.assertEquals(403, response.getStatus());
-        JsonNode responseBody = JsonUtil.fromJson(response.readEntity(String.class)).get("error");
+        JsonNode responseBody = JsonUtil.fromJson(response.readEntity(String.class));
         Assertions.assertEquals("auth/001", responseBody.get("code").asText());
         Assertions.assertEquals("Forbidden", responseBody.get("message").asText());
     }

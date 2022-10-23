@@ -98,8 +98,7 @@ class ExceptionHandlingIT extends AbstractIntegrationTest {
     }
 
     protected void validateErrorObject(JsonNode responseObject, String errorCode, String errorMessage) {
-        JsonNode error = responseObject.get("error");
-        Assertions.assertEquals(errorCode, error.get("code").asText());
-        Assertions.assertEquals(errorMessage, error.get("message").asText());
+        Assertions.assertEquals(errorCode, responseObject.get("code").asText());
+        Assertions.assertEquals(errorMessage, responseObject.get("message").asText());
     }
 }

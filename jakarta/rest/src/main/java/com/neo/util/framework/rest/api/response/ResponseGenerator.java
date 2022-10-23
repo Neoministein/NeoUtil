@@ -14,8 +14,6 @@ public interface ResponseGenerator {
 
     Response success(JsonNode data);
 
-    Response partialSuccess(int code, JsonNode data, ObjectNode error);
-
     Response error(int code, String errorCode, String message);
 
     Response error(int code, ObjectNode error);
