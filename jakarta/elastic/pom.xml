@@ -90,6 +90,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
                 <configuration>
                     <!-- Need to use System class loader, else will hit into jar hell issue caused by maven sure fire plugin -->
                     <useSystemClassLoader>true</useSystemClassLoader>
