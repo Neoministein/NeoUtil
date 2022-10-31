@@ -23,7 +23,8 @@ public class CommonExceptionMapper implements ExceptionMapper<CommonRuntimeExcep
 
     @Override
     public Response toResponse(CommonRuntimeException ex) {
-        LOGGER.error("A exception occurred during a rest call", ex);
+        LOGGER.error("A CommonRuntimeException occurred during a rest call with id [{}] and message  [{}]",
+                ex.getExceptionId(), ex.getMessage());
         if (ex.getInternal()) {
             return responseGenerator.error(500, RuntimeExceptionMapper.EX_INTERNAL_RUNTIME_EXCEPTION);
         }
