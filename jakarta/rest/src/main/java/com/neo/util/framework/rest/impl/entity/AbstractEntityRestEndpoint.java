@@ -1,6 +1,10 @@
 package com.neo.util.framework.rest.impl.entity;
 
 import com.neo.util.common.api.json.Views;
+import com.neo.util.common.impl.exception.ExceptionUtils;
+import com.neo.util.common.impl.exception.NoContentFoundException;
+import com.neo.util.common.impl.exception.ValidationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.api.persistence.criteria.ExplicitSearchCriteria;
@@ -8,7 +12,6 @@ import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityRepository;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
-import com.neo.util.common.impl.exception.InternalJsonException;
 import com.neo.util.framework.impl.connection.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import org.slf4j.Logger;
@@ -16,8 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
-import jakarta.transaction.RollbackException;
-import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,15 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEntityRestEndpoint.class);
 
+    public static final ExceptionDetails EX_ENTITY_NOT_FOUND = new ExceptionDetails(
+            "resource/not-found", "Cannot find resource {0}", false
+    );
+    public static final ExceptionDetails EX_ENTITY_NONE_UNIQUE = new ExceptionDetails(
+            "resource/none-unique", "", false
+    );
+    public static final ExceptionDetails EX_ENTITY_MISSING_FIELDS = new ExceptionDetails(
+            "resource/already-exists", "", false
+    );
     public static final String ENTITY_PERM = "CRUD_";
 
     public static final String PERM_INTERNAL = "internal";
@@ -43,9 +53,6 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
 
     @Inject
     protected ResponseGenerator responseGenerator;
-
-    @Inject
-    protected EntityRestResponse entityRestResponse;
 
     protected abstract Object convertToPrimaryKey(String primaryKey);
 
@@ -60,16 +67,22 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
     }
 
     protected Response create(String x) {
-        T entity = JsonUtil.fromJson(x, getEntityClass(), getSerializationScope());
+        T entity;
+        try {
+            entity = JsonUtil.fromJson(x, getEntityClass(), getSerializationScope());
+        } catch (ValidationException ex) {
+            throw ExceptionUtils.asExternal(ex);
+        }
+
         try {
             entityRepository.create(entity);
             LOGGER.info("Created new [{},{}]",getEntityClass().getSimpleName(), entity.getPrimaryKey());
-        } catch (RollbackException ex) {
-            LOGGER.debug("Provided value isn't unique");
-            return responseGenerator.error(400, entityRestResponse.getNotUniqueError());
         } catch (PersistenceException ex) {
             LOGGER.debug("Entity is missing mandatory fields");
-            return responseGenerator.error(400, entityRestResponse.getMissingFieldsError());
+            return responseGenerator.error(400, EX_ENTITY_MISSING_FIELDS);
+        } catch (Exception ex) {
+            LOGGER.debug("Provided value isn't unique");
+            return responseGenerator.error(400, EX_ENTITY_NONE_UNIQUE);
         }
         return parseToResponse(entity,Views.Owner.class);
     }
@@ -83,15 +96,15 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
 
         if (entity.isEmpty()) {
             LOGGER.debug("Entity not found [{},{}]", getEntityClass().getSimpleName() ,primaryKey);
-            return responseGenerator.error(404, entityRestResponse.getNotFoundError());
+            return responseGenerator.error(404, EX_ENTITY_NOT_FOUND, primaryKey);
         }
 
         try {
             entityRepository.remove(entity.get());
             LOGGER.info("Deleted entity [{},{}]",getEntityClass().getSimpleName(), entity.get().getPrimaryKey());
             return responseGenerator.success();
-        } catch (RollbackException ex) {
-            return responseGenerator.error(400, entityRestResponse.getMissingFieldsError());
+        } catch (PersistenceException ex) {
+            return responseGenerator.error(400, EX_ENTITY_MISSING_FIELDS);
         }
     }
 
@@ -108,7 +121,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
         EntityResult<T> entity = entityRepository.find(entityParameters);
         if (entity.getHitSize() == 0) {
             LOGGER.debug("Entity not found [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
-            return responseGenerator.error(404, entityRestResponse.getNotFoundError());
+            return responseGenerator.error(404, EX_ENTITY_NOT_FOUND, value);
         }
         LOGGER.trace("Entity lookup success [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
         return parseToResponse(entity.getHits().get(0), getSerializationScope());
@@ -118,12 +131,12 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
         try {
             entityRepository.edit(entity);
             LOGGER.info("Created new [{},{}]",getEntityClass().getSimpleName(), entity.getPrimaryKey());
-        } catch (RollbackException ex) {
-            LOGGER.debug("Provided value isn't unique");
-            return responseGenerator.error(400, entityRestResponse.getNotUniqueError());
         } catch (PersistenceException ex) {
             LOGGER.debug("Entity is missing mandatory fields");
-            return responseGenerator.error(400, entityRestResponse.getMissingFieldsError());
+            return responseGenerator.error(400, EX_ENTITY_MISSING_FIELDS);
+        } catch (Exception ex) {
+            LOGGER.debug("Provided value isn't unique");
+            return responseGenerator.error(400, EX_ENTITY_NONE_UNIQUE);
         }
         return parseToResponse(entity, serializationScope);
     }
@@ -137,19 +150,15 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
      * @return the response to be delivered to the client
      */
     protected Response parseToResponse(Object object, Class<?> serializationScope) {
-        try {
-            String result = JsonUtil.toJson(object, serializationScope);
-            return responseGenerator.success(JsonUtil.fromJson(result));
-        } catch (InternalJsonException ex) {
-            LOGGER.error("Unable to parse object to JSON {}", ex.getMessage());
-            return responseGenerator.error(500, entityRestResponse.getCannotParseError());
-        }
+        return responseGenerator.success(JsonUtil.fromPojo(object, serializationScope));
     }
 
     protected T parseJSONIntoExistingEntity(String x, Class<?> serializationScope) {
-        Optional<T> entity = entityRepository.find(JsonUtil.fromJson(x, getEntityClass()).getPrimaryKey(), getEntityClass());
+        Object primaryKey =  JsonUtil.fromJson(x, getEntityClass(), serializationScope).getPrimaryKey();
+
+        Optional<T> entity = entityRepository.find(primaryKey, getEntityClass());
         if (entity.isEmpty()) {
-            throw new ClientErrorException(404);
+            throw new NoContentFoundException(EX_ENTITY_NOT_FOUND, primaryKey);
         }
         return JsonUtil.updateExistingEntity(entity.get(), x, getEntityClass(), serializationScope);
     }
@@ -171,9 +180,5 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
 
     protected HttpRequestDetails getRequestDetails() {
         return (HttpRequestDetails) requestDetails;
-    }
-
-    public void setEntityRepository(EntityRepository entityRepository) {
-        this.entityRepository = entityRepository;
     }
 }

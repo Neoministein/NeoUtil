@@ -1,6 +1,5 @@
 package com.neo.util.framework.helidon.impl.config;
 
-import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.config.ConfigValue;
@@ -20,6 +19,6 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public void save(ConfigValue<?> config) {
-        throw new InternalLogicException("Saving config is not supported in the Helidon implementation");
+        throw new IllegalArgumentException("Saving config is not supported in the Helidon implementation");
     }
 }

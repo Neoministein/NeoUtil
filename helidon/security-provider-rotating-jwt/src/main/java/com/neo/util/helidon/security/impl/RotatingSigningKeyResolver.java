@@ -1,14 +1,14 @@
 package com.neo.util.helidon.security.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.neo.util.common.impl.exception.ValidationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.helidon.security.impl.key.JWTKey;
 import com.neo.util.helidon.security.impl.key.JWTPublicKey;
 import com.neo.util.common.impl.KeyUtils;
-import com.neo.util.common.impl.http.LazyHttpExecutor;
-import com.neo.util.common.impl.http.verify.DefaultSuccessResponse;
+import com.neo.util.common.impl.retry.RetryHttpExecutor;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.common.impl.exception.InternalJsonException;
-import com.neo.util.common.impl.exception.InternalLogicException;
+import com.neo.util.common.impl.exception.CommonRuntimeException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.MalformedJwtException;
@@ -30,19 +30,26 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
 
     private static final Logger LOGGER =  LoggerFactory.getLogger(RotatingSigningKeyResolver.class);
 
+    protected static final ExceptionDetails EX_CANNOT_REACH_PUBLIC_KEY = new ExceptionDetails(
+            "auth/jwt/cannot-reach-public-key-endpoint", "Cannot reach public key endpoint", true
+    );
+    protected static final ExceptionDetails EX_INVALID_PUBLIC_KEY = new ExceptionDetails(
+            "auth/jwt/invalid-public-key","Cannot parse json result from PublicKey Endpoint", true
+    );
+
     protected static final int TEN_SECONDS = 10 * 1000;
     protected long lastUpdate = 0L;
 
     protected final HttpGet publicKeyEndpoint;
     protected Map<String, JWTKey> keyMap = new HashMap<>();
-    protected LazyHttpExecutor lazyHttpExecutor;
+    protected RetryHttpExecutor lazyHttpExecutor;
 
     public RotatingSigningKeyResolver(String publicKeyEndpoint, boolean isSecurityService) {
-        this(publicKeyEndpoint, isSecurityService, new LazyHttpExecutor());
+        this(publicKeyEndpoint, isSecurityService, new RetryHttpExecutor());
     }
 
 
-    protected RotatingSigningKeyResolver(String publicKeyEndpoint, boolean isSecurityService, LazyHttpExecutor lazyHttpExecutor) {
+    protected RotatingSigningKeyResolver(String publicKeyEndpoint, boolean isSecurityService, RetryHttpExecutor lazyHttpExecutor) {
         this.lazyHttpExecutor = lazyHttpExecutor;
         this.publicKeyEndpoint = new HttpGet(publicKeyEndpoint);
         if (!isSecurityService) {
@@ -89,7 +96,7 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
         boolean hasChanged;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             LOGGER.trace("Calling public key endpoint [{}]", publicKeyEndpoint.getURI());
-            String response = lazyHttpExecutor.execute(httpClient, publicKeyEndpoint, new DefaultSuccessResponse(), 5);
+            String response = lazyHttpExecutor.execute(httpClient, publicKeyEndpoint, 5);
 
             Map<String, JWTKey> newMap = parseEndpointResult(response);
             lastUpdate = System.currentTimeMillis();
@@ -105,8 +112,8 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
             }
 
             return hasChanged;
-        } catch (IOException | InternalLogicException e) {
-            throw new InternalLogicException("Cannot reach PublicKey Endpoint");
+        } catch (IOException | CommonRuntimeException e) {
+            throw new CommonRuntimeException(EX_CANNOT_REACH_PUBLIC_KEY);
         }
     }
 
@@ -131,9 +138,9 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
             }
             LOGGER.trace("Received public kid {}", newMap.keySet());
             return newMap;
-        } catch (InternalJsonException ex) {
+        } catch (ValidationException ex) {
             LOGGER.error("Cannot parse json result from PublicKey Endpoint");
-            throw new InternalLogicException("Cannot parse json result from PublicKey Endpoint");
+            throw new CommonRuntimeException(EX_INVALID_PUBLIC_KEY);
         }
     }
 }

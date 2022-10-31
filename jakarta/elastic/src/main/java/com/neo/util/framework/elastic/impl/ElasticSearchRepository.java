@@ -14,7 +14,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.enumeration.Synchronization;
-import com.neo.util.common.impl.exception.InternalLogicException;
+import com.neo.util.common.impl.exception.CommonRuntimeException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.connection.RequestDetails;
@@ -86,6 +87,9 @@ public class ElasticSearchRepository implements SearchRepository {
     public static final String BULK_ACTION_CONFIG = CONFIG_PREFIX + ".BulkActions";
     public static final String CONCURRENT_REQUEST_CONFIG = CONFIG_PREFIX + ".ConcurrentRequests";
     public static final String BULK_SIZE = CONFIG_PREFIX + ".BulkSize";
+
+    protected static final ExceptionDetails EX_SYNCHRONOUS_INDEXING = new ExceptionDetails(
+            "elk/synchronous-indexing", "IOException while synchronous indexing", true);
 
     @Inject
     protected ConfigService configService;
@@ -188,7 +192,7 @@ public class ElasticSearchRepository implements SearchRepository {
             try {
                 getClient().index(indexRequest, RequestOptions.DEFAULT);
             } catch (IOException ex) {
-                throw new InternalLogicException("IOException while synchronous indexing", ex);
+                throw new CommonRuntimeException(ex, EX_SYNCHRONOUS_INDEXING);
             } catch (IllegalStateException ex) {
                 reconnectClientIfNeeded(ex);
                 throw ex;
@@ -211,7 +215,7 @@ public class ElasticSearchRepository implements SearchRepository {
             try {
                 getClient().bulk(bulkRequest, RequestOptions.DEFAULT);
             } catch (IOException ex) {
-                throw new InternalLogicException("IOException while synchronous indexing bulk", ex);
+                throw new CommonRuntimeException(ex, EX_SYNCHRONOUS_INDEXING, ex);
             } catch (IllegalStateException ex) {
                 reconnectClientIfNeeded(ex);
                 throw ex;
@@ -227,35 +231,35 @@ public class ElasticSearchRepository implements SearchRepository {
 
     @Override
     public void update(Searchable searchable, boolean partial, IndexParameter indexParameter) {
-        throw new InternalLogicException("Not implemented yet");
+        throw new IllegalStateException("Not implemented yet");
     }
 
     @Override
     public void update(List<? extends Searchable> searchableList, boolean partial) {
-        throw new InternalLogicException("Not implemented yet");
+        throw new IllegalStateException("Not implemented yet");
     }
 
     @Override
     public void delete(Searchable searchable) {
-        throw new InternalLogicException("Not implemented yet");
+        throw new IllegalStateException("Not implemented yet");
     }
 
     @Override
     public void delete(List<? extends Searchable> searchableList) {
-        throw new InternalLogicException("Not implemented yet");
+        throw new IllegalStateException("Not implemented yet");
     }
 
     @Override
     public void deleteAll(Class<? extends Searchable> searchableClazz) {
-        throw new InternalLogicException("Not implemented yet");
+        throw new IllegalStateException("Not implemented yet");
     }
 
     @Override
     public void process(QueueableSearchable queueableSearchable) {
         switch (queueableSearchable.getRequestType()) {
         case INDEX -> getBulkProcessor().add(generateIndexRequest(queueableSearchable));
-        case UPDATE, DELETE -> throw new InternalLogicException("Not implemented yet");
-        default -> throw new InternalLogicException("Not supported");
+        case UPDATE, DELETE -> throw new IllegalStateException("Not implemented yet");
+        default -> throw new IllegalStateException("Not supported");
         }
     }
 
@@ -265,8 +269,8 @@ public class ElasticSearchRepository implements SearchRepository {
         for (QueueableSearchable queueableSearchable : transportSearchableList) {
             switch (queueableSearchable.getRequestType()) {
             case INDEX -> bulkRequest.add(generateIndexRequest(queueableSearchable));
-            case UPDATE, DELETE -> throw new InternalLogicException("Not implemented yet");
-            default -> throw new InternalLogicException("Not supported");
+            case UPDATE, DELETE -> throw new IllegalStateException("Not implemented yet");
+            default -> throw new IllegalStateException("Not supported");
             }
         }
 
@@ -276,12 +280,12 @@ public class ElasticSearchRepository implements SearchRepository {
         } catch (IOException ex) {
             LOGGER.warn("Executed bulk with complete failure, entire bulk will be retried, message: [{}]",
                     ex.getMessage());
-            throw new InternalLogicException("Indexing-IOException unable to process bulk Untransportable");
+            throw new CommonRuntimeException(EX_SYNCHRONOUS_INDEXING);
         } catch (IllegalStateException ex) {
             LOGGER.warn("Executed bulk with complete failure, entire bulk will be retried, message: [{}]",
                     ex.getMessage());
             reconnectClientIfNeeded(ex);
-            throw new InternalLogicException("Indexing-IOException unable to process bulk Untransportable");
+            throw new CommonRuntimeException(EX_SYNCHRONOUS_INDEXING);
         }
     }
 
@@ -536,7 +540,7 @@ public class ElasticSearchRepository implements SearchRepository {
             case ContainsSearchCriteria criteria -> buildContainsSearchQuery(criteria);
             case ExistingFieldSearchCriteria criteria -> buildExistingFieldQuery(criteria);
             case CombinedSearchCriteria criteria -> buildCombinedQuery(criteria);
-            default -> throw new InternalLogicException("Criteria not supported " + filter.getClass().getName());
+            default -> throw new IllegalStateException("Criteria not supported " + filter.getClass().getName());
         };
     }
 
@@ -774,7 +778,7 @@ public class ElasticSearchRepository implements SearchRepository {
             objectNode.put(Searchable.TYPE, searchable.getClassName());
             return objectNode;
         } catch (IllegalArgumentException e) {
-            throw new InternalLogicException("Error while parsing searchable to json: " + searchable.getClassName() + ":" + searchable.getBusinessId(), e);
+            throw new IllegalStateException("Error while parsing searchable to json: " + searchable.getClassName() + ":" + searchable.getBusinessId(), e);
         }
     }
 

@@ -2,7 +2,6 @@ package com.neo.util.framework.database.impl;
 
 import com.neo.util.common.impl.StopWatch;
 import com.neo.util.common.impl.enumeration.PersistenceOperation;
-import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
@@ -173,7 +172,7 @@ public class DatabaseRepository implements EntityRepository {
             case ContainsSearchCriteria criteria -> buildContainsSearchQuery(criteria, cb, root);
             case ExistingFieldSearchCriteria criteria ->buildAnyNoneQuery(criteria, cb, root);
             case CombinedSearchCriteria criteria -> buildCombinedQuery(criteria, cb, root);
-            default -> throw new InternalLogicException("Criteria not supported " + filter.getClass().getName());
+            default -> throw new IllegalStateException("Criteria not supported " + filter.getClass().getName());
         };
     }
 

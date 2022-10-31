@@ -1,5 +1,6 @@
 package com.neo.util.framework.api.persistence.entity;
 
+import jakarta.persistence.PersistenceException;
 import jakarta.transaction.RollbackException;
 import java.util.Optional;
 
@@ -12,22 +13,28 @@ public interface EntityRepository {
      * Creates a entry in the table for the given {@link PersistenceEntity}
      *
      * @param entity the entity to be created
+     * @throws RollbackException if unique is violated
+     * @throws PersistenceException if nullable is violated
      */
-    void create(PersistenceEntity entity) throws RollbackException;
+    void create(PersistenceEntity entity);
 
     /**
      * Edits the given entry in the table for the given {@link PersistenceEntity}
      *
      * @param entity the entity to be edited
+     * @throws RollbackException if unique is violated
+     * @throws PersistenceException if nullable is violated
      */
-    void edit(PersistenceEntity entity) throws RollbackException;
+    void edit(PersistenceEntity entity);
 
     /**
      * Removes the entry in the table for the given {@link PersistenceEntity}
      *
      * @param entity the entity to remove
+     * @throws RollbackException if unique is violated
+     * @throws PersistenceException if nullable is violated
      */
-    void remove(PersistenceEntity entity) throws RollbackException;
+    void remove(PersistenceEntity entity);
 
     /**
      * Finds the entry in the table and returns it as an {@link Optional<X>}

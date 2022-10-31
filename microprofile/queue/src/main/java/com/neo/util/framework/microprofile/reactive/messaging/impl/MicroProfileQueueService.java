@@ -1,6 +1,7 @@
 package com.neo.util.framework.microprofile.reactive.messaging.impl;
 
-import com.neo.util.common.impl.exception.InternalConfigurationException;
+import com.neo.util.common.impl.exception.ConfigurationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
@@ -26,6 +27,13 @@ public class MicroProfileQueueService implements QueueService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicroProfileQueueService.class);
 
+    protected static final ExceptionDetails EX_DUPLICATED_QUEUE = new ExceptionDetails(
+            "queue/duplicated-queue-configured","Duplicated queues present \n - {0}\n - {1}",true);
+
+    protected static final ExceptionDetails EX_NON_EXISTENT_QUEUE = new ExceptionDetails(
+            "queue/non-existent-queue", "The QueueProducer {0} does not exist", true
+    );
+
     protected Map<String, QueueProducer> queueProducerMap = new HashMap<>();
 
     /**
@@ -36,11 +44,8 @@ public class MicroProfileQueueService implements QueueService {
     protected void init(Instance<QueueProducer> queueProducerInstances) {
         for (QueueProducer queueProducer: queueProducerInstances) {
             if (queueProducerMap.containsKey(queueProducer.getQueueName())) {
-                LOGGER.error("Found duplicated queue {} {} {}",
-                        queueProducer.getQueueName(),
-                        queueProducer.getClass().getSimpleName(),
-                        queueProducerMap.get(queueProducer.getQueueName()));
-                throw new InternalConfigurationException("Duplicated queue present");
+                throw new ConfigurationException(EX_DUPLICATED_QUEUE,
+                        queueProducer.getClass().getName(), queueProducerMap.get(queueProducer.getQueueName()));
             } else {
                 queueProducerMap.put(queueProducer.getQueueName(), queueProducer);
                 LOGGER.info("Registered queue {}", queueProducer.getQueueName());
@@ -55,7 +60,7 @@ public class MicroProfileQueueService implements QueueService {
 
     @Override
     public void addToQueue(String queueName, QueueMessage message) {
-        queueProducerMap.computeIfAbsent(queueName, s -> { throw new InternalConfigurationException(); })
+        queueProducerMap.computeIfAbsent(queueName, s -> { throw new ConfigurationException(EX_NON_EXISTENT_QUEUE, queueName); })
                 .addToQueue(JsonUtil.toJson(message));
     }
 }

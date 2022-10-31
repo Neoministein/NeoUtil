@@ -1,7 +1,6 @@
 package com.neo.util.framework.database.impl;
 
 import com.neo.util.common.impl.enumeration.PersistenceOperation;
-import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 
 import jakarta.persistence.*;
@@ -34,7 +33,7 @@ public class EntityAuditTrail extends AuditableDataBaseEntity implements Persist
 
     @PreUpdate
     private void preUpdate() {
-        throw new InternalLogicException("Updating an audit entity is not supported");
+        throw new IllegalArgumentException("Updating an audit entity is not supported");
     }
 
     public Long getId() {

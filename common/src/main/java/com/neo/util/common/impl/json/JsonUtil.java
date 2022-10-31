@@ -9,7 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.neo.util.common.impl.exception.InternalJsonException;
+import com.neo.util.common.impl.exception.ValidationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,10 @@ import java.util.*;
 public class JsonUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtil.class);
+
+    public static final ExceptionDetails EX_INTERNAL_JSON_EXCEPTION = new ExceptionDetails(
+            "common/json", "{0}", true
+    );
 
     /**
      * https://stackoverflow.com/questions/3907929/should-i-declare-jacksons-objectmapper-as-a-static-field
@@ -49,7 +54,7 @@ public class JsonUtil {
     }
 
     /**
-     * Create a Json String from a pojo. Exceptions are caught and a new {@link InternalJsonException} is
+     * Create a Json String from a pojo. Exceptions are caught and a new {@link ValidationException} is
      * thrown.
      *
      * @param pojo to object convert
@@ -63,7 +68,7 @@ public class JsonUtil {
             jsonString = MAPPER.writeValueAsString(pojo);
         } catch (JsonProcessingException ex) {
             LOGGER.error("Error while creating json string from pojo:{}, exception:{} ", pojo, ex.getMessage());
-            throw new InternalJsonException(ex.getMessage(), ex);
+            throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
         return jsonString;
     }
@@ -73,12 +78,12 @@ public class JsonUtil {
             return MAPPER.readTree(json);
         } catch (IOException ex) {
             LOGGER.error("Error while parsing JSON node from json string:{}, exception:{} ", json, ex.getMessage());
-            throw new InternalJsonException(ex.getMessage(), ex);
+            throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
     }
 
     /**
-     * Create a Json String from a pojo. Exceptions are caught and a new {@link InternalJsonException} is
+     * Create a Json String from a pojo. Exceptions are caught and a new {@link ValidationException} is
      * thrown.
      *
      * @param pojo to object convert
@@ -91,12 +96,12 @@ public class JsonUtil {
             return MAPPER.writerWithView(serializationScope).writeValueAsString(pojo);
         } catch (JsonProcessingException ex) {
             LOGGER.error("Error while creating json string from pojo:{}, exception:{} ", pojo, ex.getMessage());
-            throw new InternalJsonException(ex.getMessage(), ex);
+            throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
     }
 
     /**
-     * Creates an object based on the provided class and json. Exceptions are caught and a new {@link InternalJsonException} is
+     * Creates an object based on the provided class and json. Exceptions are caught and a new {@link ValidationException} is
      * thrown.
      *
      * @param json the json string
@@ -111,12 +116,12 @@ public class JsonUtil {
         } catch (IOException ex) {
             LOGGER.error("Error while creating pojo from json string:{}, exception:{} ", json, ex.getMessage());
 
-            throw new InternalJsonException(ex.getMessage(), ex);
+            throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
     }
 
     /**
-     * Creates an object based on the provided class and json. Exceptions are caught and a new {@link InternalJsonException} is
+     * Creates an object based on the provided class and json. Exceptions are caught and a new {@link ValidationException} is
      * thrown.
      *
      * @param json the json string
@@ -131,7 +136,7 @@ public class JsonUtil {
             return MAPPER.readerWithView(serializationScope).readValue(json, clazz);
         } catch (IOException ex) {
             LOGGER.error("Error while creating pojo from json string:{}, exception:{} ", json, ex.getMessage());
-            throw new InternalJsonException(ex.getMessage(), ex);
+            throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
     }
 
@@ -150,7 +155,7 @@ public class JsonUtil {
     }
 
     /**
-     * Converts an object to to a {@link ObjectNode}.
+     * Converts an object to a {@link ObjectNode}.
      *
      * @param pojo to object convert
      *
@@ -164,7 +169,21 @@ public class JsonUtil {
     }
 
     /**
-     * Adds the json to the existing entity based on the serialization scope. Exceptions are caught and a new {@link InternalJsonException} is
+     * Converts an object to a {@link JsonNode} based on the serializationScope.
+     *
+     * @param pojo to object convert
+     * @param serializationScope the jackson serialization scope
+     * @return the JsonNode
+     */
+    public static JsonNode fromPojo(Object pojo, Class<?> serializationScope) {
+        if (pojo == null) {
+            return null;
+        }
+        return JsonUtil.fromJson(JsonUtil.toJson(pojo, serializationScope));
+    }
+
+    /**
+     * Adds the json to the existing entity based on the serialization scope. Exceptions are caught and a new {@link ValidationException} is
      * thrown.
      *
      * @param pojo the object to add to
@@ -179,7 +198,7 @@ public class JsonUtil {
             return MAPPER.readerForUpdating(pojo).withView(serializationScope).readValue(json, clazz);
         } catch (IOException ex) {
             LOGGER.error("Error while updating existing pojo from json string:{}, exception:{} ", json, ex.getMessage());
-            throw new InternalJsonException(ex.getMessage(), ex);
+            throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
     }
 

@@ -1,6 +1,5 @@
 package com.neo.util.helidon.security.impl;
 
-import com.neo.util.common.impl.exception.InternalLogicException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -42,7 +41,7 @@ public abstract class AbstractJWTTest {
             publicKey = jsonObject.getString("public");
         } catch ( NullPointerException| IOException | JSONException ex) {
             LOGGER.error("Unable to retrieve private key from resources");
-            throw new InternalLogicException();
+            throw new RuntimeException();
         }
 
     }

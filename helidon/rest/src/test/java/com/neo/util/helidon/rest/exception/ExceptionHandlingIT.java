@@ -2,6 +2,7 @@ package com.neo.util.helidon.rest.exception;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.json.JsonUtil;
+import com.neo.util.framework.rest.impl.exception.RuntimeExceptionMapper;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
 import io.helidon.microprofile.tests.junit5.AddBean;
 import io.helidon.microprofile.tests.junit5.HelidonTest;
@@ -39,13 +40,13 @@ class ExceptionHandlingIT extends AbstractIntegrationTest {
         Assertions.assertEquals(500, response.getStatus());
         validateErrorObject(
                 JsonUtil.fromJson(response.readEntity(String.class)),
-                "unknown",
-                "Internal server error please try again later"
+                RuntimeExceptionMapper.EX_INTERNAL_RUNTIME_EXCEPTION.getExceptionId(),
+                RuntimeExceptionMapper.EX_INTERNAL_RUNTIME_EXCEPTION.getFormat()
         );
     }
 
     @Test
-    void internalLogic() {
+    void internalException() {
         //Arrange
         //Act
         Response response = webTarget.path(ExceptionResource.RESOURCE_LOCATION + ExceptionResource.P_INTERNAL_LOGIC).request().method("GET");
@@ -54,13 +55,13 @@ class ExceptionHandlingIT extends AbstractIntegrationTest {
         Assertions.assertEquals(500, response.getStatus());
         validateErrorObject(
                 JsonUtil.fromJson(response.readEntity(String.class)),
-                "unknown",
-                "Internal server error please try again later"
+                RuntimeExceptionMapper.EX_INTERNAL_RUNTIME_EXCEPTION.getExceptionId(),
+                RuntimeExceptionMapper.EX_INTERNAL_RUNTIME_EXCEPTION.getFormat()
         );
     }
 
     @Test
-    void internalJson() {
+    void externalException() {
         //Arrange
         //Act
         Response response = webTarget.path(ExceptionResource.RESOURCE_LOCATION + ExceptionResource.P_EXTERNAL_JSON).request().method("GET");
@@ -69,8 +70,8 @@ class ExceptionHandlingIT extends AbstractIntegrationTest {
         Assertions.assertEquals(400, response.getStatus());
         validateErrorObject(
                 JsonUtil.fromJson(response.readEntity(String.class)),
-                "json/000",
-                "Invalid json format in the request body: Test Internal Json Exception"
+                    ExceptionResource.EX_EXTERNAL_COMMON_RUNTIME.getExceptionId(),
+                    ExceptionResource.EX_EXTERNAL_COMMON_RUNTIME.getFormat()
         );
     }
 

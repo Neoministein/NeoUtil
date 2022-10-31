@@ -2,12 +2,10 @@ package com.neo.util.common.impl.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.ResourceUtil;
-import com.neo.util.common.impl.exception.InternalJsonException;
+import com.neo.util.common.impl.exception.ValidationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.networknt.schema.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -18,7 +16,12 @@ import java.util.Optional;
  */
 public class JsonSchemaUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsonSchemaUtil.class);
+
+    private static final ExceptionDetails EX_INVALID_JSON_SCHEMA = new ExceptionDetails(
+            "common/json/invalid-schema", "The provided json schema is invalid", true);
+
+    private static final ExceptionDetails EX_INVALID_JSON = new ExceptionDetails(
+            "common/json/invalid-json", "{0}", false);
 
     private JsonSchemaUtil(){}
 
@@ -29,13 +32,13 @@ public class JsonSchemaUtil {
      * @param jsonNode the node to check for validity
      * @param jsonSchema the schema to check against
      *
-     * @throws InternalJsonException is thrown if it isn't valid
+     * @throws ValidationException is thrown if it isn't valid
      */
     public static void isValidOrThrow(JsonNode jsonNode, JsonSchema jsonSchema) {
         try {
             jsonSchema.validate(jsonNode);
         } catch (JsonSchemaException ex) {
-            throw new InternalJsonException(ex.getMessage());
+            throw new ValidationException(EX_INVALID_JSON, ex.getMessage());
         }
     }
 
@@ -67,12 +70,7 @@ public class JsonSchemaUtil {
      * @return the generated JsonSchema
      */
     public static JsonSchema generateSchemaFromResource(String fileLocation) {
-        try {
-            return generateNewSchema(ResourceUtil.getResourceFileAsString(fileLocation), SpecVersion.VersionFlag.V201909);
-        } catch (IOException ex) {
-            LOGGER.error("Unable to retrieve json schema from file {}", ex.getMessage(), ex);
-            throw new InternalJsonException("Unable to create a json schema file could not be read");
-        }
+        return generateNewSchema(ResourceUtil.getResourceFileAsString(fileLocation), SpecVersion.VersionFlag.V201909);
     }
 
     /**
@@ -112,7 +110,7 @@ public class JsonSchemaUtil {
         try {
             return JsonSchemaFactory.getInstance(specVersion).getSchema(schema, config);
         } catch (JsonSchemaException ex) {
-            throw new InternalJsonException("The provided json schema is invalid");
+            throw new ValidationException(EX_INVALID_JSON_SCHEMA);
         }
     }
 

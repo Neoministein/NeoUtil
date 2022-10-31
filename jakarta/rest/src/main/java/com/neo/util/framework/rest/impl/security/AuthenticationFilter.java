@@ -1,9 +1,9 @@
 package com.neo.util.framework.rest.impl.security;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.api.security.CredentialsGenerator;
 import com.neo.util.framework.api.security.RolePrincipal;
+import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.impl.connection.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import com.neo.util.framework.api.security.AuthenticationProvider;
@@ -11,7 +11,6 @@ import com.neo.util.framework.rest.api.security.Secured;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -34,8 +33,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationFilter.class);
 
-    protected ObjectNode unauthorized;
-
     @Inject
     protected AuthenticationProvider authenticationProvider;
 
@@ -47,11 +44,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     @Inject
     protected RequestDetails requestDetails;
-
-    @PostConstruct
-    protected void init() {
-        unauthorized = responseGenerator.errorObject("auth/000", "Unauthorized");
-    }
 
     @Override
     public void filter(ContainerRequestContext containerRequest) {
@@ -75,6 +67,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     protected void abortWithUnauthorized(ContainerRequestContext containerRequest) {
         LOGGER.info("Aborting request with unauthorized");
-        containerRequest.abortWith(responseGenerator.error(401, unauthorized));
+        containerRequest.abortWith(responseGenerator.error(401, FrameworkConstants.EX_UNAUTHORIZED));
     }
 }

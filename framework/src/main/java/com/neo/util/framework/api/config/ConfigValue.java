@@ -1,6 +1,6 @@
 package com.neo.util.framework.api.config;
 
-import com.neo.util.common.impl.exception.InternalConfigurationException;
+import com.neo.util.common.impl.exception.ConfigurationException;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -26,9 +26,9 @@ public interface ConfigValue<T> {
     Optional<T> asOptional();
 
     /**
-     * The value but throws a {@link InternalConfigurationException} if not found
+     * The value but throws a {@link ConfigurationException} if not found
      */
-    T get() throws InternalConfigurationException;
+    T get() throws ConfigurationException;
 
     /**
      * Set the value of the current config

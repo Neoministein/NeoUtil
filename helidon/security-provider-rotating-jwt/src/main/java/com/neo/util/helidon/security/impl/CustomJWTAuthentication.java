@@ -3,10 +3,12 @@ package com.neo.util.helidon.security.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.KeyUtils;
 import com.neo.util.common.impl.ResourceUtil;
+import com.neo.util.common.impl.exception.ConfigurationException;
+import com.neo.util.common.impl.exception.ValidationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.common.impl.StringUtils;
-import com.neo.util.common.impl.exception.InternalJsonException;
-import com.neo.util.common.impl.exception.InternalLogicException;
+import com.neo.util.common.impl.exception.CommonRuntimeException;
 import io.helidon.config.Config;
 import io.helidon.security.*;
 import io.helidon.security.spi.AuthenticationProvider;
@@ -19,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import java.io.*;
 import java.lang.SecurityException;
 import java.lang.annotation.Annotation;
 import java.security.Key;
@@ -28,6 +29,10 @@ import java.util.*;
 public class CustomJWTAuthentication extends SynchronousProvider implements AuthenticationProvider, OutboundSecurityProvider {
 
     private static final Logger LOGGER =  LoggerFactory.getLogger(CustomJWTAuthentication.class);
+
+    private static final ExceptionDetails EX_CANNOT_ACCESS_PRIVATE_KEY = new ExceptionDetails(
+            "auth/jwt/cannot-access-private-key", "Unable to retrieve private key from resources {0}", true
+    );
 
     protected static final String KEY_ENDPOINT = "publicKeyEndpoint";
     protected static final String IS_SECURITY_SERVICE = "isSecurityService";
@@ -125,7 +130,7 @@ public class CustomJWTAuthentication extends SynchronousProvider implements Auth
         } catch (SignatureException| UnsupportedJwtException ex)  {
             LOGGER.warn("Token signature {}", ex.getMessage());
             return AuthenticationResponse.failed("Token signature is invalid");
-        } catch (InternalLogicException ex) {
+        } catch (CommonRuntimeException ex) {
             LOGGER.error("An error has occurred {}", ex.getMessage());
             return AuthenticationResponse.failed("Internal authentication error");
         } catch (Exception ex) {
@@ -197,9 +202,8 @@ public class CustomJWTAuthentication extends SynchronousProvider implements Auth
         try {
             JsonNode node = JsonUtil.fromJson(ResourceUtil.getResourceFileAsString("jwt-keys.json"));
             return KeyUtils.parseRSAPrivateKey(node.get("private").asText());
-        } catch (IOException | InternalJsonException ex) {
-            LOGGER.error("Unable to retrieve private key from resources [{}]", ex.getMessage());
+        } catch (ValidationException | ConfigurationException ex) {
+            throw new ConfigurationException(ex, EX_CANNOT_ACCESS_PRIVATE_KEY, ex.getMessage());
         }
-        throw new InternalLogicException();
     }
 }

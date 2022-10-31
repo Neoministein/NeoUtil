@@ -1,6 +1,5 @@
 package com.neo.util.framework.helidon.impl.config;
 
-import com.neo.util.common.impl.exception.InternalLogicException;
 import com.neo.util.framework.api.config.ConfigValue;
 
 import java.util.Optional;
@@ -39,7 +38,7 @@ public class ConfigValueHelidonWrapper<T> implements ConfigValue<T> {
 
     @Override
     public void set(T value) {
-        throw new InternalLogicException("Saving config is not supported in the Helidon implementation");
+        throw new IllegalArgumentException("Saving config is not supported in the Helidon implementation");
     }
 
     @Override

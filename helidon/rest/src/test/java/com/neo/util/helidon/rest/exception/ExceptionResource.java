@@ -1,8 +1,8 @@
 package com.neo.util.helidon.rest.exception;
 
-import com.neo.util.common.impl.exception.InternalLogicException;
+import com.neo.util.common.impl.exception.CommonRuntimeException;
 
-import com.neo.util.common.impl.exception.ExternalJsonException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -18,9 +18,15 @@ public class ExceptionResource {
 
     public static final String P_SUCCESS = "/success";
     public static final String P_RUNTIME = "/runtime";
-    public static final String P_INTERNAL_LOGIC = "/internalLogic";
-    public static final String P_EXTERNAL_JSON = "/externalJsonInput";
+    public static final String P_INTERNAL_LOGIC = "/internalException";
+    public static final String P_EXTERNAL_JSON = "/externalException";
     public static final String P_CLIENT_ERROR = "/clientError";
+
+    public static final ExceptionDetails EX_INTERNAL_COMMON_RUNTIME = new ExceptionDetails(
+            "test/internal-common-runtime", "CommonRuntimeException", true);
+
+    public static final ExceptionDetails EX_EXTERNAL_COMMON_RUNTIME = new ExceptionDetails(
+            "test/external-common-runtime", "CommonRuntimeException", false);
 
     @GET
     @Path(P_SUCCESS)
@@ -36,14 +42,14 @@ public class ExceptionResource {
 
     @GET
     @Path(P_INTERNAL_LOGIC)
-    public Response internalLogic() {
-        throw new InternalLogicException("Test Internal Logic Exception");
+    public Response internalException() {
+        throw new CommonRuntimeException(EX_INTERNAL_COMMON_RUNTIME);
     }
 
     @GET
     @Path(P_EXTERNAL_JSON)
-    public Response externalJsonInput() {
-        throw new ExternalJsonException("Test Internal Json Exception");
+    public Response externalException() {
+        throw new CommonRuntimeException(EX_EXTERNAL_COMMON_RUNTIME);
     }
 
     @GET

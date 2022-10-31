@@ -1,9 +1,8 @@
 package com.neo.util.helidon.security.impl;
 
-import com.neo.util.common.api.http.verify.ResponseFormatVerification;
 import com.neo.util.helidon.security.impl.key.JWTKey;
 import com.neo.util.helidon.security.impl.key.JWTPublicKey;
-import com.neo.util.common.impl.http.LazyHttpExecutor;
+import com.neo.util.common.impl.retry.RetryHttpExecutor;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.MalformedJwtException;
@@ -26,11 +25,11 @@ class RotatingSigningKeyResolverTest extends AbstractJWTTest {
 
     RotatingSigningKeyResolver subject;
 
-    LazyHttpExecutor lazyHttpExecutor;
+    RetryHttpExecutor lazyHttpExecutor;
 
     @BeforeEach
     void setupExecutor() {
-        lazyHttpExecutor = Mockito.mock(LazyHttpExecutor.class);
+        lazyHttpExecutor = Mockito.mock(RetryHttpExecutor.class);
     }
 
     void setupSubject(boolean isSecurityService) {
@@ -75,8 +74,7 @@ class RotatingSigningKeyResolverTest extends AbstractJWTTest {
     @Test
     void resolveNoNewSigningKeyTest() {
         //Arrange
-        Mockito.doReturn(defaultEndpointResponse("0")).when(lazyHttpExecutor).execute(Mockito.any(HttpClient.class),Mockito.any(HttpUriRequest.class),Mockito.any(
-                ResponseFormatVerification.class),Mockito.anyInt());
+        Mockito.doReturn(defaultEndpointResponse("0")).when(lazyHttpExecutor).execute(Mockito.any(HttpClient.class),Mockito.any(HttpUriRequest.class),Mockito.anyInt());
 
         setupSubject(false);
         JwsHeader jwsHeader = Mockito.mock(JwsHeader.class);
@@ -100,11 +98,10 @@ class RotatingSigningKeyResolverTest extends AbstractJWTTest {
 
         Mockito.doReturn("1").when(jwsHeader).getKeyId();
 
-        lazyHttpExecutor = Mockito.mock(LazyHttpExecutor.class);
+        lazyHttpExecutor = Mockito.mock(RetryHttpExecutor.class);
         subject.lazyHttpExecutor = lazyHttpExecutor;
 
-        Mockito.doReturn(defaultEndpointResponse("1")).when(lazyHttpExecutor).execute(Mockito.any(HttpClient.class),Mockito.any(HttpUriRequest.class),Mockito.any(
-                ResponseFormatVerification.class),Mockito.anyInt());
+        Mockito.doReturn(defaultEndpointResponse("1")).when(lazyHttpExecutor).execute(Mockito.any(HttpClient.class),Mockito.any(HttpUriRequest.class),Mockito.anyInt());
         //Act
         Key key = subject.resolveSigningKey(jwsHeader, (Claims) null);
 

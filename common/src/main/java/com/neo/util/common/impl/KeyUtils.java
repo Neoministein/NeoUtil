@@ -1,6 +1,10 @@
 package com.neo.util.common.impl;
 
-import com.neo.util.common.impl.exception.InternalLogicException;
+import com.neo.util.common.impl.exception.CommonRuntimeException;
+import com.neo.util.common.impl.exception.ValidationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -13,6 +17,15 @@ import java.util.Base64;
 
 public class KeyUtils {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeyUtils.class);
+
+    private static final ExceptionDetails EX_RSA_KEY_PARSING = new ExceptionDetails(
+            "common/rsa", "Invalid RSA {0} key.",true
+    );
+
+    private static final String PUBLIC_KEY = "public";
+    private static final String PRIVATE_KEY = "private";
+
     private KeyUtils() {}
 
     /**
@@ -21,7 +34,7 @@ public class KeyUtils {
      * @param base64Key the base64 encoded key
      * @return a public key instance
      *
-     * @throws InternalLogicException if the key cannot be parsed
+     * @throws CommonRuntimeException if the key cannot be parsed
      */
     public static PublicKey parseRSAPublicKey(String base64Key) {
         try {
@@ -29,11 +42,14 @@ public class KeyUtils {
             KeyFactory kf = KeyFactory.getInstance("RSA");
             return kf.generatePublic(spec);
         } catch (NoSuchAlgorithmException ex) {
-            throw new InternalLogicException("Invalid public key parsing key format");
+            LOGGER.error("Invalid public key parsing format");
+            throw new ValidationException(EX_RSA_KEY_PARSING, PUBLIC_KEY);
         } catch (InvalidKeySpecException ex) {
-            throw new InternalLogicException("The public key cannot be parsed to a key");
+            LOGGER.error("RSA public key cannot be parsed");
+            throw new ValidationException(EX_RSA_KEY_PARSING, PUBLIC_KEY);
         } catch (IllegalArgumentException ex) {
-            throw new InternalLogicException("The public key is not Base64 encoded");
+            LOGGER.error("RSA public key is not Base64 encoded");
+            throw new ValidationException(EX_RSA_KEY_PARSING, PUBLIC_KEY);
         }
     }
 
@@ -49,11 +65,14 @@ public class KeyUtils {
             KeyFactory kf = KeyFactory.getInstance("RSA");
             return kf.generatePrivate(spec);
         } catch (NoSuchAlgorithmException ex) {
-            throw new InternalLogicException("Invalid private key parsing key format");
+            LOGGER.error("Invalid private key parsing format");
+            throw new ValidationException(EX_RSA_KEY_PARSING, PRIVATE_KEY);
         } catch (InvalidKeySpecException ex) {
-            throw new InternalLogicException("The private key cannot be parsed to a key");
+            LOGGER.error("RSA private key cannot be parsed");
+            throw new ValidationException(EX_RSA_KEY_PARSING, PRIVATE_KEY);
         } catch (IllegalArgumentException ex) {
-            throw new InternalLogicException("The private key is not Base64 encoded");
+            LOGGER.error("RSA private key is not Base64 encoded");
+            throw new ValidationException(EX_RSA_KEY_PARSING, PRIVATE_KEY);
         }
     }
 }

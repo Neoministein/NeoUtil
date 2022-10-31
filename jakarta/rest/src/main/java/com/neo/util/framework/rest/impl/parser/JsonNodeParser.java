@@ -2,9 +2,10 @@ package com.neo.util.framework.rest.impl.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.StringUtils;
-import com.neo.util.common.impl.exception.InternalConfigurationException;
-import com.neo.util.common.impl.exception.InternalJsonException;
-import com.neo.util.common.impl.exception.ExternalJsonException;
+import com.neo.util.common.impl.exception.ConfigurationException;
+import com.neo.util.common.impl.exception.ExceptionUtils;
+import com.neo.util.common.impl.exception.ValidationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.impl.json.JsonSchemaLoader;
@@ -37,6 +38,10 @@ import java.util.Optional;
 @Consumes({MediaType.APPLICATION_JSON, "text/json"})
 public class JsonNodeParser implements MessageBodyReader<JsonNode> {
 
+    protected static final ExceptionDetails EX_UNKOWN_JSON_SCHEMA = new ExceptionDetails(
+            "framework/json/unknown-schema", "Invalid json schema to check against {0}.", true
+    );
+
     protected final Map<String, JsonSchema> schemaMap;
 
     @Inject
@@ -60,8 +65,8 @@ public class JsonNodeParser implements MessageBodyReader<JsonNode> {
             JsonNode input = JsonUtil.fromJson(StringUtils.toString(inputStream, StandardCharsets.UTF_8));
             checkForSchema(input);
             return input;
-        } catch (InternalJsonException ex) {
-            throw new ExternalJsonException(ex);
+        } catch (ValidationException ex) {
+            throw ExceptionUtils.asExternal(ex);
         }
     }
 
@@ -74,6 +79,6 @@ public class JsonNodeParser implements MessageBodyReader<JsonNode> {
 
     protected JsonSchema retrieveSchemaFromString(String schemaLocation) {
         return Optional.ofNullable(schemaMap.get(schemaLocation))
-                .orElseThrow(() -> new InternalConfigurationException("Invalid json schema to check against [" + schemaLocation + "]"));
+                .orElseThrow(() -> new ConfigurationException(EX_UNKOWN_JSON_SCHEMA, schemaLocation));
     }
 }

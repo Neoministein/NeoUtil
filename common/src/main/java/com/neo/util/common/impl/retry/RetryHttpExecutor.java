@@ -1,9 +1,6 @@
-package com.neo.util.common.impl.http;
+package com.neo.util.common.impl.retry;
 
-import com.neo.util.common.api.action.Action;
-import com.neo.util.common.api.http.verify.ResponseFormatVerification;
-import com.neo.util.common.impl.lazy.LazyExecutor;
-import com.neo.util.common.impl.exception.InternalLogicException;
+import com.neo.util.common.impl.exception.CommonRuntimeException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -12,19 +9,20 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 /**
  * This utility class handles sending and retrying http calls through a apache http client.
  */
-public class LazyHttpExecutor {
+public class RetryHttpExecutor {
 
-    protected final LazyExecutor lazyExecutor;
+    protected final RetryExecutor lazyExecutor;
 
-    public LazyHttpExecutor() {
-        this(new LazyExecutor());
+    public RetryHttpExecutor() {
+        this(new RetryExecutor());
     }
 
-    protected LazyHttpExecutor(LazyExecutor lazyAction) {
+    protected RetryHttpExecutor(RetryExecutor lazyAction) {
         this.lazyExecutor = lazyAction;
     }
 
@@ -33,32 +31,26 @@ public class LazyHttpExecutor {
      *
      * @param httpClient the http client which send the request
      * @param httpUriRequest the request to send
-     * @param formatVerifier the formatter to check the response against
      * @param retries the amount of retries available
      *
-     * @throws InternalLogicException if it fails and no more retries are available
+     * @throws CommonRuntimeException if it fails and no more retries are available
      *
      * @return the response message
      */
-    public String execute(HttpClient httpClient, HttpUriRequest httpUriRequest, ResponseFormatVerification formatVerifier, int retries) {
-        Action<String> action = () -> {
+    public String execute(HttpClient httpClient, HttpUriRequest httpUriRequest, int retries) {
+        Supplier<String> action = () -> {
             try {
                 HttpResponse httpResponse = httpClient.execute(httpUriRequest);
                 if (httpResponse.getStatusLine().getStatusCode() != 200) {
-                    throw new InternalLogicException("Http call failed "
+                    throw new RuntimeException("Http call failed "
                             + "code " + httpResponse.getStatusLine().getStatusCode()
                             + "message " + httpResponse.getStatusLine().getReasonPhrase());
                 }
                 HttpEntity responseEntity = httpResponse.getEntity();
 
-                String message = EntityUtils.toString(responseEntity);
-
-                if (!formatVerifier.verify(message)) {
-                    throw new InternalLogicException("The http message does not meet the required format");
-                }
-                return message;
+                return EntityUtils.toString(responseEntity);
             } catch (IOException | ParseException ex) {
-                throw new InternalLogicException("Error while during lazy http call reason " + ex.getMessage());
+                throw new RuntimeException("Error while during lazy http call reason " + ex.getMessage());
             }
         };
 

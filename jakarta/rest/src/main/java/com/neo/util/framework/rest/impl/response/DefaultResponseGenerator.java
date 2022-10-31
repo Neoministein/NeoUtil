@@ -2,6 +2,8 @@ package com.neo.util.framework.rest.impl.response;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.neo.util.common.impl.exception.CommonRuntimeException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 
@@ -22,22 +24,25 @@ public class DefaultResponseGenerator implements ResponseGenerator {
     }
 
     @Override
+    public Response buildResponse(int code, JsonNode data) {
+        return Response.status(code).entity(data).build();
+    }
+
+    @Override
     public Response error(int code, String errorCode, String message) {
         return Response.status(code).entity(errorObject(errorCode, message).toString()).build();
     }
 
     @Override
-    public Response error(int code, ObjectNode error) {
-
-        return Response.status(code).entity(error.toString()).build();
+    public Response error(int code, CommonRuntimeException exceptionDetails) {
+        return Response.status(code).entity(errorObject(exceptionDetails.getExceptionId(), exceptionDetails.getMessage()).toString()).build();
     }
 
     @Override
-    public ObjectNode errorObject(String errorCode, Exception ex) {
-        return errorObject(errorCode, ex.getMessage());
+    public Response error(int code, ExceptionDetails exceptionDetails, Object... arguments) {
+        return error(code, new CommonRuntimeException(exceptionDetails, arguments));
     }
 
-    @Override
     public ObjectNode errorObject(String errorCode, String message) {
         ObjectNode errorObject = JsonUtil.emptyObjectNode();
         errorObject.put("code", errorCode);

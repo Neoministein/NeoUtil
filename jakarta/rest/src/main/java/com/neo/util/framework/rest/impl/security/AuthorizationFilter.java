@@ -1,12 +1,11 @@
 package com.neo.util.framework.rest.impl.security;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.impl.connection.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import com.neo.util.framework.rest.api.security.Secured;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Priority;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -30,8 +29,6 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizationFilter.class);
 
-    protected ObjectNode forbidden;
-
     @Inject
     protected RequestDetails requestDetails;
 
@@ -40,11 +37,6 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
     @Inject
     protected ResponseGenerator responseGenerator;
-
-    @PostConstruct
-    public void init() {
-        forbidden = responseGenerator.errorObject("auth/001", "Forbidden");
-    }
 
     @Override
     public void filter(ContainerRequestContext containerRequest) {
@@ -57,7 +49,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         Set<String> roles = Set.of(rolesAllowed.value());
         if (!((HttpRequestDetails) requestDetails).hasOneOfTheRoles(roles)) {
             LOGGER.info("Aborting request with forbidden, one of the permissions is required {}", roles);
-            containerRequest.abortWith(responseGenerator.error(403, forbidden));
+            containerRequest.abortWith(responseGenerator.error(403, FrameworkConstants.EX_FORBIDDEN));
         }
     }
 }
