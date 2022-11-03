@@ -27,7 +27,7 @@
 		<jackson.version>2.13.4</jackson.version>
 
 		<!-- MP Implementation -->
-		<helidon.version>3.0.1</helidon.version>
+		<helidon.version>3.0.2</helidon.version>
 		<!-- Testing -->
 		<junit.version>5.9.0</junit.version>
 		<mockito.version>4.8.0</mockito.version>
