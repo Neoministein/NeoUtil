@@ -1,7 +1,5 @@
 package com.neo.util.framework.api.persistence.entity;
 
-import jakarta.persistence.PersistenceException;
-import jakarta.transaction.RollbackException;
 import java.util.Optional;
 
 /**
@@ -10,34 +8,28 @@ import java.util.Optional;
 public interface EntityRepository {
 
     /**
-     * Creates a entry in the table for the given {@link PersistenceEntity}
+     * Persists the {@link PersistenceEntity}
      *
      * @param entity the entity to be created
-     * @throws RollbackException if unique is violated
-     * @throws PersistenceException if nullable is violated
      */
     void create(PersistenceEntity entity);
 
     /**
-     * Edits the given entry in the table for the given {@link PersistenceEntity}
+     * Edits the {@link PersistenceEntity}
      *
      * @param entity the entity to be edited
-     * @throws RollbackException if unique is violated
-     * @throws PersistenceException if nullable is violated
      */
     void edit(PersistenceEntity entity);
 
     /**
-     * Removes the entry in the table for the given {@link PersistenceEntity}
+     * Removes the {@link PersistenceEntity}
      *
      * @param entity the entity to remove
-     * @throws RollbackException if unique is violated
-     * @throws PersistenceException if nullable is violated
      */
     void remove(PersistenceEntity entity);
 
     /**
-     * Finds the entry in the table and returns it as an {@link Optional<X>}
+     * Finds the {@link PersistenceEntity} and returns it as an {@link Optional<X>}
      *
      * @param primaryKey the primary key of the searched object
      *
@@ -46,7 +38,7 @@ public interface EntityRepository {
     <X extends PersistenceEntity> Optional<X> find(Object primaryKey, Class<X> entityClazz);
 
     /**
-     * Finds all entities which match the given parameter
+     * Finds all {@link PersistenceEntity} which match the given parameter
      *
      * @param parameters the parameters
      * @param <X> the entity type
