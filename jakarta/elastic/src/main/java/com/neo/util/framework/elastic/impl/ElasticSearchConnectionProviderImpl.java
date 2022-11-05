@@ -8,7 +8,7 @@ import com.neo.util.common.impl.StringUtils;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.event.ApplicationReadyEvent;
-import com.neo.util.framework.elastic.api.ElasticSearchConnectionRepository;
+import com.neo.util.framework.elastic.api.ElasticSearchConnectionProvider;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -35,9 +35,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @SuppressWarnings("deprecation")
 @ApplicationScoped
-public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConnectionRepository {
+public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnectionProvider {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchConnectionRepositoryImpl.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchConnectionProviderImpl.class);
 
     protected static final String DEFAULT_SCHEME = "http";
     protected static final String LOCALHOST_HOST_NAME = "127.0.0.1";
@@ -45,7 +45,7 @@ public class ElasticSearchConnectionRepositoryImpl implements ElasticSearchConne
 
     protected static final String DEFAULT_URL = DEFAULT_SCHEME + "://" + LOCALHOST_HOST_NAME + ":" + DEFAULT_PORT;
 
-    protected static final String CONFIG_PREFIX = ElasticSearchRepository.CONFIG_PREFIX;
+    protected static final String CONFIG_PREFIX = ElasticSearchProvider.CONFIG_PREFIX;
     protected static final String ENABLED_CONFIG = CONFIG_PREFIX + ".enabled";
     protected static final String NODE_CONFIG = CONFIG_PREFIX + ".nodes";
     protected static final String CREDENTIALS_CONFIG = CONFIG_PREFIX + ".credentials";

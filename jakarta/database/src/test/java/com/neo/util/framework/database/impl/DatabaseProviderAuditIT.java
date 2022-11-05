@@ -1,19 +1,16 @@
 package com.neo.util.framework.database.impl;
 
-import com.neo.util.common.impl.RandomString;
 import com.neo.util.common.impl.enumeration.PersistenceOperation;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
-import com.neo.util.framework.api.security.RolePrincipal;
 import com.neo.util.framework.database.impl.entity.AddressEntity;
 import com.neo.util.framework.database.impl.entity.PersonEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Set;
 
-class DatabaseRepositoryAuditIT extends AbstractIntegrationTest {
+class DatabaseProviderAuditIT extends AbstractIntegrationTest {
 
     @Test
     void auditCreationTest() {
@@ -28,7 +25,7 @@ class DatabaseRepositoryAuditIT extends AbstractIntegrationTest {
 
         subject.remove(address);
 
-        EntityResult<EntityAuditTrail> entityResult = subject.find(new EntityQuery<>(EntityAuditTrail.class));
+        EntityResult<EntityAuditTrail> entityResult = subject.fetch(new EntityQuery<>(EntityAuditTrail.class));
         List<EntityAuditTrail> result = entityResult.getHits();
         //Assert
 
@@ -61,7 +58,7 @@ class DatabaseRepositoryAuditIT extends AbstractIntegrationTest {
         person.setAge(35);
         subject.edit(person);
 
-        EntityResult<PersonEntity> entityResult = subject.find(new EntityQuery<>(PersonEntity.class));
+        EntityResult<PersonEntity> entityResult = subject.fetch(new EntityQuery<>(PersonEntity.class));
         PersonEntity result = entityResult.getFirst().get();
         //Assert
 
@@ -85,7 +82,7 @@ class DatabaseRepositoryAuditIT extends AbstractIntegrationTest {
         subject.edit(person);
 
 
-        EntityResult<PersonEntity> entityResult = subject.find(new EntityQuery<>(PersonEntity.class));
+        EntityResult<PersonEntity> entityResult = subject.fetch(new EntityQuery<>(PersonEntity.class));
         PersonEntity result = entityResult.getFirst().get();
         //Assert
 

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
+class DatabaseProviderFindIT extends AbstractIntegrationTest {
 
     PersonEntity personOne;
     PersonEntity personTwo;
@@ -45,9 +45,9 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
         ));
         //Act
 
-        EntityResult<PersonEntity> fromResult = subject.find(fromQuery);
-        EntityResult<PersonEntity> toResult = subject.find(toQuery);
-        EntityResult<PersonEntity> betweenResult = subject.find(betweenQuery);
+        EntityResult<PersonEntity> fromResult = subject.fetch(fromQuery);
+        EntityResult<PersonEntity> toResult = subject.fetch(toQuery);
+        EntityResult<PersonEntity> betweenResult = subject.fetch(betweenQuery);
         //Assert
 
         Assertions.assertEquals(3, fromResult.getHitSize());
@@ -79,9 +79,9 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
         ));
         //Act
 
-        EntityResult<PersonEntity> fromResult = subject.find(fromQuery);
-        EntityResult<PersonEntity> toResult = subject.find(toQuery);
-        EntityResult<PersonEntity> betweenResult = subject.find(betweenQuery);
+        EntityResult<PersonEntity> fromResult = subject.fetch(fromQuery);
+        EntityResult<PersonEntity> toResult = subject.fetch(toQuery);
+        EntityResult<PersonEntity> betweenResult = subject.fetch(betweenQuery);
         //Assert
 
         Assertions.assertEquals(3, fromResult.getHitSize());
@@ -105,7 +105,7 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
         ));
         //Act
 
-        EntityResult<PersonEntity> result = subject.find(entityQuery);
+        EntityResult<PersonEntity> result = subject.fetch(entityQuery);
         List<PersonEntity> resultList = result.getHits();
         //Assert
 
@@ -121,7 +121,7 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
         ));
         //Act
 
-        EntityResult<PersonEntity> result = subject.find(entityQuery);
+        EntityResult<PersonEntity> result = subject.fetch(entityQuery);
         List<PersonEntity> resultList = result.getHits();
         //Assert
 
@@ -142,8 +142,8 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
         ));
         //Act
 
-        EntityResult<PersonEntity> starResult = subject.find(starQuery);
-        EntityResult<PersonEntity> questionResult = subject.find(questionQuery);
+        EntityResult<PersonEntity> starResult = subject.fetch(starQuery);
+        EntityResult<PersonEntity> questionResult = subject.fetch(questionQuery);
         //Assert
 
         Assertions.assertEquals(1, starResult.getHitSize());
@@ -162,7 +162,7 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
         ));
         //Act
 
-        EntityResult<PersonEntity> result = subject.find(entityQuery);
+        EntityResult<PersonEntity> result = subject.fetch(entityQuery);
         List<PersonEntity> resultList = result.getHits();
         //Assert
 
@@ -180,7 +180,7 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
         personThree.setAge(null);
         subject.edit(personThree);
         //Act
-        EntityResult<PersonEntity> result = subject.find(query);
+        EntityResult<PersonEntity> result = subject.fetch(query);
 
         //Assert
         Assertions.assertEquals(3, result.getHitSize());
@@ -200,9 +200,9 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
                 new DateSearchCriteria(AuditableDataBaseEntity.C_CREATED_ON, personTwo.getCreatedOn(), personThree.getCreatedOn())));
 
         //Act
-        EntityResult<PersonEntity> fromResult = subject.find(fromQuery);
-        EntityResult<PersonEntity> toResult = subject.find(toQuery);
-        EntityResult<PersonEntity> betweenResult = subject.find(betweenQuery);
+        EntityResult<PersonEntity> fromResult = subject.fetch(fromQuery);
+        EntityResult<PersonEntity> toResult = subject.fetch(toQuery);
+        EntityResult<PersonEntity> betweenResult = subject.fetch(betweenQuery);
         //Assert
 
         Assertions.assertEquals(3,fromResult.getHitSize());
@@ -225,7 +225,7 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
         EntityQuery<PersonEntity> query = new EntityQuery<>(PersonEntity.class, List.of(
                 new ContainsSearchCriteria(PersonEntity.C_AGE, 0, 10,40)));
         //Act
-        EntityResult<PersonEntity> result = subject.find(query);
+        EntityResult<PersonEntity> result = subject.fetch(query);
 
         //Assert
         Assertions.assertEquals(2,result.getHitSize());
@@ -241,7 +241,7 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
                         new ContainsSearchCriteria(PersonEntity.C_AGE, 0, 10,40),
                         new ExplicitSearchCriteria(PersonEntity.C_NAME, "*ne*", true))));
         //Act
-        EntityResult<PersonEntity> result = subject.find(query);
+        EntityResult<PersonEntity> result = subject.fetch(query);
 
         //Assert
         Assertions.assertEquals(1, result.getHitSize());
@@ -256,7 +256,7 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
                         new ContainsSearchCriteria(PersonEntity.C_AGE, 0, 10,40),
                         new ExplicitSearchCriteria(PersonEntity.C_NAME, "*ne*", true))));
         //Act
-        EntityResult<PersonEntity> result = subject.find(query);
+        EntityResult<PersonEntity> result = subject.fetch(query);
 
         //Assert
         Assertions.assertEquals(3, result.getHitSize());
@@ -274,7 +274,7 @@ class DatabaseRepositoryFindIT extends AbstractIntegrationTest {
                 PersonEntity.C_WEIGHT, false
         ));
         //Act
-        EntityResult<PersonEntity> result = subject.find(query);
+        EntityResult<PersonEntity> result = subject.fetch(query);
 
         //Assert
         Assertions.assertEquals(maxResult, result.getHitCount());

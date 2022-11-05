@@ -1,6 +1,6 @@
 package com.neo.util.framework.elastic.impl;
 
-import com.neo.util.framework.api.persistence.search.SearchRepository;
+import com.neo.util.framework.api.persistence.search.SearchProvider;
 import com.neo.util.framework.api.persistence.search.QueueableSearchable;
 import com.neo.util.framework.api.queue.IncomingQueueConnection;
 import com.neo.util.framework.api.queue.QueueListener;
@@ -15,7 +15,7 @@ import java.util.List;
 public class IndexingQueueConsumer implements QueueListener {
 
     @Inject
-    protected SearchRepository searchRepository;
+    protected SearchProvider searchRepository;
 
     @Override
     public void onMessage(QueueMessage message) {

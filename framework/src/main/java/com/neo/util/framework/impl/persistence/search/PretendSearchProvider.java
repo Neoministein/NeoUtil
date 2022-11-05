@@ -7,7 +7,7 @@ import java.util.List;
 
 @ApplicationScoped
 @SuppressWarnings("java:S1186") //Default search implementation that does nothing
-public class PretendSearchRepository implements SearchRepository {
+public class PretendSearchProvider implements SearchProvider {
 
     @Override
     public void index(Searchable searchable) {

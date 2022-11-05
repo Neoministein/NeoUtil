@@ -7,7 +7,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import java.io.Serializable;
 
 @SuppressWarnings("deprecation")
-public interface ElasticSearchConnectionRepository extends Serializable {
+public interface ElasticSearchConnectionProvider extends Serializable {
 
     /**
      * Reloads the config and reconnects to elasticsearch

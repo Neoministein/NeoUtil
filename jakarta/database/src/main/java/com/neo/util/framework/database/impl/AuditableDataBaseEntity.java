@@ -2,6 +2,7 @@ package com.neo.util.framework.database.impl;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.neo.util.common.api.json.Views;
+import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.database.impl.listener.DataBaseAuditListener;
 
@@ -80,5 +81,10 @@ public abstract class AuditableDataBaseEntity implements PersistenceEntity {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    @Override
+    public String toString() {
+        return "\"" + this.getClass().getSimpleName() + "\":" + JsonUtil.toJson(this);
     }
 }

@@ -35,7 +35,7 @@ public class M2PersistenceContextService implements PersistenceContextService {
     }
 
     @Override
-    public EntityManager getEntityManager() {
+    public EntityManager getEm() {
         return em;
     }
 }

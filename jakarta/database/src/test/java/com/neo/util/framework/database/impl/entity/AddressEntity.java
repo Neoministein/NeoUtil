@@ -1,5 +1,6 @@
 package com.neo.util.framework.database.impl.entity;
 
+import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import jakarta.persistence.*;
 
@@ -70,5 +71,10 @@ public class AddressEntity implements PersistenceEntity {
     @Override
     public Object getPrimaryKey() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        return "\"" + this.getClass().getSimpleName() + "\":" + JsonUtil.toJson(this);
     }
 }

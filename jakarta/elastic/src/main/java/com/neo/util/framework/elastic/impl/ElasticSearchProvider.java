@@ -23,7 +23,7 @@ import com.neo.util.framework.api.persistence.aggregation.*;
 import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.search.*;
 import com.neo.util.framework.api.queue.QueueMessage;
-import com.neo.util.framework.elastic.api.ElasticSearchConnectionRepository;
+import com.neo.util.framework.elastic.api.ElasticSearchConnectionProvider;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 import jakarta.inject.Provider;
 import org.elasticsearch.ElasticsearchException;
@@ -66,9 +66,9 @@ import java.util.concurrent.TimeUnit;
 @Alternative
 @Priority(PriorityConstants.APPLICATION)
 @ApplicationScoped
-public class ElasticSearchRepository implements SearchRepository {
+public class ElasticSearchProvider implements SearchProvider {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchRepository.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchProvider.class);
 
     protected static final List<RestStatus> FILTER_REST_STATUS = Arrays.asList(RestStatus.CONFLICT,
             RestStatus.NOT_FOUND);
@@ -104,7 +104,7 @@ public class ElasticSearchRepository implements SearchRepository {
     protected IndexNamingService indexNameService;
 
     @Inject
-    protected ElasticSearchConnectionRepository connection;
+    protected ElasticSearchConnectionProvider connection;
 
     protected volatile BulkProcessor bulkProcessor;
 

@@ -10,7 +10,7 @@ public class DefaultPersistenceContext implements PersistenceContextService {
     private EntityManager em;
 
     @Override
-    public EntityManager getEntityManager() {
+    public EntityManager getEm() {
         return em;
     }
 }

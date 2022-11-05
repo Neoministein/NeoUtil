@@ -4,5 +4,5 @@ import jakarta.persistence.EntityManager;
 
 public interface PersistenceContextService {
 
-    EntityManager getEntityManager();
+    EntityManager getEm();
 }

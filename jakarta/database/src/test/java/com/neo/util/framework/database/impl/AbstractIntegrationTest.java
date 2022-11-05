@@ -15,16 +15,16 @@ abstract class AbstractIntegrationTest {
 
     @WeldSetup
     public WeldInitiator weld = WeldInitiator.from(
-            DatabaseRepository.class,
+            DatabaseProvider.class,
             M2PersistenceContextService.class,
             RequestDetailsDummy.class,
             TransactionExtension.class
     ).activate(RequestScoped.class).build();
 
-    protected DatabaseRepository subject;
+    protected DatabaseProvider subject;
 
     @BeforeEach
     void init() {
-        subject = weld.select(DatabaseRepository.class).get();
+        subject = weld.select(DatabaseProvider.class).get();
     }
 }

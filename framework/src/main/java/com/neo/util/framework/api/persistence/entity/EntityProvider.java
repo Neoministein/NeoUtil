@@ -3,9 +3,11 @@ package com.neo.util.framework.api.persistence.entity;
 import java.util.Optional;
 
 /**
- * This interfaces defines the interactions capability for persistence relational data storage per database entity
+ * This interfaces defines the interactions capability for persistence relational data storage per {@link EntityProvider}
+ * <p>
+ * It provides a programmatic configurable layer between high level usage and the impl.
  */
-public interface EntityRepository {
+public interface EntityProvider {
 
     /**
      * Persists the {@link PersistenceEntity}
@@ -35,7 +37,7 @@ public interface EntityRepository {
      *
      * @return the entry as an {@link Optional<X>}
      */
-    <X extends PersistenceEntity> Optional<X> find(Object primaryKey, Class<X> entityClazz);
+    <X extends PersistenceEntity> Optional<X> fetch(Object primaryKey, Class<X> entityClazz);
 
     /**
      * Finds all {@link PersistenceEntity} which match the given parameter
@@ -45,5 +47,5 @@ public interface EntityRepository {
      *
      * @return the result of the given search
      */
-    <X extends PersistenceEntity> EntityResult<X> find(EntityQuery<X> parameters);
+    <X extends PersistenceEntity> EntityResult<X> fetch(EntityQuery<X> parameters);
 }

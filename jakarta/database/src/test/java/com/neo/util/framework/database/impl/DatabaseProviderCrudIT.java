@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
-class DatabaseRepositoryCrudIT extends AbstractIntegrationTest {
+class DatabaseProviderCrudIT extends AbstractIntegrationTest {
 
     @Test
     void createOneTest() {
@@ -19,7 +19,7 @@ class DatabaseRepositoryCrudIT extends AbstractIntegrationTest {
         //Act
         subject.create(address);
 
-        EntityResult<AddressEntity> entityResult = subject.find(new EntityQuery<>(AddressEntity.class));
+        EntityResult<AddressEntity> entityResult = subject.fetch(new EntityQuery<>(AddressEntity.class));
         AddressEntity result = entityResult.getFirst().get();
         //Assert
 
@@ -39,7 +39,7 @@ class DatabaseRepositoryCrudIT extends AbstractIntegrationTest {
         subject.create(addressZurich);
         subject.create(addressBern);
 
-        EntityResult<AddressEntity> entityResult = subject.find(new EntityQuery<>(AddressEntity.class));
+        EntityResult<AddressEntity> entityResult = subject.fetch(new EntityQuery<>(AddressEntity.class));
         List<AddressEntity> result = entityResult.getHits();
         //Assert
 
@@ -54,7 +54,7 @@ class DatabaseRepositoryCrudIT extends AbstractIntegrationTest {
         //Act
         subject.create(address);
 
-        Optional<AddressEntity> entityResult = subject.find(address.getId(), AddressEntity.class);
+        Optional<AddressEntity> entityResult = subject.fetch(address.getId(), AddressEntity.class);
         //Assert
 
         Assertions.assertTrue(entityResult.isPresent());
@@ -72,7 +72,7 @@ class DatabaseRepositoryCrudIT extends AbstractIntegrationTest {
         //Act
         subject.create(address);
 
-        Optional<AddressEntity> wrongPrimaryKey = subject.find(200, AddressEntity.class);
+        Optional<AddressEntity> wrongPrimaryKey = subject.fetch(200, AddressEntity.class);
         //Assert
 
         Assertions.assertFalse(wrongPrimaryKey.isPresent());
@@ -88,7 +88,7 @@ class DatabaseRepositoryCrudIT extends AbstractIntegrationTest {
         address.setZipcode(8001);
         subject.edit(address);
 
-        EntityResult<AddressEntity> entityResult = subject.find(new EntityQuery<>(AddressEntity.class));
+        EntityResult<AddressEntity> entityResult = subject.fetch(new EntityQuery<>(AddressEntity.class));
         AddressEntity result = entityResult.getFirst().get();
         //Assert
 
@@ -106,7 +106,7 @@ class DatabaseRepositoryCrudIT extends AbstractIntegrationTest {
         subject.create(address);
         subject.remove(address);
 
-        EntityResult<AddressEntity> entityResult = subject.find(new EntityQuery<>(AddressEntity.class));
+        EntityResult<AddressEntity> entityResult = subject.fetch(new EntityQuery<>(AddressEntity.class));
         //Assert
 
         Assertions.assertEquals(0, entityResult.getHitCount());

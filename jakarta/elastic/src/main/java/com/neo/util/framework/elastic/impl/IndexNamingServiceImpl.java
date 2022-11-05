@@ -23,7 +23,7 @@ public class IndexNamingServiceImpl implements IndexNamingService {
     protected static final String INDEX_SEPARATOR = "-";
     protected static final String SEARCH_PROVIDER_NO_DATE_INDEX_POSTFIX = "no-date";
 
-    public static final String CONFIG_PREFIX = ElasticSearchRepository.CONFIG_PREFIX;
+    public static final String CONFIG_PREFIX = ElasticSearchProvider.CONFIG_PREFIX;
 
     protected static final String PROJECT_PREFIX_CONFIG = CONFIG_PREFIX + ".prefix";
     protected static final String PROJECT_POSTFIX_CONFIG = CONFIG_PREFIX + ".postfix";

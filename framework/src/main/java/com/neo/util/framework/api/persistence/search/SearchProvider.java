@@ -3,9 +3,11 @@ package com.neo.util.framework.api.persistence.search;
 import java.util.List;
 
 /**
- * This interfaces defines the necessary functionality of a SearchProvider service to store searchable objects in a persistent manner.
+ * This interfaces defines the interactions capability for search data storage {@link Searchable}
+ * <p>
+ * It provides a programmatic configurable layer between high level usage and the impl.
  */
-public interface SearchRepository {
+public interface SearchProvider {
 
     void index(Searchable searchable);
 

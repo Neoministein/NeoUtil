@@ -51,16 +51,16 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
     protected static final int TIME_TO_SLEEP_IN_MILLISECOND = 500;
     protected static final int SLEEP_RETRY_COUNT = 10;
 
-    protected static ElasticSearchRepository elasticSearchRepository;
+    protected static ElasticSearchProvider elasticSearchRepository;
 
     protected static RestClient restClient;
 
     protected TestConfigService configService = new TestConfigService(Map.of(
-            ElasticSearchConnectionRepositoryImpl.ENABLED_CONFIG, true,
-            ElasticSearchRepository.FLUSH_INTERVAL_CONFIG, 1
+            ElasticSearchConnectionProviderImpl.ENABLED_CONFIG, true,
+            ElasticSearchProvider.FLUSH_INTERVAL_CONFIG, 1
     ));
 
-    protected static ElasticSearchConnectionRepositoryImpl connection = new ElasticSearchConnectionRepositoryImpl();
+    protected static ElasticSearchConnectionProviderImpl connection = new ElasticSearchConnectionProviderImpl();
     protected RequestDetails requestDetails = new SchedulerRequestDetails(new RandomString().nextString(), new RequestContext.Scheduler("integrationTest"));
     protected IndexNamingService indexNamingService = createIndexNameService(configService);
 
@@ -129,7 +129,8 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         ensureStableCluster(1);
         restClient = getRestClient();
         LOGGER.info("Elasticsearch node started at [{}]", restClient.getNodes().get(0).getHost().toString());
-        configService.addConfig(ElasticSearchConnectionRepositoryImpl.NODE_CONFIG, List.of(restClient.getNodes().get(0).getHost().toString()));
+        configService.addConfig(
+                ElasticSearchConnectionProviderImpl.NODE_CONFIG, List.of(restClient.getNodes().get(0).getHost().toString()));
         connection.configService = configService;
         connection.connectionStatusEvent = new EventMock<>();
 
@@ -149,7 +150,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
     protected void initialiseElasticSearchProvider() {
         connection.postConstruct();
         connection.connect();
-        elasticSearchRepository = new ElasticSearchRepository();
+        elasticSearchRepository = new ElasticSearchProvider();
         elasticSearchRepository.configService = configService;
         elasticSearchRepository.connection = connection;
         elasticSearchRepository.indexerQueueService = new PretendIndexerNotificationService();

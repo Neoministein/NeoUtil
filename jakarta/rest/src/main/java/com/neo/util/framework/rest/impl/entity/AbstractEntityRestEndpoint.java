@@ -10,7 +10,7 @@ import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.api.persistence.criteria.ExplicitSearchCriteria;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
-import com.neo.util.framework.api.persistence.entity.EntityRepository;
+import com.neo.util.framework.api.persistence.entity.EntityProvider;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
 import com.neo.util.framework.impl.connection.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
@@ -46,7 +46,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
     public static final String PERM_INTERNAL = "internal";
 
     @Inject
-    protected EntityRepository entityRepository;
+    protected EntityProvider entityRepository;
 
     @Inject
     protected RequestDetails requestDetails;
@@ -92,7 +92,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
     }
 
     protected Response delete(String primaryKey) {
-        Optional<T> entity = entityRepository.find(convertToPrimaryKey(primaryKey), getEntityClass());
+        Optional<T> entity = entityRepository.fetch(convertToPrimaryKey(primaryKey), getEntityClass());
 
         if (entity.isEmpty()) {
             LOGGER.debug("Entity not found [{},{}]", getEntityClass().getSimpleName() ,primaryKey);
@@ -118,7 +118,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
      */
     protected Response entityByColumn(String field, Object value) {
         EntityQuery<T> entityParameters = new EntityQuery<>(getEntityClass(), 1, List.of(new ExplicitSearchCriteria(field, value)));
-        EntityResult<T> entity = entityRepository.find(entityParameters);
+        EntityResult<T> entity = entityRepository.fetch(entityParameters);
         if (entity.getHitSize() == 0) {
             LOGGER.debug("Entity not found [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
             return responseGenerator.error(404, EX_ENTITY_NOT_FOUND, value);
@@ -156,7 +156,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
     protected T parseJSONIntoExistingEntity(String x, Class<?> serializationScope) {
         Object primaryKey =  JsonUtil.fromJson(x, getEntityClass(), serializationScope).getPrimaryKey();
 
-        Optional<T> entity = entityRepository.find(primaryKey, getEntityClass());
+        Optional<T> entity = entityRepository.fetch(primaryKey, getEntityClass());
         if (entity.isEmpty()) {
             throw new NoContentFoundException(EX_ENTITY_NOT_FOUND, primaryKey);
         }

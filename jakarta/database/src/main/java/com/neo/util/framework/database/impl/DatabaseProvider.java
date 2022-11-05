@@ -1,19 +1,15 @@
 package com.neo.util.framework.database.impl;
 
 import com.neo.util.common.impl.StopWatch;
-import com.neo.util.common.impl.enumeration.PersistenceOperation;
 import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
-import com.neo.util.framework.api.persistence.entity.EntityRepository;
+import com.neo.util.framework.api.persistence.entity.EntityProvider;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
-import com.neo.util.framework.database.api.PersistenceContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.persistence.NoResultException;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
@@ -26,62 +22,32 @@ import java.util.Optional;
 
 @Transactional
 @ApplicationScoped
-public class DatabaseRepository implements EntityRepository {
+public class DatabaseProvider extends AbstractDatabaseRepository implements EntityProvider {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(DatabaseRepository.class);
-
-    @Inject
-    protected PersistenceContextService pcs;
+    protected static final Logger LOGGER = LoggerFactory.getLogger(DatabaseProvider.class);
 
     @Override
     public void create(PersistenceEntity entity) {
-        pcs.getEntityManager().persist(entity);
-        LOGGER.debug("Created entity {}:{}", entity.getPrimaryKey(), entity.getClass().getSimpleName());
-        if (!(entity instanceof EntityAuditTrail)) {
-            createAuditTrail(entity, PersistenceOperation.CREATE);
-        }
+        super.createWithAudit(entity);
     }
 
     @Override
     public void edit(PersistenceEntity entity) {
-        pcs.getEntityManager().merge(entity);
-        LOGGER.debug("Edited entity {}:{}", entity.getPrimaryKey(), entity.getClass().getSimpleName());
-        createAuditTrail(entity, PersistenceOperation.UPDATE);
+        super.editWithAudit(entity);
     }
 
     @Override
     public void remove(PersistenceEntity entity) {
-        pcs.getEntityManager().remove(pcs.getEntityManager().merge(entity));
-        LOGGER.debug("Removed entity {}:{}", entity.getPrimaryKey(), entity.getClass().getSimpleName());
-        createAuditTrail(entity, PersistenceOperation.DELETE);
-    }
-
-    protected void createAuditTrail(PersistenceEntity entity, PersistenceOperation operation) {
-        try {
-            EntityAuditTrail auditTrail = new EntityAuditTrail();
-            auditTrail.setOperation(operation);
-            auditTrail.setClassType(entity.getClass().getSimpleName());
-            auditTrail.setObjectKey(entity.getPrimaryKey().toString());
-            this.create(auditTrail);
-        } catch (Exception ex) {
-            String entityIdentifier = entity.getClass().getSimpleName() + ":" + entity.getPrimaryKey();
-            LOGGER.error("Unable to persist audit trail for {}", entityIdentifier, ex);
-        }
+        super.removeWithAudit(entity);
     }
 
     @Override
-    public <X extends PersistenceEntity> Optional<X> find(Object primaryKey, Class<X> entityClazz) {
-        try {
-            LOGGER.trace("Searching for entity {}:{}", primaryKey, entityClazz.getSimpleName());
-            return Optional.ofNullable(pcs.getEntityManager().find(entityClazz, primaryKey));
-        } catch (NoResultException | IllegalArgumentException  ex) {
-            LOGGER.trace("Unable to find entity {}:{}", primaryKey, entityClazz.getSimpleName());
-            return Optional.empty();
-        }
+    public <X extends PersistenceEntity> Optional<X> fetch(Object primaryKey, Class<X> entityClazz) {
+        return super.find(primaryKey, entityClazz);
     }
 
     @Override
-    public <X extends PersistenceEntity> EntityResult<X> find(EntityQuery<X> parameters) {
+    public <X extends PersistenceEntity> EntityResult<X> fetch(EntityQuery<X> parameters) {
         LOGGER.trace("Searching for entity {} maxResults {} SearchCriteria {}",
                 parameters.getEntityClass().getSimpleName(),
                 parameters.getMaxResults().orElse(-1),
@@ -89,18 +55,17 @@ public class DatabaseRepository implements EntityRepository {
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        CriteriaBuilder cb = pcs.getEntityManager().getCriteriaBuilder();
+        CriteriaBuilder cb = pcs.getEm().getCriteriaBuilder();
 
-        AbstractQuery<X> aQuery = cb.createQuery(parameters.getEntityClass());
+        CriteriaQuery<X> cQuery = cb.createQuery(parameters.getEntityClass());
 
-        Root<X> root = aQuery.from(parameters.getEntityClass());
+        Root<X> root = cQuery.from(parameters.getEntityClass());
 
-        aQuery.where(addSearchFilters(parameters.getFilters(), cb, root));
+        cQuery.where(addSearchFilters(parameters.getFilters(), cb, root));
 
-        CriteriaQuery<X> cQuery = ((CriteriaQuery<X>) aQuery).select(root);
         cQuery.orderBy(mapOrders(parameters.getSorting(), cb, root));
 
-        TypedQuery<X> typedQuery = pcs.getEntityManager().createQuery(cQuery);
+        TypedQuery<X> typedQuery = pcs.getEm().createQuery(cQuery);
 
         if (parameters.getMaxResults().isPresent()) {
             typedQuery = typedQuery.setMaxResults(parameters.getMaxResults().get());
@@ -126,11 +91,11 @@ public class DatabaseRepository implements EntityRepository {
     }
 
     public <X> int count(List<? extends SearchCriteria> filters, Class<X> entityClass) {
-        CriteriaBuilder cb = pcs.getEntityManager().getCriteriaBuilder();
+        CriteriaBuilder cb = pcs.getEm().getCriteriaBuilder();
         CriteriaQuery<Object> cq = cb.createQuery();
         Root<X> root = cq.from(entityClass);
         cq.select(cb.count(root));
-        Query q = pcs.getEntityManager().createQuery(cq);
+        Query q = pcs.getEm().createQuery(cq);
         cq.where(addSearchFilters(filters, cb, root));
         return ((Long) q.getSingleResult()).intValue();
     }
