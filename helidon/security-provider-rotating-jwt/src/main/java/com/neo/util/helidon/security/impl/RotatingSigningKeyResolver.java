@@ -1,6 +1,7 @@
 package com.neo.util.helidon.security.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.helidon.security.impl.key.JWTKey;
@@ -14,13 +15,13 @@ import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SigningKeyResolverAdapter;
 import io.jsonwebtoken.security.SignatureException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +31,9 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
 
     private static final Logger LOGGER =  LoggerFactory.getLogger(RotatingSigningKeyResolver.class);
 
+    protected static final ExceptionDetails EX_INVALID_URL = new ExceptionDetails(
+            "auth/jwt/invalid-public-key-url", "Invalid public key url {0}", true
+    );
     protected static final ExceptionDetails EX_CANNOT_REACH_PUBLIC_KEY = new ExceptionDetails(
             "auth/jwt/cannot-reach-public-key-endpoint", "Cannot reach public key endpoint", true
     );
@@ -40,7 +44,7 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
     protected static final int TEN_SECONDS = 10 * 1000;
     protected long lastUpdate = 0L;
 
-    protected final HttpGet publicKeyEndpoint;
+    protected final HttpRequest publicKeyEndpoint;
     protected Map<String, JWTKey> keyMap = new HashMap<>();
     protected RetryHttpExecutor lazyHttpExecutor;
 
@@ -51,7 +55,11 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
 
     protected RotatingSigningKeyResolver(String publicKeyEndpoint, boolean isSecurityService, RetryHttpExecutor lazyHttpExecutor) {
         this.lazyHttpExecutor = lazyHttpExecutor;
-        this.publicKeyEndpoint = new HttpGet(publicKeyEndpoint);
+        try {
+            this.publicKeyEndpoint = HttpRequest.newBuilder().uri(new URI(publicKeyEndpoint)).GET().build();
+        } catch (URISyntaxException e) {
+            throw new ConfigurationException(EX_INVALID_URL, publicKeyEndpoint);
+        }
         if (!isSecurityService) {
             updateCache();
         }
@@ -94,9 +102,9 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
 
     protected boolean checkForNewKey() {
         boolean hasChanged;
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            LOGGER.trace("Calling public key endpoint [{}]", publicKeyEndpoint.getURI());
-            String response = lazyHttpExecutor.execute(httpClient, publicKeyEndpoint, 5);
+        try {
+            LOGGER.trace("Calling public key endpoint [{}]", publicKeyEndpoint.uri());
+            String response = lazyHttpExecutor.execute(HttpClient.newHttpClient(), publicKeyEndpoint, 5);
 
             Map<String, JWTKey> newMap = parseEndpointResult(response);
             lastUpdate = System.currentTimeMillis();
@@ -112,7 +120,7 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
             }
 
             return hasChanged;
-        } catch (IOException | CommonRuntimeException e) {
+        } catch (CommonRuntimeException e) {
             throw new CommonRuntimeException(EX_CANNOT_REACH_PUBLIC_KEY);
         }
     }

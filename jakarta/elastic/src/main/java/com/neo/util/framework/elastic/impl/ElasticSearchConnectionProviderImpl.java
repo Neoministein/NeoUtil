@@ -5,6 +5,7 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.neo.util.common.impl.StringUtils;
+import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.event.ApplicationReadyEvent;
@@ -186,7 +187,7 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
 
         client = new RestHighLevelClientBuilder(restClient).setApiCompatibilityMode(true).build();
 
-        ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper(JsonUtil.createMapper()));
 
         elasticsearchClient = new ElasticsearchClient(transport);
 

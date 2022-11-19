@@ -23,8 +23,13 @@
 		<!-- Logging -->
 		<slf4j.version>2.0.3</slf4j.version>
 		<log4j.version>2.19.0</log4j.version>
+
+		<!-- Class Generation -->
+		<javapoet.version>1.13.0</javapoet.version>
+		<auto-service.version>1.0.1</auto-service.version>
 		<!-- Jackson -->
-		<jackson.version>2.13.4</jackson.version>
+		<jackson.version>2.14.0</jackson.version>
+		<jackson.schema-generator>4.28.0</jackson.schema-generator>
 
 		<!-- MP Implementation -->
 		<helidon.version>3.0.2</helidon.version>
@@ -36,6 +41,10 @@
 		<weld-junit.version>3.1.0.Final</weld-junit.version>
 
 		<!-- Maven -->
+		<maven.core.version>3.8.5</maven.core.version>
+		<maven.testing.version>3.3.0</maven.testing.version>
+		<maven.tools.version>3.6.4</maven.tools.version>
+		<maven.plugin.plugin.version>3.7.0</maven.plugin.plugin.version>
 		<surefire.version>3.0.0-M7</surefire.version>
 	</properties>
 
@@ -96,6 +105,7 @@
 		<module>jakarta/elastic</module>
 		<module>jakarta/database</module>
 		<module>jakarta/rest</module>
+		<module>jakarta/rest-plugin</module>
 		<module>microprofile</module>
 		<module>helidon</module>
 	</modules>

@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 @SuppressWarnings("java:S2139")
@@ -35,22 +36,26 @@ public class JsonUtil {
      * but you are not changing configuration so that is fine. If you did need to change configuration,
      * you would do that from the static block, and it would be fine as well.
      */
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = createMapper();
 
     private JsonUtil() {}
 
-    static {
+
+    public static ObjectMapper createMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+
         // ignore null fields
-        MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         // use fields only
-        MAPPER.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-        MAPPER.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
-        MAPPER.setTimeZone(TimeZone.getDefault());
+        mapper.setTimeZone(TimeZone.getDefault());
 
-        // Don't throw error when empty bean is being serialize
-        MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        // Don't throw error when empty bean is being serialized
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        return mapper;
     }
 
     /**
@@ -73,11 +78,34 @@ public class JsonUtil {
         return jsonString;
     }
 
+    /**
+     * Creates a {@link JsonNode} from a {@link String}. Exceptions are caught and a new {@link ValidationException} is
+     * thrown.
+     *
+     * @param json to convert
+     * @return is converted to JsonNode
+     */
     public static JsonNode fromJson(String json) {
         try {
             return MAPPER.readTree(json);
         } catch (IOException ex) {
             LOGGER.error("Error while parsing JSON node from json string:{}, exception:{} ", json, ex.getMessage());
+            throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
+        }
+    }
+
+    /**
+     * Creates a {@link JsonNode} from a {@link InputStream}. Exceptions are caught and a new
+     * {@link ValidationException} is thrown.
+     *
+     * @param is to convert
+     * @return is converted to JsonNode
+     */
+    public static JsonNode fromJson(InputStream is) {
+        try {
+            return MAPPER.readTree(is);
+        } catch (IOException ex) {
+            LOGGER.error("Error while parsing JSON node from input stream, exception:{} ", ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
     }
@@ -96,6 +124,26 @@ public class JsonUtil {
             return MAPPER.writerWithView(serializationScope).writeValueAsString(pojo);
         } catch (JsonProcessingException ex) {
             LOGGER.error("Error while creating json string from pojo:{}, exception:{} ", pojo, ex.getMessage());
+            throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
+        }
+    }
+
+    /**
+     * Creates an object based on the provided class and json. Exceptions are caught and a new {@link ValidationException} is
+     * thrown.
+     *
+     * @param json the json string
+     * @param clazz the class of to object to convert to
+     * @param <T> the object to convert to
+     *
+     * @return the object
+     */
+    public static <T> T fromJson(JsonNode json, Class<T> clazz) {
+        try {
+            return MAPPER.treeToValue(json, clazz);
+        } catch (IOException ex) {
+            LOGGER.error("Error while creating pojo from JsonNode:{}, exception:{} ", json, ex.getMessage());
+
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
     }

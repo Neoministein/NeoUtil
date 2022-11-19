@@ -7,13 +7,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.security.Key;
 import java.security.PublicKey;
 import java.util.Base64;
@@ -33,7 +33,7 @@ class RotatingSigningKeyResolverTest extends AbstractJWTTest {
     }
 
     void setupSubject(boolean isSecurityService) {
-        subject = new RotatingSigningKeyResolver("localhost", isSecurityService, lazyHttpExecutor);
+        subject = new RotatingSigningKeyResolver("http://127.0.0.1", isSecurityService, lazyHttpExecutor);
         subject = Mockito.spy(subject);
     }
 
@@ -74,7 +74,7 @@ class RotatingSigningKeyResolverTest extends AbstractJWTTest {
     @Test
     void resolveNoNewSigningKeyTest() {
         //Arrange
-        Mockito.doReturn(defaultEndpointResponse("0")).when(lazyHttpExecutor).execute(Mockito.any(HttpClient.class),Mockito.any(HttpUriRequest.class),Mockito.anyInt());
+        Mockito.doReturn(defaultEndpointResponse("0")).when(lazyHttpExecutor).execute(Mockito.any(HttpClient.class),Mockito.any(HttpRequest.class),Mockito.anyInt());
 
         setupSubject(false);
         JwsHeader jwsHeader = Mockito.mock(JwsHeader.class);
@@ -101,7 +101,7 @@ class RotatingSigningKeyResolverTest extends AbstractJWTTest {
         lazyHttpExecutor = Mockito.mock(RetryHttpExecutor.class);
         subject.lazyHttpExecutor = lazyHttpExecutor;
 
-        Mockito.doReturn(defaultEndpointResponse("1")).when(lazyHttpExecutor).execute(Mockito.any(HttpClient.class),Mockito.any(HttpUriRequest.class),Mockito.anyInt());
+        Mockito.doReturn(defaultEndpointResponse("1")).when(lazyHttpExecutor).execute(Mockito.any(HttpClient.class),Mockito.any(HttpRequest.class),Mockito.anyInt());
         //Act
         Key key = subject.resolveSigningKey(jwsHeader, (Claims) null);
 

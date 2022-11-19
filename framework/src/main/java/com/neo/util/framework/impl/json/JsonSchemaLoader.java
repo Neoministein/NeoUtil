@@ -2,7 +2,9 @@ package com.neo.util.framework.impl.json;
 
 import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
+import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.config.ConfigService;
+import com.neo.util.framework.api.config.ConfigValue;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.networknt.schema.JsonSchema;
 import jakarta.annotation.PostConstruct;
@@ -35,11 +37,16 @@ public class JsonSchemaLoader {
     @PostConstruct
     public void init() {
         LOGGER.info("Pre-loading json schemas");
-        String jsonSchemaFolder = configService.get("json").get("schemaFolder").asString().orElse("schema");
-
         Map<String, JsonSchema> mapToFill = new HashMap<>();
 
-        addSchemas(mapToFill, ResourceUtil.getFolderContent(jsonSchemaFolder), jsonSchemaFolder, "");
+        addSchemas(mapToFill, ResourceUtil.getFolderContent(FrameworkConstants.JSON_SCHEMA_LOCATION),
+                FrameworkConstants.JSON_SCHEMA_LOCATION, "");
+
+        ConfigValue<String> jsonSchemaFolder = configService.get("json").get("schemaFolder").asString();
+        if (jsonSchemaFolder.isPresent()) {
+            addSchemas(mapToFill, ResourceUtil.getFolderContent(jsonSchemaFolder.get()),
+                    jsonSchemaFolder.get(), "");
+        }
 
         jsonSchemaMap = mapToFill;
     }

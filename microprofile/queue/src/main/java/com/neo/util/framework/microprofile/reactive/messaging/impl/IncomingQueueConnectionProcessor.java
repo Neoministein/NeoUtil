@@ -1,34 +1,33 @@
 package com.neo.util.framework.microprofile.reactive.messaging.impl;
 
 import com.google.auto.service.AutoService;
-import com.neo.util.common.impl.annotation.AnnotationProcessorUtils;
+import com.neo.util.common.impl.annotation.ProcessorUtils;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.connection.RequestContext;
 import com.neo.util.framework.api.queue.IncomingQueueConnection;
-import com.neo.util.framework.api.queue.OutgoingQueueConnection;
 import com.neo.util.framework.api.queue.QueueListener;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.impl.connection.QueueRequestDetails;
 import com.neo.util.framework.impl.connection.RequestDetailsProducer;
 import com.squareup.javapoet.*;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.RequestContextController;
+import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.*;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import javax.lang.model.util.Elements;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @SupportedAnnotationTypes("com.neo.util.framework.api.queue.IncomingQueueConnection")
-@SupportedSourceVersion(SourceVersion.RELEASE_11)
 @AutoService(Processor.class)
 public class IncomingQueueConnectionProcessor extends AbstractProcessor {
 
@@ -45,6 +44,12 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
     protected Map<String, String> existingIncomingAnnotation = new HashMap<>();
     protected Map<String, String> generatedClasses = new HashMap<>();
 
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latestSupported();
+    }
+
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
@@ -54,8 +59,8 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        List<TypeElement> queueConsumerElements = getDependencyClasses();
-        queueConsumerElements.addAll((getSourceClasses(roundEnv)));
+        List<TypeElement> queueConsumerElements = ProcessorUtils.getTypedElementsAnnotatedWith(roundEnv,
+                elements, IncomingQueueConnection.class, List.of(ElementKind.CLASS));
         if (queueConsumerElements.isEmpty()) {
             return false;
         }
@@ -64,15 +69,15 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
         Set<? extends Element> incomingElements = roundEnv.getElementsAnnotatedWith(Incoming.class);
         for (Element element: incomingElements) {
             Parameterizable parameterizable = (Parameterizable) element;
-            existingIncomingAnnotation.put((String) AnnotationProcessorUtils.getAnnotationValue(
-                    element.getAnnotationMirrors(), Incoming.class, BASIC_ANNOTATION_FIELD_NAME),
+            existingIncomingAnnotation.put(ProcessorUtils.getAnnotationValue(element, Incoming.class,
+                            BASIC_ANNOTATION_FIELD_NAME),
                     parameterizable.getEnclosingElement().getSimpleName().toString());
         }
         LOGGER.debug("Existing queues {}", existingIncomingAnnotation);
 
         for (TypeElement typeElement: queueConsumerElements) {
-            AnnotationProcessorUtils.checkRequiredInterface(typeElement, QueueListener.class);
-            String queueName = (String) AnnotationProcessorUtils.getAnnotationValue(typeElement.getAnnotationMirrors(), IncomingQueueConnection.class,
+            ProcessorUtils.checkRequiredInterface(typeElement, QueueListener.class);
+            String queueName = ProcessorUtils.getAnnotationValue(typeElement, IncomingQueueConnection.class,
                     BASIC_ANNOTATION_FIELD_NAME);
 
             String existingQueueAnnotationClass = existingIncomingAnnotation.get(QUEUE_PREFIX + queueName);
@@ -92,30 +97,6 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
 
         }
         return false;
-    }
-
-    protected List<TypeElement> getSourceClasses(RoundEnvironment roundEnv) {
-        List<TypeElement> classList = new ArrayList<>();
-        Set<? extends Element> queueConsumerElements = roundEnv.getElementsAnnotatedWith(IncomingQueueConnection.class);
-        for (Element element: queueConsumerElements) {
-            if (element.getKind() != ElementKind.CLASS) {
-                throw new IllegalStateException(OutgoingQueueConnection.class.getName() + " must annotate a Class");
-            }
-            classList.add((TypeElement) element);
-        }
-        return classList;
-    }
-
-    protected List<TypeElement> getDependencyClasses() {
-        List<TypeElement> classList = new ArrayList<>();
-        Reflections reflections = new Reflections("com.neo");
-        Set<Class<?>> clazzSet = reflections.get(
-                Scanners.SubTypes.of(Scanners.TypesAnnotated.with(IncomingQueueConnection.class)).asClass());
-        for (Class<?> clazz: clazzSet) {
-            String clazzName = clazz.getName();
-            classList.add(elements.getTypeElement(clazzName));
-        }
-        return classList;
     }
 
     /**
@@ -181,5 +162,4 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
             throw new IllegalArgumentException("Unable to generate src file for " + typeElement.getSimpleName().toString(), ex);
         }
     }
-
 }

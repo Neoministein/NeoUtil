@@ -20,6 +20,21 @@
             <artifactId>neoutil-framework</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!-- Class generation and reflection for processor logic -->
+        <dependency>
+            <groupId>com.squareup</groupId>
+            <artifactId>javapoet</artifactId>
+            <version>${javapoet.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <version>${auto-service.version}</version>
+        </dependency>
+
+        <!-- Test -->
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>

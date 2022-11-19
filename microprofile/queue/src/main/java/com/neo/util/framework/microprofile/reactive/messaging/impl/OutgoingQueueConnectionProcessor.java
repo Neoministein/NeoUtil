@@ -1,41 +1,48 @@
 package com.neo.util.framework.microprofile.reactive.messaging.impl;
 
 import com.google.auto.service.AutoService;
-import com.neo.util.common.impl.annotation.AnnotationProcessorUtils;
+import com.neo.util.common.impl.annotation.ProcessorUtils;
 import com.neo.util.framework.api.queue.OutgoingQueueConnection;
 import com.neo.util.framework.api.queue.QueueProducer;
 import com.squareup.javapoet.*;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 import org.reactivestreams.FlowAdapters;
 import org.reactivestreams.Publisher;
-import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.*;
-import jakarta.enterprise.context.ApplicationScoped;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import javax.lang.model.util.Elements;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.SubmissionPublisher;
 
 @SupportedAnnotationTypes("com.neo.util.framework.api.queue.OutgoingQueueConnection")
-@SupportedSourceVersion(SourceVersion.RELEASE_11)
 @AutoService(Processor.class)
 public class OutgoingQueueConnectionProcessor extends AbstractProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OutgoingQueueConnectionProcessor.class);
 
+    protected static final String PACKAGE_LOCATION = "com.neo.util.framework.microprofile.reactive.messaging";
+
     protected static final String BASIC_ANNOTATION_FIELD_NAME = "value";
     protected static final String QUEUE_PREFIX = "to-";
 
-    private Filer filer;
+    protected Filer filer;
     protected Elements elements;
     protected Map<String, String> existingIncomingAnnotation = new HashMap<>();
     protected Map<String, String> generatedClasses = new HashMap<>();
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latestSupported();
+    }
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -46,8 +53,8 @@ public class OutgoingQueueConnectionProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        List<TypeElement> queueProducerElements = getDependencyClasses();
-        queueProducerElements.addAll((getSourceClasses(roundEnv)));
+        List<TypeElement> queueProducerElements = ProcessorUtils.getTypedElementsAnnotatedWith(roundEnv,
+                elements, OutgoingQueueConnection.class, List.of(ElementKind.CLASS));
         if (queueProducerElements.isEmpty()) {
             return false;
         }
@@ -55,14 +62,14 @@ public class OutgoingQueueConnectionProcessor extends AbstractProcessor {
         Set<? extends Element> incomingElements = roundEnv.getElementsAnnotatedWith(Outgoing.class);
         for (Element element: incomingElements) {
             Parameterizable parameterizable = (Parameterizable) element;
-            existingIncomingAnnotation.put((String) AnnotationProcessorUtils.getAnnotationValue(
-                            element.getAnnotationMirrors(), Outgoing.class, BASIC_ANNOTATION_FIELD_NAME),
+            existingIncomingAnnotation.put(ProcessorUtils.getAnnotationValue(element, Outgoing.class,
+                            BASIC_ANNOTATION_FIELD_NAME),
                     parameterizable.getEnclosingElement().getSimpleName().toString());
         }
         LOGGER.debug("Existing queues {}", existingIncomingAnnotation);
 
         for (TypeElement typeElement: queueProducerElements) {
-            String queueName = (String) AnnotationProcessorUtils.getAnnotationValue(typeElement.getAnnotationMirrors(), OutgoingQueueConnection.class,
+            String queueName = ProcessorUtils.getAnnotationValue(typeElement, OutgoingQueueConnection.class,
                     BASIC_ANNOTATION_FIELD_NAME);
 
             String existingQueueAnnotationClass = existingIncomingAnnotation.get(QUEUE_PREFIX + queueName);
@@ -81,29 +88,6 @@ public class OutgoingQueueConnectionProcessor extends AbstractProcessor {
             generatedClasses.put(queueName, typeElement.getSimpleName().toString());
         }
         return false;
-    }
-
-    protected List<TypeElement> getSourceClasses(RoundEnvironment roundEnv) {
-        List<TypeElement> classList = new ArrayList<>();
-        Set<? extends Element> queueConsumerElements = roundEnv.getElementsAnnotatedWith(OutgoingQueueConnection.class);
-        for (Element element: queueConsumerElements) {
-            if (element.getKind() != ElementKind.CLASS) {
-                throw new IllegalStateException(OutgoingQueueConnection.class.getName() + " must annotate a Class");
-            }
-            classList.add((TypeElement) element);
-        }
-        return classList;
-    }
-
-    protected List<TypeElement> getDependencyClasses() {
-        List<TypeElement> classList = new ArrayList<>();
-        Reflections reflections = new Reflections("com.neo");
-        Set<Class<?>> clazzSet = reflections.get(Scanners.SubTypes.of(Scanners.TypesAnnotated.with(OutgoingQueueConnection.class)).asClass());
-        for (Class<?> clazz: clazzSet) {
-            String clazzName = clazz.getName();
-            classList.add(elements.getTypeElement(clazzName));
-        }
-        return classList;
     }
 
     protected void createConsumeClass(String queueName, TypeElement typeElement) {
@@ -144,7 +128,7 @@ public class OutgoingQueueConnectionProcessor extends AbstractProcessor {
                     .addField(queueEmitter)
                     .build();
 
-            JavaFile javaFile = JavaFile.builder("com.neo.util.framework.microprofile.reactive.messaging", callerClass).build();
+            JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();
 
             LOGGER.debug("Generating src file {}", className);
             javaFile.writeTo(filer);

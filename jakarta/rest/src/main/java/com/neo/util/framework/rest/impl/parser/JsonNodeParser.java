@@ -54,7 +54,7 @@ public class JsonNodeParser implements MessageBodyReader<JsonNode> {
 
     @Override
     public boolean isReadable(Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType) {
-        return true;
+        return JsonNode.class.equals(aClass);
     }
 
     @Override

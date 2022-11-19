@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.*;
 
 public class ResourceUtil {
 
@@ -26,6 +27,7 @@ public class ResourceUtil {
      *
      * @param fileName path to the resource file
      * @return the file's contents
+     *
      * @throws ConfigurationException if read fails for any reason
      */
     public static String getResourceFileAsString(String fileName) {
@@ -45,20 +47,39 @@ public class ResourceUtil {
      * Returns an array with the files in the folder
      *
      * @param folderLocation path to the folder
+     *
      * @return an array with the files in the folder
      */
     public static File[] getFolderContent(String folderLocation) {
-        URL folderURL = classLoader().getResource(folderLocation);
-        if (folderURL != null) {
-            try {
-                return new File(folderURL.toURI()).listFiles();
-            } catch (URISyntaxException ex) {
-                throw new ConfigurationException(ex, EX_CANNOT_READ_FILE_CONTENT, folderLocation);
-            } catch (IllegalArgumentException ex) {
-                return new File[0];
+        try {
+            List<File> content = new LinkedList<>();
+            content.toArray(new File[0]);
+
+            Enumeration<URL> urlEnumeration = classLoader().getResources(folderLocation);
+            while (urlEnumeration.hasMoreElements()) {
+                content.addAll(Arrays.asList(getFolderContent(urlEnumeration.nextElement())));
             }
+            return content.toArray(new File[0]);
+        } catch (IOException ex) {
+            throw new ConfigurationException(ex, EX_CANNOT_READ_FILE_CONTENT, folderLocation);
         }
-        return new File[0];
+    }
+
+    /**
+     * Returns an array with the files in the folder
+     *
+     * @param url path to the folder
+     *
+     * @return an array with the files in the folder
+     */
+    public static File[] getFolderContent(URL url) {
+        try {
+            return new File(url.toURI()).listFiles();
+        } catch (URISyntaxException ex) {
+            throw new ConfigurationException(ex, EX_CANNOT_READ_FILE_CONTENT, url);
+        } catch (IllegalArgumentException ex) {
+            return new File[0];
+        }
     }
 
     protected static ClassLoader classLoader() {

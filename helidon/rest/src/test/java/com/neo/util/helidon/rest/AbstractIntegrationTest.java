@@ -13,7 +13,6 @@ public abstract class AbstractIntegrationTest {
 
     protected JsonNode validateResponse(Response response, int code) {
         Assertions.assertEquals(code, response.getStatus());
-        JsonNode responseBody = JsonUtil.fromJson(response.readEntity(String.class));
-        return responseBody;
+        return JsonUtil.fromJson(response.readEntity(String.class));
     }
 }

@@ -76,6 +76,12 @@
         </dependency>
         <dependency>
             <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-startup</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.neo.util</groupId>
             <artifactId>neoutil-database</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -118,4 +124,21 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.neo.util</groupId>
+                <artifactId>neoutil-rest-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-inboundDto</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

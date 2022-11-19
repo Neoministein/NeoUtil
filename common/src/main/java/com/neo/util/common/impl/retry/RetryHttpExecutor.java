@@ -1,14 +1,11 @@
 package com.neo.util.common.impl.retry;
 
 import com.neo.util.common.impl.exception.CommonRuntimeException;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.function.Supplier;
 
 /**
@@ -30,27 +27,27 @@ public class RetryHttpExecutor {
      * Executes the httpUriRequest via the httpClient and verifies if the response format is correct and reties if it fails
      *
      * @param httpClient the http client which send the request
-     * @param httpUriRequest the request to send
+     * @param request the request to send
      * @param retries the amount of retries available
      *
      * @throws CommonRuntimeException if it fails and no more retries are available
      *
      * @return the response message
      */
-    public String execute(HttpClient httpClient, HttpUriRequest httpUriRequest, int retries) {
+    public String execute(HttpClient httpClient, HttpRequest request, int retries) {
         Supplier<String> action = () -> {
             try {
-                HttpResponse httpResponse = httpClient.execute(httpUriRequest);
-                if (httpResponse.getStatusLine().getStatusCode() != 200) {
-                    throw new RuntimeException("Http call failed "
-                            + "code " + httpResponse.getStatusLine().getStatusCode()
-                            + "message " + httpResponse.getStatusLine().getReasonPhrase());
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() != 200) {
+                    throw new RuntimeException("Http call failed with code " +  response.statusCode());
                 }
-                HttpEntity responseEntity = httpResponse.getEntity();
 
-                return EntityUtils.toString(responseEntity);
-            } catch (IOException | ParseException ex) {
-                throw new RuntimeException("Error while during lazy http call reason " + ex.getMessage());
+                return response.body();
+            } catch (IOException ex) {
+                throw new RuntimeException("Error occurred during lazy http call reason " + ex.getMessage());
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("An InterruptedException occurred during lazy http call");
             }
         };
 
