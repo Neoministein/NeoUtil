@@ -72,7 +72,7 @@ public interface BaseRepository<T extends PersistenceEntity> {
      *
      * @return all {@link T} order
      */
-    List<T> findAll(String... columnOrder);
+    List<T> fetchAll(String... columnOrder);
 
     /**
      * Finds all {@link T} which have the column match the value.

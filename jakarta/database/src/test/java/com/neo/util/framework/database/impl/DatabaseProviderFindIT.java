@@ -7,27 +7,45 @@ import com.neo.util.framework.database.impl.entity.PersonEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
-class DatabaseProviderFindIT extends AbstractIntegrationTest {
+class DatabaseProviderFindIT extends AbstractIntegrationTest<DatabaseProvider> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseProviderFindIT.class);
+
+    @Override
+    protected Class<DatabaseProvider> getSubjectClass() {
+        return DatabaseProvider.class;
+    }
 
     PersonEntity personOne;
     PersonEntity personTwo;
     PersonEntity personThree;
     PersonEntity personFour;
 
+    /*
+     * Normally Thread.sleep should be avoided however we require at least 1 millisecond of delay between the creation
+     * of the entity for the dateRangeSearchTest, since on faster machines it can happen that multiple entities get
+     * created at the same point in time
+     */
+    @SuppressWarnings("java:S2925")
     @BeforeEach
-    void setupEntity() {
+    void setupEntity() throws InterruptedException {
         personOne = new PersonEntity("Heaven Schneider",10,40.0,false);
         personTwo = new PersonEntity("Catherine Leon",20,45.0, false);
         personThree = new PersonEntity("Davian Chang",30,50.0,false);
         personFour = new PersonEntity("Gabriel Ryan",40,55.0,true);
 
         subject.create(personOne);
+        Thread.sleep(1);
         subject.create(personTwo);
+        Thread.sleep(1);
         subject.create(personThree);
+        Thread.sleep(1);
         subject.create(personFour);
     }
 

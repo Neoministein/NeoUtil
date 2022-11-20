@@ -10,7 +10,7 @@
     <artifactId>neoutil-database</artifactId>
     <version>1.0.0</version>
 
-    <name>Neo Util Framework Persistence JAR</name>
+    <name>Neo Util Framework Database JAR</name>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -8,9 +8,11 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
 
 import java.util.*;
 
+@Transactional
 public abstract class BaseRepositoryImpl<T extends PersistenceEntity> extends AbstractDatabaseRepository implements BaseRepository<T> {
 
 
@@ -56,7 +58,7 @@ public abstract class BaseRepositoryImpl<T extends PersistenceEntity> extends Ab
     }
 
     @Override
-    public List<T> findAll(String... columnOrder) {
+    public List<T> fetchAll(String... columnOrder) {
         CriteriaBuilder cb = pcs.getEm().getCriteriaBuilder();
         CriteriaQuery<T> cQuery = cb.createQuery(clazz);
 

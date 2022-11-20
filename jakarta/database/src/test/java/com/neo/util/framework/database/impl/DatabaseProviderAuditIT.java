@@ -10,7 +10,12 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-class DatabaseProviderAuditIT extends AbstractIntegrationTest {
+class DatabaseProviderAuditIT extends AbstractIntegrationTest<DatabaseProvider> {
+
+    @Override
+    protected Class<DatabaseProvider> getSubjectClass() {
+        return DatabaseProvider.class;
+    }
 
     @Test
     void auditCreationTest() {

@@ -1,7 +1,6 @@
-package com.neo.util.framework.database.impl;
+package com.neo.util.framework.database.impl.repository;
 
-import com.neo.util.framework.api.persistence.entity.EntityQuery;
-import com.neo.util.framework.api.persistence.entity.EntityResult;
+import com.neo.util.framework.database.impl.AbstractIntegrationTest;
 import com.neo.util.framework.database.impl.entity.AddressEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -9,11 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
-class DatabaseProviderCrudIT extends AbstractIntegrationTest<DatabaseProvider> {
+class BaseRepositoryIT extends AbstractIntegrationTest<AddressRepository> {
 
     @Override
-    protected Class<DatabaseProvider> getSubjectClass() {
-        return DatabaseProvider.class;
+    protected Class<AddressRepository> getSubjectClass() {
+        return AddressRepository.class;
     }
 
     @Test
@@ -24,14 +23,13 @@ class DatabaseProviderCrudIT extends AbstractIntegrationTest<DatabaseProvider> {
         //Act
         subject.create(address);
 
-        EntityResult<AddressEntity> entityResult = subject.fetch(new EntityQuery<>(AddressEntity.class));
-        AddressEntity result = entityResult.getFirst().get();
+        List<AddressEntity> entityResult = subject.fetchAll();
         //Assert
 
-        Assertions.assertEquals(1, entityResult.getHitCount());
+        Assertions.assertEquals(1, entityResult.size());
 
-        Assertions.assertEquals(address.getCity(), result.getCity());
-        Assertions.assertEquals(address.getZipcode(), result.getZipcode());
+        Assertions.assertEquals(address.getCity(), entityResult.get(0).getCity());
+        Assertions.assertEquals(address.getZipcode(), entityResult.get(0).getZipcode());
     }
 
     @Test
@@ -44,11 +42,10 @@ class DatabaseProviderCrudIT extends AbstractIntegrationTest<DatabaseProvider> {
         subject.create(addressZurich);
         subject.create(addressBern);
 
-        EntityResult<AddressEntity> entityResult = subject.fetch(new EntityQuery<>(AddressEntity.class));
-        List<AddressEntity> result = entityResult.getHits();
+        List<AddressEntity> entityResult = subject.fetchAll();
         //Assert
 
-        Assertions.assertEquals(2, entityResult.getHitCount());
+        Assertions.assertEquals(2, entityResult.size());
     }
 
     @Test
@@ -59,7 +56,7 @@ class DatabaseProviderCrudIT extends AbstractIntegrationTest<DatabaseProvider> {
         //Act
         subject.create(address);
 
-        Optional<AddressEntity> entityResult = subject.fetch(address.getId(), AddressEntity.class);
+        Optional<AddressEntity> entityResult = subject.fetch(address.getId());
         //Assert
 
         Assertions.assertTrue(entityResult.isPresent());
@@ -77,7 +74,7 @@ class DatabaseProviderCrudIT extends AbstractIntegrationTest<DatabaseProvider> {
         //Act
         subject.create(address);
 
-        Optional<AddressEntity> wrongPrimaryKey = subject.fetch(200, AddressEntity.class);
+        Optional<AddressEntity> wrongPrimaryKey = subject.fetch(200);
         //Assert
 
         Assertions.assertFalse(wrongPrimaryKey.isPresent());
@@ -93,13 +90,12 @@ class DatabaseProviderCrudIT extends AbstractIntegrationTest<DatabaseProvider> {
         address.setZipcode(8001);
         subject.edit(address);
 
-        EntityResult<AddressEntity> entityResult = subject.fetch(new EntityQuery<>(AddressEntity.class));
-        AddressEntity result = entityResult.getFirst().get();
+        List<AddressEntity> entityResult = subject.fetchAll();
         //Assert
 
-        Assertions.assertEquals(1, entityResult.getHitCount());
+        Assertions.assertEquals(1, entityResult.size());
 
-        Assertions.assertEquals(8001, result.getZipcode());
+        Assertions.assertEquals(8001, entityResult.get(0).getZipcode());
     }
 
     @Test
@@ -111,10 +107,10 @@ class DatabaseProviderCrudIT extends AbstractIntegrationTest<DatabaseProvider> {
         subject.create(address);
         subject.remove(address);
 
-        EntityResult<AddressEntity> entityResult = subject.fetch(new EntityQuery<>(AddressEntity.class));
+        List<AddressEntity> entityResult = subject.fetchAll();
         //Assert
 
-        Assertions.assertEquals(0, entityResult.getHitCount());
+        Assertions.assertEquals(0, entityResult.size());
     }
 
     @Test
@@ -129,7 +125,7 @@ class DatabaseProviderCrudIT extends AbstractIntegrationTest<DatabaseProvider> {
         subject.create(addressBern);
         subject.create(addressBasel);
 
-        long countResult = subject.count(List.of(), AddressEntity.class);
+        long countResult = subject.count();
         //Assert
 
         Assertions.assertEquals(3, countResult);

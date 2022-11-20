@@ -11,20 +11,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(JtaEnvironment.class)
 @ExtendWith(WeldJunit5Extension.class)
-abstract class AbstractIntegrationTest {
+public abstract class AbstractIntegrationTest<T> {
 
     @WeldSetup
     public WeldInitiator weld = WeldInitiator.from(
-            DatabaseProvider.class,
             M2PersistenceContextService.class,
             RequestDetailsDummy.class,
-            TransactionExtension.class
+            TransactionExtension.class,
+            getSubjectClass()
     ).activate(RequestScoped.class).build();
 
-    protected DatabaseProvider subject;
+    protected abstract Class<T> getSubjectClass();
+
+    protected T subject;
 
     @BeforeEach
     void init() {
-        subject = weld.select(DatabaseProvider.class).get();
+        subject = weld.select(getSubjectClass()).get();
     }
 }
