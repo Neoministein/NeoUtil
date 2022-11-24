@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 
 @SupportedAnnotationTypes("com.neo.util.framework.rest.api.parser.InboundDto")
-@SupportedSourceVersion(SourceVersion.RELEASE_17)
 @AutoService(Processor.class)
 public class InboundDtoProcessor extends AbstractProcessor {
 
@@ -37,13 +36,18 @@ public class InboundDtoProcessor extends AbstractProcessor {
     protected Elements elements;
 
     @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latestSupported();
+    }
+
+    @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         this.filer = processingEnv.getFiler();
         this.elements = processingEnv.getElementUtils();
     }
 
-    @Override
+   @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         List<TypeElement> inboundDtoList = ProcessorUtils.getTypedElementsAnnotatedWith(roundEnv, elements,
                 InboundDto.class, List.of(ElementKind.CLASS, ElementKind.RECORD));
