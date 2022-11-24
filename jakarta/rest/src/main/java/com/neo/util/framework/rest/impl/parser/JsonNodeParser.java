@@ -38,7 +38,7 @@ import java.util.Optional;
 @Consumes({MediaType.APPLICATION_JSON, "text/json"})
 public class JsonNodeParser implements MessageBodyReader<JsonNode> {
 
-    protected static final ExceptionDetails EX_UNKOWN_JSON_SCHEMA = new ExceptionDetails(
+    protected static final ExceptionDetails EX_UNKNOWN_JSON_SCHEMA = new ExceptionDetails(
             "framework/json/unknown-schema", "Invalid json schema to check against {0}.", true
     );
 
@@ -79,6 +79,6 @@ public class JsonNodeParser implements MessageBodyReader<JsonNode> {
 
     protected JsonSchema retrieveSchemaFromString(String schemaLocation) {
         return Optional.ofNullable(schemaMap.get(schemaLocation))
-                .orElseThrow(() -> new ConfigurationException(EX_UNKOWN_JSON_SCHEMA, schemaLocation));
+                .orElseThrow(() -> new ConfigurationException(EX_UNKNOWN_JSON_SCHEMA, schemaLocation));
     }
 }
