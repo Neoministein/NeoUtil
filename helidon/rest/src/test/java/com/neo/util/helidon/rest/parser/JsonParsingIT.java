@@ -50,7 +50,7 @@ class JsonParsingIT extends AbstractIntegrationTest {
 
         Entity<String> content = Entity.entity(JsonUtil.toJson(jsonBody), MediaType.APPLICATION_JSON_TYPE);
         //Act
-        Response response = webTarget.path(JsonEndpointResource.RESOURCE_LOCATION + JsonEndpointResource.P_PARSING).request().method("POST",content);
+        Response response = webTarget.path(JsonEndpointResource.RESOURCE_LOCATION + JsonEndpointResource.P_SCHEMA).request().method("POST",content);
         //Assert
 
         Assertions.assertEquals(200, response.getStatus());
