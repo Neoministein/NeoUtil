@@ -25,7 +25,7 @@ public class DefaultResponseGenerator implements ResponseGenerator {
 
     @Override
     public Response buildResponse(int code, JsonNode data) {
-        return Response.status(code).entity(data).build();
+        return Response.status(code).entity(data.toString()).build();
     }
 
     @Override
