@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
 
@@ -36,7 +36,7 @@ import java.util.Optional;
 @ApplicationScoped
 @Priority(Priorities.ENTITY_CODER)
 @Consumes({MediaType.APPLICATION_JSON, "text/json"})
-public class JsonNodeParser implements MessageBodyReader<JsonNode> {
+public class JsonNodeReader implements MessageBodyReader<JsonNode> {
 
     protected static final ExceptionDetails EX_UNKNOWN_JSON_SCHEMA = new ExceptionDetails(
             "framework/json/unknown-schema", "Invalid json schema to check against {0}.", true
@@ -45,7 +45,7 @@ public class JsonNodeParser implements MessageBodyReader<JsonNode> {
     protected final Map<String, JsonSchema> schemaMap;
 
     @Inject
-    public JsonNodeParser(JsonSchemaLoader jsonSchemaLoader) {
+    public JsonNodeReader(JsonSchemaLoader jsonSchemaLoader) {
         schemaMap = jsonSchemaLoader.getUnmodifiableMap();
     }
 
@@ -62,7 +62,7 @@ public class JsonNodeParser implements MessageBodyReader<JsonNode> {
             MultivaluedMap<String, String> multivaluedMap, InputStream inputStream)
             throws IOException, WebApplicationException {
         try {
-            JsonNode input = JsonUtil.fromJson(StringUtils.toString(inputStream, StandardCharsets.UTF_8));
+            JsonNode input = JsonUtil.fromJson(StringUtils.toString(inputStream, getCharset(mediaType)));
             checkForSchema(input);
             return input;
         } catch (ValidationException ex) {
@@ -80,5 +80,10 @@ public class JsonNodeParser implements MessageBodyReader<JsonNode> {
     protected JsonSchema retrieveSchemaFromString(String schemaLocation) {
         return Optional.ofNullable(schemaMap.get(schemaLocation))
                 .orElseThrow(() -> new ConfigurationException(EX_UNKNOWN_JSON_SCHEMA, schemaLocation));
+    }
+
+    protected Charset getCharset(MediaType m) {
+        String name = (m == null) ? null : m.getParameters().get(MediaType.CHARSET_PARAMETER);
+        return (name == null) ? Charset.defaultCharset() : Charset.forName(name);
     }
 }

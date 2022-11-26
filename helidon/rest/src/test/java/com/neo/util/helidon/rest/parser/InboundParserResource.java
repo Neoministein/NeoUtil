@@ -13,7 +13,7 @@ import jakarta.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 public class InboundParserResource {
 
-    public static final String RESOURCE_LOCATION = "/test/parsing";
+    public static final String RESOURCE_LOCATION = "/test/inbound/parsing";
     public static final String P_BASIC = "/basic";
     public static final String P_ADVANCED = "/advanced";
 

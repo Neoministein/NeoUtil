@@ -1,6 +1,5 @@
 package com.neo.util.framework.rest.impl.response;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
@@ -12,21 +11,6 @@ import jakarta.ws.rs.core.Response;
 
 @ApplicationScoped
 public class DefaultResponseGenerator implements ResponseGenerator {
-
-    @Override
-    public Response success() {
-        return Response.ok().build();
-    }
-
-    @Override
-    public Response success(JsonNode data) {
-        return Response.ok().entity(data.toString()).build();
-    }
-
-    @Override
-    public Response buildResponse(int code, JsonNode data) {
-        return Response.status(code).entity(data.toString()).build();
-    }
 
     @Override
     public Response error(int code, String errorCode, String message) {

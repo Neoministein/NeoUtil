@@ -18,10 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @HelidonTest
-@AddBean(JsonEndpointResource.class)
-class JsonParsingIT extends AbstractIntegrationTest {
+@AddBean(JsonReaderEndpointResource.class)
+class JsonReaderIT extends AbstractIntegrationTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsonParsingIT.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonReaderIT.class);
 
     @Inject
     protected WebTarget webTarget;
@@ -33,7 +33,7 @@ class JsonParsingIT extends AbstractIntegrationTest {
 
         Entity<String> content = Entity.entity(JsonUtil.toJson(json), MediaType.APPLICATION_JSON_TYPE);
         //Act
-        Response response = webTarget.path(JsonEndpointResource.RESOURCE_LOCATION + JsonEndpointResource.P_PARSING).request().method("POST",content);
+        Response response = webTarget.path(JsonReaderEndpointResource.RESOURCE_LOCATION + JsonReaderEndpointResource.P_IN_PARSING).request().method("POST",content);
         //Assert
 
         Assertions.assertEquals(200, response.getStatus());
@@ -50,7 +50,7 @@ class JsonParsingIT extends AbstractIntegrationTest {
 
         Entity<String> content = Entity.entity(JsonUtil.toJson(jsonBody), MediaType.APPLICATION_JSON_TYPE);
         //Act
-        Response response = webTarget.path(JsonEndpointResource.RESOURCE_LOCATION + JsonEndpointResource.P_SCHEMA).request().method("POST",content);
+        Response response = webTarget.path(JsonReaderEndpointResource.RESOURCE_LOCATION + JsonReaderEndpointResource.P_IN_SCHEMA).request().method("POST",content);
         //Assert
 
         Assertions.assertEquals(200, response.getStatus());
@@ -66,7 +66,7 @@ class JsonParsingIT extends AbstractIntegrationTest {
 
         Entity<String> content = Entity.entity(JsonUtil.toJson(jsonBody), MediaType.APPLICATION_JSON_TYPE);
         //Act
-        Response response = webTarget.path(JsonEndpointResource.RESOURCE_LOCATION + JsonEndpointResource.P_SCHEMA).request().method("POST",content);
+        Response response = webTarget.path(JsonReaderEndpointResource.RESOURCE_LOCATION + JsonReaderEndpointResource.P_IN_SCHEMA).request().method("POST",content);
         //Assert
 
         Assertions.assertEquals(400, response.getStatus());

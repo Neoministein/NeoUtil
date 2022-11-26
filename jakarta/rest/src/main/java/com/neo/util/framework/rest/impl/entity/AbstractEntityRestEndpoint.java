@@ -102,7 +102,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
         try {
             entityRepository.remove(entity.get());
             LOGGER.info("Deleted entity [{},{}]",getEntityClass().getSimpleName(), entity.get().getPrimaryKey());
-            return responseGenerator.success();
+            return Response.ok().build();
         } catch (PersistenceException ex) {
             return responseGenerator.error(400, EX_ENTITY_MISSING_FIELDS);
         }
@@ -150,7 +150,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
      * @return the response to be delivered to the client
      */
     protected Response parseToResponse(Object object, Class<?> serializationScope) {
-        return responseGenerator.success(JsonUtil.fromPojo(object, serializationScope));
+        return Response.ok().entity(JsonUtil.fromPojo(object, serializationScope).toString()).build();
     }
 
     protected T parseJSONIntoExistingEntity(String x, Class<?> serializationScope) {

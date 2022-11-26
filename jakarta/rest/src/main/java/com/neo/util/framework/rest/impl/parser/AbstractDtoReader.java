@@ -28,7 +28,7 @@ import java.util.Optional;
  * @param <T> the object the input stream should be parsed into
  */
 @Consumes({"application/json", "text/json", "*/*"})
-public abstract class AbstractDtoParser<T> implements MessageBodyReader<T> {
+public abstract class AbstractDtoReader<T> implements MessageBodyReader<T> {
 
     protected static final ExceptionDetails EX_UNKNOWN_JSON_SCHEMA = new ExceptionDetails(
             "framework/json/unknown-schema", "Invalid json schema to check against {0}.", true
@@ -41,7 +41,7 @@ public abstract class AbstractDtoParser<T> implements MessageBodyReader<T> {
 
     protected final Class<T> clazz;
 
-    protected AbstractDtoParser(Class<T> clazz) {
+    protected AbstractDtoReader(Class<T> clazz) {
         this.clazz = clazz;
     }
 

@@ -51,14 +51,13 @@ public class InboundDtoProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         List<TypeElement> inboundDtoList = ProcessorUtils.getTypedElementsAnnotatedWith(roundEnv, elements,
                 InboundDto.class, List.of(ElementKind.CLASS, ElementKind.RECORD));
-        if (inboundDtoList.isEmpty()) {
-            return true;
+        if (!inboundDtoList.isEmpty()) {
+            LOGGER.debug("Generating associated files for {} annotation", InboundDto.class.getName());
+            for (TypeElement typeElement: inboundDtoList) {
+                createClass(typeElement);
+            }
         }
-
-        LOGGER.debug("Generating associated files for {} annotation", InboundDto.class.getName());
-        for (TypeElement typeElement: inboundDtoList) {
-            createClass(typeElement);
-        }
+        
         return true;
     }
 
@@ -89,7 +88,7 @@ public class InboundDtoProcessor extends AbstractProcessor {
                     .addAnnotation(Provider.class)
                     .addAnnotation(ApplicationScoped.class)
                     .addAnnotation(AnnotationSpec.builder(Priority.class).addMember(BASIC_ANNOTATION_FIELD_NAME, "$L", Priorities.ENTITY_CODER).build())
-                    .superclass(ParameterizedTypeName.get(ClassName.get(AbstractDtoParser.class), ClassName.get(typeElement)))
+                    .superclass(ParameterizedTypeName.get(ClassName.get(AbstractDtoReader.class), ClassName.get(typeElement)))
                     .addMethod(getSchemaLocation)
                     .addField(logger)
                     .build();

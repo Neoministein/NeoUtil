@@ -10,24 +10,24 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path(JsonEndpointResource.RESOURCE_LOCATION)
+@Path(JsonReaderEndpointResource.RESOURCE_LOCATION)
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-public class JsonEndpointResource {
+public class JsonReaderEndpointResource {
 
-    public static final String RESOURCE_LOCATION = "/test/json";
+    public static final String RESOURCE_LOCATION = "/test/";
 
-    public static final String P_PARSING = "/parsing";
+    public static final String P_IN_PARSING = "inbound/json/parsing";
 
-    public static final String P_SCHEMA = "/schema";
+    public static final String P_IN_SCHEMA = "inbound/json/schema";
 
     @POST
-    @Path(P_PARSING)
+    @Path(P_IN_PARSING)
     public Response jsonParsing(JsonNode jsonNode) {
         return Response.ok().entity(JsonUtil.toJson(jsonNode)).build();
     }
 
     @POST
-    @Path(P_SCHEMA)
+    @Path(P_IN_SCHEMA)
     @ValidateJsonSchema("ITSchema.json")
     public Response jsonScheme(JsonNode jsonNode) {
         return Response.ok().entity(JsonUtil.toJson(jsonNode)).build();
