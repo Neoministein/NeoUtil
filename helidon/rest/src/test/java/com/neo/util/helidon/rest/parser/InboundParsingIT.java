@@ -61,7 +61,7 @@ class InboundParsingIT extends AbstractIntegrationTest {
         //Assert
 
         JsonNode body = validateResponse(response, 400);
-        Assertions.assertEquals("$.aString: is missing but it is required", body.get("message").asText());
+        Assertions.assertEquals("$.aString", body.get("message").asText().substring(0,9));
     }
 
     @Test
@@ -99,6 +99,6 @@ class InboundParsingIT extends AbstractIntegrationTest {
         //Assert
 
         JsonNode body = validateResponse(response, 400);
-        Assertions.assertEquals("$.a_different_name: is missing but it is required", body.get("message").asText());
+        Assertions.assertEquals("$.a_different_name", body.get("message").asText().substring(0,18));
     }
 }

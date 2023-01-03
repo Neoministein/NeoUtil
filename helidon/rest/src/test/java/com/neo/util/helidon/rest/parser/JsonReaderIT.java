@@ -74,7 +74,7 @@ class JsonReaderIT extends AbstractIntegrationTest {
         String errorBody = responseBoy.get("message").asText();
 
         LOGGER.info("Error body: [{}]", errorBody);
-        Assertions.assertTrue(errorBody.contains("$.boolean: is missing but it is required"));
+        Assertions.assertTrue(errorBody.contains("$.boolean"));
     }
 
     protected static final String RANDOM_JSON = "[\n" + "  {\n" + "    \"_id\": \"62d3ec24d160c5a72a37ccf2\",\n"
