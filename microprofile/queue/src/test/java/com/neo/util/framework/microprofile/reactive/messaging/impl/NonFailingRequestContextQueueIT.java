@@ -3,6 +3,7 @@ package com.neo.util.framework.microprofile.reactive.messaging.impl;
 import com.neo.util.common.impl.RandomString;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
 import com.neo.util.framework.api.queue.QueueMessage;
+import com.neo.util.framework.impl.RequestContextExecutor;
 import com.neo.util.framework.impl.connection.RequestDetailsProducer;
 import com.neo.util.framework.microprofile.reactive.messaging.RequestQueueProducer; //IMPORTANT: IDE WON'T REFERENCE BUT IT IS COMPILABLE IN MAVEN AND INTELLIJ
 import com.neo.util.framework.microprofile.reactive.messaging.RequestQueueConsumerCaller; //IMPORTANT: IDE WON'T REFERENCE BUT IT IS COMPILABLE IN MAVEN AND INTELLIJ
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.Test;
 @AddExtension(MessagingCdiExtension.class)
 @AddBean(RequestDetailsProducer.class)
 @AddBean(MicroProfileQueueService.class)
+@AddBean(RequestContextExecutor.class)
 @AddBean(RequestQueueService.class)
 @AddBean(RequestQueueConsumer.class)
 @AddBean(MockConnector.class)

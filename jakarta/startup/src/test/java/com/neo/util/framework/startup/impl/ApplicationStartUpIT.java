@@ -1,5 +1,11 @@
 package com.neo.util.framework.startup.impl;
 
+import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
+import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
+import com.neo.util.framework.api.event.ApplicationReadyEvent;
+import com.neo.util.framework.api.event.ApplicationShutdownEvent;
+import com.neo.util.framework.impl.RequestContextExecutor;
+import com.neo.util.framework.impl.connection.RequestDetailsProducer;
 import com.neo.util.framework.startup.impl.event.PostReadyListener;
 import com.neo.util.framework.startup.impl.event.PreReadyListener;
 import com.neo.util.framework.startup.impl.event.ReadyListener;
@@ -26,7 +32,9 @@ class ApplicationStartUpIT {
             ShutDownListener.class,
             PostReadyListener.class,
             ReadyListener.class,
-            PreReadyListener.class
+            PreReadyListener.class,
+            RequestDetailsProducer.class,
+            RequestContextExecutor.class
     ).activate(RequestScoped.class).build();
 
     protected ListenerSequenceRecorder recorder;
@@ -47,9 +55,9 @@ class ApplicationStartUpIT {
 
         //List gets updated since it's the same instance as in the recorder
         Assertions.assertEquals(List.of(
-                PreReadyListener.class,
-                ReadyListener.class,
-                PostReadyListener.class,
-                ShutDownListener.class), callSequence);
+                ApplicationPreReadyEvent.EVENT_NAME,
+                ApplicationReadyEvent.EVENT_NAME,
+                ApplicationPostReadyEvent.EVENT_NAME,
+                ApplicationShutdownEvent.EVENT_NAME), callSequence);
     }
 }

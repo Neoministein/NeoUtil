@@ -2,18 +2,17 @@ package com.neo.util.framework.microprofile.reactive.messaging.impl;
 
 import com.google.auto.service.AutoService;
 import com.neo.util.common.impl.annotation.ProcessorUtils;
+import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.connection.RequestContext;
 import com.neo.util.framework.api.queue.IncomingQueueConnection;
 import com.neo.util.framework.api.queue.QueueListener;
 import com.neo.util.framework.api.queue.QueueMessage;
+import com.neo.util.framework.impl.RequestContextExecutor;
 import com.neo.util.framework.impl.connection.QueueRequestDetails;
-import com.neo.util.framework.impl.connection.RequestDetailsProducer;
 import com.squareup.javapoet.*;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.context.control.RequestContextController;
 import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,16 +111,11 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
                     .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
                     .initializer("$T.getLogger(" + typeElement.getSimpleName().toString() + "Caller.class)",LoggerFactory.class)
                     .build();
-
-            FieldSpec requestContextFactory = FieldSpec.builder(ParameterizedTypeName.get(Provider.class, RequestContextController.class), "requestContextControllerFactory")
-                    .addModifiers(Modifier.PROTECTED)
-                    .addAnnotation(Inject.class)
-                    .build();
-            FieldSpec requestDetailsProducer = FieldSpec.builder(RequestDetailsProducer.class, "requestDetailsProducer")
-                    .addModifiers(Modifier.PROTECTED)
-                    .addAnnotation(Inject.class)
-                    .build();
             FieldSpec queueConsumer = FieldSpec.builder(TypeName.get(typeElement.asType()), "queueConsumer")
+                    .addModifiers(Modifier.PROTECTED)
+                    .addAnnotation(Inject.class)
+                    .build();
+            FieldSpec requestContextExecutor = FieldSpec.builder(RequestContextExecutor.class, "requestContextExecutor")
                     .addModifiers(Modifier.PROTECTED)
                     .addAnnotation(Inject.class)
                     .build();
@@ -130,17 +124,14 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
                     .addAnnotation(AnnotationSpec.builder(Incoming.class)
                             .addMember(BASIC_ANNOTATION_FIELD_NAME,"$S" , QUEUE_PREFIX + queueName).build())
                     .addParameter(String.class, "msg")
-                    .addStatement("final var requestContextController = requestContextControllerFactory.get()")
-                    .addStatement("requestContextController.activate()")
                     .beginControlFlow("try")
                     .addStatement("final var queueMessage = $T.fromJson(msg, $T.class)", JsonUtil.class, QueueMessage.class)
-                    .addStatement("requestDetailsProducer.setRequestDetails(new $T(queueMessage, new $T($S)))",
+                    .addStatement("requestContextExecutor.execute(new $T(queueMessage, new $T($S)), () -> queueConsumer.onMessage(queueMessage))",
                             QueueRequestDetails.class, RequestContext.Queue.class, queueName)
-                    .addStatement("queueConsumer.onMessage(queueMessage)")
+                    .nextControlFlow("catch($T ex)", ValidationException.class)
+                    .addStatement("LOGGER.error($S, ex.getMessage())","Unable to parse incoming queue message [{}], action won't be retried.")
                     .nextControlFlow("catch($T ex)", Exception.class)
                     .addStatement("LOGGER.error($S, ex.getMessage())","Unexpected error occurred while processing a queue [{}], action won't be retried.")
-                    .nextControlFlow("finally")
-                    .addStatement("requestContextController.deactivate()")
                     .endControlFlow()
                     .build();
 
@@ -150,8 +141,7 @@ public class IncomingQueueConnectionProcessor extends AbstractProcessor {
                     .addMethod(consumeMethodBuilder)
                     .addField(queueConsumer)
                     .addField(logger)
-                    .addField(requestContextFactory)
-                    .addField(requestDetailsProducer)
+                    .addField(requestContextExecutor)
                     .build();
 
             JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();

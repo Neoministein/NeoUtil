@@ -1,6 +1,6 @@
 package com.neo.util.framework.api.connection;
 
-public sealed interface RequestContext permits RequestContext.Http, RequestContext.Queue, RequestContext.Scheduler {
+public interface RequestContext {
 
     String toString();
 

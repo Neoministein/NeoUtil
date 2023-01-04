@@ -8,13 +8,13 @@ import java.util.List;
 @ApplicationScoped
 public class ListenerSequenceRecorder {
 
-    protected List<Class<?>> callSequence = new ArrayList<>();
+    protected List<String> callSequence = new ArrayList<>();
 
-    public void addToSequence(Class<?> clazz) {
-        callSequence.add(clazz);
+    public void addToSequence(String eventName) {
+        callSequence.add(eventName);
     }
 
-    public List<Class<?>> getCallSequence() {
+    public List<String> getCallSequence() {
         return callSequence;
     }
 }
