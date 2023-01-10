@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.victools.jsonschema.generator.*;
 import com.github.victools.jsonschema.module.jackson.JacksonModule;
 import com.github.victools.jsonschema.module.jackson.JacksonOption;
+import com.github.victools.jsonschema.module.jakarta.validation.JakartaValidationModule;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.rest.api.parser.InboundDto;
+import com.neo.util.framework.rest.api.parser.SchemaConfig;
 import com.neo.util.framework.rest.impl.parser.InboundDtoProcessor;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
@@ -23,6 +25,7 @@ import org.reflections.util.ConfigurationBuilder;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -55,9 +58,11 @@ public class InboundDtoSchemaMojo extends AbstractMojo {
     protected final Log logger = getLog();
 
     public InboundDtoSchemaMojo() {
-        JacksonModule module = new JacksonModule(JacksonOption.RESPECT_JSONPROPERTY_REQUIRED);
-        SchemaGeneratorConfigBuilder configBuilder = new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2019_09,
-                OptionPreset.PLAIN_JSON).with(Option.FORBIDDEN_ADDITIONAL_PROPERTIES_BY_DEFAULT).with(module);
+        JakartaValidationModule jakartaModule = new JakartaValidationModule();
+        JacksonModule jacksonModule = new JacksonModule(JacksonOption.RESPECT_JSONPROPERTY_REQUIRED);
+        SchemaGeneratorConfigBuilder configBuilder = new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2019_09, OptionPreset.PLAIN_JSON)
+                .with(Option.FORBIDDEN_ADDITIONAL_PROPERTIES_BY_DEFAULT)
+                .with(jacksonModule).with(jakartaModule);
         schemaGenerator = new SchemaGenerator(configBuilder.build());
     }
 
