@@ -1,6 +1,7 @@
 package com.neo.util.framework.api.persistence.search;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.neo.util.common.impl.json.JsonUtil;
 
 import java.util.Date;
 
@@ -25,15 +26,27 @@ public interface Searchable {
      */
     String getIndexName();
 
+
+    /**
+     * The json to store
+     */
+    default ObjectNode getObjectNode() {
+        return JsonUtil.fromPojo(this);
+    }
+
     /**
      * The simple class name of the Searchable
      */
-    String getClassName();
+    default String getClassName() {
+        return this.getClass().getSimpleName();
+    }
 
     /**
      * The index period
      */
-    IndexPeriod getIndexPeriod();
+    default IndexPeriod getIndexPeriod() {
+        return IndexPeriod.DEFAULT;
+    }
 
     /**
      * The creation date
@@ -44,9 +57,4 @@ public interface Searchable {
      * The transaction count
      */
     Long getVersion();
-
-    /**
-     * The Object in json format
-     */
-    ObjectNode getJsonNode();
 }

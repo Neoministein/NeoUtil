@@ -2,12 +2,12 @@ package com.neo.util.framework.elastic.impl;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.api.persistence.search.GenericSearchable;
+import com.neo.util.framework.api.persistence.search.AbstractSearchable;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
 
 import java.util.Date;
 
-public class BasicPersonSearchable extends GenericSearchable {
+public class BasicPersonSearchable extends AbstractSearchable {
 
     public static final String INDEX_NAME = "basicindex";
 
@@ -48,7 +48,7 @@ public class BasicPersonSearchable extends GenericSearchable {
     }
 
     @Override
-    public ObjectNode getJsonNode() {
+    public ObjectNode getObjectNode() {
         return JsonUtil.fromPojo(this);
     }
 

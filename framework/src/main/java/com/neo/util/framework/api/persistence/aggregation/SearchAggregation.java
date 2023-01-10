@@ -8,7 +8,7 @@ import java.io.Serializable;
 public interface SearchAggregation extends Serializable {
 
     /**
-     *  The name of this simpleFieldAggregation
+     *  The name of this aggregations
      */
     String getName();
 }

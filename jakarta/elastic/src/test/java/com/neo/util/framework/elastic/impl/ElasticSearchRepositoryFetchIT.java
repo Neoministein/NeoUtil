@@ -23,7 +23,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 	protected static final String INDEX_NAME_FOR_QUERY = BasicPersonSearchable.INDEX_NAME + "-*";
 	protected static final String FULL_INDEX_NAME_FOR_QUERY = BasicPersonSearchable.INDEX_NAME + "-no-date-v1";
 
-	protected static final int MAX_NUMER_OF_SEARCHABLES = 4;
+	protected static final int MAX_NUMBER_OF_SEARCHABLES = 4;
 
 	protected BasicPersonSearchable personOne;
 	protected BasicPersonSearchable personTwo;
@@ -31,7 +31,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 	protected BasicPersonSearchable personFour;
 
 	@Before
-	public void initSearchable() throws Exception{
+	public void initSearchable() throws Exception {
 		personOne = createSearchable("Heaven Schneider",10,40.0,null);
 		Thread.sleep(1);
 		personTwo = createSearchable("Catherine Leon",20,45.0, false);
@@ -62,13 +62,13 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		//Arrange
 		List<String> desiredField = List.of(Searchable.BUSINESS_ID);
 
-		SearchQuery fromQuery = new SearchQuery(desiredField, MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery fromQuery = new SearchQuery(desiredField, MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new LongRangeSearchCriteria(BasicPersonSearchable.F_AGE, 15L,null)
 		));
-		SearchQuery toQuery = new SearchQuery(desiredField, MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery toQuery = new SearchQuery(desiredField, MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new LongRangeSearchCriteria(BasicPersonSearchable.F_AGE, null,35L)
 		));
-		SearchQuery betweenQuery = new SearchQuery(desiredField, MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery betweenQuery = new SearchQuery(desiredField, MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new LongRangeSearchCriteria(BasicPersonSearchable.F_AGE, 15L,35L)
 		));
 		//Act
@@ -101,13 +101,13 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		//Arrange
 		List<String> desiredField = List.of(BasicPersonSearchable.F_WEIGHT);
 
-		SearchQuery fromQuery = new SearchQuery(desiredField, MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery fromQuery = new SearchQuery(desiredField, MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new DoubleRangeSearchCriteria(BasicPersonSearchable.F_WEIGHT, 42.5,null)
 		));
-		SearchQuery toQuery = new SearchQuery(desiredField, MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery toQuery = new SearchQuery(desiredField, MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new DoubleRangeSearchCriteria(BasicPersonSearchable.F_WEIGHT, null,42.5)
 		));
-		SearchQuery betweenQuery = new SearchQuery(desiredField, MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery betweenQuery = new SearchQuery(desiredField, MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new DoubleRangeSearchCriteria(BasicPersonSearchable.F_WEIGHT, 42.5,52.5)
 		));
 		//Act
@@ -142,7 +142,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 	@Test
 	public void explicitBooleanSearchSearchTest() {
 		//Arrange
-		SearchQuery searchQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery searchQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new ExplicitSearchCriteria(BasicPersonSearchable.F_HAS_TWO_ARMS, true)
 		));
 		//Act
@@ -161,7 +161,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 	@Test
 	public void explicitIntegerSearchSearchTest() {
 		//Arrange
-		SearchQuery searchQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery searchQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new ExplicitSearchCriteria(BasicPersonSearchable.F_AGE, 20)
 		));
 		//Act
@@ -181,11 +181,11 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 	public void explicitWildcardSearchTest() {
 		//Arrange
 
-		SearchQuery starQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery starQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new ExplicitSearchCriteria(BasicPersonSearchable.F_NAME + ".keyword", "*Leon*", true)
 		));
 
-		SearchQuery questionQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery questionQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new ExplicitSearchCriteria(BasicPersonSearchable.F_NAME + ".keyword", "Heaven Schne?der", true)
 		));
 		//Act
@@ -207,7 +207,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 	public void explicitStringSearchSearchTest() {
 		//Arrange
 
-		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new ExplicitSearchCriteria(BasicPersonSearchable.F_NAME + ".keyword", "Catherine Leon")
 		));
 		//Act
@@ -226,7 +226,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 	@Test
 	public void existingSearchTest() {
 		//Arrange
-		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new ExistingFieldSearchCriteria(BasicPersonSearchable.F_HAS_TWO_ARMS)
 		));
 
@@ -248,11 +248,11 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 	@Test
 	public void dateRangeSearchTest() {
 		//Arrange
-		SearchQuery fromQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery fromQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new DateSearchCriteria(BasicPersonSearchable.F_TIMESTAMP, personTwo.getTimestamp(), null)));
-		SearchQuery toQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery toQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new DateSearchCriteria(BasicPersonSearchable.F_TIMESTAMP, null, personTwo.getTimestamp())));
-		SearchQuery betweenQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery betweenQuery = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new DateSearchCriteria(BasicPersonSearchable.F_TIMESTAMP, personTwo.getTimestamp(), personThree.getTimestamp())));
 
 		//Act
@@ -283,7 +283,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 	@Test
 	public void containsSearchTest() {
 		//Arrange
-		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new ContainsSearchCriteria(BasicPersonSearchable.F_AGE, 0, 10,40)));
 		//Act
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
@@ -302,7 +302,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 	@Test
 	public void combinedSearchAndTest() {
 		//Arrange
-		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new CombinedSearchCriteria(
 						new ContainsSearchCriteria(BasicPersonSearchable.F_AGE, 0, 10,40),
 						new ExplicitSearchCriteria(BasicPersonSearchable.F_NAME, "*ne*", true))));
@@ -322,7 +322,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 	@Test
 	public void combinedSearchOrTest() {
 		//Arrange
-		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMER_OF_SEARCHABLES, List.of(
+		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMBER_OF_SEARCHABLES, List.of(
 				new CombinedSearchCriteria(CombinedSearchCriteria.Association.OR,
 						new ContainsSearchCriteria(BasicPersonSearchable.F_AGE, 0, 10,40),
 						new ExplicitSearchCriteria(BasicPersonSearchable.F_NAME, "*ne*", true))));
@@ -428,6 +428,32 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			//Assert
 			return true;
 		});
+	}
+
+	@Test
+	public void termAggregationTest() {
+		TermAggregation termAggregation = new TermAggregation("termAggregation", "name.keyword", "0", false,
+				List.of(new SimpleFieldAggregation("0", BasicPersonSearchable.F_WEIGHT, SimpleFieldAggregation.Type.AVG)));
+
+		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID),0 ,0,
+				null ,List.of(), Map.of(), List.of(termAggregation), false);
+
+		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
+			flushAndRefresh();
+			SearchResult result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query);
+
+			TermAggregationResult termAggregationResult = (TermAggregationResult) result.getAggregations().get("termAggregation");
+			List<TermAggregationResult.Bucket> buckets = termAggregationResult.getBuckets();
+
+			Assertions.assertEquals("Gabriel Ryan",buckets.get(0).key());
+			Assertions.assertEquals("Davian Chang",buckets.get(1).key());
+			Assertions.assertEquals("Catherine Leon",buckets.get(2).key());
+			Assertions.assertEquals("Heaven Schneider",buckets.get(3).key());
+
+			//Assert
+			return true;
+		});
+
 	}
 
 	protected BasicPersonSearchable createSearchable(String name, int age, Double weight, Boolean hasTwoArms) {

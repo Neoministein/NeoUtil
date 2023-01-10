@@ -1,7 +1,9 @@
 package com.neo.util.framework.api.persistence.aggregation;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
- * Defines simpleFieldAggregation result from a {@link SimpleFieldAggregation}
+ * Defines aggregations result from a {@link SimpleFieldAggregation}
  */
 public record SimpleAggregationResult(String name, Object value) implements AggregationResult {
 
@@ -10,6 +12,7 @@ public record SimpleAggregationResult(String name, Object value) implements Aggr
         return name;
     }
 
+    @JsonValue
     public Object getValue() {
         return value;
     }

@@ -25,6 +25,7 @@ import com.neo.util.framework.api.persistence.search.*;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionProvider;
 import com.neo.util.framework.elastic.api.IndexNamingService;
+import com.neo.util.framework.elastic.api.aggregation.BucketScriptAggregation;
 import jakarta.inject.Provider;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.DocWriteRequest;
@@ -58,6 +59,7 @@ import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * This class provides methods to interact with elastic search
@@ -344,7 +346,10 @@ public class ElasticSearchProvider implements SearchProvider {
             builder.timeout(new TimeValue(parameters.getTimeout().get(), TimeUnit.MILLISECONDS).toString());
         }
 
-        addSearchFilters(parameters.getFilters(), builder);
+        if (!parameters.getFilters().isEmpty()) {
+            builder.query(buildQuery(parameters.getFilters())._toQuery());
+        }
+
         if (parameters.getFields().isPresent()) {
             if (parameters.getFields().get().isEmpty()) {
                 //If no fields are requested, then the result doesn't need any hits
@@ -381,8 +386,7 @@ public class ElasticSearchProvider implements SearchProvider {
             }
             builder.sort(sortOptions);
         }
-
-        addAggregations(parameters.getAggregations(), builder);
+        builder.aggregations(buildAggregations(parameters.getAggregations()));
 
         LOGGER.debug("Executing search on index {} with parameters {}, builder {}", index, parameters, builder);
 
@@ -519,17 +523,15 @@ public class ElasticSearchProvider implements SearchProvider {
         }
     }
 
-    protected void addSearchFilters(List<SearchCriteria> searchFilters, SearchRequest.Builder builder) {
-        if (!searchFilters.isEmpty()) {
-            BoolQuery.Builder boolQuery = co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders.bool();
-            List<Query> queryList = new ArrayList<>();
-            for (SearchCriteria filter : searchFilters) {
-                // all filters are added with AND (means must)
-                queryList.add(buildInnerQuery(filter));
-            }
-            boolQuery.must(queryList);
-            builder.query(boolQuery.build()._toQuery());
+    protected BoolQuery buildQuery(List<SearchCriteria> searchFilters) {
+        BoolQuery.Builder boolQuery = QueryBuilders.bool();
+        List<Query> queryList = new ArrayList<>();
+        for (SearchCriteria filter : searchFilters) {
+            // all filters are added with AND (means must)
+            queryList.add(buildInnerQuery(filter));
         }
+        boolQuery.must(queryList);
+        return boolQuery.build();
     }
 
     protected Query buildInnerQuery(SearchCriteria filter) {
@@ -644,43 +646,77 @@ public class ElasticSearchProvider implements SearchProvider {
         };
     }
 
-    protected void addAggregations(List<SearchAggregation> aggregations, SearchRequest.Builder builder) {
+    protected Map<String, Aggregation> buildAggregations(List<SearchAggregation> aggregations) {
         Map<String, Aggregation> aggregationMap = new TreeMap<>();
         for (SearchAggregation aggregation : aggregations) {
-             if (aggregation instanceof SimpleFieldAggregation simpleFieldAgg) {
-                 aggregationMap.put(simpleFieldAgg.getName(),
-                         buildAggregation(
-                                 simpleFieldAgg.getType(),
-                                 simpleFieldAgg.getFieldName()));
-            } else if (aggregation instanceof CriteriaAggregation criteriaAggregation
-                     && criteriaAggregation.getSearchCriteriaMap().size() > 1) {
-                 Map<String, Query> filterMap = new TreeMap<>();
-                 for (Map.Entry<String, SearchCriteria> entry: criteriaAggregation.getSearchCriteriaMap().entrySet()) {
-                     filterMap.put(entry.getKey(), buildInnerQuery(entry.getValue()));
-                 }
-                 FiltersAggregation filtersAggregate = AggregationBuilders.filters().filters(new Buckets.Builder<Query>().keyed(filterMap).build()).build();
-
-                 Aggregation subAggregationMap = buildAggregation(
-                         criteriaAggregation.getAggregation().getType(),
-                         criteriaAggregation.getAggregation().getFieldName());
-                 aggregationMap.put(
-                         criteriaAggregation.getName(),
-                         new Aggregation.Builder().filters(filtersAggregate).aggregations(criteriaAggregation.getName(), subAggregationMap).build());
-            }
+            aggregationMap.put(aggregation.getName(), buildAggregation(aggregation));
         }
-        builder.aggregations(aggregationMap);
+        return aggregationMap;
     }
 
-    protected Aggregation buildAggregation(SimpleFieldAggregation.Type aggregationType, String fieldName) {
-        return switch (aggregationType) {
-            case MAX -> AggregationBuilders.max(agg -> agg.field(fieldName));
-            case AVG -> AggregationBuilders.avg(agg -> agg.field(fieldName));
-            case MIN -> AggregationBuilders.min(agg -> agg.field(fieldName));
-            case SUM -> AggregationBuilders.sum(agg -> agg.field(fieldName));
-            case CARDINALITY -> AggregationBuilders.cardinality(agg -> agg.field(fieldName));
-            default -> AggregationBuilders.valueCount(agg -> agg.field(fieldName));
+    protected Aggregation buildAggregation(SearchAggregation aggregation) {
+        return switch (aggregation) {
+            case SimpleFieldAggregation simpleFieldAgg -> buildAggregation(simpleFieldAgg);
+            case CriteriaAggregation criteriaAggregation && !criteriaAggregation.getSearchCriteriaMap().isEmpty() ->
+                    buildAggregation(criteriaAggregation);
+            case TermAggregation termAggregation -> buildAggregation(termAggregation);
+            case BucketScriptAggregation bucketScriptAggregation -> buildAggregation(bucketScriptAggregation);
+            case null -> throw new IllegalStateException("SearchAggregation unsupported class: null");
+            case default -> throw new IllegalStateException("SearchAggregation unsupported class: " + aggregation.getClass().getName());
         };
     }
+
+    protected Aggregation buildAggregation(SimpleFieldAggregation agg) {
+        return switch (agg.getType()) {
+            case MAX -> AggregationBuilders.max(val -> val.field(agg.getFieldName()));
+            case AVG -> AggregationBuilders.avg(val -> val.field(agg.getFieldName()));
+            case MIN -> AggregationBuilders.min(val -> val.field(agg.getFieldName()));
+            case SUM -> AggregationBuilders.sum(val -> val.field(agg.getFieldName()));
+            case CARDINALITY -> AggregationBuilders.cardinality(val -> val.field(agg.getFieldName()));
+            default -> AggregationBuilders.valueCount(val -> val.field(agg.getFieldName()));
+        };
+    }
+
+    protected Aggregation buildAggregation(BucketScriptAggregation agg) {
+        return new Aggregation.Builder().bucketScript(
+                val -> val.script(script -> script.inline(inline -> inline.source(agg.getScript())))
+                        .bucketsPath(path -> path.dict(agg.getPath()))).build();
+    }
+
+    protected Aggregation buildAggregation(CriteriaAggregation agg) {
+        Map<String, Query> filterMap = new TreeMap<>();
+        for (Map.Entry<String, SearchCriteria> entry: agg.searchCriteriaMap().entrySet()) {
+            filterMap.put(entry.getKey(), buildInnerQuery(entry.getValue()));
+        }
+        FiltersAggregation filtersAggregate = AggregationBuilders.filters().filters(new Buckets.Builder<Query>().keyed(filterMap).build()).build();
+
+        if (agg.getAggregation().isEmpty()) {
+            return filtersAggregate._toAggregation();
+        }
+
+        return new Aggregation.Builder().filters(filtersAggregate)
+                .aggregations(agg.getAggregation().get().getName(), buildAggregation(agg.getAggregation().get())).build();
+    }
+
+    protected Aggregation buildAggregation(TermAggregation agg) {
+        TermsAggregation.Builder termsAggregation = AggregationBuilders.terms().field(agg.getFieldName());
+        if (agg.getMaxResults().isPresent()) {
+            termsAggregation.size(agg.getMaxResults().get());
+        }
+
+        Map<String, Aggregation> aggregationMap = agg.aggregations().stream().collect(
+                Collectors.toMap(SearchAggregation::getName, this::buildAggregation));
+
+        if (agg.getAggregationToOrderAfter().isPresent() && agg.isAsc().isPresent()) {
+            aggregationMap.put("sortByBucketSort", new Aggregation.Builder().bucketSort(bucket ->
+                    bucket.sort(List.of(SortOptions.of(sortOption -> sortOption.field(field ->
+                            field.field(agg.getAggregationToOrderAfter().get()).order(
+                                    agg.isAsc().get() ? SortOrder.Asc : SortOrder.Desc)))))).build());
+        }
+
+        return new Aggregation.Builder().terms(termsAggregation.build()).aggregations(aggregationMap).build();
+    }
+
 
     protected SearchResult parseSearchResponse(SearchQuery parameters, SearchResponse<ObjectNode> response) {
         return new SearchResult(
@@ -712,40 +748,59 @@ public class ElasticSearchProvider implements SearchProvider {
 
         if (aggregations != null) {
             for (Map.Entry<String, Aggregate> agg : aggregations.entrySet()) {
-                AggregateVariant variant = (AggregateVariant) agg.getValue()._get();
-                String key = agg.getKey();
-
-                if (variant instanceof SingleMetricAggregateBase singleValue) {
-                    aggregationResults.put(key, new SimpleAggregationResult(key, singleValue.value()));
-                } else if (variant instanceof FiltersAggregate filtersAggregate) {
-                    parseFilterAggregation(aggregationResults, filtersAggregate, filtersAggregate.buckets(), key);
-                } else {
-                    LOGGER.warn("Unsupported simpleFieldAggregation variant received [{}]", variant._aggregateKind());
-                }
+                aggregationResults.put(agg.getKey(), parseAggregation(agg.getValue(), agg.getKey()));
             }
         }
         return aggregationResults;
     }
 
-    protected void parseFilterAggregation(Map<String, AggregationResult> toAddTo,
-            FiltersAggregate filtersAggregate, Buckets<FiltersBucket> buckets, String key) {
-        switch (filtersAggregate.buckets()._kind()) {
-        case Keyed:
-            Map<String, Object> result = new HashMap<>(buckets.keyed().size());
-            for (Map.Entry<String, FiltersBucket> bucket: buckets.keyed().entrySet()) {
-                for (Map.Entry<String, Aggregate> aggregate: bucket.getValue().aggregations().entrySet()) {
-                    if (aggregate.getValue()._get() instanceof SingleMetricAggregateBase singleValue) {
-                        result.put(bucket.getKey(), singleValue.value());
-                    } else {
-                        LOGGER.warn("Unsupported simpleFieldAggregation variant received [{}]", aggregate.getValue()._kind());
-                    }
+    protected AggregationResult parseAggregation(Aggregate agg, String key) {
+        AggregateVariant variant = (AggregateVariant) agg._get();
+
+        if (variant instanceof SingleMetricAggregateBase singleValue) {
+            return new SimpleAggregationResult(key, singleValue.value());
+        } else if (variant instanceof FiltersAggregate filtersAggregate) {
+            return parseFilterAggregation(filtersAggregate, filtersAggregate.buckets(), key);
+        } else if (variant instanceof TermsAggregateBase<?> termsAggregateBase) {
+            return parseTermAggregation(termsAggregateBase,key);
+        } else {
+            throw new IllegalStateException("Unsupported aggregations variant received:" + variant._aggregateKind());
+        }
+    }
+
+    protected AggregationResult parseFilterAggregation(FiltersAggregate filtersAggregate,
+            Buckets<FiltersBucket> buckets, String key) {
+        if (!Buckets.Kind.Keyed.equals(filtersAggregate.buckets()._kind())) {
+            throw new IllegalStateException("Unsupported filter value type: " +filtersAggregate.buckets()._kind());
+        }
+        Map<String, Object> result = new HashMap<>(buckets.keyed().size());
+        for (Map.Entry<String, FiltersBucket> bucket: buckets.keyed().entrySet()) {
+            for (Map.Entry<String, Aggregate> aggregate: bucket.getValue().aggregations().entrySet()) {
+                if (aggregate.getValue()._get() instanceof SingleMetricAggregateBase singleValue) {
+                    result.put(bucket.getKey(), singleValue.value());
+                } else {
+                    throw new IllegalStateException("Unsupported filter value type: " + aggregate.getValue()._kind());
                 }
             }
-            toAddTo.put(key, new CriteriaAggregationResult(key, result));
-            break;
-        case default:
-            LOGGER.warn("Unsupported filter value type [{}]", filtersAggregate.buckets()._kind());
         }
+        return new CriteriaAggregationResult(key, result);
+    }
+
+    protected AggregationResult parseTermAggregation(TermsAggregateBase<?> termsAggregateBase, String key) {
+        if (!Buckets.Kind.Array.equals(termsAggregateBase.buckets()._kind())) {
+            throw new IllegalStateException("Unsupported filter value type: " +termsAggregateBase.buckets()._kind());
+        }
+        List<TermAggregationResult.Bucket> resultBuckets = new LinkedList<>();
+        for (Object bucket: termsAggregateBase.buckets().array()) {
+            if (bucket instanceof StringTermsBucket stringTermsAggregate) {
+                Map<String, Object> aggregationResult = new LinkedHashMap<>();
+                for (Map.Entry<String, Aggregate> agg : stringTermsAggregate.aggregations().entrySet()) {
+                    aggregationResult.put(agg.getKey(), parseAggregation(agg.getValue(), agg.getKey()));
+                }
+                resultBuckets.add(new TermAggregationResult.Bucket(stringTermsAggregate.key() ,aggregationResult));
+            }
+        }
+        return new TermAggregationResult(key, resultBuckets);
     }
 
     protected void addToBulkProcessor(DocWriteRequest<?> request) {
@@ -773,8 +828,10 @@ public class ElasticSearchProvider implements SearchProvider {
 
     protected ObjectNode parseSearchableToObjectNode(Searchable searchable) {
         try {
-            ObjectNode objectNode = searchable.getJsonNode();
-            objectNode.put(Searchable.BUSINESS_ID, searchable.getBusinessId());
+            ObjectNode objectNode = searchable.getObjectNode();
+            if (!StringUtils.isEmpty(searchable.getBusinessId())) {
+                objectNode.put(Searchable.BUSINESS_ID, searchable.getBusinessId());
+            }
             objectNode.put(Searchable.TYPE, searchable.getClassName());
             return objectNode;
         } catch (IllegalArgumentException e) {
