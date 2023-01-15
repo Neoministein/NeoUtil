@@ -17,11 +17,13 @@ public interface SearchProvider {
 
     void index(List<? extends Searchable> searchableList, IndexParameter indexParameter);
 
-    void update(Searchable searchable, boolean partial);
+    void update(Searchable searchable, boolean upsert);
 
-    void update(Searchable searchable, boolean partial, IndexParameter indexParameter);
+    void update(Searchable searchable, boolean upsert, IndexParameter indexParameter);
 
-    void update(List<? extends Searchable> searchableList, boolean partial);
+    void update(List<? extends Searchable> searchableList, boolean upsert);
+
+    void update(List<? extends Searchable> searchableList, boolean upsert, IndexParameter indexParameter);
 
     void delete(Searchable searchable);
 

@@ -7,6 +7,8 @@ import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.elasticsearch.core.CountRequest;
+import co.elastic.clients.elasticsearch.core.CountResponse;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.*;
@@ -227,18 +229,54 @@ public class ElasticSearchProvider implements SearchProvider {
 
     //TODO IMPLEMENT THIS
     @Override
-    public void update(Searchable searchable, boolean partial) {
-        update(searchable, partial, new IndexParameter());
+    public void update(Searchable searchable, boolean upsert) {
+        update(searchable, upsert, new IndexParameter());
     }
 
     @Override
-    public void update(Searchable searchable, boolean partial, IndexParameter indexParameter) {
-        throw new IllegalStateException("Not implemented yet");
+    public void update(Searchable searchable, boolean upsert, IndexParameter indexParameter) {
+        final UpdateRequest updateRequest = generateUpdateRequest(searchable, upsert);
+        if (Synchronization.ASYNCHRONOUS == indexParameter.getSynchronization()) {
+            addToBulkProcessor(updateRequest);
+        } else {
+            try {
+                getClient().update(updateRequest, RequestOptions.DEFAULT);
+            } catch (IOException ex) {
+                throw new CommonRuntimeException(ex, EX_SYNCHRONOUS_INDEXING);
+            } catch (IllegalStateException ex) {
+                reconnectClientIfNeeded(ex);
+                throw ex;
+            }
+        }
     }
 
     @Override
-    public void update(List<? extends Searchable> searchableList, boolean partial) {
-        throw new IllegalStateException("Not implemented yet");
+    public void update(List<? extends Searchable> searchableList, boolean upsert) {
+        update(searchableList, upsert, new IndexParameter());
+    }
+
+    @Override
+    public void update(List<? extends Searchable> searchableList, boolean upsert, IndexParameter indexParameter) {
+        if (Synchronization.ASYNCHRONOUS.equals(indexParameter.getSynchronization())) {
+            for (Searchable searchable : searchableList) {
+                getBulkProcessor().add(generateUpdateRequest(searchable, upsert));
+            }
+        } else {
+            final BulkRequest bulkRequest = new BulkRequest();
+
+            for (Searchable searchable : searchableList) {
+                bulkRequest.add(generateUpdateRequest(searchable, upsert));
+            }
+
+            try {
+                getClient().bulk(bulkRequest, RequestOptions.DEFAULT);
+            } catch (IOException ex) {
+                throw new CommonRuntimeException(ex, EX_SYNCHRONOUS_INDEXING, ex);
+            } catch (IllegalStateException ex) {
+                reconnectClientIfNeeded(ex);
+                throw ex;
+            }
+        }
     }
 
     @Override
@@ -700,18 +738,23 @@ public class ElasticSearchProvider implements SearchProvider {
 
     protected Aggregation buildAggregation(TermAggregation agg) {
         TermsAggregation.Builder termsAggregation = AggregationBuilders.terms().field(agg.getFieldName());
-        if (agg.getMaxResults().isPresent()) {
-            termsAggregation.size(agg.getMaxResults().get());
+        if (agg.getMaxResult().isPresent()) {
+            termsAggregation.size(agg.getMaxResult().get());
+        }
+        if (agg.getPartition().isPresent()) {
+            termsAggregation.include(include -> include.partition(partition -> partition
+                    .partition(agg.getPartition().get().partition())
+                    .numPartitions(agg.getPartition().get().numPartition())));
         }
 
         Map<String, Aggregation> aggregationMap = agg.aggregations().stream().collect(
                 Collectors.toMap(SearchAggregation::getName, this::buildAggregation));
 
-        if (agg.getAggregationToOrderAfter().isPresent() && agg.isAsc().isPresent()) {
+        if (agg.getOrder().isPresent()) {
             aggregationMap.put("sortByBucketSort", new Aggregation.Builder().bucketSort(bucket ->
                     bucket.sort(List.of(SortOptions.of(sortOption -> sortOption.field(field ->
-                            field.field(agg.getAggregationToOrderAfter().get()).order(
-                                    agg.isAsc().get() ? SortOrder.Asc : SortOrder.Desc)))))).build());
+                            field.field(agg.getOrder().get().aggregationToOrderAfter()).order(
+                                    agg.getOrder().get().asc() ? SortOrder.Asc : SortOrder.Desc)))))).build());
         }
 
         return new Aggregation.Builder().terms(termsAggregation.build()).aggregations(aggregationMap).build();
@@ -824,6 +867,25 @@ public class ElasticSearchProvider implements SearchProvider {
             indexRequest.version(searchable.getVersion()).versionType(VersionType.EXTERNAL_GTE);
         }
         return indexRequest;
+    }
+
+    protected UpdateRequest generateUpdateRequest(Searchable searchable, boolean upsert) {
+        String indexName = indexNameService.getIndexName(searchable);
+
+        String source = parseSearchableToObjectNode(searchable).toString();
+
+        UpdateRequest  updateRequest = new UpdateRequest()
+                .index(indexName)
+                .id(searchable.getBusinessId())
+                .doc(source, XContentType.JSON);
+        if (upsert) {
+            updateRequest.upsert(source, XContentType.JSON);
+        }
+
+        if (searchable.getVersion() != null) {
+            updateRequest.version(searchable.getVersion()).versionType(VersionType.EXTERNAL_GTE);
+        }
+        return updateRequest;
     }
 
     protected ObjectNode parseSearchableToObjectNode(Searchable searchable) {

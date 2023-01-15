@@ -45,6 +45,11 @@ public class PretendSearchProvider implements SearchProvider {
     }
 
     @Override
+    public void update(List<? extends Searchable> searchableList, boolean partial, IndexParameter indexParameter) {
+
+    }
+
+    @Override
     public void delete(Searchable searchable) {
 
     }
