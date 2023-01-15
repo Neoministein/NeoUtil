@@ -110,11 +110,11 @@ public class IndexNamingServiceImpl implements IndexNamingService {
         return sb.toString();
     }
 
-    protected String getIndexNamePrefix(Searchable searchable, boolean appendInfix ) {
+    protected String getIndexNamePrefix(Searchable searchable, boolean appendInfix) {
         return (appendInfix  ? getIndexPrefix() : StringUtils.EMPTY) + searchable.getIndexName() + (appendInfix  ? getIndexPostfix() : StringUtils.EMPTY);
     }
 
-    public String getIndexNamePrefixFromClass(Class<?> searchableClazz, boolean appendInfix ) {
+    public String getIndexNamePrefixFromClass(Class<? extends Searchable> searchableClazz, boolean appendInfix) {
         return (appendInfix  ? getIndexPrefix() : StringUtils.EMPTY) + indexNamePrefixes.get(searchableClazz) + (appendInfix  ? getIndexPostfix() : StringUtils.EMPTY);
     }
 

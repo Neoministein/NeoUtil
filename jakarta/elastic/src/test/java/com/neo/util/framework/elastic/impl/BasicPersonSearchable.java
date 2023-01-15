@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.persistence.search.AbstractSearchable;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
+import jakarta.enterprise.context.Dependent;
 
 import java.util.Date;
 
+@Dependent
 public class BasicPersonSearchable extends AbstractSearchable {
 
     public static final String INDEX_NAME = "basicindex";

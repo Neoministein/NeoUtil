@@ -15,7 +15,7 @@ public interface IndexNamingService {
     /**
      * The index name prefix for the class
      */
-    String getIndexNamePrefixFromClass(Class<?> searchableClazz, boolean appendProjectIdPart);
+    String getIndexNamePrefixFromClass(Class<? extends Searchable> searchableClazz, boolean appendProjectIdPart);
 
     /**
      * Since multiple project could be housed in the same Cluster it's the project indices are separated

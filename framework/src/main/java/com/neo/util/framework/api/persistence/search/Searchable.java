@@ -2,11 +2,15 @@ package com.neo.util.framework.api.persistence.search;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.json.JsonUtil;
+import jakarta.enterprise.context.Dependent;
 
 import java.util.Date;
 
 /**
  * Defines necessary functionality of a class that can be indexed into a search provider.
+ * <p>
+ * Classes implementing this interface need to have the {@link Dependent}.
+ * Even though the get instantiated through the new keyword
  */
 public interface Searchable {
 
