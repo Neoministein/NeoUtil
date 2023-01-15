@@ -1,5 +1,7 @@
 package com.neo.util.framework.api.persistence.search;
 
+import com.neo.util.framework.api.persistence.criteria.SearchCriteria;
+
 import java.util.List;
 
 /**
@@ -34,6 +36,10 @@ public interface SearchProvider {
     void process(QueueableSearchable transportSearchable);
 
     void process(List<QueueableSearchable> transportSearchableList);
+
+    long count(Class<? extends Searchable> searchableClazz);
+
+    long count(Class<? extends Searchable> searchableClazz, List<SearchCriteria> searchCriteriaList);
 
     SearchResult fetch(String index, SearchQuery parameters);
 

@@ -374,6 +374,27 @@ public class ElasticSearchProvider implements SearchProvider {
         return bulkQueueableSearchableList;
     }
 
+    public long count(Class<? extends Searchable> searchableClazz) {
+        return count(searchableClazz, List.of());
+    }
+
+    public long count(Class<? extends Searchable> searchableClazz, List<SearchCriteria> searchCriteriaList) {
+        String indexName = indexNameService.getIndexNamePrefixFromClass(searchableClazz, false);
+
+        CountRequest countRequest = new CountRequest.Builder()
+                .index(List.of(indexName))
+                .query(buildQuery(searchCriteriaList)._toQuery()).build();
+
+        try {
+            CountResponse countResponse = getApiClient().count(countRequest);
+            return countResponse.count();
+        } catch (IOException | IllegalStateException ex) {
+            LOGGER.error("Failed to count entries for index {} because of {}", indexName,
+                    ex.getCause());
+            return 0L;
+        }
+    }
+
     @Override
     public SearchResult fetch(String index, SearchQuery parameters) {
         SearchRequest.Builder builder = new SearchRequest.Builder();

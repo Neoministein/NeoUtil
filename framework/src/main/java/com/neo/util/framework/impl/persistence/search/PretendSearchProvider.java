@@ -1,5 +1,6 @@
 package com.neo.util.framework.impl.persistence.search;
 
+import com.neo.util.framework.api.persistence.criteria.SearchCriteria;
 import com.neo.util.framework.api.persistence.search.*;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -72,6 +73,16 @@ public class PretendSearchProvider implements SearchProvider {
     @Override
     public void process(List<QueueableSearchable> transportSearchableList) {
 
+    }
+
+    @Override
+    public long count(Class<? extends Searchable> searchableClazz) {
+        return 0;
+    }
+
+    @Override
+    public long count(Class<? extends Searchable> searchableClazz, List<SearchCriteria> searchCriteriaList) {
+        return 0;
     }
 
     @Override
