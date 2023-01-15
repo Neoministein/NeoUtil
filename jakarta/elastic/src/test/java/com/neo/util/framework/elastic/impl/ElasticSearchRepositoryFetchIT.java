@@ -432,7 +432,8 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 	@Test
 	public void termAggregationTest() {
-		TermAggregation termAggregation = new TermAggregation("termAggregation", "name.keyword", "0", false,
+		TermAggregation termAggregation = new TermAggregation("termAggregation", "name.keyword",
+				new TermAggregation.Order( "0", false),
 				List.of(new SimpleFieldAggregation("0", BasicPersonSearchable.F_WEIGHT, SimpleFieldAggregation.Type.AVG)));
 
 		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID),0 ,0,
