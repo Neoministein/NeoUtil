@@ -1,7 +1,6 @@
 package com.neo.util.framework.elastic.api;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import com.neo.util.framework.elastic.impl.ElasticSearchConnectionStatusEvent;
 
 import java.io.Serializable;
 
@@ -28,7 +27,7 @@ public interface ElasticSearchConnectionProvider extends Serializable {
     void disconnect();
 
     /**
-     * Connects the client to elasticsearch and fires a {@link ElasticSearchConnectionStatusEvent}
+     * Connects the client to elasticsearch
      */
     void connect();
 }

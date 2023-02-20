@@ -23,6 +23,7 @@ import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.api.persistence.aggregation.*;
 import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.search.*;
@@ -130,17 +131,15 @@ public class ElasticSearchProvider implements SearchProvider {
 
     @PreDestroy
     public void preDestroy() {
-        closeBulkProcessor();
+        closeBulkIngester();
         disconnect();
     }
 
-    public void connectionStatusListener(@Observes ElasticSearchConnectionStatusEvent event) {
-        if (ElasticSearchConnectionStatusEvent.STATUS_EVENT_CONNECTED.equals(event.getConnectionStatus())) {
-            setupBulkIngester();
-        }
+    public void connectionStatusListener(@Observes ApplicationReadyEvent event) {
+        setupBulkIngester();
     }
 
-    protected BulkIngester getBulkIngester() {
+    protected BulkIngester<Object> getBulkIngester() {
         if (bulkIngester == null) {
             getApiClient();
             throw new IllegalStateException("Elasticsearch bulkProcessor not ready");
@@ -822,10 +821,11 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
     public void reload() {
-        closeBulkProcessor();
+        closeBulkIngester();
         connection.reloadConfig();
         connection.disconnect();
         connection.connect();
+        setupBulkIngester();
     }
 
     @Override
@@ -854,9 +854,9 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
     /**
-     * prepare shutdown and close bulk processor
+     * Shutdown and close bulk ingester
      */
-    protected void closeBulkProcessor() {
+    protected void closeBulkIngester() {
         // make sure all bulk requests have been processed
         try {
             if (bulkIngester != null) {
@@ -876,19 +876,19 @@ public class ElasticSearchProvider implements SearchProvider {
 
 
         long flushInterval = configService.get(FLUSH_INTERVAL_CONFIG).asInt().orElse(10);
-        LOGGER.info("BulkProcessor.Builder FlushInterval: {}", flushInterval);
+        LOGGER.info("BulkIngester.Builder FlushInterval: {}", flushInterval);
         builder.flushInterval(flushInterval, TimeUnit.SECONDS);
 
         int bulkAction = configService.get(BULK_ACTION_CONFIG).asInt().orElse(2500);
-        LOGGER.info("BulkProcessor.Builder BulkActions: {}", bulkAction);
+        LOGGER.info("BulkIngester.Builder BulkActions: {}", bulkAction);
         builder.maxOperations(bulkAction);
 
         int concurrentRequests = configService.get(CONCURRENT_REQUEST_CONFIG).asInt().orElse(3);
-        LOGGER.info("BulkProcessor.Builder ConcurrentRequests: {}", concurrentRequests);
+        LOGGER.info("BulkIngester.Builder ConcurrentRequests: {}", concurrentRequests);
         builder.maxConcurrentRequests(concurrentRequests);
 
         int bulkSize = configService.get(BULK_SIZE).asInt().orElse(10);
-        LOGGER.info("BulkProcessor.Builder BulkSize: {}", bulkSize);
+        LOGGER.info("BulkIngester.Builder BulkSize: {}", bulkSize);
         builder.maxSize(bulkSize * BYTES_IN_MB);
 
         return builder;

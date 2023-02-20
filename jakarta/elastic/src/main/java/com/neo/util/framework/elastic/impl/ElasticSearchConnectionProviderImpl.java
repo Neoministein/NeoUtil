@@ -8,6 +8,7 @@ import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
+import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionProvider;
 import org.apache.http.HttpHost;
@@ -53,9 +54,6 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
     @Inject
     protected ConfigService configService;
 
-    @Inject
-    protected Event<ElasticSearchConnectionStatusEvent> connectionStatusEvent;
-
     protected volatile ElasticsearchClient elasticsearchClient;
 
     protected List<String> nodeList = new ArrayList<>();
@@ -81,7 +79,7 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
         }
     }
 
-    public void onStartUp(@Observes ApplicationReadyEvent preReadyEvent) {
+    public void onStartUp(@Observes ApplicationPreReadyEvent preReadyEvent) {
         LOGGER.debug("Startup event received");
     }
 
@@ -177,7 +175,6 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
         elasticsearchClient = new ElasticsearchClient(transport);
 
         LOGGER.debug("Initializing elasticsearch complete");
-        connectionStatusEvent.fire(new ElasticSearchConnectionStatusEvent(ElasticSearchConnectionStatusEvent.STATUS_EVENT_CONNECTED));
     }
 
     /**
