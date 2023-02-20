@@ -722,7 +722,7 @@ public class ElasticSearchProvider implements SearchProvider {
                 for (Map.Entry<String, Aggregate> agg : stringTermsAggregate.aggregations().entrySet()) {
                     aggregationResult.put(agg.getKey(), parseAggregation(agg.getValue(), agg.getKey()));
                 }
-                resultBuckets.add(new TermAggregationResult.Bucket(stringTermsAggregate.key().toString() ,aggregationResult));
+                resultBuckets.add(new TermAggregationResult.Bucket(stringTermsAggregate.key().stringValue() ,aggregationResult));
             }
         }
         return new TermAggregationResult(key, resultBuckets);
