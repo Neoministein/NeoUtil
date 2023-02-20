@@ -9,6 +9,8 @@ import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.*;
 import co.elastic.clients.elasticsearch.core.search.*;
+import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
+import co.elastic.clients.elasticsearch.indices.GetIndexRequest;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.JsonpMapper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -261,7 +263,24 @@ public class ElasticSearchProvider implements SearchProvider {
 
     @Override
     public void deleteAll(Class<? extends Searchable> searchableClazz) {
-        throw new IllegalStateException("Not implemented yet");
+        List<String> indices = getIndicesOfSearchable(searchableClazz);
+        if (indices.isEmpty()) {
+            LOGGER.info("No indices found for searchable {}", searchableClazz.getSimpleName());
+            return;
+        }
+
+        DeleteIndexRequest deleteRequest = new DeleteIndexRequest.Builder().index(indices).build();
+        try {
+            getApiClient().indices().delete(deleteRequest);
+            LOGGER.info("Deleted indices {}", indices);
+        } catch (IOException ex) {
+            LOGGER.error("Failed to indices for class {}, index names {}, with exception {}",
+                    searchableClazz.getSimpleName(), indices, ex.getMessage());
+        } catch (ElasticsearchException ex) {
+            LOGGER.error("Failed to indices for class {}, index names {}, with exception {}",
+                    searchableClazz.getSimpleName(), indices, ex.getMessage());
+            throw ex;
+        }
     }
 
     @Override
@@ -917,10 +936,32 @@ public class ElasticSearchProvider implements SearchProvider {
                 QueueableSearchable.RequestType.DELETE);
     }
 
-    public JsonData parseObjectNode(JsonNode objectNode) {
+    protected JsonData parseObjectNode(JsonNode objectNode) {
         JsonpMapper jsonpMapper = getApiClient()._transport().jsonpMapper();
         JsonProvider jsonProvider = jsonpMapper.jsonProvider();
 
         return JsonData.from(jsonProvider.createParser(new StringReader(objectNode.toString())), jsonpMapper);
+    }
+
+    protected List<String> getIndicesOfSearchable(Class<? extends Searchable> searchableClazz) {
+        String searchableIndexName = indexNameService.getIndexNamePrefixFromClass(searchableClazz, true);
+        List<String> searchableIndices = new ArrayList<>();
+        for (String indexName: getAllIndices()) {
+            if (indexName.startsWith(searchableIndexName.concat("-")) || indexName.equals(searchableIndexName)) {
+                searchableIndices.add(indexName);
+            }
+        }
+        return searchableIndices;
+    }
+
+    protected Set<String> getAllIndices() {
+        GetIndexRequest request = new GetIndexRequest.Builder().index("*").build();
+
+        try {
+            return getApiClient().indices().get(request).result().keySet();
+        } catch (IOException ex) {
+            LOGGER.error("Unable to retrieve all indices", ex);
+        }
+        return Set.of();
     }
 }

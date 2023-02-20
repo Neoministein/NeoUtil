@@ -13,10 +13,12 @@ import com.neo.util.common.impl.test.IntegrationTestUtil;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.connection.RequestContext;
 import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.api.persistence.search.Searchable;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 import com.neo.util.framework.impl.connection.SchedulerRequestDetails;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.event.NotificationOptions;
+import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.util.TypeLiteral;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.common.network.NetworkModule;
@@ -70,6 +72,8 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
             }
         };
         indexNamingService.postConstruct();
+
+        indexNamingService.initIndexProperties(new AllSearchables());
         return indexNamingService;
     }
 
@@ -349,6 +353,51 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         @Override
         public <U extends T> CompletionStage<U> fireAsync(U u, NotificationOptions options) {
             return null;
+        }
+    }
+
+    protected static class AllSearchables implements Instance<Searchable> {
+
+        protected static final List<Searchable> ALL_SEARCHABLE = List.of(new BasicPersonSearchable());
+
+        @Override
+        public Instance<Searchable> select(Annotation... annotations) {
+            return null;
+        }
+
+        @Override
+        public <U extends Searchable> Instance<U> select(Class<U> aClass, Annotation... annotations) {
+            return null;
+        }
+
+        @Override
+        public <U extends Searchable> Instance<U> select(TypeLiteral<U> typeLiteral, Annotation... annotations) {
+            return null;
+        }
+
+        @Override
+        public boolean isUnsatisfied() {
+            return false;
+        }
+
+        @Override
+        public boolean isAmbiguous() {
+            return false;
+        }
+
+        @Override
+        public void destroy(Searchable searchable) {
+
+        }
+
+        @Override
+        public Searchable get() {
+            return null;
+        }
+
+        @Override
+        public Iterator<Searchable> iterator() {
+            return ALL_SEARCHABLE.iterator();
         }
     }
 }

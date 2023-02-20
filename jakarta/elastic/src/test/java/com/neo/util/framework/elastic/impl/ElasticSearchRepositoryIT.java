@@ -270,6 +270,21 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 		Assert.assertTrue("At least one record expected, SearchResult:" + result, result.getHits().size() >= 1);
 	}
 
+	@Test
+	public void getAllIndicesTest() {
+		indexBasicSearchable(UUID.randomUUID().toString());
+		Set<String> allIndices = elasticSearchRepository.getAllIndices();
+		Assert.assertEquals(1, allIndices.size());
+		Assert.assertEquals("basicindex-no-date-v1", allIndices.toArray()[0]);
+	}
+
+	@Test
+	public void getIndicesOfSearchableTest() {
+		indexBasicSearchable(UUID.randomUUID().toString());
+		List<String> indices = elasticSearchRepository.getIndicesOfSearchable(BasicPersonSearchable.class);
+		Assert.assertEquals(1, indices.size());
+	}
+
 	/*
 	Test Helper Methods
 	 */
