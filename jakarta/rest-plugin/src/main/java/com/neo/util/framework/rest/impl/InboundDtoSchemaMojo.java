@@ -7,7 +7,6 @@ import com.github.victools.jsonschema.module.jackson.JacksonOption;
 import com.github.victools.jsonschema.module.jakarta.validation.JakartaValidationModule;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.rest.api.parser.InboundDto;
-import com.neo.util.framework.rest.api.parser.SchemaConfig;
 import com.neo.util.framework.rest.impl.parser.InboundDtoProcessor;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
@@ -25,7 +24,6 @@ import org.reflections.util.ConfigurationBuilder;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
