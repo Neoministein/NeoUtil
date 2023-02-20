@@ -14,8 +14,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <elastic.version>7.17.6</elastic.version>
-        <elastic.high-level-rest.version>7.17.6</elastic.high-level-rest.version>
+        <elastic.version>8.6.2</elastic.version>
     </properties>
 
     <dependencies>
@@ -27,23 +26,12 @@
         </dependency>
         <!-- Module specific -->
         <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-high-level-client</artifactId>
-            <version>${elastic.high-level-rest.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>co.elastic.clients</groupId>
             <artifactId>elasticsearch-java</artifactId>
-            <version>${elastic.version}</version>
+            <version>8.7.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Testing -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.elasticsearch.test</groupId>
             <artifactId>framework</artifactId>
@@ -60,9 +48,8 @@
         </dependency>
         <dependency>
             <groupId>org.elasticsearch.plugin</groupId>
-            <artifactId>transport-netty4-client</artifactId>
+            <artifactId>transport-netty4</artifactId>
             <version>${elastic.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>

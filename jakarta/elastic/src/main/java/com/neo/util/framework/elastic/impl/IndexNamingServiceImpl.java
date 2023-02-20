@@ -5,15 +5,16 @@ import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.Searchable;
 import com.neo.util.framework.elastic.api.IndexNamingService;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
+
+import java.text.SimpleDateFormat;
+import java.time.temporal.TemporalAccessor;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,10 +33,10 @@ public class IndexNamingServiceImpl implements IndexNamingService {
     protected static final String DEFAULT_MAPPING_VERSION = "v1";
 
 
-    protected static final DateTimeFormatter INDEX_DATE_FORMAT_DAY = DateTimeFormat.forPattern("yyyy.MM.ww.DDD");
-    protected static final DateTimeFormatter INDEX_DATE_FORMAT_WEEK = DateTimeFormat.forPattern("yyyy.MM.ww");
-    protected static final DateTimeFormatter INDEX_DATE_FORMAT_MONTH = DateTimeFormat.forPattern("yyyy.MM");
-    protected static final DateTimeFormatter INDEX_DATE_FORMAT_YEAR = DateTimeFormat.forPattern("yyyy");
+    protected static final SimpleDateFormat INDEX_DATE_FORMAT_DAY = new SimpleDateFormat("yyyy.MM.ww.DDD");
+    protected static final SimpleDateFormat INDEX_DATE_FORMAT_WEEK = new SimpleDateFormat("yyyy.MM.ww");
+    protected static final SimpleDateFormat INDEX_DATE_FORMAT_MONTH = new SimpleDateFormat("yyyy.MM");
+    protected static final SimpleDateFormat INDEX_DATE_FORMAT_YEAR = new SimpleDateFormat("yyyy");
 
     protected String mappingVersion;
     protected String indexPrefix;
@@ -136,15 +137,13 @@ public class IndexNamingServiceImpl implements IndexNamingService {
         if (IndexPeriod.EXTERNAL.equals(indexPeriod)) {
             return StringUtils.EMPTY;
         }
-        DateTimeFormatter formatter = getDateFormatter(indexPeriod);
-
-        return getDateFormatString(new DateTime(searchable.getCreationDate()), formatter);
+        return getDateFormatString(searchable.getCreationDate(), getDateFormatter(indexPeriod));
     }
 
     /**
      * Returns the appropriate date formatter for the given index period.
      */
-    protected DateTimeFormatter getDateFormatter(IndexPeriod indexPeriod) {
+    protected SimpleDateFormat getDateFormatter(IndexPeriod indexPeriod) {
         return switch (indexPeriod) {
             case DAILY -> INDEX_DATE_FORMAT_DAY;
             case WEEKLY -> INDEX_DATE_FORMAT_WEEK;
@@ -157,12 +156,12 @@ public class IndexNamingServiceImpl implements IndexNamingService {
     }
 
     /**
-     * Formats the given {@link DateTime} with the given formatter. When the formatter is null the default value will be
+     * Formats the given {@link TemporalAccessor} with the given formatter. When the formatter is null the default value will be
      * returned.
      */
-    protected String getDateFormatString(DateTime dateTime, DateTimeFormatter formatter) {
+    protected String getDateFormatString(Date dateTime, SimpleDateFormat formatter) {
         if (formatter != null) {
-            return formatter.print(dateTime);
+            return formatter.format(dateTime);
         } else {
             return SEARCH_PROVIDER_NO_DATE_INDEX_POSTFIX;
         }

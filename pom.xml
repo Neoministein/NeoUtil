@@ -34,7 +34,7 @@
 		<json-schema-validator.version>1.0.76</json-schema-validator.version>
 
 		<!-- MP Implementation -->
-		<helidon.version>3.0.2</helidon.version>
+		<helidon.version>3.1.2</helidon.version>
 		<!-- Testing -->
 		<junit.version>5.9.0</junit.version>
 		<mockito.version>4.8.0</mockito.version>
@@ -47,7 +47,7 @@
 		<maven.testing.version>3.3.0</maven.testing.version>
 		<maven.tools.version>3.6.4</maven.tools.version>
 		<maven.plugin.plugin.version>3.7.0</maven.plugin.plugin.version>
-		<surefire.version>3.0.0-M7</surefire.version>
+		<surefire.version>3.0.0-M8</surefire.version>
 	</properties>
 
 	<build>

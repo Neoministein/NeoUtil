@@ -1,7 +1,5 @@
 package com.neo.util.framework.elastic.impl;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.persistence.search.AbstractSearchable;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import jakarta.enterprise.context.Dependent;
@@ -47,11 +45,6 @@ public class BasicPersonSearchable extends AbstractSearchable {
     @Override
     public IndexPeriod getIndexPeriod() {
         return IndexPeriod.ALL;
-    }
-
-    @Override
-    public ObjectNode getObjectNode() {
-        return JsonUtil.fromPojo(this);
     }
 
     public String getName() {

@@ -1,6 +1,7 @@
 package com.neo.util.framework.api.persistence.search;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.json.JsonUtil;
 import jakarta.enterprise.context.Dependent;
 
@@ -35,7 +36,16 @@ public interface Searchable {
      * The json to store
      */
     default ObjectNode getObjectNode() {
-        return JsonUtil.fromPojo(this);
+        try {
+            ObjectNode objectNode = JsonUtil.fromPojo(this);
+            if (!StringUtils.isEmpty(getBusinessId())) {
+                objectNode.put(Searchable.BUSINESS_ID, getBusinessId());
+            }
+            objectNode.put(Searchable.TYPE, getClassName());
+            return objectNode;
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalStateException("Error while parsing searchable to json: " + getClassName() + ":" + getBusinessId(), ex);
+        }
     }
 
     /**

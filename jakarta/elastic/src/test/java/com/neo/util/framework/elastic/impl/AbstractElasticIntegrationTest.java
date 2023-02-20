@@ -3,6 +3,7 @@ package com.neo.util.framework.elastic.impl;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.indices.*;
 import com.carrotsearch.randomizedtesting.annotations.ThreadLeakScope;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -17,17 +18,13 @@ import com.neo.util.framework.impl.connection.SchedulerRequestDetails;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.event.NotificationOptions;
 import jakarta.enterprise.util.TypeLiteral;
-import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
-import org.elasticsearch.action.support.master.AcknowledgedResponse;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.indices.CloseIndexRequest;
 import org.elasticsearch.common.network.NetworkModule;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.test.ESIntegTestCase;
-import org.elasticsearch.transport.Netty4Plugin;
+import org.elasticsearch.transport.netty4.Netty4Plugin;
 import org.elasticsearch.transport.netty4.Netty4Transport;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -93,7 +90,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
 
     /**
      * Randomize netty settings
-     *
+     * <p>
      * <a href="https://stackoverflow.com/questions/47766777/what-is-the-purpose-of-this-propertyes-set-netty-runtime-available-processors">This is why</a>
      */
     @Override
@@ -118,7 +115,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
      */
     @BeforeClass
     public static void enableMultipleNettyProcessors() {
-        System.setProperty("es.set.netty.runtime.available.processors", "false");
+        //System.setProperty("es.set.netty.runtime.available.processors", "false");
     }
 
     @Override
@@ -156,7 +153,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         elasticSearchRepository.indexerQueueService = new PretendIndexerNotificationService();
         elasticSearchRepository.requestDetailsProvider = () -> requestDetails;
         elasticSearchRepository.indexNameService = indexNamingService;
-        elasticSearchRepository.setupBulkProcessor();
+        elasticSearchRepository.setupBulkIngester();
     }
 
     /*
@@ -164,17 +161,15 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
      */
 
     protected boolean closeIndex(String indexName) throws IOException {
-        CloseIndexRequest request = new CloseIndexRequest(indexName);
-        AcknowledgedResponse indexResponse = elasticSearchRepository.getClient().indices().close(request,
-                RequestOptions.DEFAULT);
-        return indexResponse.isAcknowledged();
+        CloseIndexRequest request = new CloseIndexRequest.Builder().index(indexName).build();
+        CloseIndexResponse indexResponse = elasticSearchRepository.getApiClient().indices().close(request);
+        return indexResponse.acknowledged();
     }
 
     protected boolean openIndex(String indexName) throws IOException {
-        OpenIndexRequest request = new OpenIndexRequest(indexName);
-        AcknowledgedResponse indexResponse = elasticSearchRepository.getClient().indices().open(request,
-                RequestOptions.DEFAULT);
-        return indexResponse.isAcknowledged();
+        OpenRequest request = new OpenRequest.Builder().index(indexName).build();
+        OpenResponse indexResponse = elasticSearchRepository.getApiClient().indices().open(request);
+        return indexResponse.acknowledged();
     }
 
     protected SearchResponse<ObjectNode> fetchDocumentsInIndex(String uuid, String indexName) {
@@ -307,6 +302,16 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
             }
 
         });
+    }
+
+    protected boolean checkIfIndexExists(String indexName) {
+        GetIndexRequest getIndexRequest = new GetIndexRequest.Builder().index(indexName).build();
+        try {
+            GetIndexResponse response = elasticSearchRepository.getApiClient().indices().get(getIndexRequest);
+            return response.get(indexName) != null;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     protected static class EventMock<T> implements Event<T> {

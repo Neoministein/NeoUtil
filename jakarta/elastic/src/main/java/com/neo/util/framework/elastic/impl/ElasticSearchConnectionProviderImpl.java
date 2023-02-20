@@ -16,8 +16,6 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.RestHighLevelClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +32,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * This class is responsible for upholding the connection to the elasticsearch nodes.
  */
-@SuppressWarnings("deprecation")
 @ApplicationScoped
 public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnectionProvider {
 
@@ -59,7 +56,6 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
     @Inject
     protected Event<ElasticSearchConnectionStatusEvent> connectionStatusEvent;
 
-    protected volatile RestHighLevelClient client;
     protected volatile ElasticsearchClient elasticsearchClient;
 
     protected List<String> nodeList = new ArrayList<>();
@@ -87,14 +83,6 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
 
     public void onStartUp(@Observes ApplicationReadyEvent preReadyEvent) {
         LOGGER.debug("Startup event received");
-    }
-
-    /**
-     * Returns a connected client. If there isn't one yer one is created.
-     */
-    public RestHighLevelClient getClient() {
-        throwIfNotConnected(client);
-        return client;
     }
 
     public ElasticsearchClient getApiClient() {
@@ -127,16 +115,15 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
      * Disconnects the client from elasticsearch
      */
     public synchronized void disconnect() {
-        if (client == null && elasticsearchClient == null) {
+        if (elasticsearchClient == null) {
             return;
         }
 
         try {
-            client.close();
+            elasticsearchClient._transport().close();
         } catch (IOException e) {
             LOGGER.warn("Unable to close connection to elasticsearch correctly. Setting client to null");
         } finally {
-            client = null;
             elasticsearchClient = null;
             connectorInitializationOngoing.set(false);
         }
@@ -146,7 +133,7 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
      * Connects the client to elasticsearch and fires a {@link ElasticSearchConnectionStatusEvent}
      */
     public synchronized void connect() {
-        if (client != null && elasticsearchClient != null) {
+        if (elasticsearchClient != null) {
             return;
         }
 
@@ -176,22 +163,18 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
         RestClient restClient;
 
         if (credentialsProvider != null) {
-            restClient = RestClient.builder(nodes.toArray(new HttpHost[nodes.size()]))
+            restClient = RestClient.builder(nodes.toArray(new HttpHost[0]))
                     .setHttpClientConfigCallback(
                             httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
                     .build();
         } else {
-            restClient = RestClient.builder(nodes.toArray(new HttpHost[nodes.size()]))
+            restClient = RestClient.builder(nodes.toArray(new HttpHost[0]))
                     .build();
         }
-
-        client = new RestHighLevelClientBuilder(restClient).setApiCompatibilityMode(true).build();
 
         ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper(JsonUtil.createMapper()));
 
         elasticsearchClient = new ElasticsearchClient(transport);
-
-        // hlrc and esClient share the same httpClient
 
         LOGGER.debug("Initializing elasticsearch complete");
         connectionStatusEvent.fire(new ElasticSearchConnectionStatusEvent(ElasticSearchConnectionStatusEvent.STATUS_EVENT_CONNECTED));

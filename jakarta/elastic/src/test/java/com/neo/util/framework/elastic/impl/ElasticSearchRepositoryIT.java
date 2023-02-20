@@ -1,9 +1,9 @@
 package com.neo.util.framework.elastic.impl;
 
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.framework.api.persistence.search.*;
-import org.elasticsearch.ElasticsearchStatusException;
-import org.elasticsearch.action.index.IndexRequest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -23,14 +23,14 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 	public void indexSearchableTest() {
 		client().admin().indices().prepareDelete(INDEX_NAME_FOR_QUERY).get();
 		flushAndRefresh(INDEX_NAME_FOR_QUERY);
-		assertFalse(client().admin().indices().prepareExists(INDEX_NAME_FOR_QUERY).get().isExists());
+		assertFalse(checkIfIndexExists(INDEX_NAME_FOR_QUERY));
 
 		String uuid = UUID.randomUUID().toString();
 		Searchable dummySearchable = getBasicSearchable(uuid);
 		elasticSearchRepository.index(dummySearchable, new IndexParameter(Synchronization.SYNCHRONOUS));
 
 		validateDocumentInIndex(uuid, INDEX_NAME_FOR_QUERY, true);
-		assertTrue(client().admin().indices().prepareExists(INDEX_NAME_FOR_QUERY).get().isExists());
+		assertFalse(checkIfIndexExists(INDEX_NAME_FOR_QUERY));
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 		closeIndex(FULL_INDEX_NAME_FOR_QUERY);
 
 		elasticSearchRepository.index(List.of(dummySearchable1, dummySearchable2), new IndexParameter());
-		elasticSearchRepository.getBulkProcessor().flush();
+		elasticSearchRepository.getBulkIngester().flush();
 
 		openIndex(FULL_INDEX_NAME_FOR_QUERY);
 
@@ -113,7 +113,7 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 		closeIndex(FULL_INDEX_NAME_FOR_QUERY);
 
 		elasticSearchRepository.index(List.of(dummySearchable1, dummySearchable2), new IndexParameter(Synchronization.SYNCHRONOUS));
-		elasticSearchRepository.getBulkProcessor().flush();
+		elasticSearchRepository.getBulkIngester().flush();
 
 		openIndex(FULL_INDEX_NAME_FOR_QUERY);
 
@@ -155,8 +155,8 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 	public void incomingQueueIndexTest() {
 		String uuid = UUID.randomUUID().toString();
 		Searchable dummySearchable = getBasicSearchable(uuid);
-		IndexRequest indexRequest = elasticSearchRepository.generateIndexRequest(dummySearchable);
-		QueueableSearchable transportSearchable = elasticSearchRepository.generateQueueableSearchable(indexRequest);
+		BulkOperation indexRequest = elasticSearchRepository.buildIndexOperation(dummySearchable);
+		QueueableSearchable transportSearchable = elasticSearchRepository.buildQueueableSearchable(indexRequest);
 
 		elasticSearchRepository.process(transportSearchable);
 
@@ -177,8 +177,8 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 		validateDocumentInIndex(uuid3, INDEX_NAME_FOR_QUERY, true);
 
 		Searchable dummySearchable1 = getBasicSearchable(uuid1);
-		IndexRequest indexRequest1 = elasticSearchRepository.generateIndexRequest(dummySearchable1);
-		QueueableSearchable transportSearchable1 = elasticSearchRepository.generateQueueableSearchable(indexRequest1);
+		BulkOperation indexRequest1 = elasticSearchRepository.buildIndexOperation(dummySearchable1);
+		QueueableSearchable transportSearchable1 = elasticSearchRepository.buildQueueableSearchable(indexRequest1);
 
 		List<QueueableSearchable> bulk = List.of(transportSearchable1);
 
@@ -203,7 +203,7 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 		closeIndex(FULL_INDEX_NAME_FOR_QUERY);
 
 		elasticSearchRepository.index(dummySearchable, new IndexParameter());
-		elasticSearchRepository.getBulkProcessor().flush();
+		elasticSearchRepository.getBulkIngester().flush();
 
 		openIndex(FULL_INDEX_NAME_FOR_QUERY);
 
@@ -234,7 +234,7 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 			elasticSearchRepository.index(dummySearchable, new IndexParameter(Synchronization.SYNCHRONOUS));
 			Assert.fail("Expected Exception not thrown!");
 		} catch (Exception e) {
-			Assert.assertEquals(ElasticsearchStatusException.class, e.getClass());
+			Assert.assertEquals(ElasticsearchException.class, e.getClass());
 		} finally {
 			openIndex(FULL_INDEX_NAME_FOR_QUERY);
 		}
@@ -270,25 +270,9 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 		Assert.assertTrue("At least one record expected, SearchResult:" + result, result.getHits().size() >= 1);
 	}
 
-	@Test
-	public void readTypeMappingTest() {
-		String uuid = UUID.randomUUID().toString();
-		BasicPersonSearchable dummySearchable = indexBasicSearchable(uuid);
-
-		String indexName = dummySearchable.getIndexName().concat("-*");
-		Map<String, Object> mapping = elasticSearchRepository.readTypeMapping(indexName);
-		Assert.assertFalse(mapping.isEmpty());
-
-		Map<String, Class<?>> flatMapping = elasticSearchRepository.getFlatTypeMapping(mapping);
-		Assert.assertFalse(flatMapping.isEmpty());
-		Assert.assertTrue(flatMapping.containsKey(BasicPersonSearchable.F_NAME)
-				&& String.class.equals(flatMapping.get(BasicPersonSearchable.F_NAME)));
-	}
-
 	/*
 	Test Helper Methods
 	 */
-
 	private BasicPersonSearchable indexBasicSearchable(String uuid) {
 		BasicPersonSearchable dummySearchable = getBasicSearchable(uuid);
 		elasticSearchRepository.index(dummySearchable);

@@ -15,7 +15,7 @@ public class QueueableSearchable implements Serializable {
 
     /**
      * Type of request reference.
-     *
+     * </p>
      * Only these types are supported at the moment.
      */
     public enum RequestType {
@@ -47,9 +47,9 @@ public class QueueableSearchable implements Serializable {
      */
     protected String jsonSource;
     /**
-     * The source of an update
+     * If the upsert functionality should be used
      */
-    protected String jsonUpsertSource;
+    protected boolean upsert = false;
     /**
      * The Request type
      */
@@ -61,11 +61,11 @@ public class QueueableSearchable implements Serializable {
 
     public QueueableSearchable(String index, String id, Long version, String routing, String jsonSource,
             RequestType requestType) {
-        this(index, id, version, routing, jsonSource, null, requestType);
+        this(index, id, version, routing, jsonSource, false, requestType);
     }
 
     public QueueableSearchable(String index, String id, Long version, String routing, String jsonSource,
-            String jsonUpsertSource, RequestType requestType) {
+            boolean upsert, RequestType requestType) {
         super();
         this.creationDate = new Date();
         this.index = index;
@@ -73,7 +73,7 @@ public class QueueableSearchable implements Serializable {
         this.version = version;
         this.routing = routing;
         this.jsonSource = jsonSource;
-        this.jsonUpsertSource = jsonUpsertSource;
+        this.upsert = upsert;
         this.requestType = requestType;
     }
 
@@ -117,16 +117,16 @@ public class QueueableSearchable implements Serializable {
         this.jsonSource = jsonSource;
     }
 
-    public void setJsonUpsertSource(String jsonUpsertSource) {
-        this.jsonUpsertSource = jsonUpsertSource;
-    }
-
-    public String getJsonUpsertSource() {
-        return jsonUpsertSource;
-    }
-
     public RequestType getRequestType() {
         return requestType;
+    }
+
+    public boolean getUpsert() {
+        return upsert;
+    }
+
+    public void setUpsert(boolean upsert) {
+        this.upsert = upsert;
     }
 
     @Override

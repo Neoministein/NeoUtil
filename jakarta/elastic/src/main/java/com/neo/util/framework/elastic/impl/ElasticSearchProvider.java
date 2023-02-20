@@ -1,23 +1,23 @@
 package com.neo.util.framework.elastic.impl;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.FieldSort;
-import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._helpers.bulk.BulkIngester;
+import co.elastic.clients.elasticsearch._helpers.bulk.BulkListener;
+import co.elastic.clients.elasticsearch._types.*;
 import co.elastic.clients.elasticsearch._types.aggregations.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
-import co.elastic.clients.elasticsearch.core.CountRequest;
-import co.elastic.clients.elasticsearch.core.CountResponse;
-import co.elastic.clients.elasticsearch.core.SearchRequest;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.*;
+import co.elastic.clients.elasticsearch.core.bulk.*;
 import co.elastic.clients.elasticsearch.core.search.*;
+import co.elastic.clients.json.JsonData;
+import co.elastic.clients.json.JsonpMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.connection.RequestDetails;
@@ -29,26 +29,7 @@ import com.neo.util.framework.elastic.api.ElasticSearchConnectionProvider;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 import com.neo.util.framework.elastic.api.aggregation.BucketScriptAggregation;
 import jakarta.inject.Provider;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.DocWriteRequest;
-import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.action.bulk.BulkProcessor;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.GetMappingsRequest;
-import org.elasticsearch.client.indices.GetMappingsResponse;
-import org.elasticsearch.cluster.metadata.MappingMetadata;
-import org.elasticsearch.common.unit.ByteSizeUnit;
-import org.elasticsearch.common.unit.ByteSizeValue;
-import org.elasticsearch.core.TimeValue;
-import org.elasticsearch.index.VersionType;
-import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.xcontent.XContentType;
+import jakarta.json.spi.JsonProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +40,7 @@ import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -66,7 +48,6 @@ import java.util.stream.Collectors;
 /**
  * This class provides methods to interact with elastic search
  */
-@SuppressWarnings("deprecation")
 @Alternative
 @Priority(PriorityConstants.APPLICATION)
 @ApplicationScoped
@@ -74,16 +55,9 @@ public class ElasticSearchProvider implements SearchProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchProvider.class);
 
-    protected static final List<RestStatus> FILTER_REST_STATUS = Arrays.asList(RestStatus.CONFLICT,
-            RestStatus.NOT_FOUND);
+    protected static final long BYTES_IN_MB = 1000000;
 
-    //Response looks like this: I/O reactor status: STOPPED","I/O reactor has been shut down"
     protected static final String[] FILTER_HTTPCLIENT_MESSAGES = new String[] { "I/O reactor" };
-
-    protected static final String[] FILTER_MESSAGES = new String[] { "type=version_conflict_engine_exception" };
-
-    protected static final String TYPE = "type";
-    protected static final String PROPERTIES = "properties";
 
     protected static final String CONFIG_PREFIX = "elastic";
 
@@ -110,31 +84,31 @@ public class ElasticSearchProvider implements SearchProvider {
     @Inject
     protected ElasticSearchConnectionProvider connection;
 
-    protected volatile BulkProcessor bulkProcessor;
+    protected volatile BulkIngester bulkIngester;
 
-    protected synchronized void setupBulkProcessor() {
-        if (bulkProcessor != null) {
+    protected synchronized void setupBulkIngester() {
+        if (bulkIngester != null) {
             return;
         }
 
-        BulkProcessor.Listener listener = new BulkProcessor.Listener() {
+        BulkListener<Object> listener = new BulkListener<>() {
             @Override
-            public void beforeBulk(long executionId, BulkRequest bulkRequest) {
-                LOGGER.debug("Executing bulk [{}] with [{}] requests", executionId, bulkRequest.numberOfActions());
+            public void beforeBulk(long executionId, BulkRequest request, List<Object> objects) {
+                LOGGER.debug("Executing bulk [{}] with [{}] requests", executionId, request.operations().size());
             }
 
             @Override
-            public void afterBulk(long executionId, BulkRequest bulkRequest, BulkResponse bulkResponse) {
-                handleBulkResponse(executionId, bulkRequest, bulkResponse);
+            public void afterBulk(long executionId, BulkRequest request, List<Object> objects, BulkResponse response) {
+                handleBulkResponse(executionId, request, response);
             }
 
             @Override
-            public void afterBulk(long executionId, BulkRequest bulkRequest, Throwable failure) {
+            public void afterBulk(long executionId, BulkRequest request, List<Object> objects, Throwable failure) {
                 LOGGER.info("Executed bulk [{}] with complete failure, entire bulk will be retried, message: [{}]", executionId,
                         failure.getMessage());
                 ArrayList<QueueableSearchable> bulkQueueableSearchableList = new ArrayList<>();
-                for (DocWriteRequest<?> request : bulkRequest.requests()) {
-                    bulkQueueableSearchableList.add(generateQueueableSearchable(request));
+                for (BulkOperation operation : request.operations()) {
+                    bulkQueueableSearchableList.add(buildQueueableSearchable(operation));
                 }
                 indexerQueueService.addToIndexingQueue(new QueueMessage(requestDetailsProvider.get(),
                         QueueableSearchable.RequestType.BULK.toString(), bulkQueueableSearchableList));
@@ -145,8 +119,8 @@ public class ElasticSearchProvider implements SearchProvider {
         };
 
         try {
-            BulkProcessor.Builder builder = createBulkRequestBuilder(listener);
-            bulkProcessor = builder.build();
+            BulkIngester.Builder<Object> builder = createBulkRequestBuilder(listener);
+            bulkIngester = builder.build();
         } catch (IllegalStateException e) {
             LOGGER.error("Unable to create bulk processor", e);
         }
@@ -160,20 +134,16 @@ public class ElasticSearchProvider implements SearchProvider {
 
     public void connectionStatusListener(@Observes ElasticSearchConnectionStatusEvent event) {
         if (ElasticSearchConnectionStatusEvent.STATUS_EVENT_CONNECTED.equals(event.getConnectionStatus())) {
-            setupBulkProcessor();
+            setupBulkIngester();
         }
     }
 
-    protected BulkProcessor getBulkProcessor() {
-        if (bulkProcessor == null) {
-            getClient();
+    protected BulkIngester getBulkIngester() {
+        if (bulkIngester == null) {
+            getApiClient();
             throw new IllegalStateException("Elasticsearch bulkProcessor not ready");
         }
-        return bulkProcessor;
-    }
-
-    protected RestHighLevelClient getClient() {
-        return connection.getClient();
+        return bulkIngester;
     }
 
     protected ElasticsearchClient getApiClient() {
@@ -189,16 +159,17 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
     public void index(Searchable searchable, IndexParameter indexParameter) {
-        final IndexRequest indexRequest = generateIndexRequest(searchable);
         if (Synchronization.ASYNCHRONOUS == indexParameter.getSynchronization()) {
-            addToBulkProcessor(indexRequest);
+            addToBulkProcessor(buildIndexOperation(searchable));
         } else {
             try {
-                getClient().index(indexRequest, RequestOptions.DEFAULT);
+                getApiClient().index(buildIndexRequest(searchable));
             } catch (IOException ex) {
                 throw new CommonRuntimeException(ex, EX_SYNCHRONOUS_INDEXING);
             } catch (IllegalStateException ex) {
                 reconnectClientIfNeeded(ex);
+                throw ex;
+            } catch (ElasticsearchException ex) {
                 throw ex;
             }
         }
@@ -207,17 +178,17 @@ public class ElasticSearchProvider implements SearchProvider {
     public void index(List<? extends Searchable> searchableList, IndexParameter indexParameter) {
         if (Synchronization.ASYNCHRONOUS.equals(indexParameter.getSynchronization())) {
             for (Searchable searchable : searchableList) {
-                getBulkProcessor().add(generateIndexRequest(searchable));
+                getBulkIngester().add(buildIndexOperation(searchable));
             }
         } else {
-            final BulkRequest bulkRequest = new BulkRequest();
+            final BulkRequest.Builder br = new BulkRequest.Builder();
 
             for (Searchable searchable : searchableList) {
-                bulkRequest.add(generateIndexRequest(searchable));
+                br.operations(buildIndexOperation(searchable));
             }
-
+            BulkRequest bulkRequest = br.build();
             try {
-                getClient().bulk(bulkRequest, RequestOptions.DEFAULT);
+                handleBulkResponse(-1, bulkRequest, getApiClient().bulk(bulkRequest));
             } catch (IOException ex) {
                 throw new CommonRuntimeException(ex, EX_SYNCHRONOUS_INDEXING, ex);
             } catch (IllegalStateException ex) {
@@ -227,7 +198,6 @@ public class ElasticSearchProvider implements SearchProvider {
         }
     }
 
-    //TODO IMPLEMENT THIS
     @Override
     public void update(Searchable searchable, boolean upsert) {
         update(searchable, upsert, new IndexParameter());
@@ -235,12 +205,11 @@ public class ElasticSearchProvider implements SearchProvider {
 
     @Override
     public void update(Searchable searchable, boolean upsert, IndexParameter indexParameter) {
-        final UpdateRequest updateRequest = generateUpdateRequest(searchable, upsert);
         if (Synchronization.ASYNCHRONOUS == indexParameter.getSynchronization()) {
-            addToBulkProcessor(updateRequest);
+            addToBulkProcessor(buildUpdateOperation(searchable, upsert));
         } else {
             try {
-                getClient().update(updateRequest, RequestOptions.DEFAULT);
+                getApiClient().update(buildUpdateRequest(searchable, upsert), String.class);
             } catch (IOException ex) {
                 throw new CommonRuntimeException(ex, EX_SYNCHRONOUS_INDEXING);
             } catch (IllegalStateException ex) {
@@ -259,17 +228,18 @@ public class ElasticSearchProvider implements SearchProvider {
     public void update(List<? extends Searchable> searchableList, boolean upsert, IndexParameter indexParameter) {
         if (Synchronization.ASYNCHRONOUS.equals(indexParameter.getSynchronization())) {
             for (Searchable searchable : searchableList) {
-                getBulkProcessor().add(generateUpdateRequest(searchable, upsert));
+                addToBulkProcessor(buildUpdateOperation(searchable, upsert));
             }
         } else {
-            final BulkRequest bulkRequest = new BulkRequest();
+            final BulkRequest.Builder br = new BulkRequest.Builder();
 
             for (Searchable searchable : searchableList) {
-                bulkRequest.add(generateUpdateRequest(searchable, upsert));
+                br.operations(buildUpdateOperation(searchable, upsert));
             }
 
+            BulkRequest bulkRequest = br.build();
             try {
-                getClient().bulk(bulkRequest, RequestOptions.DEFAULT);
+                handleBulkResponse(-1, bulkRequest, getApiClient().bulk(bulkRequest));
             } catch (IOException ex) {
                 throw new CommonRuntimeException(ex, EX_SYNCHRONOUS_INDEXING, ex);
             } catch (IllegalStateException ex) {
@@ -297,26 +267,28 @@ public class ElasticSearchProvider implements SearchProvider {
     @Override
     public void process(QueueableSearchable queueableSearchable) {
         switch (queueableSearchable.getRequestType()) {
-        case INDEX -> getBulkProcessor().add(generateIndexRequest(queueableSearchable));
-        case UPDATE, DELETE -> throw new IllegalStateException("Not implemented yet");
+        case INDEX -> getBulkIngester().add(buildIndexOperation(queueableSearchable));
+        case UPDATE -> getBulkIngester().add(buildUpdateOperation(queueableSearchable));
+        case DELETE -> throw new IllegalStateException("Not implemented yet");
         default -> throw new IllegalStateException("Not supported");
         }
     }
 
     @Override
     public void process(List<QueueableSearchable> transportSearchableList) {
-        BulkRequest bulkRequest = new BulkRequest();
+        BulkRequest.Builder brBuilder = new BulkRequest.Builder();
         for (QueueableSearchable queueableSearchable : transportSearchableList) {
             switch (queueableSearchable.getRequestType()) {
-            case INDEX -> bulkRequest.add(generateIndexRequest(queueableSearchable));
-            case UPDATE, DELETE -> throw new IllegalStateException("Not implemented yet");
+            case INDEX -> brBuilder.operations(buildIndexOperation(queueableSearchable));
+            case UPDATE -> brBuilder.operations(buildUpdateOperation(queueableSearchable));
+            case DELETE -> throw new IllegalStateException("Not implemented yet");
             default -> throw new IllegalStateException("Not supported");
             }
         }
+        BulkRequest bulkRequest = brBuilder.build();
 
         try {
-            BulkResponse bulkResponse = getClient().bulk(bulkRequest, RequestOptions.DEFAULT);
-            handleBulkResponse(-1,bulkRequest, bulkResponse);
+            handleBulkResponse(-1,bulkRequest, getApiClient().bulk(bulkRequest));
         } catch (IOException ex) {
             LOGGER.warn("Executed bulk with complete failure, entire bulk will be retried, message: [{}]",
                     ex.getMessage());
@@ -331,9 +303,9 @@ public class ElasticSearchProvider implements SearchProvider {
 
     protected void handleBulkResponse(long executionId, BulkRequest bulkRequest, BulkResponse bulkResponse) {
         LOGGER.info("Executed bulk [{}] with [{}] requests, hasFailures: [{}], took: [{}], ingestTook: [{}]",
-                executionId, bulkRequest.numberOfActions(), bulkResponse.hasFailures(), bulkResponse.getTook(),
-                bulkResponse.getIngestTook());
-        if (bulkResponse.hasFailures()) {
+                executionId, bulkRequest.operations().size(), bulkResponse.errors(), bulkResponse.took(),
+                bulkResponse.ingestTook());
+        if (bulkResponse.errors()) {
             List<QueueableSearchable> queueableSearchableList = handleFailedBulkProcess(bulkRequest, bulkResponse);
             for (QueueableSearchable queueableSearchable: queueableSearchableList) {
                 indexerQueueService.addToIndexingQueue(new QueueMessage(requestDetailsProvider.get(),
@@ -345,30 +317,30 @@ public class ElasticSearchProvider implements SearchProvider {
     /**
      * Collect the items of bulk request result which have failed and can be retried
      */
-    protected ArrayList<QueueableSearchable> handleFailedBulkProcess(BulkRequest bulkRequest,
+    protected List<QueueableSearchable> handleFailedBulkProcess(BulkRequest bulkRequest,
             BulkResponse bulkResponse) {
-        if (!bulkResponse.hasFailures()) {
+        if (!bulkResponse.errors()) {
             return new ArrayList<>();
         }
-        ArrayList<QueueableSearchable> bulkQueueableSearchableList = new ArrayList<>();
-        BulkItemResponse[] bulkItemResponse = bulkResponse.getItems();
-        for (int i = 0; i < bulkItemResponse.length; i++) {
+        List<QueueableSearchable> bulkQueueableSearchableList = new ArrayList<>();
+        List<BulkResponseItem> bulkItemResponse = bulkResponse.items();
+        for (int i = 0; i < bulkItemResponse.size(); i++) {
 
-            BulkItemResponse item = bulkItemResponse[i];
-            if (item.isFailed()) {
-                BulkItemResponse.Failure failure = item.getFailure();
-                if (exceptionIsToBeRetried(failure.getCause())) {
-                    DocWriteRequest<?> request = bulkRequest.requests().get(i);
-                    QueueableSearchable transportSearchable = generateQueueableSearchable(request);
-                    bulkQueueableSearchableList.add(transportSearchable);
+            BulkResponseItem item = bulkItemResponse.get(i);
+            if (item.error() != null) {
+                ErrorCause errorCause = item.error();
+                if (exceptionIsToBeRetried(errorCause)) {
+                    BulkOperation bulkOperation = bulkRequest.operations().get(i);
+                    QueueableSearchable queueableSearchable = buildQueueableSearchable(bulkOperation);
+                    bulkQueueableSearchableList.add(queueableSearchable);
                     LOGGER.info("Request failed, to be retried, failureMessage:[{}], transportSearchable:[{}]",
-                            failure.getMessage(), transportSearchable);
+                            errorCause.reason(), queueableSearchable);
                 } else {
-                    LOGGER.info("Request failed, no retry, failureMessage:[{}]", failure.getMessage());
+                    LOGGER.info("Request failed, no retry, failureMessage:[{}]", errorCause.reason());
                 }
             }
         }
-        LOGGER.debug("Sending bulk failure to queue, initial size:[{}], retry size:[{}]", bulkRequest.numberOfActions(),
+        LOGGER.debug("Sending bulk failure to queue, initial size:[{}], retry size:[{}]", bulkRequest.operations().size(),
                 bulkQueueableSearchableList.size());
 
         return bulkQueueableSearchableList;
@@ -402,7 +374,7 @@ public class ElasticSearchProvider implements SearchProvider {
         builder.size(parameters.getMaxResults());
         builder.query(QueryBuilders.matchAll().build()._toQuery());
         if (parameters.getTimeout().isPresent()) {
-            builder.timeout(new TimeValue(parameters.getTimeout().get(), TimeUnit.MILLISECONDS).toString());
+            builder.timeout(parameters.getTimeout().get().toString());
         }
 
         if (!parameters.getFilters().isEmpty()) {
@@ -426,18 +398,13 @@ public class ElasticSearchProvider implements SearchProvider {
 
         if (!parameters.getSorting().isEmpty()) {
             List<SortOptions> sortOptions = new ArrayList<>();
-            Map<String, Class<?>> mapping = getFlatTypeMapping(readTypeMapping(index));
             for (Map.Entry<String, Boolean> sorting : parameters.getSorting().entrySet()) {
-                // if the sorting field is of type string we need to sort on the keyword
-                // property of that field
-                String fieldName = sorting.getKey();
-                if (mapping.get(sorting.getKey()).isAssignableFrom(String.class)) {
-                    fieldName = fieldName.concat(Searchable.INDEX_SEARCH_KEYWORD);
-                }
+                // If the sorting field is of type string we need make sure that we are searching on a keyword field.
+                // Text won't work
                 sortOptions.add(
                         new SortOptions.Builder()
                                 .field(new FieldSort.Builder()
-                                        .field(fieldName)
+                                        .field(sorting.getKey())
                                         .order(sorting.getValue().booleanValue() ? SortOrder.Asc : SortOrder.Desc)
                                         .build()
                                 ).build()
@@ -457,128 +424,6 @@ public class ElasticSearchProvider implements SearchProvider {
             LOGGER.error("Failed to fetch {} entries for index {} because of {}", parameters.getMaxResults(), index,
                     e.getCause());
             return new SearchResult();
-        }
-    }
-
-
-    protected Map<String, Object> readTypeMapping(String index) {
-        /*
-        --NOTE--
-        If I want to fully migrate of from HighLevel RestClient I would need to get the mapping another way.
-
-        This blog post describes getting the mapping manually with a request using the RestClient
-        https://spinscale.de/posts/2022-03-03-running-the-elasticcc-platform-part-2.html#testing
-         */
-        Map<String, Object> results = new HashMap<>();
-        GetMappingsRequest request = new GetMappingsRequest();
-        request.setMasterTimeout(TimeValue.timeValueMinutes(1));
-        request.indices(index);
-
-        try {
-            GetMappingsResponse response = getClient().indices().getMapping(request, RequestOptions.DEFAULT);
-            Map<String, MappingMetadata> mappings = response.mappings();
-
-            for (Map.Entry<String, MappingMetadata> mapping : mappings.entrySet()) {
-                Map<String, Object> properties = (Map<String, Object>) mapping.getValue().getSourceAsMap().get(PROPERTIES);
-                if (properties == null) {
-                    continue;
-                }
-                for (Map.Entry<String, Object> property : properties.entrySet()) {
-                    if (property.getValue() instanceof Map) {
-                        if (results.containsKey(property.getKey())) {
-                            Object typeMapping = results.get(property.getKey());
-
-                            if (typeMapping instanceof Class) {
-                                // this is an explicit field mapping, skip this
-                                LOGGER.debug("Skipping properties of key {} because this key was already analyzed",
-                                        property.getKey());
-                            } else {
-                                Map<String, Object> subMap = (Map<String, Object>) analyzePropertyMap(
-                                        (Map<String, Object>) property.getValue());
-                                Map<String, Object> existingMap = (Map<String, Object>) results.get(property.getKey());
-                                existingMap.putAll(subMap);
-                            }
-                        } else {
-                            results.put(property.getKey(),
-                                    analyzePropertyMap((Map<String, Object>) property.getValue()));
-                        }
-                    }
-                }
-            }
-        } catch (IOException | IllegalStateException ex) {
-            //TODO handle exceptions properly
-            ex.printStackTrace();
-        }
-
-        return results;
-    }
-
-    protected Object analyzePropertyMap(Map<String, Object> propertyMap) {
-        if (propertyMap.containsKey(TYPE)) {
-            // explicit property
-            return getClassBasedOnTypeName(propertyMap.get(TYPE).toString());
-        } else {
-            // is an inner map
-            Map<String, Object> innerMap = (Map<String, Object>) propertyMap.get(PROPERTIES);
-            Map<String, Object> innerTypeMap = new HashMap<>();
-
-            // this loop with the recursive call makes sure we add all the sub properties as
-            // a column
-            for (Map.Entry<String, Object> innerProperty : innerMap.entrySet()) {
-                Map<String, Object> innerPropertyMap = (Map<String, Object>) innerProperty.getValue();
-
-                innerTypeMap.put(innerProperty.getKey(), analyzePropertyMap(innerPropertyMap));
-            }
-
-            return innerTypeMap;
-        }
-    }
-
-    protected Class<?> getClassBasedOnTypeName(String typeName) {
-        return switch (typeName) {
-            case "string" -> String.class;
-            case "boolean" -> Boolean.class;
-            case "date" -> Date.class;
-            case "long" -> Long.class;
-            case "double" -> Double.class;
-            case "short" -> Short.class;
-            case "byte" -> Byte.class;
-            case "integer" -> Integer.class;
-            case "float" -> Float.class;
-            case null, default -> String.class;
-        };
-    }
-
-    public Map<String, Class<?>> getFlatTypeMapping(Map<String, Object> readTypeMapping) {
-        Map<String, Class<?>> result = new HashMap<>();
-
-        getFlatTypeMapping(readTypeMapping, "", result);
-
-        return result;
-    }
-
-    /**
-     * Recursive implementation of {@link #getFlatTypeMapping(Map)}
-     */
-    protected void getFlatTypeMapping(Map<String, Object> readTypeMapping, String prefix,
-            Map<String, Class<?>> result) {
-        for (Map.Entry<String, Object> entry : readTypeMapping.entrySet()) {
-            String fieldName = prefix + entry.getKey();
-
-            if (entry.getValue() instanceof Class clazz) {
-                result.put(fieldName, clazz);
-
-            } else {
-                // currently we support nested fields and the field as a whole, so we just write
-                // out the toString
-                // which makes this field type string and not sortable
-                result.put(fieldName, String.class);
-            }
-
-            if (entry.getValue() instanceof Map<?, ?>) {
-                // this is a nested field, therefore we need to read the inner map
-                getFlatTypeMapping((Map<String, Object>) entry.getValue(), prefix + entry.getKey() + ".", result);
-            }
         }
     }
 
@@ -622,12 +467,10 @@ public class ElasticSearchProvider implements SearchProvider {
         rangeQuery.field(criteria.getFieldName());
         if (criteria.getFrom() != null) {
             rangeQuery.from(criteria.getFrom().toString());
-            //rangeQuery.includeLower(criteria.isIncludeFrom());
         }
 
         if (criteria.getTo() != null) {
             rangeQuery.to(criteria.getTo().toString());
-            //rangeQuery.includeUpper(criteria.isIncludeTo());
         }
 
         return rangeQuery;
@@ -861,65 +704,102 @@ public class ElasticSearchProvider implements SearchProvider {
                 for (Map.Entry<String, Aggregate> agg : stringTermsAggregate.aggregations().entrySet()) {
                     aggregationResult.put(agg.getKey(), parseAggregation(agg.getValue(), agg.getKey()));
                 }
-                resultBuckets.add(new TermAggregationResult.Bucket(stringTermsAggregate.key() ,aggregationResult));
+                resultBuckets.add(new TermAggregationResult.Bucket(stringTermsAggregate.key().toString() ,aggregationResult));
             }
         }
         return new TermAggregationResult(key, resultBuckets);
     }
 
-    protected void addToBulkProcessor(DocWriteRequest<?> request) {
+    protected void addToBulkProcessor(BulkOperation bulkOperation) {
         try {
-            getBulkProcessor().add(request);
+            getBulkIngester().add(bulkOperation);
         } catch (IllegalStateException ex) {
             LOGGER.info("Error while adding to BulkProcessor, message: {}", ex.getMessage());
-            QueueableSearchable searchable = generateQueueableSearchable(request);
+            QueueableSearchable searchable = buildQueueableSearchable(bulkOperation);
             indexerQueueService.addToIndexingQueue(new QueueMessage(requestDetailsProvider.get(),
                     searchable.getRequestType().toString(), searchable));
         }
     }
 
-    protected IndexRequest generateIndexRequest(Searchable searchable) {
+    protected IndexRequest<Object> buildIndexRequest(Searchable searchable) {
         String indexName = indexNameService.getIndexName(searchable);
-        IndexRequest indexRequest = new IndexRequest(indexName)
-                .source(parseSearchableToObjectNode(searchable).toString(), XContentType.JSON)
+        IndexRequest.Builder<Object> indexRequest = new IndexRequest.Builder<>()
+                .index(indexName)
+                .withJson(new StringReader(searchable.getObjectNode().toString()))
                 .id(searchable.getBusinessId());
 
         if (searchable.getVersion() != null) {
-            indexRequest.version(searchable.getVersion()).versionType(VersionType.EXTERNAL_GTE);
+            indexRequest.version(searchable.getVersion()).versionType(VersionType.ExternalGte);
         }
-        return indexRequest;
+        return indexRequest.build();
     }
 
-    protected UpdateRequest generateUpdateRequest(Searchable searchable, boolean upsert) {
+    protected BulkOperation buildIndexOperation(Searchable searchable) {
         String indexName = indexNameService.getIndexName(searchable);
-
-        String source = parseSearchableToObjectNode(searchable).toString();
-
-        UpdateRequest  updateRequest = new UpdateRequest()
+        IndexOperation.Builder<Object> indexRequest = new IndexOperation.Builder<>()
                 .index(indexName)
-                .id(searchable.getBusinessId())
-                .doc(source, XContentType.JSON);
-        if (upsert) {
-            updateRequest.upsert(source, XContentType.JSON);
-        }
+                .document(parseObjectNode(searchable.getObjectNode()))
+                .id(searchable.getBusinessId());
 
         if (searchable.getVersion() != null) {
-            updateRequest.version(searchable.getVersion()).versionType(VersionType.EXTERNAL_GTE);
+            indexRequest.version(searchable.getVersion()).versionType(VersionType.ExternalGte);
         }
-        return updateRequest;
+        return new BulkOperation(indexRequest.build());
     }
 
-    protected ObjectNode parseSearchableToObjectNode(Searchable searchable) {
-        try {
-            ObjectNode objectNode = searchable.getObjectNode();
-            if (!StringUtils.isEmpty(searchable.getBusinessId())) {
-                objectNode.put(Searchable.BUSINESS_ID, searchable.getBusinessId());
-            }
-            objectNode.put(Searchable.TYPE, searchable.getClassName());
-            return objectNode;
-        } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("Error while parsing searchable to json: " + searchable.getClassName() + ":" + searchable.getBusinessId(), e);
+    protected BulkOperation buildIndexOperation(QueueableSearchable queueableSearchable) {
+        IndexOperation.Builder<Object> operation = new IndexOperation.Builder<>()
+                .index(queueableSearchable.getIndex())
+                .id(queueableSearchable.getId())
+                .routing(queueableSearchable.getRouting())
+                .document(parseObjectNode(JsonUtil.fromJson(queueableSearchable.getJsonSource())));
+        if (queueableSearchable.getVersion() != null && !StringUtils.isEmpty(queueableSearchable.getId())) {
+            operation.version(queueableSearchable.getVersion()).versionType(VersionType.ExternalGte);
         }
+        return new BulkOperation(operation.build());
+    }
+
+    protected UpdateRequest<Object, Object> buildUpdateRequest(Searchable searchable, boolean upsert) {
+        String indexName = indexNameService.getIndexName(searchable);
+
+        UpdateRequest.Builder<Object, Object> updateRequest = new UpdateRequest.Builder<>()
+                .index(indexName)
+                .id(searchable.getBusinessId())
+                .withJson(new StringReader(searchable.getObjectNode().toString()))
+                .docAsUpsert(upsert);
+
+        return updateRequest.build();
+    }
+
+    protected BulkOperation buildUpdateOperation(QueueableSearchable queueableSearchable) {
+        UpdateAction.Builder<Object, Object> action = new UpdateAction.Builder<>()
+                .docAsUpsert(queueableSearchable.getUpsert())
+                .withJson(new StringReader(queueableSearchable.getJsonSource()));
+
+        UpdateOperation.Builder<Object, Object> updateRequest = new UpdateOperation.Builder<>()
+                .index(queueableSearchable.getIndex())
+                .id(queueableSearchable.getId())
+                .withJson(new StringReader(queueableSearchable.getJsonSource()))
+                .action(action.build());
+        if (queueableSearchable.getVersion() != null && !StringUtils.isEmpty(queueableSearchable.getId())) {
+            updateRequest.version(queueableSearchable.getVersion()).versionType(VersionType.ExternalGte);
+        }
+        return new BulkOperation(updateRequest.build());
+    }
+
+    protected BulkOperation buildUpdateOperation(Searchable searchable, boolean upsert) {
+        String indexName = indexNameService.getIndexName(searchable);
+
+        UpdateAction.Builder<Object, Object> updateAction = new UpdateAction.Builder<>()
+                .doc(parseObjectNode(searchable.getObjectNode()))
+                .docAsUpsert(upsert);
+
+        UpdateOperation.Builder<Object, Object> updateRequest = new UpdateOperation.Builder<>()
+                .index(indexName)
+                .id(searchable.getBusinessId())
+                .action(updateAction.build());
+
+        return new BulkOperation(updateRequest.build());
     }
 
     public void reload() {
@@ -960,90 +840,87 @@ public class ElasticSearchProvider implements SearchProvider {
     protected void closeBulkProcessor() {
         // make sure all bulk requests have been processed
         try {
-            if (bulkProcessor != null) {
-                bulkProcessor.awaitClose(30L,
-                        TimeUnit.SECONDS);
+            if (bulkIngester != null) {
+                bulkIngester.close();
             }
-        } catch (InterruptedException ex) {
+        } catch (Exception ex) {
             LOGGER.warn("exception while closing bulkProcessor, error: {}", ex.getMessage());
             Thread.currentThread().interrupt();
         }
-        bulkProcessor = null;
+        bulkIngester = null;
     }
 
-    protected BulkProcessor.Builder createBulkRequestBuilder(BulkProcessor.Listener listener) {
-        BulkProcessor.Builder builder = BulkProcessor.builder(
-                (request, bulkListener) ->
-                        getClient().bulkAsync(request, RequestOptions.DEFAULT, bulkListener),
-                listener);
+    protected BulkIngester.Builder<Object> createBulkRequestBuilder(BulkListener<Object> listener) {
+        BulkIngester.Builder<Object> builder = new BulkIngester.Builder<>()
+                .client(connection.getApiClient())
+                .listener(listener);
 
 
         long flushInterval = configService.get(FLUSH_INTERVAL_CONFIG).asInt().orElse(10);
         LOGGER.info("BulkProcessor.Builder FlushInterval: {}", flushInterval);
-        builder.setFlushInterval(TimeValue.timeValueSeconds(flushInterval));
+        builder.flushInterval(flushInterval, TimeUnit.SECONDS);
 
         int bulkAction = configService.get(BULK_ACTION_CONFIG).asInt().orElse(2500);
         LOGGER.info("BulkProcessor.Builder BulkActions: {}", bulkAction);
-        builder.setBulkActions(bulkAction);
+        builder.maxOperations(bulkAction);
 
         int concurrentRequests = configService.get(CONCURRENT_REQUEST_CONFIG).asInt().orElse(3);
         LOGGER.info("BulkProcessor.Builder ConcurrentRequests: {}", concurrentRequests);
-        builder.setConcurrentRequests(concurrentRequests);
+        builder.maxConcurrentRequests(concurrentRequests);
 
         int bulkSize = configService.get(BULK_SIZE).asInt().orElse(10);
         LOGGER.info("BulkProcessor.Builder BulkSize: {}", bulkSize);
-        builder.setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.MB));
+        builder.maxSize(bulkSize * BYTES_IN_MB);
 
         return builder;
-    }
-
-
-    protected IndexRequest generateIndexRequest(QueueableSearchable queueableSearchable) {
-        IndexRequest request = new IndexRequest(queueableSearchable.getIndex()).id(queueableSearchable.getId())
-                .routing(queueableSearchable.getRouting())
-                .source(queueableSearchable.getJsonSource(), XContentType.JSON);
-        if (queueableSearchable.getVersion() != null && !StringUtils.isEmpty(queueableSearchable.getId())) {
-            request.versionType(VersionType.EXTERNAL_GTE).version(queueableSearchable.getVersion());
-        }
-
-        return request;
     }
 
     /**
      * Checks the message of the exception if its an {@link ElasticsearchException} otherwise it will be retried
      */
-    public boolean exceptionIsToBeRetried(Exception e) {
-        if (e instanceof ElasticsearchException elasticEx) {
-            return !FILTER_REST_STATUS.contains(elasticEx.status()) && Arrays.stream(FILTER_MESSAGES)
-                    .noneMatch(elasticEx.getDetailedMessage()::contains);
-        }
+    public boolean exceptionIsToBeRetried(Exception ex) {
+        //TODO FIND IT OUT
+        LOGGER.error("An error occurred during an elastic operation type: {}", JsonUtil.toJson(ex));
         return true;
     }
 
-    protected QueueableSearchable generateQueueableSearchable(DocWriteRequest<?> request) {
-        return switch (request) {
-            case UpdateRequest updateRequest -> generateQueueableSearchable(updateRequest);
-            case IndexRequest indexRequest -> generateQueueableSearchable(indexRequest);
-            case DeleteRequest deleteRequest -> generateQueueableSearchable(deleteRequest);
-            default -> throw new IllegalArgumentException("Unknown request type: " + request.getClass().getName());
+    public boolean exceptionIsToBeRetried(ErrorCause errorCause) {
+        //TODO FIND IT OUT
+        LOGGER.error("An error occurred during an elastic operation type: {}", JsonUtil.toJson(errorCause));
+        return true;
+    }
+
+    protected QueueableSearchable buildQueueableSearchable(BulkOperation operation) {
+        return switch (operation._get()) {
+            case UpdateOperation<?, ?> updateRequest -> buildQueueableSearchable(updateRequest);
+            case IndexOperation<?> indexRequest -> buildQueueableSearchable(indexRequest);
+            case DeleteOperation deleteRequest -> buildQueueableSearchable(deleteRequest);
+            default -> throw new IllegalArgumentException("Unknown request type: " + operation._get().getClass().getName());
         };
     }
 
-    protected QueueableSearchable generateQueueableSearchable(IndexRequest request) {
+    protected QueueableSearchable buildQueueableSearchable(IndexOperation<?> request) {
         return new QueueableSearchable(request.index(), request.id(), request.version(), request.routing(),
-                request.source().utf8ToString(), QueueableSearchable.RequestType.INDEX);
+                request.document().toString(), QueueableSearchable.RequestType.INDEX);
     }
 
-    protected QueueableSearchable generateQueueableSearchable(UpdateRequest request) {
-        return new QueueableSearchable(request.index(), request.id(), request.version(), request.routing(),
-                request.doc().source().utf8ToString(),
-                request.upsertRequest() != null ? request.upsertRequest().source().utf8ToString() : null,
+    protected QueueableSearchable buildQueueableSearchable(UpdateOperation<?,?> request) {
+        return new QueueableSearchable(request.index(), request.id(), null, request.routing(),
+                request.action().doc().toString(),
+                Boolean.TRUE.equals(request.action().docAsUpsert()),
                 QueueableSearchable.RequestType.UPDATE);
 
     }
 
-    protected QueueableSearchable generateQueueableSearchable(DeleteRequest request) {
+    protected QueueableSearchable buildQueueableSearchable(DeleteOperation request) {
         return new QueueableSearchable(request.index(), request.id(), request.version(), request.routing(), null,
                 QueueableSearchable.RequestType.DELETE);
+    }
+
+    public JsonData parseObjectNode(JsonNode objectNode) {
+        JsonpMapper jsonpMapper = getApiClient()._transport().jsonpMapper();
+        JsonProvider jsonProvider = jsonpMapper.jsonProvider();
+
+        return JsonData.from(jsonProvider.createParser(new StringReader(objectNode.toString())), jsonpMapper);
     }
 }
