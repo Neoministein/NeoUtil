@@ -22,6 +22,9 @@ public class CacheControlResponseFilter implements ContainerResponseFilter {
                        ContainerResponseContext responseContext) {
         if (responseContext.getStatus() == 200) {
             CacheControl cacheAnnotation = resourceInfo.getResourceMethod().getAnnotation(CacheControl.class);
+            if (cacheAnnotation == null) {
+                cacheAnnotation = resourceInfo.getResourceClass().getAnnotation(CacheControl.class);
+            }
 
             jakarta.ws.rs.core.CacheControl cacheControl = new jakarta.ws.rs.core.CacheControl();
             cacheControl.setMaxAge(cacheAnnotation.maxAge());
