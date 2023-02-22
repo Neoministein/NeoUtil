@@ -3,7 +3,6 @@ package com.neo.util.helidon.rest.security;
 import com.neo.util.framework.api.connection.RequestContext;
 import com.neo.util.framework.impl.connection.HttpRequestDetails;
 import com.neo.util.framework.impl.connection.RequestDetailsProducer;
-import io.helidon.security.SecurityContext;
 import io.helidon.webserver.ServerRequest;
 import jakarta.ws.rs.core.Context;
 
@@ -13,6 +12,8 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.ext.Provider;
+
+import java.util.UUID;
 
 @Provider
 @Priority(100)
@@ -24,12 +25,9 @@ public class IdentificationFilter implements ContainerRequestFilter {
     @Context
     protected ServerRequest serverRequest;
 
-    @Context
-    protected SecurityContext securityContext;
-
     @Override
     public void filter(ContainerRequestContext containerRequest) {
-        requestDetailsProvider.setRequestDetails(new HttpRequestDetails(serverRequest.remoteAddress(), securityContext.id(),
+        requestDetailsProvider.setRequestDetails(new HttpRequestDetails(serverRequest.remoteAddress(), UUID.randomUUID().toString(),
                 new RequestContext.Http(containerRequest.getMethod(), getUri(containerRequest.getUriInfo()))));
     }
 

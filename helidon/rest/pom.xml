@@ -17,11 +17,16 @@
             <artifactId>neoutil-framework</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-rest</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Helidon -->
         <dependency>
             <groupId>io.helidon.microprofile.bundles</groupId>
-            <artifactId>helidon-microprofile</artifactId>
+            <artifactId>helidon-microprofile-core</artifactId>
             <version>${helidon.version}</version>
         </dependency>
         <dependency>
@@ -69,11 +74,6 @@
         </dependency>
 
         <!-- Testing -->
-        <dependency>
-            <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-rest</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.neo.util</groupId>
             <artifactId>neoutil-startup</artifactId>
