@@ -27,7 +27,7 @@ public interface ElasticSearchConnectionProvider extends Serializable {
     void disconnect();
 
     /**
-     * Connects the client to elasticsearch
+     * Connects the client to elasticsearch and fires a {@link ElasticSearchConnectionStatusEvent}
      */
     void connect();
 }

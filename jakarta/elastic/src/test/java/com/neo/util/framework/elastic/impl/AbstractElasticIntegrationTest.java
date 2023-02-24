@@ -16,6 +16,8 @@ import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.api.persistence.search.Searchable;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 import com.neo.util.framework.impl.connection.SchedulerRequestDetails;
+import jakarta.enterprise.event.Event;
+import jakarta.enterprise.event.NotificationOptions;
 import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.util.TypeLiteral;
 import org.elasticsearch.client.RestClient;
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.*;
+import java.util.concurrent.CompletionStage;
 
 @ESIntegTestCase.ClusterScope(scope = ESIntegTestCase.Scope.TEST, numDataNodes = 0)
 @ThreadLeakScope(ThreadLeakScope.Scope.NONE)
@@ -130,6 +133,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         configService.addConfig(
                 ElasticSearchConnectionProviderImpl.NODE_CONFIG, List.of(restClient.getNodes().get(0).getHost().toString()));
         connection.configService = configService;
+        connection.connectionStatusEvent = new EventMock<>();
 
         initialiseElasticSearchProvider();
     }
@@ -311,6 +315,44 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
             return response.get(indexName) != null;
         } catch (IOException e) {
             return false;
+        }
+    }
+
+    protected static class EventMock<T> implements Event<T> {
+        private Object event;
+
+        public Object getEvent() {
+            return event;
+        }
+
+        @Override
+        public void fire(Object event) {
+            this.event = event;
+        }
+
+        @Override
+        public Event<T> select(Annotation... qualifiers) {
+            return null;
+        }
+
+        @Override
+        public <U extends T> Event<U> select(Class<U> clazz, Annotation... qualifiers) {
+            return null;
+        }
+
+        @Override
+        public <U extends T> Event<U> select(TypeLiteral<U> u, Annotation... qualifiers) {
+            return null;
+        }
+
+        @Override
+        public <U extends T> CompletionStage<U> fireAsync(U u) {
+            return null;
+        }
+
+        @Override
+        public <U extends T> CompletionStage<U> fireAsync(U u, NotificationOptions options) {
+            return null;
         }
     }
 

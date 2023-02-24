@@ -29,6 +29,7 @@ import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.search.*;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionProvider;
+import com.neo.util.framework.elastic.api.ElasticSearchConnectionStatusEvent;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 import com.neo.util.framework.elastic.api.aggregation.BucketScriptAggregation;
 import jakarta.inject.Provider;
@@ -113,10 +114,14 @@ public class ElasticSearchProvider implements SearchProvider {
                 for (BulkOperation operation : request.operations()) {
                     bulkQueueableSearchableList.add(buildQueueableSearchable(operation));
                 }
-                indexerQueueService.addToIndexingQueue(new QueueMessage(requestDetailsProvider.get(),
+                indexerQueueService.addToIndexingQueue(new QueueMessage("BulkIngester",
+                        "BulkIngester-" + executionId,
                         QueueableSearchable.RequestType.BULK.toString(), bulkQueueableSearchableList));
                 if (failure instanceof IllegalStateException illegalStateException) {
-                    reconnectClientIfNeeded(illegalStateException);
+
+                    //To not encounter a deadlock if a reconnect is needed since this is called by an elastic thread
+                    //https://discuss.elastic.co/t/highlevelrestclient-java-client-does-not-shut-down-after-async-requests/286836
+                    new Thread(() -> reconnectClientIfNeeded(illegalStateException));
                 }
             }
         };
@@ -137,6 +142,12 @@ public class ElasticSearchProvider implements SearchProvider {
 
     public void connectionStatusListener(@Observes ApplicationReadyEvent event) {
         setupBulkIngester();
+    }
+
+    public void connectionStatusListener(@Observes ElasticSearchConnectionStatusEvent event) {
+        if (ElasticSearchConnectionStatusEvent.STATUS_EVENT_CONNECTED.equals(event.getConnectionStatus())) {
+            setupBulkIngester();
+        }
     }
 
     protected BulkIngester<Object> getBulkIngester() {
@@ -320,14 +331,21 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
     protected void handleBulkResponse(long executionId, BulkRequest bulkRequest, BulkResponse bulkResponse) {
-        LOGGER.info("Executed bulk [{}] with [{}] requests, hasFailures: [{}], took: [{}], ingestTook: [{}]",
-                executionId, bulkRequest.operations().size(), bulkResponse.errors(), bulkResponse.took(),
-                bulkResponse.ingestTook());
+        LOGGER.info("Executed bulk [{}] with [{}] requests, hasFailures: [{}], took: [{}]",
+                executionId, bulkRequest.operations().size(), bulkResponse.errors(), bulkResponse.took());
         if (bulkResponse.errors()) {
             List<QueueableSearchable> queueableSearchableList = handleFailedBulkProcess(bulkRequest, bulkResponse);
             for (QueueableSearchable queueableSearchable: queueableSearchableList) {
-                indexerQueueService.addToIndexingQueue(new QueueMessage(requestDetailsProvider.get(),
-                        queueableSearchable.getRequestType().toString(), queueableSearchable));
+                if (executionId == -1) {
+                    indexerQueueService.addToIndexingQueue(new QueueMessage(requestDetailsProvider.get(),
+                            queueableSearchable.getRequestType().toString(), queueableSearchable));
+                } else {
+                    indexerQueueService.addToIndexingQueue(new QueueMessage("BulkIngester",
+                            "BulkIngester-" + executionId,
+                            queueableSearchable.getRequestType().toString(), queueableSearchable));
+
+                }
+
             }
         }
     }
@@ -438,9 +456,9 @@ public class ElasticSearchProvider implements SearchProvider {
             SearchRequest searchRequest = builder.build();
             SearchResponse<ObjectNode> response = getApiClient().search(searchRequest, ObjectNode.class);
             return parseSearchResponse(parameters, response);
-        } catch (IOException | IllegalStateException e) {
+        } catch (IOException | ElasticsearchException ex) {
             LOGGER.error("Failed to fetch {} entries for index {} because of {}", parameters.getMaxResults(), index,
-                    e.getCause());
+                    ex.getCause());
             return new SearchResult();
         }
     }
@@ -825,7 +843,6 @@ public class ElasticSearchProvider implements SearchProvider {
         connection.reloadConfig();
         connection.disconnect();
         connection.connect();
-        setupBulkIngester();
     }
 
     @Override
@@ -838,7 +855,7 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
     /**
-     * In some situations the underlying http client used by elasticsearch's high level rest client stops proceeding and
+     * In some situations the underlying http client stops proceeding and
      * returns IllegalStateException.
      *
      * @param ex the exception to check

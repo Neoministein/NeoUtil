@@ -9,8 +9,8 @@ import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
-import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionProvider;
+import com.neo.util.framework.elastic.api.ElasticSearchConnectionStatusEvent;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -51,8 +51,13 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
 
     protected boolean enabled = false;
 
+    protected boolean initialized = false;
+
     @Inject
     protected ConfigService configService;
+
+    @Inject
+    protected Event<ElasticSearchConnectionStatusEvent> connectionStatusEvent;
 
     protected volatile ElasticsearchClient elasticsearchClient;
 
@@ -63,6 +68,7 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
     @PostConstruct
     public void postConstruct() {
         reloadConfig();
+        initialized = true;
     }
 
     public void reloadConfig() {
@@ -154,8 +160,8 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
         CredentialsProvider credentialsProvider = getCredentialsProvider();
 
         for (HttpHost node : nodes) {
-            LOGGER.info("Elasticsearch configuration. Host:{} Port:{} Protocol: {}", node.getHostName(), node.getPort(),
-                    node.getSchemeName());
+            LOGGER.info("Elasticsearch configuration. Protocol: {} Host:{} Port:{} ", node.getSchemeName(),
+                    node.getHostName(), node.getPort());
         }
 
         RestClient restClient;
@@ -175,6 +181,12 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
         elasticsearchClient = new ElasticsearchClient(transport);
 
         LOGGER.debug("Initializing elasticsearch complete");
+
+        //On first initialization it's false and this is used to let the BulkIngester to be initialized by the ApplicationReadEvent
+        if (initialized) {
+            connectionStatusEvent.fire(new ElasticSearchConnectionStatusEvent(ElasticSearchConnectionStatusEvent.STATUS_EVENT_CONNECTED));
+        }
+
     }
 
     /**
