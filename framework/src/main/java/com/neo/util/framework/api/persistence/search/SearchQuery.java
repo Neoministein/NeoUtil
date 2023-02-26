@@ -1,5 +1,6 @@
 package com.neo.util.framework.api.persistence.search;
 
+import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.persistence.aggregation.SearchAggregation;
 import com.neo.util.framework.api.persistence.criteria.SearchCriteria;
 
@@ -169,5 +170,10 @@ public class SearchQuery implements Serializable {
 
     public void setSearchPeriod(SearchPeriod searchPeriod) {
         this.searchPeriod = searchPeriod;
+    }
+
+    @Override
+    public String toString() {
+        return "\"SearchQuery\":" + JsonUtil.toJson(this);
     }
 }

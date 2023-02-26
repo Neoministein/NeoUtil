@@ -365,14 +365,15 @@ public class ElasticSearchProvider implements SearchProvider {
             BulkResponseItem item = bulkItemResponse.get(i);
             if (item.error() != null) {
                 ErrorCause errorCause = item.error();
+                String errorReason = errorCause.reason();
                 if (exceptionIsToBeRetried(errorCause)) {
                     BulkOperation bulkOperation = bulkRequest.operations().get(i);
                     QueueableSearchable queueableSearchable = buildQueueableSearchable(bulkOperation);
                     bulkQueueableSearchableList.add(queueableSearchable);
                     LOGGER.info("Request failed, to be retried, failureMessage:[{}], transportSearchable:[{}]",
-                            errorCause.reason(), queueableSearchable);
+                            errorReason, queueableSearchable);
                 } else {
-                    LOGGER.info("Request failed, no retry, failureMessage:[{}]", errorCause.reason());
+                    LOGGER.info("Request failed, no retry, failureMessage:[{}]", errorReason);
                 }
             }
         }
@@ -449,16 +450,18 @@ public class ElasticSearchProvider implements SearchProvider {
             builder.sort(sortOptions);
         }
         builder.aggregations(buildAggregations(parameters.getAggregations()));
+        SearchRequest searchRequest = builder.build();
 
-        LOGGER.debug("Executing search on index {} with parameters {}, builder {}", index, parameters, builder);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Executing search on index {} with parameters {}, \"builder\": {{}}", index, parameters, JsonUtil.toJson(builder));
+        }
 
         try {
-            SearchRequest searchRequest = builder.build();
             SearchResponse<ObjectNode> response = getApiClient().search(searchRequest, ObjectNode.class);
             return parseSearchResponse(parameters, response);
         } catch (IOException | ElasticsearchException ex) {
-            LOGGER.error("Failed to fetch {} entries for index {} because of {}", parameters.getMaxResults(), index,
-                    ex.getCause());
+            LOGGER.error("Failed to fetch {} entries for index {} because of {}: {}", parameters.getMaxResults(), index,
+                    ex.getClass().getSimpleName(), ex.getMessage());
             return new SearchResult();
         }
     }
@@ -916,13 +919,15 @@ public class ElasticSearchProvider implements SearchProvider {
      */
     public boolean exceptionIsToBeRetried(Exception ex) {
         //TODO FIND IT OUT
-        LOGGER.error("An error occurred during an elastic operation type: {}", JsonUtil.toJson(ex));
+        LOGGER.error("An error occurred during an elastic operation", ex);
         return true;
     }
 
     public boolean exceptionIsToBeRetried(ErrorCause errorCause) {
         //TODO FIND IT OUT
-        LOGGER.error("An error occurred during an elastic operation type: {}", JsonUtil.toJson(errorCause));
+        if (LOGGER.isErrorEnabled()) {
+            LOGGER.error("An error occurred during an elastic operation {}", JsonUtil.toJson(errorCause));
+        }
         return true;
     }
 
