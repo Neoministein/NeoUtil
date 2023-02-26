@@ -5,6 +5,7 @@ import com.neo.util.framework.impl.connection.HttpRequestDetails;
 import com.neo.util.framework.impl.connection.RequestDetailsProducer;
 import com.networknt.schema.format.InetAddressValidator;
 import io.helidon.webserver.ServerRequest;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.Context;
 
 import jakarta.annotation.Priority;
@@ -15,13 +16,18 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.ext.Provider;
 
+import java.util.UUID;
+
 @Provider
 @Priority(100)
+@ApplicationScoped
 public class IdentificationFilter implements ContainerRequestFilter {
 
     public static final String X_REAL_IP = "X-Real-IP";
 
     public static final String X_FORWARDED_FOR = "X-Forwarded-For";
+
+    protected final String instanceUuid = UUID.randomUUID().toString();
 
     @Inject
     protected RequestDetailsProducer requestDetailsProvider;
@@ -32,7 +38,7 @@ public class IdentificationFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) {
         requestDetailsProvider.setRequestDetails(new HttpRequestDetails(
-                getRemoteAddress(serverRequest, requestContext.getHeaders()), String.valueOf(serverRequest.requestId()),
+                getRemoteAddress(serverRequest, requestContext.getHeaders()), instanceUuid + ":" + serverRequest.requestId(),
                 new RequestContext.Http(requestContext.getMethod(), getUri(requestContext.getUriInfo()))));
     }
 
