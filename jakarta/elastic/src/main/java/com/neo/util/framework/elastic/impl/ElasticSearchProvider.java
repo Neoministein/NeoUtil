@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.common.impl.exception.CommonRuntimeException;
+import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
@@ -72,6 +73,12 @@ public class ElasticSearchProvider implements SearchProvider {
 
     protected static final ExceptionDetails EX_SYNCHRONOUS_INDEXING = new ExceptionDetails(
             "elk/synchronous-indexing", "IOException while synchronous indexing", true);
+
+    protected static final ExceptionDetails EX_IO_SEARCHING = new ExceptionDetails(
+            "elk/io-searching", "Failed to fetch {0} entries for index {1} because of IOException: {2}", true);
+
+    protected static final ExceptionDetails EX_CONFIG_SEARCHING = new ExceptionDetails(
+            "elk/io-searching", "Failed to fetch {0} entries for index {1} because of ElasticsearchException: {2}", true);
 
     @Inject
     protected ConfigService configService;
@@ -177,7 +184,7 @@ public class ElasticSearchProvider implements SearchProvider {
             try {
                 getApiClient().index(buildIndexRequest(searchable));
             } catch (IOException ex) {
-                throw new CommonRuntimeException(ex, EX_SYNCHRONOUS_INDEXING);
+                throw new CommonRuntimeException(ex, EX_IO_SEARCHING);
             } catch (IllegalStateException ex) {
                 reconnectClientIfNeeded(ex);
                 throw ex;
@@ -223,7 +230,7 @@ public class ElasticSearchProvider implements SearchProvider {
             try {
                 getApiClient().update(buildUpdateRequest(searchable, upsert), String.class);
             } catch (IOException ex) {
-                throw new CommonRuntimeException(ex, EX_SYNCHRONOUS_INDEXING);
+                throw new CommonRuntimeException(ex, EX_IO_SEARCHING);
             } catch (IllegalStateException ex) {
                 reconnectClientIfNeeded(ex);
                 throw ex;
@@ -253,7 +260,7 @@ public class ElasticSearchProvider implements SearchProvider {
             try {
                 handleBulkResponse(-1, bulkRequest, getApiClient().bulk(bulkRequest));
             } catch (IOException ex) {
-                throw new CommonRuntimeException(ex, EX_SYNCHRONOUS_INDEXING, ex);
+                throw new CommonRuntimeException(ex, EX_IO_SEARCHING, ex);
             } catch (IllegalStateException ex) {
                 reconnectClientIfNeeded(ex);
                 throw ex;
@@ -459,10 +466,10 @@ public class ElasticSearchProvider implements SearchProvider {
         try {
             SearchResponse<ObjectNode> response = getApiClient().search(searchRequest, ObjectNode.class);
             return parseSearchResponse(parameters, response);
-        } catch (IOException | ElasticsearchException ex) {
-            LOGGER.error("Failed to fetch {} entries for index {} because of {}: {}", parameters.getMaxResults(), index,
-                    ex.getClass().getSimpleName(), ex.getMessage());
-            return new SearchResult();
+        } catch (ElasticsearchException ex) {
+            throw new ConfigurationException(ex, EX_CONFIG_SEARCHING, parameters.getMaxResults(), index, ex.getMessage());
+        } catch (IOException ex) {
+            throw new CommonRuntimeException(ex, EX_IO_SEARCHING, parameters.getMaxResults(), index, ex.getMessage());
         }
     }
 
