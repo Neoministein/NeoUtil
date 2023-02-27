@@ -11,7 +11,7 @@ import java.util.Optional;
  * upon with queries
  * @param <T> the {@link PersistenceEntity} of this repository
  */
-public interface BaseRepository<T extends PersistenceEntity> {
+public interface EntityRepository<T extends PersistenceEntity> {
 
     /**
      * Persists {@link T}

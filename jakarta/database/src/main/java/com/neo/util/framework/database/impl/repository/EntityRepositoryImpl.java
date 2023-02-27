@@ -1,7 +1,7 @@
 package com.neo.util.framework.database.impl.repository;
 
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
-import com.neo.util.framework.database.api.repository.BaseRepository;
+import com.neo.util.framework.database.api.repository.EntityRepository;
 import com.neo.util.framework.database.impl.AbstractDatabaseRepository;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -13,12 +13,12 @@ import jakarta.transaction.Transactional;
 import java.util.*;
 
 @Transactional
-public abstract class BaseRepositoryImpl<T extends PersistenceEntity> extends AbstractDatabaseRepository implements BaseRepository<T> {
-
+public abstract class EntityRepositoryImpl<T extends PersistenceEntity> extends AbstractDatabaseRepository implements
+        EntityRepository<T> {
 
     protected final Class<T> clazz;
 
-    protected BaseRepositoryImpl(Class<T> clazz) {
+    protected EntityRepositoryImpl(Class<T> clazz) {
         this.clazz = clazz;
     }
 
