@@ -2,7 +2,7 @@ package com.neo.util.framework.api.persistence.search;
 
 import com.neo.util.framework.api.persistence.criteria.SearchCriteria;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * This interfaces defines the interactions capability for search data storage {@link Searchable}
@@ -15,31 +15,31 @@ public interface SearchProvider {
 
     void index(Searchable searchable, IndexParameter indexParameter);
 
-    void index(List<? extends Searchable> searchableList);
+    void index(Collection<? extends Searchable> searchableList);
 
-    void index(List<? extends Searchable> searchableList, IndexParameter indexParameter);
+    void index(Collection<? extends Searchable> searchableList, IndexParameter indexParameter);
 
     void update(Searchable searchable, boolean upsert);
 
     void update(Searchable searchable, boolean upsert, IndexParameter indexParameter);
 
-    void update(List<? extends Searchable> searchableList, boolean upsert);
+    void update(Collection<? extends Searchable> searchableList, boolean upsert);
 
-    void update(List<? extends Searchable> searchableList, boolean upsert, IndexParameter indexParameter);
+    void update(Collection<? extends Searchable> searchableList, boolean upsert, IndexParameter indexParameter);
 
     void delete(Searchable searchable);
 
-    void delete(List<? extends Searchable> searchableList);
+    void delete(Collection<? extends Searchable> searchableList);
 
     void deleteAll(Class<? extends Searchable> searchableClazz);
 
     void process(QueueableSearchable transportSearchable);
 
-    void process(List<QueueableSearchable> transportSearchableList);
+    void process(Collection<QueueableSearchable> transportSearchableList);
 
     long count(Class<? extends Searchable> searchableClazz);
 
-    long count(Class<? extends Searchable> searchableClazz, List<SearchCriteria> searchCriteriaList);
+    long count(Class<? extends Searchable> searchableClazz, Collection<SearchCriteria> searchCriteriaList);
 
     SearchResult fetch(String index, SearchQuery parameters);
 

@@ -4,7 +4,8 @@ import com.neo.util.framework.api.persistence.criteria.SearchCriteria;
 import com.neo.util.framework.api.persistence.search.*;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import java.util.List;
+
+import java.util.Collection;
 
 @ApplicationScoped
 @SuppressWarnings("java:S1186") //Default search implementation that does nothing
@@ -21,12 +22,12 @@ public class PretendSearchProvider implements SearchProvider {
     }
 
     @Override
-    public void index(List<? extends Searchable> searchableList) {
+    public void index(Collection<? extends Searchable> searchableList) {
 
     }
 
     @Override
-    public void index(List<? extends Searchable> searchableList, IndexParameter indexParameter) {
+    public void index(Collection<? extends Searchable> searchableList, IndexParameter indexParameter) {
 
     }
 
@@ -41,12 +42,12 @@ public class PretendSearchProvider implements SearchProvider {
     }
 
     @Override
-    public void update(List<? extends Searchable> searchableList, boolean partial) {
+    public void update(Collection<? extends Searchable> searchableList, boolean partial) {
 
     }
 
     @Override
-    public void update(List<? extends Searchable> searchableList, boolean partial, IndexParameter indexParameter) {
+    public void update(Collection<? extends Searchable> searchableList, boolean partial, IndexParameter indexParameter) {
 
     }
 
@@ -56,7 +57,7 @@ public class PretendSearchProvider implements SearchProvider {
     }
 
     @Override
-    public void delete(List<? extends Searchable> searchableList) {
+    public void delete(Collection<? extends Searchable> searchableList) {
 
     }
 
@@ -71,7 +72,7 @@ public class PretendSearchProvider implements SearchProvider {
     }
 
     @Override
-    public void process(List<QueueableSearchable> transportSearchableList) {
+    public void process(Collection<QueueableSearchable> transportSearchableList) {
 
     }
 
@@ -81,7 +82,7 @@ public class PretendSearchProvider implements SearchProvider {
     }
 
     @Override
-    public long count(Class<? extends Searchable> searchableClazz, List<SearchCriteria> searchCriteriaList) {
+    public long count(Class<? extends Searchable> searchableClazz, Collection<SearchCriteria> searchCriteriaList) {
         return 0;
     }
 

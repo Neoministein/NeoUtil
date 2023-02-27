@@ -95,7 +95,7 @@ public class ElasticSearchProvider implements SearchProvider {
     @Inject
     protected ElasticSearchConnectionProvider connection;
 
-    protected volatile BulkIngester bulkIngester;
+    protected volatile BulkIngester<Object> bulkIngester;
 
     protected synchronized void setupBulkIngester() {
         if (bulkIngester != null) {
@@ -173,7 +173,7 @@ public class ElasticSearchProvider implements SearchProvider {
         index(searchable, new IndexParameter());
     }
 
-    public void index(List<? extends Searchable> searchableList) {
+    public void index(Collection<? extends Searchable> searchableList) {
         index(searchableList, new IndexParameter());
     }
 
@@ -194,7 +194,7 @@ public class ElasticSearchProvider implements SearchProvider {
         }
     }
 
-    public void index(List<? extends Searchable> searchableList, IndexParameter indexParameter) {
+    public void index(Collection<? extends Searchable> searchableList, IndexParameter indexParameter) {
         if (Synchronization.ASYNCHRONOUS.equals(indexParameter.getSynchronization())) {
             for (Searchable searchable : searchableList) {
                 getBulkIngester().add(buildIndexOperation(searchable));
@@ -239,12 +239,12 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
     @Override
-    public void update(List<? extends Searchable> searchableList, boolean upsert) {
+    public void update(Collection<? extends Searchable> searchableList, boolean upsert) {
         update(searchableList, upsert, new IndexParameter());
     }
 
     @Override
-    public void update(List<? extends Searchable> searchableList, boolean upsert, IndexParameter indexParameter) {
+    public void update(Collection<? extends Searchable> searchableList, boolean upsert, IndexParameter indexParameter) {
         if (Synchronization.ASYNCHRONOUS.equals(indexParameter.getSynchronization())) {
             for (Searchable searchable : searchableList) {
                 addToBulkProcessor(buildUpdateOperation(searchable, upsert));
@@ -274,7 +274,7 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
     @Override
-    public void delete(List<? extends Searchable> searchableList) {
+    public void delete(Collection<? extends Searchable> searchableList) {
         throw new IllegalStateException("Not implemented yet");
     }
 
@@ -311,7 +311,7 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
     @Override
-    public void process(List<QueueableSearchable> transportSearchableList) {
+    public void process(Collection<QueueableSearchable> transportSearchableList) {
         BulkRequest.Builder brBuilder = new BulkRequest.Builder();
         for (QueueableSearchable queueableSearchable : transportSearchableList) {
             switch (queueableSearchable.getRequestType()) {
@@ -394,7 +394,7 @@ public class ElasticSearchProvider implements SearchProvider {
         return count(searchableClazz, List.of());
     }
 
-    public long count(Class<? extends Searchable> searchableClazz, List<SearchCriteria> searchCriteriaList) {
+    public long count(Class<? extends Searchable> searchableClazz, Collection<SearchCriteria> searchCriteriaList) {
         String indexName = indexNameService.getIndexNamePrefixFromClass(searchableClazz, false);
 
         CountRequest countRequest = new CountRequest.Builder()
@@ -473,7 +473,7 @@ public class ElasticSearchProvider implements SearchProvider {
         }
     }
 
-    protected BoolQuery buildQuery(List<SearchCriteria> searchFilters) {
+    protected BoolQuery buildQuery(Collection<SearchCriteria> searchFilters) {
         BoolQuery.Builder boolQuery = QueryBuilders.bool();
         List<Query> queryList = new ArrayList<>();
         for (SearchCriteria filter : searchFilters) {
