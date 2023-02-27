@@ -25,7 +25,7 @@ public enum IndexPeriod {
     EXTERNAL,
 
     /**
-     * The default wich is defines in the function below
+     * The default index period which is defines in {@link #getDefault()}
      */
     DEFAULT;
 
