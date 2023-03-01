@@ -18,6 +18,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This class loads all {@link JsonSchema} on startup and provided an UnmodifiableMap {@link Map} for all classes which require them.
@@ -48,7 +49,7 @@ public class JsonSchemaLoader {
                     jsonSchemaFolder.get(), "");
         }
 
-        jsonSchemaMap = mapToFill;
+        jsonSchemaMap = Collections.unmodifiableMap(mapToFill);
     }
 
     protected void addSchemas(Map<String, JsonSchema> mapToFill ,File[] files, String jsonSchemaFolder, String currentPath) {
@@ -68,6 +69,10 @@ public class JsonSchemaLoader {
     }
 
     public Map<String, JsonSchema> getUnmodifiableMap() {
-        return Collections.unmodifiableMap(jsonSchemaMap);
+        return jsonSchemaMap;
+    }
+
+    public Optional<JsonSchema> getJsonSchema(String path) {
+        return Optional.ofNullable(jsonSchemaMap.get(path));
     }
 }

@@ -50,7 +50,7 @@ public abstract class AbstractDtoReader<T> implements MessageBodyReader<T> {
 
     @PostConstruct
     protected void init() {
-        schema = Optional.ofNullable(jsonSchemaLoader.getUnmodifiableMap().get(getSchemaLocation()))
+        schema = jsonSchemaLoader.getJsonSchema(getSchemaLocation())
                 .orElseThrow(() -> new ConfigurationException(EX_UNKNOWN_JSON_SCHEMA, getSchemaLocation()));
     }
 
