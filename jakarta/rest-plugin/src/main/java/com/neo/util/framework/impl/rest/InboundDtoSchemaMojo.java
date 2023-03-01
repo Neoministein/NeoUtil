@@ -1,4 +1,4 @@
-package com.neo.util.framework.rest.impl;
+package com.neo.util.framework.impl.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.victools.jsonschema.generator.*;
@@ -6,9 +6,9 @@ import com.github.victools.jsonschema.module.jackson.JacksonModule;
 import com.github.victools.jsonschema.module.jackson.JacksonOption;
 import com.github.victools.jsonschema.module.jakarta.validation.JakartaValidationModule;
 import com.neo.util.framework.api.FrameworkConstants;
+import com.neo.util.framework.impl.ClassLoaderUtils;
 import com.neo.util.framework.rest.api.parser.InboundDto;
 import com.neo.util.framework.rest.impl.parser.InboundDtoProcessor;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -24,12 +24,7 @@ import org.reflections.util.ConfigurationBuilder;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import static com.neo.util.common.impl.annotation.ProcessorUtils.DEPENDENCY_REFLECTION_PATTERN;
@@ -47,10 +42,10 @@ public class InboundDtoSchemaMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}")
     protected MavenProject project;
 
-    @Parameter(property = "generateFromDependencies", defaultValue = "false")
+    @Parameter(property = "includeDependencies", defaultValue = "false")
     private boolean generateFromDependencies;
 
-    @Parameter(property = "generateFromDependenciesForTest", defaultValue = "false")
+    @Parameter(property = "includeTestDependencies", defaultValue = "false")
     private boolean generateFromDependenciesForTest;
 
     protected final Log logger = getLog();
@@ -66,13 +61,13 @@ public class InboundDtoSchemaMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException {
-        ClassLoader fullClassLoader = getClassLoader(true, true, new File(project.getBuild().getOutputDirectory()), new File(project.getBuild().getTestOutputDirectory()));
+        ClassLoader fullClassLoader = ClassLoaderUtils.getClassLoader(true, true, project.getArtifacts() ,new File(project.getBuild().getOutputDirectory()), new File(project.getBuild().getTestOutputDirectory()));
         generateForSrc(fullClassLoader);
         generateForTest(fullClassLoader);
     }
 
     protected void generateForSrc(ClassLoader fullClassLoader) throws MojoExecutionException {
-        Reflections reflections = getReflection(getClassLoader(generateFromDependencies, false, new File(project.getBuild().getOutputDirectory())));
+        Reflections reflections = getReflection(ClassLoaderUtils.getClassLoader(generateFromDependencies, false,project.getArtifacts() ,new File(project.getBuild().getOutputDirectory())));
         Set<String> classList = reflections.get(Scanners.TypesAnnotated.with(InboundDto.class));
         for (String clazz: classList) {
             try {
@@ -84,7 +79,7 @@ public class InboundDtoSchemaMojo extends AbstractMojo {
     }
 
     protected void generateForTest(ClassLoader fullClassLoader) throws MojoExecutionException {
-        Reflections reflections = getReflection(getClassLoader(!generateFromDependencies, generateFromDependenciesForTest, new File(project.getBuild().getTestOutputDirectory())));
+        Reflections reflections = getReflection(ClassLoaderUtils.getClassLoader(!generateFromDependencies, generateFromDependenciesForTest, project.getArtifacts() ,new File(project.getBuild().getTestOutputDirectory())));
         Set<String> classList = reflections.get(Scanners.TypesAnnotated.with(InboundDto.class));
         for (String clazz: classList) {
             try {
@@ -119,36 +114,5 @@ public class InboundDtoSchemaMojo extends AbstractMojo {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private ClassLoader getClassLoader(boolean addDependencies, boolean addTestDependencies,
-            File... runtimeClasspath) throws MojoExecutionException {
-        List<URL> urls = new ArrayList<>(runtimeClasspath.length);
-        for ( File file : runtimeClasspath ) {
-            try {
-                urls.add( file.toURI().toURL() );
-            }
-            catch (MalformedURLException ex) {
-                throw new MojoExecutionException("Unable to resolve classpath entry to URL: " + file.getAbsolutePath(), ex);
-            }
-        }
-
-        for (Artifact artifact : project.getArtifacts() ) {
-            try {
-                if (!Artifact.SCOPE_TEST.equals(artifact.getScope())) {
-                    if (addDependencies) {
-                        urls.add(artifact.getFile().toURI().toURL());
-                    }
-                } else {
-                    if (addTestDependencies) {
-                        urls.add(artifact.getFile().toURI().toURL());
-                    }
-                }
-            } catch (MalformedURLException ex) {
-                throw new MojoExecutionException( "Unable to resolve URL for dependency " + artifact.getId() + " at " + artifact.getFile().getAbsolutePath(), ex );
-            }
-        }
-
-        return new URLClassLoader( urls.toArray( new URL[urls.size()] ), Thread.currentThread().getContextClassLoader());
     }
 }

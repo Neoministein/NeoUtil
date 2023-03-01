@@ -129,12 +129,19 @@
         <plugins>
             <plugin>
                 <groupId>com.neo.util</groupId>
-                <artifactId>neoutil-rest-plugin</artifactId>
+                <artifactId>neoutil-maven-plugin</artifactId>
                 <version>${project.version}</version>
                 <executions>
                     <execution>
+                        <id>one</id>
                         <goals>
                             <goal>generate-inboundDto</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>two</id>
+                        <goals>
+                            <goal>generate-jsonSchemaIndex</goal>
                         </goals>
                     </execution>
                 </executions>

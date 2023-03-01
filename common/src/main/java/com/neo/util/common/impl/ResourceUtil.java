@@ -44,7 +44,21 @@ public class ResourceUtil {
     }
 
     /**
+     * Reads given resource file as a list of lines.
+     *
+     * @param fileName path to the resource file
+     * @return the file's contents
+     *
+     * @throws ConfigurationException if read fails for any reason
+     */
+    public static List<String> getResourceFileAsList(String fileName) {
+        return Arrays.asList(getResourceFileAsString(fileName).split("\\r?\\n"));
+    }
+
+    /**
      * Returns an array with the files in the folder
+     * <p/>
+     * This method returns an empty array if the folder location is not pointing to a jar file.
      *
      * @param folderLocation path to the folder
      *
@@ -67,6 +81,8 @@ public class ResourceUtil {
 
     /**
      * Returns an array with the files in the folder
+     * <p/>
+     * This method returns an empty array if the folder location is not pointing to a jar file.
      *
      * @param url path to the folder
      *

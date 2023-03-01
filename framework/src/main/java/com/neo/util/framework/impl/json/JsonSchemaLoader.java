@@ -1,6 +1,7 @@
 package com.neo.util.framework.impl.json;
 
 import com.neo.util.common.impl.ResourceUtil;
+import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.config.ConfigService;
@@ -11,6 +12,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +42,15 @@ public class JsonSchemaLoader {
         LOGGER.info("Pre-loading json schemas");
         Map<String, JsonSchema> mapToFill = new HashMap<>();
 
+        try {
+            for (String filePath: ResourceUtil.getResourceFileAsList(FrameworkConstants.JSON_SCHEMA_INDEX)) {
+                addSchema(mapToFill, filePath);
+            }
+        } catch (ConfigurationException ex) {
+            LOGGER.warn("Unable to load json schema index [{}]. Falling back to ", ex.getMessage());
+        }
+
+        /*
         addSchemas(mapToFill, ResourceUtil.getFolderContent(FrameworkConstants.JSON_SCHEMA_LOCATION),
                 FrameworkConstants.JSON_SCHEMA_LOCATION, "");
 
@@ -50,6 +61,7 @@ public class JsonSchemaLoader {
         }
 
         jsonSchemaMap = Collections.unmodifiableMap(mapToFill);
+        */
     }
 
     protected void addSchemas(Map<String, JsonSchema> mapToFill ,File[] files, String jsonSchemaFolder, String currentPath) {
@@ -57,9 +69,18 @@ public class JsonSchemaLoader {
             if (file.isDirectory()) {
                 addSchemas(mapToFill, file.listFiles(),jsonSchemaFolder ,currentPath + file.getName() + "/");
             } else {
-                LOGGER.debug("Loading schema : {}{}", currentPath, file.getName());
+
                 mapToFill.put(currentPath + file.getName(), JsonSchemaUtil.generateSchemaFromResource(jsonSchemaFolder+ "/"+ currentPath + file.getName()));
             }
+        }
+    }
+
+    protected void addSchema(Map<String, JsonSchema> mapToFill, String path) {
+        LOGGER.debug("Loading schema at: {}", path);
+        JsonSchema schema = JsonSchemaUtil.generateSchemaFromResource(path);
+        mapToFill.put(path, schema);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Schema loaded: {}", schema.getSchemaNode().textValue());
         }
     }
 

@@ -7,20 +7,21 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-rest-plugin</artifactId>
+    <artifactId>neoutil-maven-plugin</artifactId>
     <version>1.0.0</version>
 
-    <name>Neo Util Framework Rest Plugin JAR</name>
+    <name>Neo Util Framework Maven Plugin JAR</name>
     <packaging>maven-plugin</packaging>
 
     <dependencies>
-        <!-- Module specific -->
+        <!-- Internal Modules -->
         <dependency>
             <groupId>com.neo.util</groupId>
             <artifactId>neoutil-rest</artifactId>
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Module specific -->
         <dependency>
             <groupId>com.github.victools</groupId>
             <artifactId>jsonschema-generator</artifactId>
