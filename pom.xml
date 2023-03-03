@@ -106,7 +106,7 @@
 		<module>jakarta/elastic</module>
 		<module>jakarta/database</module>
 		<module>jakarta/rest</module>
-		<module>jakarta/rest-plugin</module>
+		<module>jakarta/maven-plugin</module>
 		<module>microprofile</module>
 		<module>helidon</module>
 	</modules>

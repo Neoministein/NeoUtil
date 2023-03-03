@@ -1,8 +1,5 @@
 package com.neo.util.common.impl.annotation;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
-
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeMirror;
@@ -10,9 +7,10 @@ import javax.lang.model.util.Elements;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
+/**
+ * This class is a provides basic Annotation Processor utilities
+ */
 public class ProcessorUtils {
-
-    public static final String DEPENDENCY_REFLECTION_PATTERN = "dependencyReflectionPattern";
 
     private ProcessorUtils(){}
 
@@ -103,24 +101,12 @@ public class ProcessorUtils {
         List<TypeElement> classList = new ArrayList<>();
 
         //Get typed element from class
-        for (Class<?> clazz: getClassesByAnnotation(annotation)) {
+        for (Class<?> clazz: ReflectionUtils.getClassesByAnnotation(annotation)) {
             TypeElement typeElement = elements.getTypeElement(clazz.getName());
             if (typeElement != null && allowedKinds.contains(typeElement.getKind())) {
                 classList.add(typeElement);
             }
         }
         return classList;
-    }
-
-    /**
-     * Returns a list of the classes which have the annotation.
-     *
-     * @param annotation the annotation to find
-     *
-     * @return  a list of classes which have the annotation
-     */
-    public static Set<Class<?>> getClassesByAnnotation(Class<? extends Annotation> annotation) {
-        Reflections reflections = new Reflections(System.getProperty(DEPENDENCY_REFLECTION_PATTERN,"com.neo"));
-        return reflections.get(Scanners.SubTypes.of(Scanners.TypesAnnotated.with(annotation)).asClass());
     }
 }

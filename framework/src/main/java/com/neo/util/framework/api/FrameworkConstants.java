@@ -6,7 +6,7 @@ public interface FrameworkConstants {
 
     String JSON_SCHEMA_LOCATION = "configuration/schema";
 
-    String JSON_SCHEMA_INDEX = "configuration/schema/index.txt";
+    String JSON_SCHEMA_INDEX = "configuration/schema/schema-index.txt";
 
     ExceptionDetails EX_UNAUTHORIZED = new ExceptionDetails(
             "auth/unauthorized", "The current request is unauthorized",false);
