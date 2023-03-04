@@ -133,14 +133,8 @@
                 <version>${project.version}</version>
                 <executions>
                     <execution>
-                        <id>one</id>
                         <goals>
                             <goal>generate-inboundDto</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>two</id>
-                        <goals>
                             <goal>generate-jsonSchemaIndex</goal>
                         </goals>
                     </execution>
