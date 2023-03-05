@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import org.slf4j.Logger;
@@ -45,13 +46,16 @@ public class JsonUtil {
         ObjectMapper mapper = new ObjectMapper();
 
         // ignore null fields
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_ABSENT);
 
         // use fields only
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
         mapper.setTimeZone(TimeZone.getDefault());
+
+        //Adds support for Optional
+        mapper.registerModule(new Jdk8Module());
 
         // Don't throw error when empty bean is being serialized
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
