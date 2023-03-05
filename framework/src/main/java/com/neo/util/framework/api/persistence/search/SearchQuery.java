@@ -148,6 +148,10 @@ public class SearchQuery implements Serializable {
         this.filters = filters;
     }
 
+    public void addFilters(SearchCriteria... filters) {
+        this.filters.addAll(Arrays.asList(filters));
+    }
+
     public Map<String, Boolean> getSorting() {
         return sorting;
     }
@@ -162,6 +166,10 @@ public class SearchQuery implements Serializable {
 
     public void setAggregations(List<SearchAggregation> aggregations) {
         this.aggregations = aggregations;
+    }
+
+    public void addAggregations(SearchAggregation... aggregation) {
+        this.aggregations.addAll(Arrays.asList(aggregation));
     }
 
     public SearchPeriod getSearchPeriod() {
