@@ -10,7 +10,7 @@ import jakarta.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 public class CacheControlFilterResource {
 
-    public static final String RESOURCE_LOCATION = "/test/cacheControll";
+    public static final String RESOURCE_LOCATION = "/test/cacheControl";
 
     public static final String P_MAX_AGE = "/maxAge";
 
