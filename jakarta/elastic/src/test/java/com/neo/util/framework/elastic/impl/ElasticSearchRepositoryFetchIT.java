@@ -1,5 +1,6 @@
 package com.neo.util.framework.elastic.impl;
 
+import com.neo.util.common.impl.enumeration.Association;
 import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
 import com.neo.util.framework.api.persistence.aggregation.*;
@@ -324,7 +325,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 	public void combinedSearchOrTest() {
 		//Arrange
 		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID), MAX_NUMBER_OF_SEARCHABLES, List.of(
-				new CombinedSearchCriteria(CombinedSearchCriteria.Association.OR,
+				new CombinedSearchCriteria(Association.OR,
 						new ContainsSearchCriteria(BasicPersonSearchable.F_AGE, 0, 10,40),
 						new ExplicitSearchCriteria(BasicPersonSearchable.F_NAME, "*ne*", true))));
 		//Act

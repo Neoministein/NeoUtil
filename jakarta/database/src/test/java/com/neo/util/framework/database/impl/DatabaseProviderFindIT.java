@@ -1,5 +1,6 @@
 package com.neo.util.framework.database.impl;
 
+import com.neo.util.common.impl.enumeration.Association;
 import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
@@ -270,7 +271,7 @@ class DatabaseProviderFindIT extends AbstractIntegrationTest<DatabaseProvider> {
     void combinedSearchOrTest() {
         //Arrange
         EntityQuery<PersonEntity> query = new EntityQuery<>(PersonEntity.class, List.of(
-                new CombinedSearchCriteria(CombinedSearchCriteria.Association.OR,
+                new CombinedSearchCriteria(Association.OR,
                         new ContainsSearchCriteria(PersonEntity.C_AGE, 0, 10,40),
                         new ExplicitSearchCriteria(PersonEntity.C_NAME, "*ne*", true))));
         //Act

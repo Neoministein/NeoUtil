@@ -1,6 +1,7 @@
 package com.neo.util.framework.database.impl;
 
 import com.neo.util.common.impl.StopWatch;
+import com.neo.util.common.impl.enumeration.Association;
 import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
@@ -221,7 +222,7 @@ public class DatabaseProvider extends AbstractDatabaseRepository implements Enti
         }
         Predicate predicate = buildInnerQuery(criteria.getSearchCriteriaList().get(0), cb,root);
         for (int i = 1; i < criteria.getSearchCriteriaList().size();i++) {
-            if (CombinedSearchCriteria.Association.AND.equals(criteria.getAssociation())) {
+            if (Association.AND.equals(criteria.getAssociation())) {
                 predicate = cb.and(buildInnerQuery(criteria.getSearchCriteriaList().get(i), cb,root), predicate);
             } else {
                 predicate = cb.or(buildInnerQuery(criteria.getSearchCriteriaList().get(i), cb,root), predicate);

@@ -16,6 +16,7 @@ import co.elastic.clients.json.JsonpMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.StringUtils;
+import com.neo.util.common.impl.enumeration.Association;
 import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.ConfigurationException;
@@ -543,7 +544,7 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
     protected Query buildContainsSearchQuery(ContainsSearchCriteria criteria) {
-        CombinedSearchCriteria combinedSearchCriteria = new CombinedSearchCriteria(CombinedSearchCriteria.Association.OR);
+        CombinedSearchCriteria combinedSearchCriteria = new CombinedSearchCriteria(Association.OR);
         criteria.getFieldValues().forEach(
                 value -> combinedSearchCriteria.addCriteria(new ExplicitSearchCriteria(criteria.getFieldName(), value)));
 

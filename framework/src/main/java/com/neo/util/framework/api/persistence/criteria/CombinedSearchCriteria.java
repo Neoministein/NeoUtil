@@ -1,5 +1,7 @@
 package com.neo.util.framework.api.persistence.criteria;
 
+import com.neo.util.common.impl.enumeration.Association;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,10 +13,6 @@ public class CombinedSearchCriteria implements SearchCriteria {
 
     protected final List<SearchCriteria> searchCriteriaList;
     protected final Association association;
-
-    public enum Association {
-        AND, OR
-    }
 
     public CombinedSearchCriteria(SearchCriteria... searchCriterion) {
         this(Association.AND, searchCriterion);
