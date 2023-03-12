@@ -20,6 +20,18 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Jakarta -->
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>${jakarta.persistence-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.transaction</groupId>
+            <artifactId>jakarta.transaction-api</artifactId>
+            <version>${jakarta.transaction-api.version}</version>
+        </dependency>
+
         <!-- Test - Framework -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

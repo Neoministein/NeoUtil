@@ -19,29 +19,9 @@
 
 		<!-- Jakarta -->
 		<dependency>
-			<groupId>jakarta.persistence</groupId>
-			<artifactId>jakarta.persistence-api</artifactId>
-			<version>${jakarta.persistence-api.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>jakarta.enterprise</groupId>
 			<artifactId>jakarta.enterprise.cdi-api</artifactId>
 			<version>${jakarta.enterprise.cdi-api.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>jakarta.transaction</groupId>
-			<artifactId>jakarta.transaction-api</artifactId>
-			<version>${jakarta.transaction-api.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>jakarta.annotation</groupId>
-			<artifactId>jakarta.annotation-api</artifactId>
-			<version>${jakarta.annotation-api.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>jakarta.ws.rs</groupId>
-			<artifactId>jakarta.ws.rs-api</artifactId>
-			<version>${jakarta.ws.rs-api.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.security.enterprise</groupId>

@@ -21,6 +21,19 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Jakarta -->
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <version>${jakarta.ws.rs-api.version}</version>
+        </dependency>
+        <!-- Should be removed or refactored at some point -->
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>${jakarta.persistence-api.version}</version>
+        </dependency>
+
         <!-- Class generation and reflection for processor logic -->
         <dependency>
             <groupId>com.squareup</groupId>
