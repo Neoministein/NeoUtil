@@ -64,9 +64,8 @@
         <!-- Test - Micro profile impl -->
         <dependency>
             <groupId>io.helidon.microprofile.bundles</groupId>
-            <artifactId>helidon-microprofile</artifactId>
+            <artifactId>helidon-microprofile-core</artifactId>
             <version>${helidon.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.helidon.microprofile.tests</groupId>
