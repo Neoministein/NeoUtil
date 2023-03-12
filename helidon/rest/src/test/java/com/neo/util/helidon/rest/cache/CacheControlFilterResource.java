@@ -1,6 +1,6 @@
 package com.neo.util.helidon.rest.cache;
 
-import com.neo.util.framework.rest.api.cache.CacheControl;
+import com.neo.util.framework.rest.api.cache.ClientCacheControl;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -20,7 +20,7 @@ public class CacheControlFilterResource {
 
     @GET
     @Path(P_MAX_AGE)
-    @CacheControl(maxAge = MAX_AGE)
+    @ClientCacheControl(maxAge = MAX_AGE)
     public String dtoParsing() {
         return ENTITY;
     }
