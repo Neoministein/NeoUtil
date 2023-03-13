@@ -368,7 +368,9 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 	@Test
 	public void simpleFieldAggregationTest() {
-		Function<AggregationResult, Double> parse = result -> (Double) ((SimpleAggregationResult) result).getValue();
+		Function<AggregationResult, Double> parseD = result -> (Double) ((SimpleAggregationResult) result).getValue();
+		Function<AggregationResult, Long> parseL = result -> (Long) ((SimpleAggregationResult) result).getValue();
+
 
 		SearchAggregation count = new SimpleFieldAggregation("COUNT", BasicPersonSearchable.F_AGE,
 				SimpleFieldAggregation.Type.COUNT);
@@ -380,20 +382,23 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 				SimpleFieldAggregation.Type.MIN);
 		SearchAggregation max = new SimpleFieldAggregation("MAX", BasicPersonSearchable.F_AGE,
 				SimpleFieldAggregation.Type.MAX);
+		SearchAggregation cardinality = new SimpleFieldAggregation("CARDINALITY", BasicPersonSearchable.F_AGE,
+				SimpleFieldAggregation.Type.CARDINALITY);
 
 		SearchQuery query = new SearchQuery(List.of(Searchable.BUSINESS_ID),0 ,0,
-				null ,List.of(), Map.of(), List.of(count, sum, avg, min, max), false);
+				null ,List.of(), Map.of(), List.of(count, sum, avg, min, max, cardinality), false);
 
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
 
 			SearchResult result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query);
 
-			Assert.assertEquals(4.0, parse.apply(result.getAggregations().get("COUNT")),0.1);
-			Assert.assertEquals(100.0, parse.apply(result.getAggregations().get("SUM")), 0.1);
-			Assert.assertEquals(25.0, parse.apply(result.getAggregations().get("AVG")),0.1);
-			Assert.assertEquals(10.0, parse.apply(result.getAggregations().get("MIN")),0.1);
-			Assert.assertEquals(40.0, parse.apply(result.getAggregations().get("MAX")),0.1);
+			Assert.assertEquals(4.0, parseD.apply(result.getAggregations().get("COUNT")),0.1);
+			Assert.assertEquals(100.0, parseD.apply(result.getAggregations().get("SUM")), 0.1);
+			Assert.assertEquals(25.0, parseD.apply(result.getAggregations().get("AVG")),0.1);
+			Assert.assertEquals(10.0, parseD.apply(result.getAggregations().get("MIN")),0.1);
+			Assert.assertEquals(40.0, parseD.apply(result.getAggregations().get("MAX")),0.1);
+			Assert.assertEquals(4L, (long) parseL.apply(result.getAggregations().get("CARDINALITY")));
 			//Assert
 			return true;
 		});

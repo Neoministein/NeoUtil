@@ -711,15 +711,17 @@ public class ElasticSearchProvider implements SearchProvider {
     protected AggregationResult parseAggregation(Aggregate agg, String key) {
         AggregateVariant variant = (AggregateVariant) agg._get();
 
-        if (variant instanceof SingleMetricAggregateBase singleValue) {
-            return new SimpleAggregationResult(key, singleValue.value());
-        } else if (variant instanceof FiltersAggregate filtersAggregate) {
-            return parseFilterAggregation(filtersAggregate, filtersAggregate.buckets(), key);
-        } else if (variant instanceof TermsAggregateBase<?> termsAggregateBase) {
-            return parseTermAggregation(termsAggregateBase,key);
-        } else {
-            throw new IllegalStateException("Unsupported aggregations variant received:" + variant._aggregateKind());
-        }
+        return switch (variant) {
+            case SingleMetricAggregateBase singleValue -> new SimpleAggregationResult(key, singleValue.value());
+            case FiltersAggregate filtersAggregate ->
+                    parseFilterAggregation(filtersAggregate, filtersAggregate.buckets(), key);
+            case TermsAggregateBase<?> termsAggregateBase -> parseTermAggregation(termsAggregateBase, key);
+            case CardinalityAggregate cardinalityAggregate ->
+                    new SimpleAggregationResult(key, cardinalityAggregate.value());
+            case null -> throw new IllegalStateException("Unsupported aggregations variant received: null");
+            case default ->
+                    throw new IllegalStateException("Unsupported aggregations variant received:" + variant._aggregateKind());
+        };
     }
 
     protected AggregationResult parseFilterAggregation(FiltersAggregate filtersAggregate,
