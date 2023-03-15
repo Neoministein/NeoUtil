@@ -396,7 +396,7 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
     public long count(Class<? extends Searchable> searchableClazz, Collection<SearchCriteria> searchCriteriaList) {
-        String indexName = indexNameService.getIndexNamePrefixFromClass(searchableClazz, false);
+        String indexName = indexNameService.getIndexNamePrefixFromClass(searchableClazz, true);
 
         CountRequest countRequest = new CountRequest.Builder()
                 .index(List.of(indexName))
