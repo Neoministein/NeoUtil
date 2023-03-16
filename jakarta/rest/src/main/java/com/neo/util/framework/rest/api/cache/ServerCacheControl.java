@@ -15,5 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, METHOD})
 public @interface ServerCacheControl {
 
+    long expireAfter() default EXPIRE_AFTER_DISABLED;
 
+    long EXPIRE_AFTER_DISABLED = -1;
 }
