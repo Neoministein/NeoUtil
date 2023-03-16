@@ -4,7 +4,7 @@ package com.neo.util.common.api.test;
 /**
  * A generic interface to check if a test should wake up.
  */
-
+@FunctionalInterface
 public interface WakeupCondition {
 
     /**

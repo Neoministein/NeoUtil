@@ -32,6 +32,8 @@
 		<jackson.version>2.14.0</jackson.version>
 		<json-schema-generator.version>4.28.0</json-schema-generator.version>
 		<json-schema-validator.version>1.0.76</json-schema-validator.version>
+		<!-- Caching -->
+		<caffeine.version>3.1.5</caffeine.version>
 
 		<!-- MP Implementation -->
 		<helidon.version>3.1.2</helidon.version>
@@ -106,6 +108,7 @@
 		<module>jakarta/elastic</module>
 		<module>jakarta/database</module>
 		<module>jakarta/rest</module>
+		<module>jakarta/rest-cache-local</module>
 		<module>jakarta/maven-plugin</module>
 		<module>microprofile</module>
 		<module>helidon</module>

@@ -17,7 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @NameBinding
 @Retention(RUNTIME)
 @Target({TYPE, METHOD})
-public @interface CacheControl {
+public @interface ClientCacheControl {
 
     /**
      * Corresponds to the max-age cache control directive.
