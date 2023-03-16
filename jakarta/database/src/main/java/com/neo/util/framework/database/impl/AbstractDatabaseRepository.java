@@ -29,7 +29,7 @@ public abstract class AbstractDatabaseRepository {
 
     protected void createWithAudit(PersistenceEntity entity) {
         pcs.getEm().persist(entity);
-        LOGGER.debug("Created entity {}", entity);
+        LOGGER.debug("Created entity {}:{}", entity.getClass().getSimpleName(),  entity);
         if (!(entity instanceof EntityAuditTrail)) {
             createAuditTrail(entity, PersistenceOperation.CREATE);
         }
@@ -37,13 +37,13 @@ public abstract class AbstractDatabaseRepository {
 
     protected void editWithAudit(PersistenceEntity entity) {
         pcs.getEm().merge(entity);
-        LOGGER.debug("Edited entity {}", entity);
+        LOGGER.debug("Edited entity {}:{}",entity.getClass().getSimpleName(), entity);
         createAuditTrail(entity, PersistenceOperation.UPDATE);
     }
 
     protected void removeWithAudit(PersistenceEntity entity) {
         pcs.getEm().remove(pcs.getEm().merge(entity));
-        LOGGER.debug("Removed entity {}", entity);
+        LOGGER.debug("Removed entity {}:{}",entity.getClass().getSimpleName(), entity);
         createAuditTrail(entity, PersistenceOperation.DELETE);
     }
 

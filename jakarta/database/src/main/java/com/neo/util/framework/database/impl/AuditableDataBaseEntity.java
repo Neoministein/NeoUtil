@@ -85,6 +85,6 @@ public abstract class AuditableDataBaseEntity implements PersistenceEntity {
 
     @Override
     public String toString() {
-        return "\"" + this.getClass().getSimpleName() + "\":" + JsonUtil.toJson(this);
+        return JsonUtil.toJson(this);
     }
 }
