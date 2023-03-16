@@ -460,8 +460,8 @@ public class ElasticSearchProvider implements SearchProvider {
         builder.aggregations(buildAggregations(parameters.getAggregations()));
         SearchRequest searchRequest = builder.build();
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Executing search on index {} with parameters {}, \"builder\": {{}}", index, parameters, JsonUtil.toJson(builder));
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Executing search on index {} with parameters {}, \"builder\": {{}}", index, parameters, JsonUtil.toJson(builder));
         }
 
         try {
