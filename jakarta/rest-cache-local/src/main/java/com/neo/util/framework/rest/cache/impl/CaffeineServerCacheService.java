@@ -4,10 +4,12 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.config.ConfigValue;
+import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
 import com.neo.util.framework.rest.cache.api.CachedObject;
 import com.neo.util.framework.rest.cache.api.ServerCacheService;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,5 +122,9 @@ public class CaffeineServerCacheService implements ServerCacheService {
     public void invalidateAll() {
         LOGGER.info("Invalidating entire cache");
         cache.invalidateAll();
+    }
+
+    public void onStartUp(@Observes ApplicationPostReadyEvent applicationPostReadyEvent) {
+        LOGGER.debug("ApplicationPostReadyEvent received");
     }
 }
