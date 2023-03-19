@@ -52,7 +52,11 @@ public class ResourceUtil {
      * @throws ConfigurationException if read fails for any reason
      */
     public static List<String> getResourceFileAsList(String fileName) {
-        return Arrays.asList(getResourceFileAsString(fileName).split("\\r?\\n"));
+        String[] fileContent = getResourceFileAsString(fileName).split("\\r?\\n");
+        if (fileContent.length == 1 && StringUtils.isEmpty(fileContent[0])) {
+            return List.of();
+        }
+        return Arrays.asList(fileContent);
     }
 
     /**
