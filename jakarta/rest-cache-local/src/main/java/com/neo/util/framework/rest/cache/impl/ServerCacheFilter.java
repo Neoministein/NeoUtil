@@ -35,7 +35,6 @@ public class ServerCacheFilter implements ContainerRequestFilter, ContainerRespo
     protected RestUtils restUtils;
 
     @Override
-    @SuppressWarnings("ConstantConditions")
     public void filter(ContainerRequestContext request) {
         String noCache = request.getHeaderString(HEADER_NO_CACHE);
         if (noCache != null) {
@@ -76,7 +75,7 @@ public class ServerCacheFilter implements ContainerRequestFilter, ContainerRespo
 
 
     protected String generateCacheKey(String method, UriInfo uriInfo) {
-        StringBuilder sb = new StringBuilder(method).append(uriInfo.getPath()).append('?');
+        StringBuilder sb = new StringBuilder(method).append("_").append(uriInfo.getPath()).append('?');
         for (Map.Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             sb.append(entry.getKey());
             sb.append('=');
