@@ -28,6 +28,11 @@
 		<!-- Class Generation -->
 		<javapoet.version>1.13.0</javapoet.version>
 		<auto-service.version>1.0.1</auto-service.version>
+
+		<!-- Reflection -->
+		<jandex.version>2.4.3.Final</jandex.version>
+		<org.reflections.version>0.10.2</org.reflections.version>
+
 		<!-- Jackson -->
 		<jackson.version>2.14.0</jackson.version>
 		<json-schema-generator.version>4.28.0</json-schema-generator.version>
@@ -108,7 +113,7 @@
 		<module>jakarta/elastic</module>
 		<module>jakarta/database</module>
 		<module>jakarta/rest</module>
-		<module>jakarta/rest-cache-local</module>
+		<module>jakarta/cache-caffeine</module>
 		<module>jakarta/maven-plugin</module>
 		<module>microprofile</module>
 		<module>helidon</module>

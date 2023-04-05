@@ -7,6 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,11 +35,91 @@ public class ReflectionUtils {
      *
      * @param annotation the annotation to find
      *
-     * @return  a set of classes which have the annotation
+     * @return a set of classes which have the annotation
      */
     public static Set<Class<?>> getClassesByAnnotation(Class<? extends Annotation> annotation) {
         Reflections reflections = new Reflections(getBasicConfig(Thread.currentThread().getContextClassLoader()));
         return reflections.get(Scanners.SubTypes.of(Scanners.TypesAnnotated.with(annotation)).asClass());
+    }
+
+    /**
+     * Returns all Annotation instances based on the {@link Target} annotation to look through.
+     *
+     * @param annotation the annotation to find
+     * @return a set of instances of the annotation
+     *
+     * @param <T> classType
+     */
+    public static <T extends Annotation> Set<T> getAnnotationInstances(Class<T> annotation) {
+        for (Annotation elementAnnotation: annotation.getAnnotations()) {
+            if (elementAnnotation instanceof Target target) {
+                return getAnnotationInstances(annotation, target.value());
+            }
+        }
+        throw new UnsupportedOperationException("Annotation " + annotation + " does not have the Target Annotation");
+    }
+
+    /**
+     * Returns all Annotation instances based on the elementTypes to look through.
+     *
+     * @param annotation the annotation to find
+     * @param elementTypes to look through
+     * @return a set of instances of the annotation
+     *
+     * @param <T> classType
+     */
+    public static <T extends Annotation> Set<T> getAnnotationInstances(Class<T> annotation, ElementType... elementTypes) {
+        LOGGER.debug("Searching instances of [{}] on types {}", annotation.getName(), elementTypes);
+        Scanners[] scanners = getScanners(elementTypes);
+        Reflections reflections = new Reflections(getBasicConfig(Thread.currentThread().getContextClassLoader())
+                .setScanners(scanners));
+        Set<T> annotationInstances = new HashSet<>();
+        for (Scanners scanner: scanners) {
+            for (AnnotatedElement field: reflections.get(scanner.with(annotation).as(getClassFromScanner(scanner)))) {
+                annotationInstances.add(field.getAnnotation(annotation));
+            }
+        }
+        LOGGER.trace("Found [{}] instances of [{}] on types {} {}", annotationInstances.size(), annotation.getName(),
+                elementTypes, annotationInstances);
+        return annotationInstances;
+    }
+
+    /**
+     * Parses Element to the equivalent scanner
+     *
+     * @param elementTypes to parse
+     *
+     * @return the equivalent scanner
+     */
+    protected static Scanners[] getScanners(ElementType... elementTypes) {
+        Scanners[] scanners = new Scanners[elementTypes.length];
+        for (int i = 0; i < elementTypes.length;i++) {
+            scanners[i] = switch (elementTypes[i]) {
+                case FIELD -> Scanners.FieldsAnnotated;
+                case METHOD -> Scanners.MethodsAnnotated;
+                case PARAMETER -> Scanners.MethodsParameter;
+                case TYPE -> Scanners.TypesAnnotated;
+                default -> throw new UnsupportedOperationException("ElementType " + elementTypes[i] + " is not supported");
+            };
+        }
+
+        return scanners;
+    }
+
+    /**
+     * Parses the scanner to the equivalent class
+     *
+     * @param scanners to pars
+     * @return the equivalent class
+     */
+    protected static Class<? extends AnnotatedElement> getClassFromScanner(Scanners scanners) {
+        return switch (scanners) {
+            case FieldsAnnotated -> Field.class;
+            case MethodsAnnotated -> Method.class;
+            case MethodsParameter -> Parameter.class;
+            case TypesAnnotated -> Class.class;
+            default -> throw new UnsupportedOperationException("Scanner " + scanners + " is not supported");
+        };
     }
 
     /**

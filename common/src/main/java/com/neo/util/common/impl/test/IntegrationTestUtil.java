@@ -1,7 +1,7 @@
 package com.neo.util.common.impl.test;
 
 import com.neo.util.common.api.test.WakeupCondition;
-import com.neo.util.common.impl.ThreadUtil;
+import com.neo.util.common.impl.ThreadUtils;
 
 import org.junit.jupiter.api.Assertions;
 
@@ -24,7 +24,7 @@ public final class IntegrationTestUtil {
         String exceptionMessage = "No exception occurred";
 
         try {
-            if (ThreadUtil.fluentWait(millisToSleep, tries, wakeUpCondition)) {
+            if (ThreadUtils.fluentWait(millisToSleep, tries, wakeUpCondition)) {
                 return;
             }
         } catch (RuntimeException | AssertionError e) {

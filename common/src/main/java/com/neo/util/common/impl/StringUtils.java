@@ -97,4 +97,15 @@ public class StringUtils {
         }
         return result.toString(charset);
     }
+
+    /**
+     * Counts the number of times the char appears in the sequence
+     *
+     * @param charSequence the sequence to count from
+     * @param charCheckAgainst to check against
+     * @return the number of times the char appears in the sequence
+     */
+    public static long countMatches(CharSequence charSequence, char charCheckAgainst) {
+        return charSequence.chars().filter(val -> charCheckAgainst == val).count();
+    }
 }

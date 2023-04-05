@@ -2,16 +2,18 @@ package com.neo.util.framework.api;
 
 import com.neo.util.common.impl.exception.ExceptionDetails;
 
-public interface FrameworkConstants {
+public final class FrameworkConstants {
 
-    String JSON_SCHEMA_LOCATION = "configuration/schema";
+    public static final String JSON_SCHEMA_LOCATION = "configuration/schema";
 
-    String JSON_SCHEMA_INDEX = "configuration/schema/schema-index.txt";
+    public static final String JSON_SCHEMA_INDEX = "configuration/schema/schema-index.txt";
 
-    ExceptionDetails EX_UNAUTHORIZED = new ExceptionDetails(
+    public static final ExceptionDetails EX_UNAUTHORIZED = new ExceptionDetails(
             "auth/unauthorized", "The current request is unauthorized",false);
 
-    ExceptionDetails EX_FORBIDDEN = new ExceptionDetails(
+    public static final ExceptionDetails EX_FORBIDDEN = new ExceptionDetails(
             "auth/forbidden", "The current request is forbidden",false);
+
+    private FrameworkConstants() {}
 
 }

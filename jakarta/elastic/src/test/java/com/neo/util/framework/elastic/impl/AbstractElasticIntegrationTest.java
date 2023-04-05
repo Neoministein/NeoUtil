@@ -15,6 +15,8 @@ import com.neo.util.framework.api.connection.RequestContext;
 import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.api.persistence.search.Searchable;
 import com.neo.util.framework.elastic.api.IndexNamingService;
+import com.neo.util.framework.impl.config.BasicConfigService;
+import com.neo.util.framework.impl.config.BasicConfigValue;
 import com.neo.util.framework.impl.connection.SchedulerRequestDetails;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.event.NotificationOptions;
@@ -54,7 +56,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
 
     protected static RestClient restClient;
 
-    protected TestConfigService configService = new TestConfigService(Map.of(
+    protected BasicConfigService configService = new BasicConfigService(Map.of(
             ElasticSearchConnectionProviderImpl.ENABLED_CONFIG, true,
             ElasticSearchProvider.FLUSH_INTERVAL_CONFIG, 1
     ));
@@ -130,8 +132,8 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         ensureStableCluster(1);
         restClient = getRestClient();
         LOGGER.info("Elasticsearch node started at [{}]", restClient.getNodes().get(0).getHost().toString());
-        configService.addConfig(
-                ElasticSearchConnectionProviderImpl.NODE_CONFIG, List.of(restClient.getNodes().get(0).getHost().toString()));
+        configService.save(new BasicConfigValue<>(
+                ElasticSearchConnectionProviderImpl.NODE_CONFIG, List.of(restClient.getNodes().get(0).getHost().toString())));
         connection.configService = configService;
         connection.connectionStatusEvent = new EventMock<>();
 

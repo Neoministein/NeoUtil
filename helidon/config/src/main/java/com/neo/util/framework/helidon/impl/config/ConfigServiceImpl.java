@@ -14,7 +14,7 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public Config get(String key) {
-        return new ConfigHelidonWrapper(config.get(key));
+        return new HelidonConfigWrapper(config.get(key));
     }
 
     @Override

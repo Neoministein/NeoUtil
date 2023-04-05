@@ -35,7 +35,7 @@ public class ResourceUtil {
             throw new ConfigurationException(EX_INVALID_URI, (Object) null);
         }
 
-        try (InputStream is = classLoader().getResourceAsStream(fileName)) {
+        try (InputStream is = ThreadUtils.classLoader().getResourceAsStream(fileName)) {
             if (is == null) throw new ConfigurationException(EX_INVALID_FILE, fileName);
             return StringUtils.toString(is, Charset.defaultCharset());
         } catch (IOException ex) {
@@ -73,7 +73,7 @@ public class ResourceUtil {
             List<File> content = new LinkedList<>();
             content.toArray(new File[0]);
 
-            Enumeration<URL> urlEnumeration = classLoader().getResources(folderLocation);
+            Enumeration<URL> urlEnumeration = ThreadUtils.classLoader().getResources(folderLocation);
             while (urlEnumeration.hasMoreElements()) {
                 content.addAll(Arrays.asList(getFolderContent(urlEnumeration.nextElement())));
             }
@@ -100,9 +100,5 @@ public class ResourceUtil {
         } catch (IllegalArgumentException ex) {
             return new File[0];
         }
-    }
-
-    protected static ClassLoader classLoader() {
-        return Thread.currentThread().getContextClassLoader();
     }
 }

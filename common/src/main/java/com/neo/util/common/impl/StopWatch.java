@@ -19,9 +19,10 @@ public final class StopWatch {
     /**
      * sets the start date and resets the stop date.
      */
-    public void start() {
+    public StopWatch start() {
         start = new Date();
         stop = null;
+        return this;
     }
 
     /**

@@ -32,7 +32,7 @@ public class IndexNamingServiceImpl implements IndexNamingService {
 
     protected static final String DEFAULT_MAPPING_VERSION = "v1";
 
-
+    //TODO REDO WITH THREAD SAFE LOGIC
     protected static final SimpleDateFormat INDEX_DATE_FORMAT_DAY = new SimpleDateFormat("yyyy.MM.ww.DDD");
     protected static final SimpleDateFormat INDEX_DATE_FORMAT_WEEK = new SimpleDateFormat("yyyy.MM.ww");
     protected static final SimpleDateFormat INDEX_DATE_FORMAT_MONTH = new SimpleDateFormat("yyyy.MM");
@@ -84,7 +84,7 @@ public class IndexNamingServiceImpl implements IndexNamingService {
      * Initializes the index names for each searchable. This is done only once at startup as it is defined by the
      * annotations on the searchable and cannot be changed at runtime.
      */
-    @Inject
+    @Inject //TODO USE JANDEX INSTEAD OF CDI FOR SEARCHABLE LOOKUP
     public void initIndexProperties(@Any Instance<Searchable> searchables) {
         indexNamePrefixes = new HashMap<>();
         indexPeriods = new HashMap<>();

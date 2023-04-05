@@ -106,6 +106,15 @@ public interface Config {
     <T> ConfigValue<List<T>> asList(Class<T> clazz);
 
     /**
+     * Returns this node as a list converting each list value using the provided mapper.
+     *
+     * @param mapper mapper to convert each list node into a typed value
+     * @param <T>    type of list elements
+     * @return a typed list with values
+     */
+    <T> ConfigValue<List<T>> asList(Function<Config, T> mapper);
+
+    /**
      * The {@link ConfigValue} as a {@link Map}
      */
     ConfigValue<Map<String, String>> asMap();
