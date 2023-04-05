@@ -413,7 +413,7 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
     @Override
-    public SearchResult fetch(String index, SearchQuery parameters) {
+    public <T> SearchResult<T> fetch(String index, SearchQuery parameters, Class<T> hitsClass) {
         SearchRequest.Builder builder = new SearchRequest.Builder();
         builder.index(index);
         builder.size(parameters.getMaxResults());
@@ -465,7 +465,7 @@ public class ElasticSearchProvider implements SearchProvider {
         }
 
         try {
-            SearchResponse<ObjectNode> response = getApiClient().search(searchRequest, ObjectNode.class);
+            SearchResponse<T> response = getApiClient().search(searchRequest, hitsClass);
             return parseSearchResponse(parameters, response);
         } catch (ElasticsearchException ex) {
             throw new ConfigurationException(ex, EX_CONFIG_SEARCHING, parameters.getMaxResults(), index, ex.getMessage());
@@ -672,7 +672,7 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
 
-    protected SearchResult parseSearchResponse(SearchQuery parameters, SearchResponse<ObjectNode> response) {
+    protected <T> SearchResult<T> parseSearchResponse(SearchQuery parameters, SearchResponse<T> response) {
         return new SearchResult(
                 response.hits().total() != null ? response.hits().total().value() : -1,
                 response.hits().maxScore() != null ? response.hits().maxScore().doubleValue() : -1,
@@ -685,9 +685,9 @@ public class ElasticSearchProvider implements SearchProvider {
                 TotalHitsRelation.Gte.equals(response.hits().total().relation()));
     }
 
-    protected List<JsonNode> parseHits(HitsMetadata<ObjectNode> hitsMetadata, boolean onlySource) {
-        List<JsonNode> hitList = new ArrayList<>();
-        for (Hit<ObjectNode> hit : hitsMetadata.hits()) {
+    protected <T> List<T> parseHits(HitsMetadata<T> hitsMetadata, boolean onlySource) {
+        List<T> hitList = new ArrayList<>();
+        for (Hit<T> hit : hitsMetadata.hits()) {
             if (onlySource) {
                 hitList.add(hit.source());
             } else {

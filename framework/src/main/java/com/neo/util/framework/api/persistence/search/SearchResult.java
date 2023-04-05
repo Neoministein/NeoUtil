@@ -2,7 +2,6 @@ package com.neo.util.framework.api.persistence.search;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.api.json.Views;
 import com.neo.util.framework.api.persistence.aggregation.AggregationResult;
 
@@ -13,8 +12,10 @@ import java.util.Map;
 
 /**
  * Defines a result from a search query from a search provider
+ *
+ * @param <T> parsed return hits
  */
-public class SearchResult {
+public class SearchResult<T> {
 
     /**
      * Total number of hits which match the query, regardless of the maxResults.
@@ -57,7 +58,7 @@ public class SearchResult {
      * The search hits found
      */
         @JsonView(Views.Public.class)
-    private List<JsonNode> hits;
+    private List<T> hits;
     /**
      * The aggregations defined in the SearchParameter's
      */
@@ -68,7 +69,7 @@ public class SearchResult {
      * Create a new SearchResult.
      */
     public SearchResult(long hitSize, double maxScore, long tookInMillis, boolean terminatedEarly, boolean timedOut,
-            String scrollId, List<JsonNode> hits, Map<String, AggregationResult> aggregations,
+            String scrollId, List<T> hits, Map<String, AggregationResult> aggregations,
             boolean relationGreaterThen) {
         super();
         this.hitSize = hitSize;
@@ -118,7 +119,7 @@ public class SearchResult {
         return scrollId;
     }
 
-    public List<JsonNode> getHits() {
+    public List<T> getHits() {
         return hits;
     }
 

@@ -2,6 +2,8 @@ package com.neo.util.framework.elastic.impl;
 
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.framework.api.persistence.search.*;
 import org.junit.Assert;
@@ -266,7 +268,7 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 		query.setFields(List.of(BasicPersonSearchable.F_NAME));
 
 		LOGGER.info("---check--- {}, {}, {}", elasticSearchRepository, indexName, query);
-		SearchResult result = elasticSearchRepository.fetch(indexName, query);
+		SearchResult<JsonNode> result = elasticSearchRepository.fetch(indexName, query, JsonNode.class);
 		Assert.assertTrue("At least one record expected, SearchResult:" + result, result.getHits().size() >= 1);
 	}
 

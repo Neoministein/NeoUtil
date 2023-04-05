@@ -41,7 +41,7 @@ public interface SearchProvider {
 
     long count(Class<? extends Searchable> searchableClazz, Collection<SearchCriteria> searchCriteriaList);
 
-    SearchResult fetch(String index, SearchQuery parameters);
+    <T> SearchResult<T> fetch(String index, SearchQuery parameters, Class<T> hitsClass);
 
     /**
      * Reloads the config and reconnects to the SearchRepository to the nodes

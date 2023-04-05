@@ -87,7 +87,7 @@ public class PretendSearchProvider implements SearchProvider {
     }
 
     @Override
-    public SearchResult fetch(String index, SearchQuery parameters) {
+    public <T> SearchResult<T> fetch(String index, SearchQuery parameters, Class<T> hitsClass) {
         return null;
     }
 

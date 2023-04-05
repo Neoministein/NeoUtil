@@ -1,5 +1,6 @@
 package com.neo.util.framework.elastic.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.enumeration.Association;
 import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
@@ -53,7 +54,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		LOGGER.info("---check--- {}, {}, {}", elasticSearchRepository, INDEX_NAME_FOR_QUERY, query);
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
-			SearchResult result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query);
+			SearchResult<JsonNode> result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query, JsonNode.class);
 			return result.getHits().size() == 4;
 		});
 	}
@@ -76,9 +77,9 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		//Act
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
-			SearchResult fromResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, fromQuery);
-			SearchResult toResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, toQuery);
-			SearchResult betweenResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, betweenQuery);
+			SearchResult<JsonNode> fromResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, fromQuery, JsonNode.class);
+			SearchResult<JsonNode> toResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, toQuery, JsonNode.class);
+			SearchResult<JsonNode> betweenResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, betweenQuery, JsonNode.class);
 			//Assert
 
 			Assert.assertEquals(3, fromResult.getHitSize());
@@ -115,9 +116,9 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		//Act
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
-			SearchResult fromResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, fromQuery);
-			SearchResult toResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, toQuery);
-			SearchResult betweenResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, betweenQuery);
+			SearchResult<JsonNode> fromResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, fromQuery, JsonNode.class);
+			SearchResult<JsonNode> toResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, toQuery, JsonNode.class);
+			SearchResult<JsonNode> betweenResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, betweenQuery, JsonNode.class);
 			//Assert
 
 			Assert.assertEquals(3, fromResult.getHitSize());
@@ -151,7 +152,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
-			SearchResult searchResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, searchQuery);
+			SearchResult<JsonNode> searchResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, searchQuery, JsonNode.class);
 			//Assert
 
 			Assert.assertEquals(1, searchResult.getHitSize());
@@ -170,7 +171,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
-			SearchResult searchResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, searchQuery);
+			SearchResult<JsonNode> searchResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, searchQuery, JsonNode.class);
 			//Assert
 
 			Assert.assertEquals(1, searchResult.getHitSize());
@@ -193,8 +194,8 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		//Act
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
-			SearchResult starResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, starQuery);
-			SearchResult questionResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, questionQuery);
+			SearchResult<JsonNode> starResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, starQuery, JsonNode.class);
+			SearchResult<JsonNode> questionResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, questionQuery, JsonNode.class);
 
 			Assert.assertEquals(1, starResult.getHitSize());
 			Assert.assertEquals(personTwo.getBusinessId(), starResult.getHits().get(0).get(Searchable.BUSINESS_ID).textValue());
@@ -215,7 +216,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		//Act
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
-			SearchResult result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query);
+			SearchResult<JsonNode> result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query, JsonNode.class);
 
 			//Assert
 			Assert.assertEquals(1, result.getHitSize());
@@ -235,7 +236,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		//Act
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
-			SearchResult result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query);
+			SearchResult<JsonNode> result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query, JsonNode.class);
 
 			//Assert
 			Assert.assertEquals(3, result.getHitSize());
@@ -261,9 +262,9 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
 
-			SearchResult fromResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, fromQuery);
-			SearchResult toResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, toQuery);
-			SearchResult betweenResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, betweenQuery);
+			SearchResult<JsonNode> fromResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, fromQuery, JsonNode.class);
+			SearchResult<JsonNode> toResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, toQuery, JsonNode.class);
+			SearchResult<JsonNode> betweenResult = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, betweenQuery, JsonNode.class);
 			//Assert
 
 			Assert.assertEquals(3,fromResult.getHitSize());
@@ -291,7 +292,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
 
-			SearchResult result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query);
+			SearchResult<JsonNode> result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query, JsonNode.class);
 
 			//Assert
 			Assert.assertEquals(2, result.getHitSize());
@@ -312,7 +313,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
 
-			SearchResult result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query);
+			SearchResult<JsonNode> result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query, JsonNode.class);
 
 			//Assert
 			Assert.assertEquals(1, result.getHitSize());
@@ -332,7 +333,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
 
-			SearchResult result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query);
+			SearchResult<JsonNode> result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query, JsonNode.class);
 
 			//Assert
 			Assert.assertEquals(3, result.getHitSize());
@@ -355,7 +356,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
 
-			SearchResult result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query);
+			SearchResult<JsonNode> result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query, JsonNode.class);
 
 			//Assert
 			Assert.assertEquals(maxResult, result.getHits().size());
@@ -391,7 +392,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
 
-			SearchResult result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query);
+			SearchResult<JsonNode> result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query, JsonNode.class);
 
 			Assert.assertEquals(4.0, parseD.apply(result.getAggregations().get("COUNT")),0.1);
 			Assert.assertEquals(100.0, parseD.apply(result.getAggregations().get("SUM")), 0.1);
@@ -424,7 +425,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
 
-			SearchResult result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query);
+			SearchResult<JsonNode> result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query, JsonNode.class);
 
 			Assert.assertEquals(1, result.getAggregations().size());
 
@@ -449,7 +450,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
-			SearchResult result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query);
+			SearchResult<JsonNode> result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query, JsonNode.class);
 
 			TermAggregationResult termAggregationResult = (TermAggregationResult) result.getAggregations().get("termAggregation");
 			List<TermAggregationResult.Bucket> buckets = termAggregationResult.getBuckets();
