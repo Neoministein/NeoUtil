@@ -5,8 +5,7 @@ import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.json.JsonUtil;
 import jakarta.enterprise.context.Dependent;
 
-import java.util.Date;
-
+import java.time.Instant;
 /**
  * Defines necessary functionality of a class that can be indexed into a search provider.
  * <p>
@@ -65,7 +64,7 @@ public interface Searchable {
     /**
      * The creation date
      */
-    Date getCreationDate();
+    Instant getCreationDate();
 
     /**
      * The transaction count

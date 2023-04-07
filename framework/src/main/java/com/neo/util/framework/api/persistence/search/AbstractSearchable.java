@@ -2,12 +2,12 @@ package com.neo.util.framework.api.persistence.search;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.Date;
+import java.time.Instant;
 
 public abstract class AbstractSearchable implements Searchable {
 
     @JsonIgnore
-    private Date creationDate = new Date();
+    private Instant creationDate = Instant.now();
 
     @JsonIgnore
     private String businessId = null;
@@ -21,7 +21,7 @@ public abstract class AbstractSearchable implements Searchable {
     }
 
     @Override
-    public Date getCreationDate() {
+    public Instant getCreationDate() {
         return creationDate;
     }
 
@@ -34,7 +34,7 @@ public abstract class AbstractSearchable implements Searchable {
         this.businessId = businessId;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 

@@ -12,9 +12,8 @@ import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 
-import java.text.SimpleDateFormat;
-import java.time.temporal.TemporalAccessor;
-import java.util.Date;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,11 +31,10 @@ public class IndexNamingServiceImpl implements IndexNamingService {
 
     protected static final String DEFAULT_MAPPING_VERSION = "v1";
 
-    //TODO REDO WITH THREAD SAFE LOGIC
-    protected static final SimpleDateFormat INDEX_DATE_FORMAT_DAY = new SimpleDateFormat("yyyy.MM.ww.DDD");
-    protected static final SimpleDateFormat INDEX_DATE_FORMAT_WEEK = new SimpleDateFormat("yyyy.MM.ww");
-    protected static final SimpleDateFormat INDEX_DATE_FORMAT_MONTH = new SimpleDateFormat("yyyy.MM");
-    protected static final SimpleDateFormat INDEX_DATE_FORMAT_YEAR = new SimpleDateFormat("yyyy");
+    protected static final DateTimeFormatter INDEX_DATE_FORMAT_DAY = DateTimeFormatter.ofPattern("yyyy.MM.ww.DDD");
+    protected static final DateTimeFormatter INDEX_DATE_FORMAT_WEEK = DateTimeFormatter.ofPattern("yyyy.MM.ww");
+    protected static final DateTimeFormatter INDEX_DATE_FORMAT_MONTH = DateTimeFormatter.ofPattern("yyyy.MM");
+    protected static final DateTimeFormatter INDEX_DATE_FORMAT_YEAR = DateTimeFormatter.ofPattern("yyyy");
 
     protected String mappingVersion;
     protected String indexPrefix;
@@ -143,7 +141,7 @@ public class IndexNamingServiceImpl implements IndexNamingService {
     /**
      * Returns the appropriate date formatter for the given index period.
      */
-    protected SimpleDateFormat getDateFormatter(IndexPeriod indexPeriod) {
+    protected DateTimeFormatter getDateFormatter(IndexPeriod indexPeriod) {
         return switch (indexPeriod) {
             case DAILY -> INDEX_DATE_FORMAT_DAY;
             case WEEKLY -> INDEX_DATE_FORMAT_WEEK;
@@ -151,15 +149,14 @@ public class IndexNamingServiceImpl implements IndexNamingService {
             case YEARLY -> INDEX_DATE_FORMAT_YEAR;
             case ALL, EXTERNAL -> null;
             case DEFAULT -> getDateFormatter(IndexPeriod.getDefault());
-            default -> getDateFormatter(IndexPeriod.getDefault());
         };
     }
 
     /**
-     * Formats the given {@link TemporalAccessor} with the given formatter. When the formatter is null the default value will be
+     * Formats the given {@link Instant} with the given formatter. When the formatter is null the default value will be
      * returned.
      */
-    protected String getDateFormatString(Date dateTime, SimpleDateFormat formatter) {
+    protected String getDateFormatString(Instant dateTime, DateTimeFormatter formatter) {
         if (formatter != null) {
             return formatter.format(dateTime);
         } else {
