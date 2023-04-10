@@ -411,6 +411,10 @@ public class ElasticSearchProvider implements SearchProvider {
             return 0L;
         }
     }
+    @Override
+    public SearchResult<JsonNode> fetch(String index, SearchQuery parameters) {
+        return fetch(index, parameters, JsonNode.class);
+    }
 
     @Override
     public <T> SearchResult<T> fetch(String index, SearchQuery parameters, Class<T> hitsClass) {

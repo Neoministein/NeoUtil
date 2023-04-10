@@ -1,5 +1,6 @@
 package com.neo.util.framework.impl.persistence.search;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.framework.api.persistence.criteria.SearchCriteria;
 import com.neo.util.framework.api.persistence.search.*;
 
@@ -84,6 +85,11 @@ public class PretendSearchProvider implements SearchProvider {
     @Override
     public long count(Class<? extends Searchable> searchableClazz, Collection<SearchCriteria> searchCriteriaList) {
         return 0;
+    }
+
+    @Override
+    public SearchResult<JsonNode> fetch(String index, SearchQuery parameters) {
+        return null;
     }
 
     @Override
