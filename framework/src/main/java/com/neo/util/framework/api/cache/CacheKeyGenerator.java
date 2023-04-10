@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
  * from within the generator. The implementation is injected as a CDI bean if possible or is instantiated using
  * the default constructor otherwise.
  * <p>
- * NOTE: Even if a bean is annotated with {@link ApplicationScoped} the injected bean will function same as a {@link Dependent} bean.
+ * NOTE: Even if a bean is annotated with {@link Dependent} the injected bean will function same as a {@link ApplicationScoped} bean.
  * This is due to no programmatic lookup being supported in CDI 3.0 and waiting for Helidon version bump to 4.0
  * Therefore {@link RequestScoped} and {@link SessionScoped} are not supported.
  */
