@@ -13,6 +13,7 @@ import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,10 +32,14 @@ public class IndexNamingServiceImpl implements IndexNamingService {
 
     protected static final String DEFAULT_MAPPING_VERSION = "v1";
 
-    protected static final DateTimeFormatter INDEX_DATE_FORMAT_DAY = DateTimeFormatter.ofPattern("yyyy.MM.ww.DDD");
-    protected static final DateTimeFormatter INDEX_DATE_FORMAT_WEEK = DateTimeFormatter.ofPattern("yyyy.MM.ww");
-    protected static final DateTimeFormatter INDEX_DATE_FORMAT_MONTH = DateTimeFormatter.ofPattern("yyyy.MM");
-    protected static final DateTimeFormatter INDEX_DATE_FORMAT_YEAR = DateTimeFormatter.ofPattern("yyyy");
+    protected static final DateTimeFormatter INDEX_DATE_FORMAT_DAY = DateTimeFormatter.ofPattern("yyyy.MM.ww.DDD")
+            .withZone(ZoneId.systemDefault());
+    protected static final DateTimeFormatter INDEX_DATE_FORMAT_WEEK = DateTimeFormatter.ofPattern("yyyy.MM.ww")
+            .withZone(ZoneId.systemDefault());
+    protected static final DateTimeFormatter INDEX_DATE_FORMAT_MONTH = DateTimeFormatter.ofPattern("yyyy.MM")
+            .withZone(ZoneId.systemDefault());
+    protected static final DateTimeFormatter INDEX_DATE_FORMAT_YEAR = DateTimeFormatter.ofPattern("yyyy")
+            .withZone(ZoneId.systemDefault());
 
     protected String mappingVersion;
     protected String indexPrefix;
