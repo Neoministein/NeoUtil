@@ -2,6 +2,7 @@ package com.neo.util.framework.impl.cache;
 
 import com.neo.util.framework.api.cache.spi.CacheName;
 import com.neo.util.framework.caffeine.impl.CaffeineCacheBuilder;
+import com.neo.util.framework.impl.cache.spi.CacheKeyGeneratorManager;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
 import org.jboss.weld.junit5.WeldInitiator;
@@ -30,6 +31,7 @@ public abstract class AbstractCacheIT {
     protected List<Class<?>> basicCDIClasses() {
         List<Class<?>> classes = new ArrayList<>();
         classes.add(BasicCacheManagerImpl.class);
+        classes.add(CacheKeyGeneratorManager.class);
         classes.add(CaffeineCacheBuilder.class);
         classes.add(ConfigServiceProducer.class);
         return classes;

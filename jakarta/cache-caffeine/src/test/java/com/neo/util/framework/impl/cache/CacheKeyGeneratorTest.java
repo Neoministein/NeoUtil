@@ -68,8 +68,8 @@ class CacheKeyGeneratorTest extends AbstractCacheIT{
         BigInteger value6 = subject.cachedMethod2();
         assertNotSame(value4, value6);
 
-        // If this fails, the interceptor may be leaking @Dependent beans by not destroying them when it should.
-        assertEquals(0, DependentKeyGen.livingBeans);
+        // If this fails, the interceptor may be recreating the same bean multiple times.
+        assertEquals(1, DependentKeyGen.livingBeans);
 
         Object value7 = subject.cachedMethod3(/* Not used */ null, /* Not used */ null);
         Object value8 = subject.cachedMethod3(/* Not used */ null, /* Not used */ null);

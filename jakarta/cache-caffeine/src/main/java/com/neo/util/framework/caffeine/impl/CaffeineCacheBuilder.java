@@ -1,12 +1,15 @@
 package com.neo.util.framework.caffeine.impl;
 
+import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.impl.cache.AbstractCacheBuilder;
 import com.neo.util.framework.api.cache.Cache;
 import com.neo.util.framework.api.cache.CacheBuilder;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.config.ConfigValue;
+import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Alternative
+@Priority(PriorityConstants.APPLICATION)
 @ApplicationScoped
 public class CaffeineCacheBuilder extends AbstractCacheBuilder implements CacheBuilder {
 

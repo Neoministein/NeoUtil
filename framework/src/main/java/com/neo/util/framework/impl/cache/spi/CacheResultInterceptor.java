@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 @CacheResult(cacheName = "") // The `cacheName` attribute is @Nonbinding.
 @Interceptor
-@Priority(CacheInterceptor.BASE_PRIORITY + 2)
+@Priority(CacheInterceptor.BASE_PRIORITY + 3)
 public class CacheResultInterceptor extends CacheInterceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheResultInterceptor.class);

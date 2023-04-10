@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation defines the cache key on for method arguments. It is used during an invocation of
- * a method annotated with {@link CacheResult} or {@link CacheInvalidate}.
+ * a method annotated with {@link CacheResult}, {@link CacheInvalidate} or {@link CachePut}.
  * <p>
  * {@link CacheKeyParameterPositions} should only be used when some method arguments are NOT part of the cache key.
  */
@@ -19,6 +19,9 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE, ElementType.METHOD })
 public @interface CacheKeyParameterPositions {
 
+    /**
+     * The index of the parameters which represents the key starting at 0
+     */
     @Nonbinding
     short[] value() default {};
 }

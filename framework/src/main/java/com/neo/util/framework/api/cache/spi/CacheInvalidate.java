@@ -24,8 +24,8 @@ import java.lang.annotation.*;
  * If the key does not identify any cache entry, nothing will happen.
  * <p>
  * This annotation can be combined with multiple other caching annotations on a single method. Caching operations will always
- * be executed in the same order: {@link CacheInvalidateAll} first, then {@link CacheInvalidate} and finally
- * {@link CacheResult}.
+ * be executed in the same order: {@link CacheInvalidateAll} first, then {@link CacheInvalidate},
+ * then {@link CachePut} and finally {@link CacheResult}.
  */
 @InterceptorBinding
 @Target({ ElementType.TYPE, ElementType.METHOD })
