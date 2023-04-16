@@ -7,6 +7,8 @@ import com.neo.util.framework.microprofile.reactive.messaging.BasicQueueProducer
 import com.neo.util.framework.microprofile.reactive.messaging.BasicQueueConsumerCaller; //IMPORTANT: IDE WON'T REFERENCE BUT IT IS COMPILABLE IN MAVEN AND INTELLIJ
 import com.neo.util.common.impl.test.IntegrationTestUtil;
 import com.neo.util.framework.api.queue.QueueMessage;
+import com.neo.util.framework.microprofile.reactive.messaging.build.IncomingQueueConnectionProcessor;
+import com.neo.util.framework.microprofile.reactive.messaging.build.OutgoingQueueConnectionProcessor;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.queue.BasicQueueConsumer;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.queue.BasicQueueService;
 import io.helidon.messaging.connectors.mock.MockConnector;

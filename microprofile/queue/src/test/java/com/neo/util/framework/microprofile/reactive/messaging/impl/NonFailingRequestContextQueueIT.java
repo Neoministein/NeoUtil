@@ -7,6 +7,8 @@ import com.neo.util.framework.impl.RequestContextExecutor;
 import com.neo.util.framework.impl.connection.RequestDetailsProducer;
 import com.neo.util.framework.microprofile.reactive.messaging.RequestQueueProducer; //IMPORTANT: IDE WON'T REFERENCE BUT IT IS COMPILABLE IN MAVEN AND INTELLIJ
 import com.neo.util.framework.microprofile.reactive.messaging.RequestQueueConsumerCaller; //IMPORTANT: IDE WON'T REFERENCE BUT IT IS COMPILABLE IN MAVEN AND INTELLIJ
+import com.neo.util.framework.microprofile.reactive.messaging.build.IncomingQueueConnectionProcessor;
+import com.neo.util.framework.microprofile.reactive.messaging.build.OutgoingQueueConnectionProcessor;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.queue.RequestQueueConsumer;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.queue.RequestQueueService;
 import io.helidon.messaging.connectors.mock.MockConnector;

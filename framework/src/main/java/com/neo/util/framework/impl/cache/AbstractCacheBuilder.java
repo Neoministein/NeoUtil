@@ -10,10 +10,9 @@ import com.neo.util.framework.api.cache.spi.CacheResult;
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -56,18 +55,18 @@ public abstract class AbstractCacheBuilder implements CacheBuilder {
     protected Set<String> getCacheNamesByAnnotation() {
         Set<String> cacheNames = new HashSet<>();
 
-        for (CacheName annotation: ReflectionUtils.getAnnotationInstances(CacheName.class)) {
-            cacheNames.add(annotation.value());
+        for (AnnotatedElement element: ReflectionUtils.getAnnotatedElement(CacheName.class)) {
+            cacheNames.add(element.getAnnotation(CacheName.class).value());
         }
 
-        for (CacheResult annotation: ReflectionUtils.getAnnotationInstances(CacheResult.class)) {
-            cacheNames.add(annotation.cacheName());
+        for (AnnotatedElement element: ReflectionUtils.getAnnotatedElement(CacheResult.class)) {
+            cacheNames.add(element.getAnnotation(CacheResult.class).cacheName());
         }
-        for (CacheInvalidate annotation: ReflectionUtils.getAnnotationInstances(CacheInvalidate.class)) {
-            cacheNames.add(annotation.cacheName());
+        for (AnnotatedElement element: ReflectionUtils.getAnnotatedElement(CacheInvalidate.class)) {
+            cacheNames.add(element.getAnnotation(CacheInvalidate.class).cacheName());
         }
-        for (CacheInvalidateAll annotation: ReflectionUtils.getAnnotationInstances(CacheInvalidateAll.class)) {
-            cacheNames.add(annotation.cacheName());
+        for (AnnotatedElement element: ReflectionUtils.getAnnotatedElement(CacheInvalidateAll.class)) {
+            cacheNames.add(element.getAnnotation(CacheInvalidateAll.class).cacheName());
         }
         return cacheNames;
     }

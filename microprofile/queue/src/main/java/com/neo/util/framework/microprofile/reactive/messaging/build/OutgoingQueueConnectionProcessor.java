@@ -1,7 +1,9 @@
-package com.neo.util.framework.microprofile.reactive.messaging.impl;
+package com.neo.util.framework.microprofile.reactive.messaging.build;
 
-import com.google.auto.service.AutoService;
-import com.neo.util.common.impl.annotation.ProcessorUtils;
+import com.neo.util.common.impl.annotation.ReflectionUtils;
+import com.neo.util.framework.api.PriorityConstants;
+import com.neo.util.framework.api.build.BuildContext;
+import com.neo.util.framework.api.build.BuildStep;
 import com.neo.util.framework.api.queue.OutgoingQueueConnection;
 import com.neo.util.framework.api.queue.QueueProducer;
 import com.squareup.javapoet.*;
@@ -14,83 +16,71 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.*;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import javax.lang.model.util.Elements;
+import java.io.File;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.SubmissionPublisher;
 
-@SupportedAnnotationTypes("com.neo.util.framework.api.queue.OutgoingQueueConnection")
-@AutoService(Processor.class)
-public class OutgoingQueueConnectionProcessor extends AbstractProcessor {
+public class OutgoingQueueConnectionProcessor implements BuildStep {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OutgoingQueueConnectionProcessor.class);
 
     protected static final String PACKAGE_LOCATION = "com.neo.util.framework.microprofile.reactive.messaging";
 
     protected static final String BASIC_ANNOTATION_FIELD_NAME = "value";
-    protected static final String QUEUE_PREFIX = "to-";
+    public static final String QUEUE_PREFIX = "to-";
 
-    protected Filer filer;
-    protected Elements elements;
-    protected Map<String, String> existingIncomingAnnotation = new HashMap<>();
-    protected Map<String, String> generatedClasses = new HashMap<>();
+    protected Map<String, Class<?>> existingOutgoingAnnotation = new HashMap<>();
+    protected Map<String, Class<?>> generatedClasses = new HashMap<>();
 
     @Override
-    public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.latestSupported();
-    }
-
-    @Override
-    public synchronized void init(ProcessingEnvironment processingEnv) {
-        super.init(processingEnv);
-        this.filer = processingEnv.getFiler();
-        this.elements = processingEnv.getElementUtils();
-    }
-
-    @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        List<TypeElement> queueProducerElements = ProcessorUtils.getTypedElementsAnnotatedWith(roundEnv,
-                elements, OutgoingQueueConnection.class, List.of(ElementKind.CLASS));
-        if (queueProducerElements.isEmpty()) {
-            return false;
+    public void execute(BuildContext context) {
+        Set<AnnotatedElement> queueProducerClasses = ReflectionUtils.getAnnotatedElement(OutgoingQueueConnection.class, context.getSrcLoader());
+        if (queueProducerClasses.isEmpty()) {
+            return;
         }
+
         LOGGER.debug("Generating associated files for {} annotation", OutgoingQueueConnection.class.getName());
-        Set<? extends Element> incomingElements = roundEnv.getElementsAnnotatedWith(Outgoing.class);
-        for (Element element: incomingElements) {
-            Parameterizable parameterizable = (Parameterizable) element;
-            existingIncomingAnnotation.put(ProcessorUtils.getAnnotationValue(element, Outgoing.class,
-                            BASIC_ANNOTATION_FIELD_NAME),
-                    parameterizable.getEnclosingElement().getSimpleName().toString());
+        Set<AnnotatedElement> incomingClasses = ReflectionUtils.getAnnotatedElement((Outgoing.class));
+        for (AnnotatedElement element: incomingClasses) {
+            Method method = (Method) element;
+            existingOutgoingAnnotation.put(method.getAnnotation(Outgoing.class).value(),
+                    method.getDeclaringClass());
         }
-        LOGGER.debug("Existing queues {}", existingIncomingAnnotation);
+        LOGGER.debug("Existing queues {}", existingOutgoingAnnotation);
 
-        for (TypeElement typeElement: queueProducerElements) {
-            String queueName = ProcessorUtils.getAnnotationValue(typeElement, OutgoingQueueConnection.class,
-                    BASIC_ANNOTATION_FIELD_NAME);
+        for (AnnotatedElement element: queueProducerClasses) {
+            Method executionMethod = (Method) element;
+            String queueName = element.getAnnotation(OutgoingQueueConnection.class).value();
 
-            String existingQueueAnnotationClass = existingIncomingAnnotation.get(QUEUE_PREFIX + queueName);
+            Class<?> existingQueueAnnotationClass = existingOutgoingAnnotation.get(QUEUE_PREFIX + queueName);
             if (existingQueueAnnotationClass != null) {
-                LOGGER.debug("Skipping outgoing class generation for queue {}. It is already in use in {}", queueName, existingQueueAnnotationClass);
+                LOGGER.debug("Skipping outgoing class generation for queue {}. It is already in use in {}", queueName, existingQueueAnnotationClass.getSimpleName());
                 break;
             }
 
-            String alreadyGeneratedClass = generatedClasses.get(queueName);
+            Class<?> alreadyGeneratedClass = generatedClasses.get(queueName);
             if (alreadyGeneratedClass != null) {
                 LOGGER.debug("Skipping outgoing class generation for queue {}. It has already been generated by {}", queueName, alreadyGeneratedClass);
                 break;
             }
 
-            createConsumeClass(queueName, typeElement);
-            generatedClasses.put(queueName, typeElement.getSimpleName().toString());
+            createConsumeClass(queueName, executionMethod, context);
+            generatedClasses.put(queueName, executionMethod.getDeclaringClass());
         }
-        return false;
     }
 
-    protected void createConsumeClass(String queueName, TypeElement typeElement) {
+    @Override
+    public int priority() {
+        return PriorityConstants.LIBRARY_BEFORE;
+    }
+
+    protected void createConsumeClass(String queueName, Method executionMethod, BuildContext context) {
         try {
             String className = parseToClassName(queueName);
             FieldSpec queueEmitter = FieldSpec.builder(ParameterizedTypeName.get(SubmissionPublisher.class, String.class), "emitter")
@@ -129,11 +119,11 @@ public class OutgoingQueueConnectionProcessor extends AbstractProcessor {
                     .build();
 
             JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();
-
+            javaFile.writeTo(new File(context.getSourceOutPutDirectory()));
             LOGGER.debug("Generating src file {}", className);
-            javaFile.writeTo(filer);
+
         } catch (Exception ex) {
-            throw new IllegalArgumentException("Unable to generate src file for " + typeElement.getSimpleName().toString(), ex);
+            throw new IllegalArgumentException("Unable to generate src file for " + executionMethod.getDeclaringClass().getName(), ex);
         }
     }
 
@@ -141,5 +131,4 @@ public class OutgoingQueueConnectionProcessor extends AbstractProcessor {
         String nonNumeric = queueName.replaceAll("[^a-zA-Z]", "");
         return nonNumeric.substring(0, 1).toUpperCase() + nonNumeric.substring(1) + "Producer";
     }
-
 }

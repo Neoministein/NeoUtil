@@ -1,5 +1,6 @@
 package com.neo.util.common.impl.annotation;
 
+import com.neo.util.common.impl.ThreadUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ConfigurationBuilder;
@@ -38,8 +39,12 @@ public class ReflectionUtils {
      * @return a set of classes which have the annotation
      */
     public static Set<Class<?>> getClassesByAnnotation(Class<? extends Annotation> annotation) {
-        Reflections reflections = new Reflections(getBasicConfig(Thread.currentThread().getContextClassLoader()));
-        return reflections.get(Scanners.SubTypes.of(Scanners.TypesAnnotated.with(annotation)).asClass());
+        return getClassesByAnnotation(annotation, ThreadUtils.classLoader());
+    }
+
+    public static Set<Class<?>> getClassesByAnnotation(Class<? extends Annotation> annotation, ClassLoader classLoader) {
+        Reflections reflections = new Reflections(getBasicConfig(classLoader).setScanners(Scanners.TypesAnnotated));
+        return reflections.get(Scanners.TypesAnnotated.with(annotation).asClass(classLoader));
     }
 
     /**
@@ -50,10 +55,19 @@ public class ReflectionUtils {
      *
      * @param <T> classType
      */
-    public static <T extends Annotation> Set<T> getAnnotationInstances(Class<T> annotation) {
+    public static Set<AnnotatedElement> getAnnotatedElement(Class<? extends Annotation> annotation) {
         for (Annotation elementAnnotation: annotation.getAnnotations()) {
             if (elementAnnotation instanceof Target target) {
-                return getAnnotationInstances(annotation, target.value());
+                return getAnnotatedElement(annotation, ThreadUtils.classLoader() ,target.value());
+            }
+        }
+        throw new UnsupportedOperationException("Annotation " + annotation + " does not have the Target Annotation");
+    }
+
+    public static Set<AnnotatedElement> getAnnotatedElement(Class<? extends Annotation> annotation, ClassLoader classLoader) {
+        for (Annotation elementAnnotation: annotation.getAnnotations()) {
+            if (elementAnnotation instanceof Target target) {
+                return getAnnotatedElement(annotation, classLoader ,target.value());
             }
         }
         throw new UnsupportedOperationException("Annotation " + annotation + " does not have the Target Annotation");
@@ -68,16 +82,14 @@ public class ReflectionUtils {
      *
      * @param <T> classType
      */
-    public static <T extends Annotation> Set<T> getAnnotationInstances(Class<T> annotation, ElementType... elementTypes) {
+    public static Set<AnnotatedElement> getAnnotatedElement(Class<? extends Annotation> annotation, ClassLoader classLoader, ElementType... elementTypes) {
         LOGGER.debug("Searching instances of [{}] on types {}", annotation.getName(), elementTypes);
         Scanners[] scanners = getScanners(elementTypes);
-        Reflections reflections = new Reflections(getBasicConfig(Thread.currentThread().getContextClassLoader())
+        Reflections reflections = new Reflections(getBasicConfig(classLoader)
                 .setScanners(scanners));
-        Set<T> annotationInstances = new HashSet<>();
+        Set<AnnotatedElement> annotationInstances = new HashSet<>();
         for (Scanners scanner: scanners) {
-            for (AnnotatedElement field: reflections.get(scanner.with(annotation).as(getClassFromScanner(scanner)))) {
-                annotationInstances.add(field.getAnnotation(annotation));
-            }
+            annotationInstances.addAll(reflections.get(scanner.with(annotation).as(getClassFromScanner(scanner))));
         }
         LOGGER.trace("Found [{}] instances of [{}] on types {} {}", annotationInstances.size(), annotation.getName(),
                 elementTypes, annotationInstances);
@@ -128,7 +140,7 @@ public class ReflectionUtils {
      * @see #getResources(String, String, ClassLoader)
      */
     public static Set<String> getResources(String path, String filePattern) {
-        return getResources(path, filePattern, Thread.currentThread().getContextClassLoader());
+        return getResources(path, filePattern, ThreadUtils.classLoader());
     }
 
     /**

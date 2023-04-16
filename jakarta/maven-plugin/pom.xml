@@ -14,35 +14,13 @@
     <packaging>maven-plugin</packaging>
 
     <dependencies>
+
         <!-- Internal Modules -->
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-rest</artifactId>
+            <artifactId>neoutil-framework</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <!-- Module specific -->
-        <dependency>
-            <groupId>com.github.victools</groupId>
-            <artifactId>jsonschema-generator</artifactId>
-            <version>${json-schema-generator.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.victools</groupId>
-            <artifactId>jsonschema-module-jackson</artifactId>
-            <version>${json-schema-generator.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.victools</groupId>
-            <artifactId>jsonschema-module-jakarta-validation</artifactId>
-            <version>${json-schema-generator.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <version>${jakarta.validation.version}</version>
-        </dependency>
-
 
         <!-- Maven plugin -->
 
@@ -74,12 +52,6 @@
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-compat</artifactId>
             <version>${maven.core.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.plugin-testing</groupId>
-            <artifactId>maven-plugin-testing-harness</artifactId>
-            <version>${maven.testing.version}</version>
             <scope>test</scope>
         </dependency>
 
