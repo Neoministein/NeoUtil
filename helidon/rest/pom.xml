@@ -128,14 +128,59 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler.plugin.version}</version>
+                <configuration>
+                    <!-- Enable preview features for compilation -->
+                    <compilerArgs>--enable-preview</compilerArgs>
+                </configuration>
+                <!-- Custom compilation mode -->
+                <executions>
+                    <execution>
+                        <id>default-test-compile</id>
+                        <phase>generate-test-sources</phase>
+                    </execution>
+                    <execution>
+                        <id>build-generated-test-code</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <configuration>
+                            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/java</generatedTestSourcesDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build-helper-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-test-sources/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- NeoUtil Compile Time stuff -->
+            <plugin>
                 <groupId>com.neo.util</groupId>
                 <artifactId>neoutil-maven-plugin</artifactId>
                 <version>${project.version}</version>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>generate-inboundDto</goal>
-                            <goal>generate-jsonSchemaIndex</goal>
+                            <goal>test-BuildStep</goal>
                         </goals>
                     </execution>
                 </executions>
