@@ -33,7 +33,7 @@ public class InboundDtoParserBuildStep implements BuildStep {
 
     @Override
     public void execute(BuildContext context) {
-        Set<Class<?>> inboundDtoSet = ReflectionUtils.getClassesByAnnotation(InboundDto.class, context.getSrcLoader());
+        Set<Class<?>> inboundDtoSet = ReflectionUtils.getClassesByAnnotation(InboundDto.class, context.srcLoader());
 
         if (inboundDtoSet.isEmpty()) {
             return;
@@ -83,7 +83,7 @@ public class InboundDtoParserBuildStep implements BuildStep {
                     .build();
 
             JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();
-            javaFile.writeTo(new File(context.getSourceOutPutDirectory()));
+            javaFile.writeTo(new File(context.sourceOutPutDirectory()));
         } catch (Exception ex) {
             throw new IllegalArgumentException("Unable to generate src file for " + inboundDto.getSimpleName(), ex);
         }

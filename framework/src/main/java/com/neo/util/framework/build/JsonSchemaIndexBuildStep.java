@@ -21,8 +21,8 @@ public class JsonSchemaIndexBuildStep implements BuildStep {
         LOGGER.info("Generating index files for all json schemas located inside {}", FrameworkConstants.JSON_SCHEMA_LOCATION);
 
         Set<String> srcFiles = ReflectionUtils.getResources(
-                FrameworkConstants.JSON_SCHEMA_LOCATION, ReflectionUtils.JSON_FILE_ENDING, context.getSrcLoader());
-        generateIndexFile(srcFiles, context.getResourceOutPutDirectory());
+                FrameworkConstants.JSON_SCHEMA_LOCATION, ReflectionUtils.JSON_FILE_ENDING, context.srcLoader());
+        generateIndexFile(srcFiles, context.resourceOutPutDirectory());
     }
 
     @Override

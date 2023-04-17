@@ -18,7 +18,7 @@ public class BuildStepExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(BuildStepExecutor.class);
 
     public void executeBuildSteps(BuildContext buildContext) {
-        Set<Class<? extends BuildStep>> buildStepClasses = ReflectionUtils.getReflections(buildContext.getFullLoader())
+        Set<Class<? extends BuildStep>> buildStepClasses = ReflectionUtils.getReflections(buildContext.fullLoader())
                 .getSubTypesOf(BuildStep.class);
 
         List<BuildStep> buildSteps = buildStepClasses.stream()

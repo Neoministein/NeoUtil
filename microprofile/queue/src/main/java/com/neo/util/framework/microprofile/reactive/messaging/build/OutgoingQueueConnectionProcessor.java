@@ -38,7 +38,7 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
 
     @Override
     public void execute(BuildContext context) {
-        Set<AnnotatedElement> queueProducerClasses = ReflectionUtils.getAnnotatedElement(OutgoingQueueConnection.class, context.getSrcLoader());
+        Set<AnnotatedElement> queueProducerClasses = ReflectionUtils.getAnnotatedElement(OutgoingQueueConnection.class, context.srcLoader());
         if (queueProducerClasses.isEmpty()) {
             return;
         }
@@ -117,7 +117,7 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
                     .build();
 
             JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();
-            javaFile.writeTo(new File(context.getSourceOutPutDirectory()));
+            javaFile.writeTo(new File(context.sourceOutPutDirectory()));
             LOGGER.debug("Generating src file {}", className);
 
         } catch (Exception ex) {

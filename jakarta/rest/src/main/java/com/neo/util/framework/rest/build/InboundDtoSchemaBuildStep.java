@@ -38,7 +38,7 @@ public class InboundDtoSchemaBuildStep implements BuildStep {
         LOGGER.info("Generating schemas for classes annotated with {}", InboundDto.class.getSimpleName());
 
         LOGGER.debug("Generating schemas for src...");
-        ReflectionUtils.getReflections(context.getSrcLoader()).get(Scanners.TypesAnnotated.with(InboundDto.class)).forEach(className -> {
+        ReflectionUtils.getReflections(context.srcLoader()).get(Scanners.TypesAnnotated.with(InboundDto.class)).forEach(className -> {
             LOGGER.debug("Found class: {}", className);
             saveSchema(className, context);
         });
@@ -51,8 +51,8 @@ public class InboundDtoSchemaBuildStep implements BuildStep {
 
     protected void saveSchema(String className, BuildContext buildContext) {
         try {
-            Class<?> clazz = buildContext.getFullLoader().loadClass(className);
-            File schemaFile = new File(generateFileLocation(clazz, buildContext.getResourceOutPutDirectory()));
+            Class<?> clazz = buildContext.fullLoader().loadClass(className);
+            File schemaFile = new File(generateFileLocation(clazz, buildContext.resourceOutPutDirectory()));
             Files.deleteIfExists(schemaFile.toPath());
 
             schemaFile.getParentFile().mkdirs();

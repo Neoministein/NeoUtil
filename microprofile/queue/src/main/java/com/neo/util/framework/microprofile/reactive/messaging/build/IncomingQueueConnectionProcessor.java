@@ -1,6 +1,5 @@
 package com.neo.util.framework.microprofile.reactive.messaging.build;
 
-import com.neo.util.common.impl.annotation.ProcessorUtils;
 import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.json.JsonUtil;
@@ -44,13 +43,13 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
 
     @Override
     public void execute(BuildContext context) {
-        Set<Class<?>> queueConsumerClasses = ReflectionUtils.getClassesByAnnotation(IncomingQueueConnection.class, context.getSrcLoader());
+        Set<Class<?>> queueConsumerClasses = ReflectionUtils.getClassesByAnnotation(IncomingQueueConnection.class, context.srcLoader());
         if (queueConsumerClasses.isEmpty()) {
             return;
         }
         LOGGER.debug("Generating associated files for {} annotation", IncomingQueueConnection.class.getName());
 
-        Set<Class<?>> incomingInstances = ReflectionUtils.getClassesByAnnotation(Incoming.class, context.getFullLoader());
+        Set<Class<?>> incomingInstances = ReflectionUtils.getClassesByAnnotation(Incoming.class, context.fullLoader());
         for (Class<?> incomingClass: incomingInstances) {
             existingIncomingAnnotation.put(incomingClass.getAnnotation(Incoming.class).value(), incomingClass);
         }
@@ -121,7 +120,7 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
 
             LOGGER.debug("Generating src file {}Caller", queueConsumerClass.getSimpleName());
             JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();
-            javaFile.writeTo(new File(context.getSourceOutPutDirectory()));
+            javaFile.writeTo(new File(context.sourceOutPutDirectory()));
         } catch (Exception ex) {
             throw new IllegalArgumentException("Unable to generate src file for " + queueConsumerClass.getSimpleName(), ex);
         }
