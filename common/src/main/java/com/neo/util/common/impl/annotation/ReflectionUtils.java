@@ -47,6 +47,11 @@ public class ReflectionUtils {
         return reflections.get(Scanners.TypesAnnotated.with(annotation).asClass(classLoader));
     }
 
+    public static <T> Set<Class<? extends T>> getSubTypesOf(Class<T> type, ClassLoader classLoader) {
+        return ReflectionUtils.getReflections(classLoader)
+                .getSubTypesOf(type);
+    }
+
     /**
      * Returns all Annotation instances based on the {@link Target} annotation to look through.
      *

@@ -1,6 +1,5 @@
 package com.neo.util.framework.impl.cache;
 
-import com.neo.util.common.impl.annotation.JandexUtils;
 import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.framework.api.cache.CacheBuilder;
 import com.neo.util.framework.api.cache.spi.CacheInvalidate;
@@ -10,6 +9,8 @@ import com.neo.util.framework.api.cache.spi.CacheResult;
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -23,14 +24,19 @@ import java.util.Set;
  */
 public abstract class AbstractCacheBuilder implements CacheBuilder {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCacheBuilder.class);
+
     protected static final String CACHE_NAME = "cacheName";
+
+    protected abstract Optional<Index> getIndex();
 
     public Set<String> getCacheNames() {
         Set<String> cacheNames;
-        Optional<Index> index = JandexUtils.getIndex();
+        Optional<Index> index = getIndex();
         if (index.isPresent()) {
             cacheNames = getCacheNamesByAnnotation(index.get());
         } else {
+            LOGGER.warn("Unable to load Jandex Index. Falling back to reflections, this can drastically increase load time.");
             cacheNames = getCacheNamesByAnnotation();
         }
         return cacheNames;

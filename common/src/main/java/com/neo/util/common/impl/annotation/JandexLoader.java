@@ -14,14 +14,14 @@ import java.util.Optional;
 /**
  * Utility class for Jandex
  */
-public class JandexUtils {
+public class JandexLoader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JandexUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JandexLoader.class);
 
     public static final String DEFAULT_JANDEX_LOCATION = "META-INF/jandex.idx";
 
 
-    private JandexUtils() {}
+    private JandexLoader() {}
 
     /**
      * Returns optional of Jandex index if file exists based on System property location

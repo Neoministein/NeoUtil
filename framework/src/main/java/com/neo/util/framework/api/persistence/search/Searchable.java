@@ -3,14 +3,16 @@ package com.neo.util.framework.api.persistence.search;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.json.JsonUtil;
-import jakarta.enterprise.context.Dependent;
+import com.neo.util.framework.api.build.BuildStep;
+import com.neo.util.framework.build.SearchableAnnotationBuildStep;
 
 import java.time.Instant;
+
 /**
  * Defines necessary functionality of a class that can be indexed into a search provider.
  * <p>
- * Classes implementing this interface need to have the {@link Dependent}.
- * Even though the get instantiated through the new keyword
+ * Classes implementing this interface need to have the {@link SearchableIndex}.
+ * It's validated via the {@link BuildStep}: {@link SearchableAnnotationBuildStep}
  */
 public interface Searchable {
 
@@ -24,12 +26,6 @@ public interface Searchable {
      * A value which is unique to this searchable
      */
     String getBusinessId();
-
-    /**
-     * The index name in which the searchable should be stored
-     */
-    String getIndexName();
-
 
     /**
      * The json to store
@@ -52,13 +48,6 @@ public interface Searchable {
      */
     default String getClassName() {
         return this.getClass().getSimpleName();
-    }
-
-    /**
-     * The index period
-     */
-    default IndexPeriod getIndexPeriod() {
-        return IndexPeriod.DEFAULT;
     }
 
     /**

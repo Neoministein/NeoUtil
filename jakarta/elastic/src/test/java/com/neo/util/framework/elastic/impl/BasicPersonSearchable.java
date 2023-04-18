@@ -2,11 +2,11 @@ package com.neo.util.framework.elastic.impl;
 
 import com.neo.util.framework.api.persistence.search.AbstractSearchable;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
-import jakarta.enterprise.context.Dependent;
+import com.neo.util.framework.api.persistence.search.SearchableIndex;
 
 import java.util.Date;
 
-@Dependent
+@SearchableIndex(indexName = BasicPersonSearchable.INDEX_NAME, indexPeriod = IndexPeriod.ALL)
 public class BasicPersonSearchable extends AbstractSearchable {
 
     public static final String INDEX_NAME = "basicindex";
@@ -35,16 +35,6 @@ public class BasicPersonSearchable extends AbstractSearchable {
         this.age = age;
         this.weight = height;
         this.hasTwoArms = hasTwoArms;
-    }
-
-    @Override
-    public String getIndexName() {
-        return INDEX_NAME;
-    }
-
-    @Override
-    public IndexPeriod getIndexPeriod() {
-        return IndexPeriod.ALL;
     }
 
     public String getName() {

@@ -260,10 +260,9 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 
 	@Test
 	public void fetchSearchableFromIndexTest() {
-		String uuid = UUID.randomUUID().toString();
-		BasicPersonSearchable dummySearchable = indexBasicSearchable(uuid);
+		indexBasicSearchable(UUID.randomUUID().toString());
 
-		String indexName = dummySearchable.getIndexName().concat("-*");
+		String indexName = BasicPersonSearchable.INDEX_NAME.concat("-*");
 		SearchQuery query = new SearchQuery();
 		query.setFields(List.of(BasicPersonSearchable.F_NAME));
 

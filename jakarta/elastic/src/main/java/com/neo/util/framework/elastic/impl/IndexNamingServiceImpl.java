@@ -1,17 +1,23 @@
 package com.neo.util.framework.elastic.impl;
 
 import com.neo.util.common.impl.StringUtils;
+import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.Searchable;
+import com.neo.util.framework.api.persistence.search.SearchableIndex;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 
+import com.neo.util.framework.impl.JandexService;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
-import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
+import org.jboss.jandex.AnnotationInstance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.AnnotatedElement;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +26,8 @@ import java.util.Map;
 
 @ApplicationScoped
 public class IndexNamingServiceImpl implements IndexNamingService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(IndexNamingServiceImpl.class);
 
     protected static final String INDEX_SEPARATOR = "-";
     protected static final String SEARCH_PROVIDER_NO_DATE_INDEX_POSTFIX = "no-date";
@@ -87,35 +95,43 @@ public class IndexNamingServiceImpl implements IndexNamingService {
      * Initializes the index names for each searchable. This is done only once at startup as it is defined by the
      * annotations on the searchable and cannot be changed at runtime.
      */
-    @Inject //TODO USE JANDEX INSTEAD OF CDI FOR SEARCHABLE LOOKUP
-    public void initIndexProperties(@Any Instance<Searchable> searchables) {
+    @Inject
+    public void initIndexProperties(@Any JandexService jandexService) {
         indexNamePrefixes = new HashMap<>();
         indexPeriods = new HashMap<>();
 
-        for (Searchable searchable : searchables) {
-            indexNamePrefixes.put(searchable.getClass(), getIndexNamePrefix(searchable, false));
-            indexPeriods.put(searchable.getClass(), searchable.getIndexPeriod());
+        if (jandexService.getIndex().isPresent()) {
+            for (AnnotationInstance searchableIndex: jandexService.getAnnotationInstance(SearchableIndex.class)) {
+                Class<?> searchableClass = jandexService.getClass(searchableIndex);
+                indexNamePrefixes.put(searchableClass, searchableIndex.value(SearchableIndex.INDEX_NAME).asString());
+                indexPeriods.put(searchableClass, (IndexPeriod) searchableIndex.value(SearchableIndex.INDEX_PERIOD).value());
+            }
+        } else {
+            LOGGER.warn("Unable to load Jandex Index. Falling back to reflections, this can drastically increase load time.");
+            for (AnnotatedElement annotatedElement: ReflectionUtils.getAnnotatedElement(SearchableIndex.class)) {
+                Class<?> searchableClass = (Class<?>) annotatedElement;
+                indexNamePrefixes.put(searchableClass, searchableClass.getAnnotation(SearchableIndex.class).indexName());
+                indexPeriods.put(searchableClass, searchableClass.getAnnotation(SearchableIndex.class).indexPeriod());
+            }
         }
     }
 
     public String getIndexName(Searchable searchable) {
+
         StringBuilder sb = new StringBuilder();
 
-        sb.append(getIndexNamePrefix(searchable, true));
+        sb.append(getIndexNamePrefixFromClass(searchable.getClass(), true));
+        IndexPeriod indexPeriod = indexPeriods.get(searchable.getClass());
 
-        if (!IndexPeriod.EXTERNAL.equals(searchable.getIndexPeriod())) {
+        if (!IndexPeriod.EXTERNAL.equals(indexPeriod)) {
 
-            String postfix = getIndexNamePostfix(searchable.getIndexPeriod(), searchable);
+            String postfix = getIndexNamePostfix(indexPeriod, searchable);
             if (!StringUtils.isEmpty(postfix)) {
                 sb.append(INDEX_SEPARATOR).append(postfix);
             }
             sb.append(INDEX_SEPARATOR).append(mappingVersion.toLowerCase());
         }
         return sb.toString();
-    }
-
-    protected String getIndexNamePrefix(Searchable searchable, boolean appendInfix) {
-        return (appendInfix  ? getIndexPrefix() : StringUtils.EMPTY) + searchable.getIndexName() + (appendInfix  ? getIndexPostfix() : StringUtils.EMPTY);
     }
 
     public String getIndexNamePrefixFromClass(Class<? extends Searchable> searchableClazz, boolean appendInfix) {
