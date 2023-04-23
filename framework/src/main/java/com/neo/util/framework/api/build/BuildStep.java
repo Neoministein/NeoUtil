@@ -7,8 +7,8 @@ package com.neo.util.framework.api.build;
  *  - target/generated-sources/java
  *  - target/generated-test-sources/java
  * <p>
- * The implementation is instantiated using the default non arg constructor. Not having one will result in a compile
- * time failure.
+ * The implementation is instantiated using the default non arg constructor. Not having one will result in a
+ * compile-time failure.
  */
 public interface BuildStep {
 

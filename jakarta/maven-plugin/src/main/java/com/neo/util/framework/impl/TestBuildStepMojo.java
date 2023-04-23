@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 @Mojo(name = "test-BuildStep",
-        defaultPhase = LifecyclePhase.GENERATE_SOURCES,
+        defaultPhase = LifecyclePhase.PROCESS_TEST_RESOURCES,
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
         requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME,
         threadSafe = true)
@@ -36,7 +36,7 @@ public class TestBuildStepMojo extends AbstractMojo {
                 ClassLoaderUtils.generate(new ClassLoaderUtils.BuildConfig(
                         false, false, project.getArtifacts(), new File(project.getBuild().getTestOutputDirectory()))),
                 ClassLoaderUtils.generate(new ClassLoaderUtils.BuildConfig(
-                        true, true, project.getArtifacts(), new File(project.getBuild().getOutputDirectory(), project.getBuild().getTestOutputDirectory()))));
+                        true, true, project.getArtifacts(), new File(project.getBuild().getOutputDirectory()), new File(project.getBuild().getTestOutputDirectory()))));
 
         buildStepExecutor.executeBuildSteps(buildContext);
     }

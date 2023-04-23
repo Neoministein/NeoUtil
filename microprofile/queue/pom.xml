@@ -114,6 +114,9 @@
                     <execution>
                         <id>default-test-compile</id>
                         <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
                     </execution>
                     <execution>
                         <id>build-generated-test-code</id>

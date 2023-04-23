@@ -18,8 +18,7 @@ public class BuildStepExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(BuildStepExecutor.class);
 
     public void executeBuildSteps(BuildContext buildContext) {
-        Set<Class<? extends BuildStep>> buildStepClasses = ReflectionUtils.getReflections(buildContext.fullLoader())
-                .getSubTypesOf(BuildStep.class);
+        Set<Class<? extends BuildStep>> buildStepClasses = ReflectionUtils.getSubTypesOf(BuildStep.class, buildContext.fullLoader());
 
         List<BuildStep> buildSteps = buildStepClasses.stream()
                 .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))

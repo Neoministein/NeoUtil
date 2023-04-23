@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.rest.impl.entity.AbstractEntityRestEndpoint;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
+import io.helidon.microprofile.tests.junit5.HelidonTest;
 import org.junit.jupiter.api.*;
 
 import jakarta.inject.Inject;
@@ -13,10 +14,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@HelidonTest(resetPerTest = true)
 abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
-
-    @Inject
-    protected WebTarget webTarget;
 
     protected abstract JsonNode defaultJSONEntity();
 
@@ -28,7 +27,7 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
 
     @Test
     @Order(0)
-    void createEntityTest() {
+    void createEntityTest(WebTarget webTarget) {
         //Arrange
         Entity<String> content = Entity.entity(defaultJSONEntity().toString(), MediaType.APPLICATION_JSON_TYPE);
         //Act
@@ -41,7 +40,7 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
 
     @Test
     @Order(1)
-    void createExistingEntityTest() {
+    void createExistingEntityTest(WebTarget webTarget) {
         //Arrange
         Entity<String> content = Entity.entity(defaultJSONEntity().toString(), MediaType.APPLICATION_JSON_TYPE);
         //Act
@@ -55,7 +54,7 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
 
     @Test
     @Order(2)
-    void retrieveEntityByIdTest() {
+    void retrieveEntityByIdTest(WebTarget webTarget) {
         //Arrange
 
         //Act
@@ -70,7 +69,7 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
 
     @Test
     @Order(30)
-    void editEntityTest() {
+    void editEntityTest(WebTarget webTarget) {
         //Arrange
         Entity<String> content = Entity.entity(editedJSONEntity().toString(), MediaType.APPLICATION_JSON_TYPE);
         //Act
@@ -85,7 +84,7 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
 
     @Test
     @Order(31)
-    void deleteEntityTest() {
+    void deleteEntityTest(WebTarget webTarget) {
         //Arrange
         //Act
         Response response = webTarget.path(resourceLocation() + "/" + getPrimaryKey()).request()
@@ -96,7 +95,7 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void createMissingFieldEntityTest() {
+    void createMissingFieldEntityTest(WebTarget webTarget) {
         //Arrange
         JsonNode entity = JsonUtil.emptyObjectNode();
 
@@ -111,7 +110,7 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void deleteNonexistentEntityTest() {
+    void deleteNonexistentEntityTest(WebTarget webTarget) {
         //Arrange
         //Act
         Response response = webTarget.path(resourceLocation() + "/" + "NonexistentEntity").request()
@@ -122,7 +121,7 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void retrieveNoneExistentEntityByIdTest() {
+    void retrieveNoneExistentEntityByIdTest(WebTarget webTarget) {
         //Arrange
         //Act
         Response response = webTarget.path(resourceLocation() + "/" + "ENTITY").request()

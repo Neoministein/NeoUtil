@@ -3,8 +3,6 @@ package com.neo.util.helidon.rest.parser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.json.JsonUtil;
-//import com.neo.util.framework.rest.impl.parsing.AdvancedInboundDtoParser;
-//import com.neo.util.framework.rest.impl.parsing.BasicInboundDtoParser;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
 import io.helidon.microprofile.tests.junit5.AddBean;
 import io.helidon.microprofile.tests.junit5.HelidonTest;
@@ -18,8 +16,6 @@ import org.junit.jupiter.api.Test;
 
 @HelidonTest
 @AddBean(InboundParserResource.class)
-//@AddBean(AdvancedInboundDtoParser.class)
-//@AddBean(BasicInboundDtoParser.class)
 class InboundParsingIT extends AbstractIntegrationTest {
 
     @Inject

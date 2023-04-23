@@ -10,8 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-@AddBean(JqplResource.class)
-@AddBean(JqplTransaction.class)
 @HelidonTest
 class JpqlIT extends AbstractIntegrationTest {
 

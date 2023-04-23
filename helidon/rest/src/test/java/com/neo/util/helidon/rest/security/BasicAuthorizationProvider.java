@@ -7,6 +7,7 @@ import com.neo.util.framework.api.security.RolePrincipal;
 import com.neo.util.framework.api.security.credential.BearerCredentials;
 
 import jakarta.annotation.Priority;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.security.enterprise.credential.Credential;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.Set;
 
 @Alternative
 @Priority(PriorityConstants.TEST)
+@ApplicationScoped
 public class BasicAuthorizationProvider implements AuthenticationProvider {
 
     public static final String NORMAL_TOKEN = "ABCDEFGHIJKLMNOPQRSTUFWXYZ";

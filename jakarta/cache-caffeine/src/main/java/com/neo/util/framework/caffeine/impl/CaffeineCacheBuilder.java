@@ -1,7 +1,6 @@
 package com.neo.util.framework.caffeine.impl;
 
 import com.neo.util.framework.api.PriorityConstants;
-import com.neo.util.framework.impl.JandexService;
 import com.neo.util.framework.impl.cache.AbstractCacheBuilder;
 import com.neo.util.framework.api.cache.Cache;
 import com.neo.util.framework.api.cache.CacheBuilder;
@@ -12,7 +11,6 @@ import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
-import org.jboss.jandex.Index;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,9 +30,6 @@ public class CaffeineCacheBuilder extends AbstractCacheBuilder implements CacheB
 
     @Inject
     protected ConfigService configService;
-
-    @Inject
-    protected JandexService jandexService;
 
     @Override
     public Map<String, Cache> build() {
@@ -67,10 +62,5 @@ public class CaffeineCacheBuilder extends AbstractCacheBuilder implements CacheB
         //Do not use async stream you will get an index out of bound exception
         return reflectionConfig.stream().map(cacheName -> new CaffeineCacheConfig(cacheName, defaultConfig))
                 .collect(Collectors.toCollection(() -> caffeineCacheConfigs.orElse(new ArrayList<>())));
-    }
-
-    @Override
-    protected Optional<Index> getIndex() {
-        return jandexService.getIndex();
     }
 }

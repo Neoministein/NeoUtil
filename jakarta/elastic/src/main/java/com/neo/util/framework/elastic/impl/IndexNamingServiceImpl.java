@@ -102,7 +102,7 @@ public class IndexNamingServiceImpl implements IndexNamingService {
 
         if (jandexService.getIndex().isPresent()) {
             for (AnnotationInstance searchableIndex: jandexService.getAnnotationInstance(SearchableIndex.class)) {
-                Class<?> searchableClass = jandexService.getClass(searchableIndex);
+                Class<?> searchableClass = jandexService.asClass(searchableIndex);
                 indexNamePrefixes.put(searchableClass, searchableIndex.value(SearchableIndex.INDEX_NAME).asString());
                 indexPeriods.put(searchableClass, (IndexPeriod) searchableIndex.value(SearchableIndex.INDEX_PERIOD).value());
             }

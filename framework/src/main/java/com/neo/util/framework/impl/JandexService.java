@@ -35,11 +35,11 @@ public class JandexService {
     }
 
 
-    public Class<?> getClass(AnnotationInstance annotationInstance) {
-        return getClass(annotationInstance, ThreadUtils.classLoader());
+    public Class<?> asClass(AnnotationInstance annotationInstance) {
+        return asClass(annotationInstance, ThreadUtils.classLoader());
     }
 
-    public Class<?> getClass(AnnotationInstance annotationInstance, ClassLoader classLoader) {
+    public Class<?> asClass(AnnotationInstance annotationInstance, ClassLoader classLoader) {
         if (AnnotationTarget.Kind.CLASS == annotationInstance.target().kind()) {
             try {
                 return classLoader.loadClass(annotationInstance.target().asClass().toString());

@@ -32,7 +32,7 @@ public class ReflectionUtils {
     private ReflectionUtils() {}
 
     /**
-     * Returns a list of the classes which have the annotation.
+     * Returns a set of the classes which have the annotation.
      *
      * @param annotation the annotation to find
      *
@@ -42,33 +42,52 @@ public class ReflectionUtils {
         return getClassesByAnnotation(annotation, ThreadUtils.classLoader());
     }
 
+    /**
+     * Returns a set of the classes which have the annotation.
+     *
+     * @param annotation the annotation to find
+     * @param classLoader the classloader to search through
+     *
+     * @return a set of classes which have the annotation
+     */
     public static Set<Class<?>> getClassesByAnnotation(Class<? extends Annotation> annotation, ClassLoader classLoader) {
         Reflections reflections = new Reflections(getBasicConfig(classLoader).setScanners(Scanners.TypesAnnotated));
         return reflections.get(Scanners.TypesAnnotated.with(annotation).asClass(classLoader));
     }
 
+    /**
+     * Returns a set of classes which are subtypes of the provided class
+     *
+     * @param type the type to check for subtypes
+     * @param classLoader the classloader to search through
+     *
+     * @return a set of classes which are subtypes of the provided class
+     *
+     * @param <T> the type
+     */
     public static <T> Set<Class<? extends T>> getSubTypesOf(Class<T> type, ClassLoader classLoader) {
-        return ReflectionUtils.getReflections(classLoader)
-                .getSubTypesOf(type);
+        return ReflectionUtils.getReflections(classLoader).getSubTypesOf(type);
     }
 
     /**
      * Returns all Annotation instances based on the {@link Target} annotation to look through.
      *
      * @param annotation the annotation to find
-     * @return a set of instances of the annotation
      *
-     * @param <T> classType
+     * @return a set of {@link AnnotatedElement}
      */
     public static Set<AnnotatedElement> getAnnotatedElement(Class<? extends Annotation> annotation) {
-        for (Annotation elementAnnotation: annotation.getAnnotations()) {
-            if (elementAnnotation instanceof Target target) {
-                return getAnnotatedElement(annotation, ThreadUtils.classLoader() ,target.value());
-            }
-        }
-        throw new UnsupportedOperationException("Annotation " + annotation + " does not have the Target Annotation");
+        return getAnnotatedElement(annotation, ThreadUtils.classLoader());
     }
 
+    /**
+     * Returns all Annotation instances based on the {@link Target} annotation to look through.
+     *
+     * @param annotation the annotation to find
+     * @param classLoader the classloader to search through
+     *
+     * @return a set of {@link AnnotatedElement}
+     */
     public static Set<AnnotatedElement> getAnnotatedElement(Class<? extends Annotation> annotation, ClassLoader classLoader) {
         for (Annotation elementAnnotation: annotation.getAnnotations()) {
             if (elementAnnotation instanceof Target target) {
@@ -83,9 +102,8 @@ public class ReflectionUtils {
      *
      * @param annotation the annotation to find
      * @param elementTypes to look through
-     * @return a set of instances of the annotation
      *
-     * @param <T> classType
+     * @return a set of {@link AnnotatedElement}
      */
     public static Set<AnnotatedElement> getAnnotatedElement(Class<? extends Annotation> annotation, ClassLoader classLoader, ElementType... elementTypes) {
         LOGGER.debug("Searching instances of [{}] on types {}", annotation.getName(), elementTypes);
@@ -94,7 +112,7 @@ public class ReflectionUtils {
                 .setScanners(scanners));
         Set<AnnotatedElement> annotationInstances = new HashSet<>();
         for (Scanners scanner: scanners) {
-            annotationInstances.addAll(reflections.get(scanner.with(annotation).as(getClassFromScanner(scanner))));
+            annotationInstances.addAll(reflections.get(scanner.with(annotation).as(getClassFromScanner(scanner), classLoader)));
         }
         LOGGER.trace("Found [{}] instances of [{}] on types {} {}", annotationInstances.size(), annotation.getName(),
                 elementTypes, annotationInstances);
@@ -181,6 +199,7 @@ public class ReflectionUtils {
      * Basic configuration for an instance of {@link Reflections}
      */
     public static ConfigurationBuilder getBasicConfig(ClassLoader classLoader) {
-        return new ConfigurationBuilder().forPackage(System.getProperty(DEPENDENCY_REFLECTION_PATTERN,"com.neo"), classLoader);
+        return new ConfigurationBuilder().forPackage(System.getProperty(DEPENDENCY_REFLECTION_PATTERN,"com.neo"), classLoader)
+                .setClassLoaders(new ClassLoader[]{classLoader});
     }
 }

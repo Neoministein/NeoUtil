@@ -53,7 +53,7 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
         LOGGER.debug("Existing queues {}", existingOutgoingAnnotation);
 
         for (AnnotatedElement element: queueProducerClasses) {
-            Method executionMethod = (Method) element;
+            Class<?> executionMethod = (Class<?>) element;
             String queueName = element.getAnnotation(OutgoingQueueConnection.class).value();
 
             Class<?> existingQueueAnnotationClass = existingOutgoingAnnotation.get(QUEUE_PREFIX + queueName);
@@ -69,7 +69,7 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
             }
 
             createConsumeClass(queueName, executionMethod, context);
-            generatedClasses.put(queueName, executionMethod.getDeclaringClass());
+            generatedClasses.put(queueName, executionMethod);
         }
     }
 
@@ -78,7 +78,7 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
         return PriorityConstants.LIBRARY_BEFORE;
     }
 
-    protected void createConsumeClass(String queueName, Method executionMethod, BuildContext context) {
+    protected void createConsumeClass(String queueName, Class<?> executionMethod, BuildContext context) {
         try {
             String className = parseToClassName(queueName);
             FieldSpec queueEmitter = FieldSpec.builder(ParameterizedTypeName.get(SubmissionPublisher.class, String.class), "emitter")
@@ -121,7 +121,7 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
             LOGGER.debug("Generating src file {}", className);
 
         } catch (Exception ex) {
-            throw new IllegalArgumentException("Unable to generate src file for " + executionMethod.getDeclaringClass().getName(), ex);
+            throw new IllegalArgumentException("Unable to generate src file for " + executionMethod.getName(), ex);
         }
     }
 

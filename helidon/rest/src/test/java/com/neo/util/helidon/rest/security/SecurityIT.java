@@ -14,16 +14,11 @@ import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 
-@HelidonTest
-@AddBean(SecurityResource.class)
-@AddBean(BasicAuthorizationProvider.class)
+@HelidonTest(resetPerTest = true)
 class SecurityIT extends AbstractIntegrationTest {
 
-    @Inject
-    protected WebTarget webTarget;
-
     @Test
-    void secureResourceTest() {
+    void secureResourceTest(WebTarget webTarget) {
         //Arrange
         //Act
         Response response = webTarget.path(SecurityResource.RESOURCE_LOCATION + SecurityResource.P_SECURED).request()
@@ -35,7 +30,7 @@ class SecurityIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void secureResourceFailTest() {
+    void secureResourceFailTest(WebTarget webTarget) {
         //Arrange
         //Act
         Response response = webTarget.path(SecurityResource.RESOURCE_LOCATION + SecurityResource.P_SECURED).request()
@@ -48,7 +43,7 @@ class SecurityIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void roleResourceTest() {
+    void roleResourceTest(WebTarget webTarget) {
         //Arrange
         //Act
         Response response = webTarget.path(SecurityResource.RESOURCE_LOCATION + SecurityResource.P_ROLE).request()
@@ -60,7 +55,7 @@ class SecurityIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void roleResourceFailureTest() {
+    void roleResourceFailureTest(WebTarget webTarget) {
         //Arrange
         //Act
         Response response = webTarget.path(SecurityResource.RESOURCE_LOCATION + SecurityResource.P_ROLE).request()

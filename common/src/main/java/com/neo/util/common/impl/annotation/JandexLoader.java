@@ -12,7 +12,7 @@ import java.net.URL;
 import java.util.Optional;
 
 /**
- * Utility class for Jandex
+ * Utility class to load the Jandex Index
  */
 public class JandexLoader {
 

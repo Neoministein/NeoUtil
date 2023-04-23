@@ -56,7 +56,7 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
         LOGGER.debug("Existing queues {}", existingIncomingAnnotation);
 
         for (Class<?> queueConsumer: queueConsumerClasses) {
-            if (!queueConsumer.isAssignableFrom(QueueListener.class)) {
+            if (!QueueListener.class.isAssignableFrom(queueConsumer)) {
                 throw new IllegalStateException(queueConsumer.getName() + " must implement " + QueueListener.class.getName());
             }
             String queueName = queueConsumer.getAnnotation(IncomingQueueConnection.class).value();
