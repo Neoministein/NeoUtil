@@ -13,6 +13,16 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Set;
 
+/**
+ * Validates that all classes implementing {@link Searchable} are annotated with {@link SearchableIndex}
+ * otherwise, a {@link ValidationException} is thrown.
+ * <p>
+ * It won't be thrown when:
+ * <ul>
+ * <li>The class is Abstract</li>
+ * <li>The class is annotated with {@link SuppressWarnings} containing {@link SearchableAnnotationBuildStep#SUPPRESS_TYPE}</li>
+ * </ul>
+ */
 public class SearchableAnnotationBuildStep implements BuildStep {
 
     public static final String SUPPRESS_TYPE = "neoutil:SearchableIndex";

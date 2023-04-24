@@ -24,6 +24,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.SubmissionPublisher;
 
+/**
+ * Generates a microprofile specific impl for a {@link OutgoingQueueConnection}
+ */
 public class OutgoingQueueConnectionProcessor implements BuildStep {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OutgoingQueueConnectionProcessor.class);

@@ -13,6 +13,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Set;
 
+/**
+ * Generates an index file that contains the locations of all json schemas. Located at {@link FrameworkConstants#JSON_SCHEMA_LOCATION}
+ * <p>
+ * The index file will be generated at: {@link FrameworkConstants#JSON_SCHEMA_INDEX}
+ */
 public class JsonSchemaIndexBuildStep implements BuildStep {
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonSchemaIndexBuildStep.class);
 

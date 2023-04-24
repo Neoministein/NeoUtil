@@ -18,6 +18,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+/**
+ * Generates a JsonSchema for a {@link InboundDto}
+ */
 public class InboundDtoSchemaBuildStep implements BuildStep {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InboundDtoSchemaBuildStep.class);

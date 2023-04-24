@@ -23,6 +23,9 @@ import javax.lang.model.element.*;
 import java.io.File;
 import java.util.*;
 
+/**
+ * Generates a microprofile specific impl for a {@link IncomingQueueConnection}
+ */
 public class IncomingQueueConnectionProcessor implements BuildStep {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IncomingQueueConnectionProcessor.class);

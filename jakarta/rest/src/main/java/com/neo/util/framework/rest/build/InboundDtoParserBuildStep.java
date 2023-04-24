@@ -10,15 +10,18 @@ import com.squareup.javapoet.*;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.ext.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.lang.model.element.Modifier;
-import javax.lang.model.util.Elements;
 import java.io.File;
 import java.util.Set;
 
+/**
+ * Generates a specific {@link MessageBodyReader} for a {@link InboundDto} based on a {@link AbstractDtoReader}
+ */
 public class InboundDtoParserBuildStep implements BuildStep {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InboundDtoParserBuildStep.class);
@@ -28,8 +31,6 @@ public class InboundDtoParserBuildStep implements BuildStep {
     public static final String PACKAGE_LOCATION = "com.neo.util.framework.rest.impl.parsing";
 
     protected static final String BASIC_ANNOTATION_FIELD_NAME = "value";
-
-    protected Elements elements;
 
     @Override
     public void execute(BuildContext context) {
