@@ -17,7 +17,6 @@ import io.helidon.microprofile.tests.junit5.*;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 
 
