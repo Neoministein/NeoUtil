@@ -145,7 +145,7 @@
                             <goal>testCompile</goal>
                         </goals>
                         <configuration>
-                            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/annotations</generatedTestSourcesDirectory>
+                            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/test-annotations</generatedTestSourcesDirectory>
                         </configuration>
                     </execution>
                 </executions>
