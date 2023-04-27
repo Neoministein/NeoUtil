@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class can be used to retrieve a {@link CacheKeyGenerator} object or instantiate it if it doesn't exist
@@ -19,7 +19,7 @@ public class CacheKeyGeneratorManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheKeyGeneratorManager.class);
 
-    protected Map<Class<? extends CacheKeyGenerator>, CacheKeyGenerator> generators = new HashMap<>();
+    protected Map<Class<? extends CacheKeyGenerator>, CacheKeyGenerator> generators = new ConcurrentHashMap<>();
 
     @Inject
     protected Instance<CacheKeyGenerator> keyGenerators;
