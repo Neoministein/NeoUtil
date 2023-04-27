@@ -104,7 +104,7 @@ public class IndexNamingServiceImpl implements IndexNamingService {
             for (AnnotationInstance searchableIndex: jandexService.getAnnotationInstance(SearchableIndex.class)) {
                 Class<?> searchableClass = jandexService.asClass(searchableIndex);
                 indexNamePrefixes.put(searchableClass, searchableIndex.value(SearchableIndex.INDEX_NAME).asString());
-                indexPeriods.put(searchableClass, (IndexPeriod) searchableIndex.value(SearchableIndex.INDEX_PERIOD).value());
+                indexPeriods.put(searchableClass, IndexPeriod.valueOf((String) searchableIndex.value(SearchableIndex.INDEX_PERIOD).value()));
             }
         } else {
             LOGGER.warn("Unable to load Jandex Index. Falling back to reflections, this can drastically increase load time.");
