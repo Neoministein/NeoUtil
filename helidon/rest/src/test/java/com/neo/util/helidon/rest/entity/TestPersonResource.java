@@ -2,12 +2,14 @@ package com.neo.util.helidon.rest.entity;
 
 import com.neo.util.framework.rest.impl.entity.AbstractEntityRestEndpoint;
 
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path(TestPersonResource.RESOURCE_LOCATION)
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+@RequestScoped
 public class TestPersonResource extends AbstractEntityRestEndpoint<TestPersonEntity> {
 
     public static final String RESOURCE_LOCATION = "/test/entity/testuser";
