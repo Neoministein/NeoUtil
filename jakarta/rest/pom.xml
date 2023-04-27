@@ -40,11 +40,6 @@
             <artifactId>javapoet</artifactId>
             <version>${javapoet.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
-            <version>${auto-service.version}</version>
-        </dependency>
 
         <!-- Json Schema Generation -->
         <dependency>
