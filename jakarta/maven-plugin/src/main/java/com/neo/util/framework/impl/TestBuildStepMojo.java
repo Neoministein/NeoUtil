@@ -31,7 +31,7 @@ public class TestBuildStepMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException {
         BuildContext buildContext = new BuildContext(
-                project.getBuild().getDirectory() + "/generated-test-sources/java",
+                project.getBuild().getDirectory() + "/generated-test-sources/test-annotations",
                 project.getBuild().getTestOutputDirectory(),
                 ClassLoaderUtils.generate(new ClassLoaderUtils.BuildConfig(
                         false, false, project.getArtifacts(), new File(project.getBuild().getTestOutputDirectory()))),

@@ -145,26 +145,7 @@
                             <goal>testCompile</goal>
                         </goals>
                         <configuration>
-                            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/java</generatedTestSourcesDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>${build-helper-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>add-test-source</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.build.directory}/generated-test-sources/java</source>
-                            </sources>
+                            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/annotations</generatedTestSourcesDirectory>
                         </configuration>
                     </execution>
                 </executions>

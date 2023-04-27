@@ -31,7 +31,7 @@ public class SourceBuildStepMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException {
         BuildContext buildContext = new BuildContext(
-                project.getBuild().getDirectory() + "/generated-sources/java",
+                project.getBuild().getDirectory() + "/generated-sources/annotations",
                 project.getBuild().getOutputDirectory(),
                 ClassLoaderUtils.generate(new ClassLoaderUtils.BuildConfig(
                         false, false, project.getArtifacts(), new File(project.getBuild().getOutputDirectory()))),
