@@ -6,8 +6,8 @@ import org.jboss.jandex.IndexReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Optional;
 
@@ -45,7 +45,8 @@ public class JandexLoader {
             LOGGER.warn("No Jandex index file found");
             return Optional.empty();
         }
-        try(FileInputStream input = new FileInputStream(url.getPath())) {
+
+        try(InputStream input = ThreadUtils.classLoader().getResourceAsStream(indexFileLocation)) {
             return Optional.ofNullable(new IndexReader(input).read());
         } catch (IOException ex) {
             LOGGER.error("There was an error parsing the Jandex index file at [{}] {}", indexFileLocation, ex.getMessage());
