@@ -1,5 +1,6 @@
 package com.neo.util.framework.api.connection;
 
+import com.neo.util.common.impl.json.JsonUtil;
 import org.slf4j.MDC;
 
 import java.util.Date;
@@ -32,4 +33,8 @@ public abstract class AbstractRequestDetails implements RequestDetails {
         return requestStartDate;
     }
 
+    @Override
+    public String toString() {
+        return JsonUtil.toJson(this);
+    }
 }

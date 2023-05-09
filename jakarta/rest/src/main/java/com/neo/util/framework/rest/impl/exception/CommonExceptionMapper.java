@@ -23,16 +23,20 @@ public class CommonExceptionMapper implements ExceptionMapper<CommonRuntimeExcep
 
     @Override
     public Response toResponse(CommonRuntimeException ex) {
-        LOGGER.error("A CommonRuntimeException occurred during a rest call with id [{}] and message: {}",
-                ex.getExceptionId(), ex.getMessage());
         if (ex.getInternal()) {
+            LOGGER.error("A [{}] occurred with message [{}] setting status to [500]",
+                    ex.getClass().getSimpleName(), ex.getMessage());
             return responseGenerator.error(500, RuntimeExceptionMapper.EX_INTERNAL_RUNTIME_EXCEPTION);
         }
 
         if (ex instanceof NoContentFoundException) {
+            LOGGER.warn("A [{}] occurred with message [{}] setting status to [404]",
+                    ex.getClass().getSimpleName(), ex.getMessage());
             return responseGenerator.error(404, ex);
         }
 
+        LOGGER.warn("A [{}] occurred with message [{}] setting status to [400]",
+                ex.getClass().getSimpleName(), ex.getMessage());
         return responseGenerator.error(400, ex);
     }
 }

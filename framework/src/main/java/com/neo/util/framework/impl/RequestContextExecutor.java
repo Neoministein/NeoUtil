@@ -7,12 +7,16 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.context.control.RequestContextController;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A utility class to standardize the execution of code inside a {@link RequestScoped} with the details of the caller.
  */
 @ApplicationScoped
 public class RequestContextExecutor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestContextExecutor.class);
 
     @Inject
     protected Provider<RequestContextController> requestContextControllerFactory;
@@ -27,6 +31,7 @@ public class RequestContextExecutor {
      * @param runnable the code to execute
      */
     public void execute(RequestDetails requestDetails, Runnable runnable) {
+        LOGGER.debug("Executing within context {}", requestDetails);
         RequestContextController requestContextController = requestContextControllerFactory.get();
         requestContextController.activate();
         try {
