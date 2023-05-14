@@ -1,5 +1,6 @@
 package com.neo.util.framework.database.impl;
 
+import com.neo.util.common.impl.ThreadUtils;
 import com.neo.util.common.impl.enumeration.Association;
 import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
@@ -33,7 +34,6 @@ class DatabaseProviderFindIT extends AbstractIntegrationTest<DatabaseProvider> {
      * of the entity for the dateRangeSearchTest, since on faster machines it can happen that multiple entities get
      * created at the same point in time
      */
-    @SuppressWarnings("java:S2925")
     @BeforeEach
     void setupEntity() throws InterruptedException {
         personOne = new PersonEntity("Heaven Schneider",10,40.0,false);
@@ -42,11 +42,11 @@ class DatabaseProviderFindIT extends AbstractIntegrationTest<DatabaseProvider> {
         personFour = new PersonEntity("Gabriel Ryan",40,55.0,true);
 
         subject.create(personOne);
-        Thread.sleep(1);
+        ThreadUtils.simpleSleep(1);
         subject.create(personTwo);
-        Thread.sleep(1);
+        ThreadUtils.simpleSleep(1);
         subject.create(personThree);
-        Thread.sleep(1);
+        ThreadUtils.simpleSleep(1);
         subject.create(personFour);
     }
 

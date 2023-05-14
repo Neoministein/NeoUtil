@@ -5,14 +5,14 @@ import com.neo.util.framework.api.connection.RequestContext;
 import com.neo.util.framework.api.connection.RequestDetails;
 import jakarta.enterprise.context.ApplicationScoped;
 
-import java.util.Date;
+import java.time.Instant;
 
 @ApplicationScoped
 public class RequestDetailsDummy implements RequestDetails {
 
     protected String caller = "127.0.0.1";
     protected String requestId = new RandomString(32).nextString();
-    protected Date receiveDate = new Date();
+    protected Instant receiveDate = Instant.now();
     protected RequestContext requestContext = null;
 
     @Override
@@ -31,7 +31,7 @@ public class RequestDetailsDummy implements RequestDetails {
     }
 
     @Override
-    public Date getRequestStartDate() {
+    public Instant getRequestStartDate() {
         return receiveDate;
     }
 

@@ -5,14 +5,20 @@ import com.neo.util.common.impl.ThreadUtils;
 
 import org.junit.jupiter.api.Assertions;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Utility for Integration Tests
  */
 public final class IntegrationTestUtil {
+
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
+            .withZone(ZoneId.systemDefault());
+
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
+            .withZone(ZoneId.systemDefault());
 
     private IntegrationTestUtil() {}
 
@@ -31,12 +37,10 @@ public final class IntegrationTestUtil {
             exceptionMessage = e.getMessage();
         }
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss.SSS");
         int totalTime = millisToSleep * tries;
         Assertions.fail("WakeupCondition [" + wakeUpCondition + "] not fulfilled after [" + tries + "] tries, total time ["
-                + dateFormat.format(totalTime) + "] Current time: ["
-                + timeFormat.format(new Date())
+                + TIME_FORMAT.format(Instant.ofEpochMilli(totalTime)) + "] Current time: ["
+                + DATE_FORMAT.format(Instant.now())
                 + "], with exception message [" + exceptionMessage + "]");
     }
 }

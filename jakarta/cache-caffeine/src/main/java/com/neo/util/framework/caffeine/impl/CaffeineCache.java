@@ -81,7 +81,7 @@ public class CaffeineCache implements Cache {
 
     @Override
     public void invalidate(Object key) {
-        LOGGER.debug("Invalidating cache for key [{}]", key);
+        LOGGER.debug("Invalidating cache [{}] for key [{}]",cacheName, key);
         cache.synchronous().invalidate(key);
     }
 
@@ -92,13 +92,13 @@ public class CaffeineCache implements Cache {
 
     @Override
     public void invalidateAll(Iterable<Object> keys) {
-        LOGGER.debug("Bulk invalidating cache for keys [{}]", keys);
+        LOGGER.debug("Bulk invalidating cache [{}] for keys [{}]", cacheName, keys);
         cache.synchronous().invalidateAll(keys);
     }
 
     @Override
     public void invalidateAll() {
-        LOGGER.info("Invalidating entire cache");
+        LOGGER.info("Invalidating entire cache [{}]", cacheName);
         cache.synchronous().invalidateAll();
     }
 

@@ -3,17 +3,17 @@ package com.neo.util.framework.api.connection;
 import com.neo.util.common.impl.json.JsonUtil;
 import org.slf4j.MDC;
 
-import java.util.Date;
+import java.time.Instant;
 
 public abstract class AbstractRequestDetails implements RequestDetails {
 
-    protected final Date requestStartDate;
+    protected final Instant requestStartDate;
     protected final String requestId;
     protected final RequestContext requestContext;
 
     protected AbstractRequestDetails(String requestId, RequestContext requestContext) {
         MDC.put("traceId", requestId);
-        this.requestStartDate = new Date();
+        this.requestStartDate = Instant.now();
         this.requestId = requestId;
         this.requestContext = requestContext;
     }
@@ -29,7 +29,7 @@ public abstract class AbstractRequestDetails implements RequestDetails {
     }
 
     @Override
-    public Date getRequestStartDate() {
+    public Instant getRequestStartDate() {
         return requestStartDate;
     }
 

@@ -8,7 +8,7 @@
         <class>com.neo.util.framework.database.impl.EntityAuditTrail</class>
         <class>com.neo.util.framework.database.impl.entity.PersonEntity</class>
         <class>com.neo.util.framework.database.impl.entity.AddressEntity</class>
-
+        <class>com.neo.util.framework.database.impl.InstantConverter</class>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
             <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create" />

@@ -59,6 +59,10 @@ public class JsonUtil {
         mapper.registerModule(new Jdk8Module());
         mapper.registerModule(new JavaTimeModule());
 
+        //Configure proper serialization of instant and LocalTime
+        mapper.configure( SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false );
+        mapper.configure( SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true );
+
         // Don't throw error when empty bean is being serialized
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         return mapper;

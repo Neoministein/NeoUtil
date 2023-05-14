@@ -4,7 +4,7 @@ import com.neo.util.framework.api.persistence.search.AbstractSearchable;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;
 
-import java.util.Date;
+import java.time.Instant;
 
 @SearchableIndex(indexName = BasicPersonSearchable.INDEX_NAME, indexPeriod = IndexPeriod.ALL)
 public class BasicPersonSearchable extends AbstractSearchable {
@@ -22,7 +22,7 @@ public class BasicPersonSearchable extends AbstractSearchable {
     private int age = 20;
     private Double weight = 45.5;
     private Boolean hasTwoArms = false;
-    private Date timestamp = new Date();
+    private Instant timestamp = Instant.now();
 
     public BasicPersonSearchable() {
         setVersion(10L);
@@ -73,11 +73,11 @@ public class BasicPersonSearchable extends AbstractSearchable {
         return hasTwoArms;
     }
 
-    public Date getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
 }

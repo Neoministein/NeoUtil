@@ -47,6 +47,7 @@ import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.io.StringReader;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -378,14 +379,14 @@ public class ElasticSearchProvider implements SearchProvider {
                     BulkOperation bulkOperation = bulkRequest.operations().get(i);
                     QueueableSearchable queueableSearchable = buildQueueableSearchable(bulkOperation);
                     bulkQueueableSearchableList.add(queueableSearchable);
-                    LOGGER.info("Request failed, to be retried, failureMessage:[{}], transportSearchable:[{}]",
+                    LOGGER.warn("Request failed, to be retried, failureMessage:[{}], transportSearchable:[{}]",
                             errorReason, queueableSearchable);
                 } else {
-                    LOGGER.info("Request failed, no retry, failureMessage:[{}]", errorReason);
+                    LOGGER.warn("Request failed, no retry, failureMessage:[{}]", errorReason);
                 }
             }
         }
-        LOGGER.debug("Sending bulk failure to queue, initial size:[{}], retry size:[{}]", bulkRequest.operations().size(),
+        LOGGER.warn("Sending bulk failure to queue, initial size:[{}], retry size:[{}]", bulkRequest.operations().size(),
                 bulkQueueableSearchableList.size());
 
         return bulkQueueableSearchableList;
@@ -504,7 +505,7 @@ public class ElasticSearchProvider implements SearchProvider {
     protected Query buildDateQuery(DateSearchCriteria criteria) {
         RangeQuery.Builder rangeQuery = buildBasicRangeQuery(criteria);
         if (criteria.getTimeZone() != null) {
-            rangeQuery.timeZone(criteria.getTimeZone());
+            rangeQuery.timeZone(criteria.getTimeZone().getId());
         }
         return searchQueryNot(criteria, rangeQuery.build()._toQuery());
     }
@@ -593,7 +594,7 @@ public class ElasticSearchProvider implements SearchProvider {
             case Float floatVal -> FieldValue.of(floatVal);
             case Double doubleVal -> FieldValue.of(doubleVal);
             case Boolean bool -> FieldValue.of(bool);
-            case Date date -> FieldValue.of(date.getTime());
+            case Instant instant -> FieldValue.of(instant.toEpochMilli());
             case null -> FieldValue.NULL;
             default -> throw new IllegalStateException("ExplicitSearchCriteria unexpected value class: " + o.getClass().getName());
         };

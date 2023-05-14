@@ -1,6 +1,6 @@
 package com.neo.util.framework.api.connection;
 
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * This interface consolidates all the data based on this request.
@@ -25,5 +25,5 @@ public interface RequestDetails {
     /**
      * Returns the date the request has been started
      */
-    Date getRequestStartDate();
+    Instant getRequestStartDate();
 }

@@ -7,7 +7,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import java.util.Date;
+
+import java.time.Instant;
 
 public class DataBaseAuditListener {
 
@@ -28,12 +29,12 @@ public class DataBaseAuditListener {
 
     protected void setPersistData(AuditableDataBaseEntity entity, String by) {
         entity.setCreatedBy(by);
-        entity.setCreatedOn(new Date());
+        entity.setCreatedOn(Instant.now());
     }
 
     protected void setUpdateData(AuditableDataBaseEntity entity, String by) {
         entity.setTransactionCount(entity.getTransactionCount()+1);
         entity.setUpdatedBy(by);
-        entity.setUpdatedOn(new Date());
+        entity.setUpdatedOn(Instant.now());
     }
 }

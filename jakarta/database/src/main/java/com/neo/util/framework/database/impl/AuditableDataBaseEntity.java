@@ -7,9 +7,11 @@ import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.database.impl.listener.DataBaseAuditListener;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
-import java.util.Date;
+
+import java.time.Instant;
 
 @MappedSuperclass
 @EntityListeners( { DataBaseAuditListener.class } )
@@ -22,9 +24,10 @@ public abstract class AuditableDataBaseEntity implements PersistenceEntity {
     public static final String C_UPDATED_ON = "updatedOn";
     public static final String C_UPDATED_BY = "updatedBy";
 
+    @Convert(converter = InstantConverter.class)
     @Column(name = C_CREATED_ON, nullable = false, updatable = false)
         @JsonView(Views.Owner.class)
-    protected Date createdOn = new Date();
+    protected Instant createdOn = Instant.now();
 
     @Column(name = C_CREATED_BY, nullable = false, updatable = false)
         @JsonView(Views.Internal.class)
@@ -34,19 +37,20 @@ public abstract class AuditableDataBaseEntity implements PersistenceEntity {
         @JsonView(Views.Internal.class)
     protected int transactionCount = 0;
 
+    @Convert(converter = InstantConverter.class)
     @Column(name = C_UPDATED_ON, nullable = false)
         @JsonView(Views.Owner.class)
-    protected Date updatedOn = new Date();
+    protected Instant updatedOn = Instant.now();
 
     @Column(name = C_UPDATED_BY, nullable = false)
         @JsonView(Views.Owner.class)
     protected String updatedBy;
 
-    public Date getCreatedOn() {
+    public Instant getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(Date createdOn) {
+    public void setCreatedOn(Instant createdOn) {
         this.createdOn = createdOn;
     }
 
@@ -67,11 +71,11 @@ public abstract class AuditableDataBaseEntity implements PersistenceEntity {
         this.transactionCount = transactionCount;
     }
 
-    public Date getUpdatedOn() {
+    public Instant getUpdatedOn() {
         return updatedOn;
     }
 
-    public void setUpdatedOn(Date updatedOn) {
+    public void setUpdatedOn(Instant updatedOn) {
         this.updatedOn = updatedOn;
     }
 

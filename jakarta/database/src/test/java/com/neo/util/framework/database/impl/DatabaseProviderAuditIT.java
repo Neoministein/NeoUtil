@@ -93,6 +93,6 @@ class DatabaseProviderAuditIT extends AbstractIntegrationTest<DatabaseProvider> 
 
         Assertions.assertEquals(expectedUser, result.getCreatedBy());
         Assertions.assertEquals(expectedUser, result.getUpdatedBy());
-        Assertions.assertTrue(result.getCreatedOn().before(result.getUpdatedOn()));
+        Assertions.assertTrue(result.getCreatedOn().isBefore(result.getUpdatedOn()));
     }
 }

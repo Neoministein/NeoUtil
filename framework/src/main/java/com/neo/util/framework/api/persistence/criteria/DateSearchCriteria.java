@@ -1,44 +1,45 @@
 package com.neo.util.framework.api.persistence.criteria;
 
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneId;
 
 /**
  * If this Criteria is applied to a field, the field must be between one or both dates based on which ones are provided.
  */
 public class DateSearchCriteria extends LongRangeSearchCriteria {
 
-    protected String timeZone;
+    protected ZoneId timeZone;
 
-    public DateSearchCriteria(String fieldName, Date from, Date to, boolean not, String timeZone) {
+    public DateSearchCriteria(String fieldName, Instant from, Instant to, boolean not, ZoneId timeZone) {
         this(fieldName, from, to, not);
         this.setTimeZone(timeZone);
     }
 
-    public DateSearchCriteria(String fieldName, Date from, Date to, boolean not) {
+    public DateSearchCriteria(String fieldName, Instant from, Instant to, boolean not) {
         super(
                 fieldName,
-                from != null ? from.getTime() : null,
-                to != null ? to.getTime() : null,
+                from != null ? from.toEpochMilli() : null,
+                to != null ? to.toEpochMilli() : null,
                 not);
     }
 
-    public DateSearchCriteria(String fieldName, Date from, Date to) {
+    public DateSearchCriteria(String fieldName, Instant from, Instant to) {
         this(fieldName, from, to, false);
     }
 
-    public Date getFromDate() {
-        return isIncludeFrom() ? new Date(getFrom()) : null;
+    public Instant getFromDate() {
+        return isIncludeFrom() ? Instant.ofEpochMilli(getFrom()) : null;
     }
 
-    public Date getToDate() {
-        return isIncludeTo() ? new Date(getTo()) : null;
+    public Instant getToDate() {
+        return isIncludeTo() ? Instant.ofEpochMilli(getTo()) : null;
     }
 
-    public String getTimeZone() {
+    public ZoneId getTimeZone() {
         return timeZone;
     }
 
-    public void setTimeZone(String timeZone) {
+    public void setTimeZone(ZoneId timeZone) {
         this.timeZone = timeZone;
     }
 }
