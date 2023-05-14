@@ -31,7 +31,7 @@ public class RequestContextExecutor {
      * @param runnable the code to execute
      */
     public void execute(RequestDetails requestDetails, Runnable runnable) {
-        LOGGER.debug("Executing within context {}", requestDetails);
+        LOGGER.debug("Starting to executing within context {}", requestDetails);
         RequestContextController requestContextController = requestContextControllerFactory.get();
         requestContextController.activate();
         try {
@@ -39,6 +39,7 @@ public class RequestContextExecutor {
             runnable.run();
         } finally {
             requestContextController.deactivate();
+            LOGGER.debug("Finished executing within context {}", requestDetails);
         }
     }
 }
