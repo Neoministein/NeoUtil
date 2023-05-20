@@ -68,8 +68,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         IndexNamingServiceImpl indexNamingService = new IndexNamingServiceImpl() {
             {
                 configService = cfg;
-                indexNamePrefixes = new HashMap<>();
-                indexPeriods = new HashMap<>();
+                searchableIndexCache = new HashMap<>();
             }
         };
         indexNamingService.postConstruct();

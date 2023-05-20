@@ -19,10 +19,16 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.AnnotatedElement;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @ApplicationScoped
 public class IndexNamingServiceImpl implements IndexNamingService {
@@ -56,11 +62,8 @@ public class IndexNamingServiceImpl implements IndexNamingService {
     @Inject
     protected ConfigService configService;
 
-    /** Cache that saves the annotation information of each searchable in regards to its index prefix */
-    protected Map<Class<?>, String> indexNamePrefixes;
-
-    /** Cache that saves the annotation information of each searchable in regards to its index period */
-    protected Map<Class<?>, IndexPeriod> indexPeriods;
+    /** Cache that saves the annotation information of each searchable */
+    protected Map<Class<? extends Searchable>, SearchableIndex> searchableIndexCache;
 
     /**
      * Create a new IndexNameServiceImpl.
@@ -97,21 +100,18 @@ public class IndexNamingServiceImpl implements IndexNamingService {
      */
     @Inject
     public void initIndexProperties(@Any JandexService jandexService) {
-        indexNamePrefixes = new HashMap<>();
-        indexPeriods = new HashMap<>();
+        searchableIndexCache = new HashMap<>();
 
         if (jandexService.getIndex().isPresent()) {
-            for (AnnotationInstance searchableIndex: jandexService.getAnnotationInstance(SearchableIndex.class)) {
-                Class<?> searchableClass = jandexService.asClass(searchableIndex);
-                indexNamePrefixes.put(searchableClass, searchableIndex.value(SearchableIndex.INDEX_NAME).asString());
-                indexPeriods.put(searchableClass, IndexPeriod.valueOf((String) searchableIndex.value(SearchableIndex.INDEX_PERIOD).value()));
+            for (AnnotationInstance annotationInstance: jandexService.getAnnotationInstance(SearchableIndex.class)) {
+                Class<? extends Searchable> searchableClass = (Class<? extends Searchable>) jandexService.asClass(annotationInstance);
+                searchableIndexCache.put(searchableClass, searchableClass.getAnnotation(SearchableIndex.class));
             }
         } else {
             LOGGER.warn("Unable to load Jandex Index. Falling back to reflections, this can drastically increase load time.");
             for (AnnotatedElement annotatedElement: ReflectionUtils.getAnnotatedElement(SearchableIndex.class)) {
-                Class<?> searchableClass = (Class<?>) annotatedElement;
-                indexNamePrefixes.put(searchableClass, searchableClass.getAnnotation(SearchableIndex.class).indexName());
-                indexPeriods.put(searchableClass, searchableClass.getAnnotation(SearchableIndex.class).indexPeriod());
+                Class<? extends Searchable> searchableClass = (Class<? extends Searchable>) annotatedElement;
+                searchableIndexCache.put(searchableClass, searchableClass.getAnnotation(SearchableIndex.class));
             }
         }
     }
@@ -121,7 +121,7 @@ public class IndexNamingServiceImpl implements IndexNamingService {
         StringBuilder sb = new StringBuilder();
 
         sb.append(getIndexNamePrefixFromClass(searchable.getClass(), true));
-        IndexPeriod indexPeriod = indexPeriods.get(searchable.getClass());
+        IndexPeriod indexPeriod = searchableIndexCache.get(searchable.getClass()).indexPeriod();
 
         if (!IndexPeriod.EXTERNAL.equals(indexPeriod)) {
 
@@ -135,13 +135,55 @@ public class IndexNamingServiceImpl implements IndexNamingService {
     }
 
     public String getIndexNamePrefixFromClass(Class<? extends Searchable> searchableClazz, boolean appendInfix) {
-        return (appendInfix  ? getIndexPrefix() : StringUtils.EMPTY) + indexNamePrefixes.get(searchableClazz) + (appendInfix  ? getIndexPostfix() : StringUtils.EMPTY);
+        return (appendInfix  ? getIndexPrefix() : StringUtils.EMPTY) + searchableIndexCache.get(searchableClazz).indexName() + (appendInfix  ? getIndexPostfix() : StringUtils.EMPTY);
     }
 
 
     @Override
     public String getIndexPostfix() {
         return indexPostFix;
+    }
+
+    @Override
+    public Set<Class<? extends Searchable>> getAllSearchables() {
+        return searchableIndexCache.keySet();
+    }
+
+    @Override
+    public Optional<LocalDate> getDateFromIndexName(Class<? extends Searchable> searchableClass, String indexName) {
+        IndexPeriod indexPeriod = searchableIndexCache.get(searchableClass).indexPeriod();
+
+        DateTimeFormatter formatter = getDateFormatter(indexPeriod);
+        if (formatter == null) {
+            LOGGER.debug("There is no date stored in the index name");
+            return Optional.empty();
+        }
+
+        String date;
+        try {
+            date = indexName.substring(getIndexNamePrefixFromClass(searchableClass, true).length() + 1, indexName.lastIndexOf('-'));
+        } catch (IndexOutOfBoundsException ex) {
+            LOGGER.warn("Unable to extract the date from index name [{}]", indexName);
+            return Optional.empty();
+        }
+
+        try {
+            return switch (indexPeriod) {
+                case DAILY -> Optional.of(LocalDate.parse(date, formatter));
+                case WEEKLY, MONTHLY -> {
+                    TemporalAccessor temporalAccessor = formatter.parse(date);
+                    yield Optional.of(LocalDate.of(temporalAccessor.get(ChronoField.YEAR), temporalAccessor.get(ChronoField.MONTH_OF_YEAR), 1));
+                }
+                case YEARLY -> {
+                    TemporalAccessor temporalAccessor = formatter.parse(date);
+                    yield Optional.of(LocalDate.of(temporalAccessor.get(ChronoField.YEAR), 1, 1));
+                }
+                default -> Optional.empty();
+            };
+        } catch (DateTimeParseException ex) {
+            LOGGER.warn("Unable to parse the date from the index name [{}]", ex.getMessage());
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -184,5 +226,4 @@ public class IndexNamingServiceImpl implements IndexNamingService {
             return SEARCH_PROVIDER_NO_DATE_INDEX_POSTFIX;
         }
     }
-
 }

@@ -14,7 +14,6 @@ import co.elastic.clients.elasticsearch.indices.GetIndexRequest;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.JsonpMapper;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.enumeration.Association;
 import com.neo.util.common.impl.enumeration.Synchronization;
@@ -298,6 +297,21 @@ public class ElasticSearchProvider implements SearchProvider {
         } catch (ElasticsearchException ex) {
             LOGGER.error("Failed to indices for class {}, index names {}, with exception {}",
                     searchableClazz.getSimpleName(), indices, ex.getMessage());
+            throw ex;
+        }
+    }
+
+    public void deleteIndex(String index) {
+        DeleteIndexRequest deleteRequest = new DeleteIndexRequest.Builder().index(index).build();
+        try {
+            getApiClient().indices().delete(deleteRequest);
+            LOGGER.info("Deleted index {}", index);
+        } catch (IOException ex) {
+            LOGGER.error("Failed to delete index names {}, with exception {}",
+                    index, ex.getMessage());
+        } catch (ElasticsearchException ex) {
+            LOGGER.error("Failed to delete index names {}, with exception {}",
+                    index, ex.getMessage());
             throw ex;
         }
     }
@@ -982,7 +996,7 @@ public class ElasticSearchProvider implements SearchProvider {
 
     protected List<String> getIndicesOfSearchable(Class<? extends Searchable> searchableClazz) {
         String searchableIndexName = indexNameService.getIndexNamePrefixFromClass(searchableClazz, true);
-        List<String> searchableIndices = new ArrayList<>();
+        List<String> searchableIndices = new LinkedList<>();
         for (String indexName: getAllIndices()) {
             if (indexName.startsWith(searchableIndexName.concat("-")) || indexName.equals(searchableIndexName)) {
                 searchableIndices.add(indexName);

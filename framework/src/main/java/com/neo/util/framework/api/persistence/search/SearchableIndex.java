@@ -9,10 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SearchableIndex {
 
-    String INDEX_NAME = "indexName";
-    String INDEX_PERIOD = "indexPeriod";
-
-
     /**
      * The index name in which the searchable should be stored
      */
@@ -23,4 +19,9 @@ public @interface SearchableIndex {
      * The index period
      */
     IndexPeriod indexPeriod() default IndexPeriod.DEFAULT;
+
+    /**
+     * Retention Period of the index
+     */
+    RetentionPeriod retentionPeriod() default RetentionPeriod.DEFAULT;
 }

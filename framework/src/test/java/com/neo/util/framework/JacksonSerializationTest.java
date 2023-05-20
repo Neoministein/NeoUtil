@@ -1,4 +1,4 @@
-package com.neo.util.framework.api;
+package com.neo.util.framework;
 
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.persistence.search.QueueableSearchable;
