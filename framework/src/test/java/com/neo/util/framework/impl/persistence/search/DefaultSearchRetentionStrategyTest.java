@@ -15,6 +15,8 @@ import java.util.HashMap;
 
 class DefaultSearchRetentionStrategyTest {
 
+    private static final String INDEX_NAME = "indexName";
+
 
     DefaultSearchRetentionStrategy subject;
 
@@ -112,6 +114,35 @@ class DefaultSearchRetentionStrategyTest {
         Assertions.assertTrue(result);
     }
 
+    @Test
+    void dailyIndexConfigTest() {
+        basicConfigService.save(new BasicConfigValue<>(DefaultSearchRetentionStrategy.CUSTOM_RETENTION_CONFIG + INDEX_NAME, 15));
+
+        SearchableIndex searchableIndex = getSearchableIndex(IndexPeriod.DAILY);
+        LocalDate indexCreateDate = LocalDate.of(2023, 1, 1);
+
+        boolean result;
+
+        result = subject.shouldIndexBeDeleted(LocalDate.of(2023, 1, 16), indexCreateDate, searchableIndex);
+        Assertions.assertFalse(result);
+
+        result = subject.shouldIndexBeDeleted(LocalDate.of(2023, 1, 17), indexCreateDate, searchableIndex);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void negativeRetentionConfigTest() {
+        basicConfigService.save(new BasicConfigValue<>(DefaultSearchRetentionStrategy.CUSTOM_RETENTION_CONFIG + INDEX_NAME, -1));
+
+        SearchableIndex searchableIndex = getSearchableIndex(IndexPeriod.DAILY);
+        LocalDate indexCreateDate = LocalDate.of(2023, 1, 1);
+
+        boolean result;
+
+        result = subject.shouldIndexBeDeleted(LocalDate.of(9999, 1, 1), indexCreateDate, searchableIndex);
+        Assertions.assertFalse(result);
+    }
+
     protected SearchableIndex getSearchableIndex(IndexPeriod indexPeriod) {
         return getSearchableIndex(indexPeriod, RetentionPeriod.INDEX_BASED);
     }
@@ -121,7 +152,7 @@ class DefaultSearchRetentionStrategyTest {
         {
             @Override
             public String indexName() {
-                return "indexName";
+                return INDEX_NAME;
             }
 
             @Override

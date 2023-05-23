@@ -26,6 +26,8 @@ public class DefaultSearchRetentionStrategy implements SearchRetentionStrategy {
     public static final String MONTHLY_CONFIG = CONFIG_PREFIX + ".monthly";
     public static final String YEARLY_CONFIG = CONFIG_PREFIX + ".yearly";
 
+    public static final String CUSTOM_RETENTION_CONFIG = CONFIG_PREFIX + ".custom.";
+
     @Inject
     protected ConfigService configService;
 
@@ -38,8 +40,13 @@ public class DefaultSearchRetentionStrategy implements SearchRetentionStrategy {
             return false;
         }
         LOGGER.debug("The index period of index [{}] is marked as [{}]", searchableIndex.indexName(), searchableIndex.indexPeriod());
-        Optional<Period> retention = getRetentionFromConfig(searchableIndex.indexPeriod());
+        Optional<Period> retention = getRetention(searchableIndex);
         if (retention.isEmpty()) {
+            return false;
+        }
+
+        if (retention.get().getDays() < 0 ) {
+            LOGGER.debug("The retention period for index [{}] is negative, therefore index won't be deleted.", searchableIndex.indexName());
             return false;
         }
 
@@ -55,6 +62,14 @@ public class DefaultSearchRetentionStrategy implements SearchRetentionStrategy {
 
         LOGGER.info("Index [{}] can be deleted", searchableIndex.indexName());
         return true;
+    }
+
+    protected Optional<Period> getRetention(SearchableIndex searchableIndex) {
+        Optional<Period> customRetention = configService.get(CUSTOM_RETENTION_CONFIG + searchableIndex.indexName()).asInt().map(Period::ofDays);
+        if (customRetention.isPresent()) {
+            return customRetention;
+        }
+        return getRetentionFromConfig(searchableIndex.indexPeriod());
     }
 
     protected Optional<Period> getRetentionFromConfig(IndexPeriod indexPeriod) {

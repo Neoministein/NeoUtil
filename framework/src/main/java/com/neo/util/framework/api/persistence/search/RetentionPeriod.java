@@ -11,22 +11,22 @@ public enum RetentionPeriod {
     INDEX_BASED,
 
     /**
-     * The index period is externally handled
+     * The index retention is externally handled
      */
     EXTERNAL,
 
     /**
-     * The default index period which is defines in {@link #getDefault()}
+     * The default retention period which is defines in {@link #getDefault()}
      */
     DEFAULT;
 
     /**
-     * The default index period
+     * The default retention period
      *
-     * @return returns the default index period
+     * @return returns the default retention period
      */
     public static RetentionPeriod getDefault() {
         // Don't return default
-        return INDEX_BASED;
+        return EXTERNAL;
     }
 }
