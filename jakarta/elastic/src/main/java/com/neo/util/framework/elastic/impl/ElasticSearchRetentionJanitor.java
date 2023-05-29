@@ -1,5 +1,6 @@
 package com.neo.util.framework.elastic.impl;
 
+import com.neo.util.framework.api.janitor.JanitorJob;
 import com.neo.util.framework.api.persistence.search.SearchRetentionStrategy;
 import com.neo.util.framework.api.persistence.search.Searchable;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 @ApplicationScoped
-public class ElasticSearchRetentionJanitor {
+public class ElasticSearchRetentionJanitor implements JanitorJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchRetentionJanitor.class);
 
@@ -26,7 +27,7 @@ public class ElasticSearchRetentionJanitor {
     @Inject
     protected ElasticSearchProvider elasticSearchProvider;
 
-    public void cleanup(LocalDate now) {
+    public void execute(LocalDate now) {
         LOGGER.info("Starting cleanup for elastic indices...");
         for (Class<? extends Searchable> searchable: indexNamingService.getAllSearchables()) {
             LOGGER.debug("Cleaning up indices for Searchable [{}]", searchable.getSimpleName());
