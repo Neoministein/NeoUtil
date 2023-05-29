@@ -24,6 +24,11 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public void save(ConfigValue<?> config) {
-        throw new IllegalArgumentException("Saving config is not supported in the Helidon implementation");
+        throw new UnsupportedOperationException("Saving config is not supported in the Helidon implementation");
+    }
+
+    @Override
+    public <T> ConfigValue<T> newConfig(String key, T value) {
+        throw new UnsupportedOperationException("Saving config is not supported in the Helidon implementation");
     }
 }

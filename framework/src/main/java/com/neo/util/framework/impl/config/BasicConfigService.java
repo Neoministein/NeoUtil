@@ -29,4 +29,9 @@ public class BasicConfigService implements ConfigService {
     public void save(ConfigValue<?> configValue) {
         configStore.put(configValue.key(), configValue.get());
     }
+
+    @Override
+    public <T> ConfigValue<T> newConfig(String key, T value) {
+        return new BasicConfigValue<>(key, value);
+    }
 }
