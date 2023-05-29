@@ -1,6 +1,5 @@
 package com.neo.util.framework.database.impl;
 
-import com.neo.util.common.impl.enumeration.PersistenceOperation;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 
 import jakarta.persistence.*;
@@ -27,9 +26,8 @@ public class EntityAuditTrail extends AuditableDataBaseEntity implements Persist
     @Column(name = C_CLASS_TYPE)
     private String classType;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = C_OPERATION)
-    private PersistenceOperation operation;
+    private String operation;
 
     @PreUpdate
     private void preUpdate() {
@@ -56,11 +54,11 @@ public class EntityAuditTrail extends AuditableDataBaseEntity implements Persist
         this.classType = classType;
     }
 
-    public PersistenceOperation getOperation() {
+    public String getOperation() {
         return operation;
     }
 
-    public void setOperation(PersistenceOperation operation) {
+    public void setOperation(String operation) {
         this.operation = operation;
     }
 

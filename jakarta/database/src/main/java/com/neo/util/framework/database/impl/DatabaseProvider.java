@@ -7,6 +7,9 @@ import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityProvider;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
+import com.neo.util.framework.database.api.PersistenceContextProvider;
+import jakarta.inject.Inject;
+import jakarta.persistence.NoResultException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,28 +26,40 @@ import java.util.Optional;
 
 @Transactional
 @ApplicationScoped
-public class DatabaseProvider extends AbstractDatabaseRepository implements EntityProvider {
+public class DatabaseProvider implements EntityProvider {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DatabaseProvider.class);
 
+    @Inject
+    PersistenceContextProvider pcs;
+
     @Override
     public void create(PersistenceEntity entity) {
-        super.createWithAudit(entity);
+        pcs.getEm().persist(entity);
+        LOGGER.debug("Created entity {}:{}", entity.getClass().getSimpleName(),  entity);
     }
 
     @Override
     public void edit(PersistenceEntity entity) {
-        super.editWithAudit(entity);
+        pcs.getEm().merge(entity);
+        LOGGER.debug("Edited entity {}:{}",entity.getClass().getSimpleName(), entity);
     }
 
     @Override
     public void remove(PersistenceEntity entity) {
-        super.removeWithAudit(entity);
+        pcs.getEm().remove(pcs.getEm().merge(entity));
+        LOGGER.debug("Removed entity {}:{}",entity.getClass().getSimpleName(), entity);
     }
 
     @Override
     public <X extends PersistenceEntity> Optional<X> fetch(Object primaryKey, Class<X> entityClazz) {
-        return super.find(primaryKey, entityClazz);
+        try {
+            LOGGER.trace("Searching for entity {}:{}", entityClazz.getSimpleName(), primaryKey);
+            return Optional.ofNullable(pcs.getEm().find(entityClazz, primaryKey));
+        } catch (NoResultException | IllegalArgumentException  ex) {
+            LOGGER.trace("Unable to find entity {}:{}", entityClazz.getSimpleName(), primaryKey);
+            return Optional.empty();
+        }
     }
 
     @Override

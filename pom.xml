@@ -47,6 +47,7 @@
 		<h2.version>2.1.214</h2.version>
 		<weld.version>4.0.3.Final</weld.version>
 		<weld-junit.version>3.1.0.Final</weld-junit.version>
+		<jboss.classfilewriter.version>1.2.5.Final</jboss.classfilewriter.version> <!-- This is due to @Transactional not working on 1.2.4.Final -->
 
 		<!-- Maven -->
 		<maven.core.version>3.8.5</maven.core.version>
@@ -114,6 +115,7 @@
 		<module>jakarta/startup</module>
 		<module>jakarta/elastic</module>
 		<module>jakarta/database</module>
+		<module>jakarta/database-audit</module>
 		<module>jakarta/rest</module>
 		<module>jakarta/cache-caffeine</module>
 		<module>microprofile</module>

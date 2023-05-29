@@ -1,60 +1,76 @@
-package com.neo.util.framework.database.impl.repository;
+package com.neo.util.framework.database.impl;
 
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
-import com.neo.util.framework.database.api.repository.EntityRepository;
-import com.neo.util.framework.database.impl.AbstractDatabaseRepository;
+import com.neo.util.framework.database.api.PersistenceContextProvider;
+import com.neo.util.framework.database.api.EntityRepository;
+import jakarta.inject.Inject;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 @Transactional
-public abstract class EntityRepositoryImpl<T extends PersistenceEntity> extends AbstractDatabaseRepository implements
-        EntityRepository<T> {
+public abstract class AbstractEntityRepository<T extends PersistenceEntity> implements EntityRepository<T> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEntityRepository.class);
+
+    @Inject
+    protected PersistenceContextProvider pcs;
 
     protected final Class<T> clazz;
 
-    protected EntityRepositoryImpl(Class<T> clazz) {
+    protected AbstractEntityRepository(Class<T> clazz) {
         this.clazz = clazz;
     }
 
     @Override
     public Optional<T> fetch(Object primaryKey) {
-        return super.find(primaryKey, clazz);
+        try {
+            LOGGER.trace("Searching for entity {}:{}", clazz.getSimpleName(), primaryKey);
+            return Optional.ofNullable(pcs.getEm().find(clazz, primaryKey));
+        } catch (NoResultException | IllegalArgumentException  ex) {
+            LOGGER.trace("Unable to find entity {}:{}", clazz.getSimpleName(), primaryKey);
+            return Optional.empty();
+        }
     }
 
     @Override
     public void create(T entity) {
-        super.createWithAudit(entity);
+        pcs.getEm().persist(entity);
+        LOGGER.debug("Created entity {}:{}", entity.getClass().getSimpleName(),  entity);
     }
 
     @Override
     public void create(Collection<T> entities) {
-        entities.forEach(super::createWithAudit);
+        entities.forEach(this::create);
     }
 
     @Override
     public void edit(T entity) {
-        super.editWithAudit(entity);
+        pcs.getEm().merge(entity);
+        LOGGER.debug("Edited entity {}:{}",entity.getClass().getSimpleName(), entity);
     }
 
     @Override
     public void edit(Collection<T> entities) {
-        entities.forEach(super::editWithAudit);
+        entities.forEach(this::edit);
     }
 
     @Override
     public void remove(T entity) {
-        super.removeWithAudit(entity);
+        pcs.getEm().remove(pcs.getEm().merge(entity));
+        LOGGER.debug("Removed entity {}:{}",entity.getClass().getSimpleName(), entity);
     }
 
     @Override
     public void remove(Collection<T> entities) {
-        entities.forEach(super::removeWithAudit);
+        entities.forEach(this::remove);
     }
 
     @Override

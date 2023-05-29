@@ -1,51 +1,17 @@
 package com.neo.util.framework.database.impl;
 
-import com.neo.util.common.impl.enumeration.PersistenceOperation;
+import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
-import com.neo.util.framework.database.impl.entity.AddressEntity;
 import com.neo.util.framework.database.impl.entity.PersonEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 class DatabaseProviderAuditIT extends AbstractIntegrationTest<DatabaseProvider> {
 
     @Override
     protected Class<DatabaseProvider> getSubjectClass() {
         return DatabaseProvider.class;
-    }
-
-    @Test
-    void auditCreationTest() {
-        //Arrange
-        AddressEntity address = new AddressEntity("Zurich",8000);
-
-        //Act
-        subject.create(address);
-
-        address.setZipcode(8001);
-        subject.edit(address);
-
-        subject.remove(address);
-
-        EntityResult<EntityAuditTrail> entityResult = subject.fetch(new EntityQuery<>(EntityAuditTrail.class));
-        List<EntityAuditTrail> result = entityResult.getHits();
-        //Assert
-
-        Assertions.assertEquals(3, entityResult.getHitCount());
-        Assertions.assertEquals(PersistenceOperation.CREATE, result.get(0).getOperation());
-        Assertions.assertEquals(address.getPrimaryKey().toString(), result.get(0).getObjectKey());
-        Assertions.assertEquals(address.getClass().getSimpleName(), result.get(0).getClassType());
-
-        Assertions.assertEquals(PersistenceOperation.UPDATE, result.get(1).getOperation());
-        Assertions.assertEquals(address.getPrimaryKey().toString(), result.get(1).getObjectKey());
-        Assertions.assertEquals(address.getClass().getSimpleName(), result.get(1).getClassType());
-
-        Assertions.assertEquals(PersistenceOperation.DELETE, result.get(2).getOperation());
-        Assertions.assertEquals(address.getPrimaryKey().toString(), result.get(2).getObjectKey());
-        Assertions.assertEquals(address.getClass().getSimpleName(), result.get(2).getClassType());
     }
 
     @Test
@@ -75,7 +41,7 @@ class DatabaseProviderAuditIT extends AbstractIntegrationTest<DatabaseProvider> 
     void requestUserTest() {
         //Arrange
         String expectedUser = "ExpectedUserName";
-        RequestDetailsDummy requestDetailsMock = weld.select(RequestDetailsDummy.class).get();
+        RequestDetailsDummy requestDetailsMock = (RequestDetailsDummy) weld.select(RequestDetails.class).get();
         requestDetailsMock.setCaller(expectedUser);
 
 

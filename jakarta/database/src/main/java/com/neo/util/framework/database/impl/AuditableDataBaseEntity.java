@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.neo.util.common.api.json.Views;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
-import com.neo.util.framework.database.impl.listener.DataBaseAuditListener;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
