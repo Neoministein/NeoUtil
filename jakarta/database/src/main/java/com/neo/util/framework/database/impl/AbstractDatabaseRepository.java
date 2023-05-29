@@ -2,7 +2,7 @@ package com.neo.util.framework.database.impl;
 
 import com.neo.util.common.impl.enumeration.PersistenceOperation;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
-import com.neo.util.framework.database.api.PersistenceContextService;
+import com.neo.util.framework.database.api.PersistenceContextProvider;
 import jakarta.inject.Inject;
 import jakarta.persistence.NoResultException;
 import org.slf4j.Logger;
@@ -15,7 +15,7 @@ public abstract class AbstractDatabaseRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDatabaseRepository.class);
 
     @Inject
-    protected PersistenceContextService pcs;
+    protected PersistenceContextProvider pcs;
 
     protected <X extends PersistenceEntity> Optional<X> find(Object primaryKey, Class<X> entityClazz) {
         try {

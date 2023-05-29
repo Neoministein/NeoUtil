@@ -1,6 +1,6 @@
 package com.neo.util.framework.database.impl;
 
-import com.neo.util.framework.database.api.PersistenceContextService;
+import com.neo.util.framework.database.api.PersistenceContextProvider;
 import com.neo.util.framework.database.impl.connection.TransactionalConnectionProvider;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.RequestScoped;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RequestScoped
-public class M2PersistenceContextService implements PersistenceContextService {
+public class M2PersistenceContextProvider implements PersistenceContextProvider {
 
     @Inject
     protected BeanManager beanManager;

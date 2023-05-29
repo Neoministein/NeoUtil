@@ -1,6 +1,6 @@
 package com.neo.util.framework.database.api;
 
-public interface DatabaseMappingConstants {
+public final class DatabaseMappingConstants {
 
-    short VARCHAR = 255;
+    public static final short VARCHAR = 255;
 }

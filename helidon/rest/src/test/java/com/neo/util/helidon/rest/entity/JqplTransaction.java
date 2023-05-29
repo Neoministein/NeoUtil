@@ -2,7 +2,7 @@ package com.neo.util.helidon.rest.entity;
 
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityProvider;
-import com.neo.util.framework.database.api.PersistenceContextService;
+import com.neo.util.framework.database.api.PersistenceContextProvider;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.Query;
@@ -15,7 +15,7 @@ import java.util.List;
 public class JqplTransaction {
 
     @Inject
-    PersistenceContextService contextService;
+    PersistenceContextProvider contextService;
 
     @Inject EntityProvider entityRepository;
 

@@ -15,7 +15,7 @@ public abstract class AbstractIntegrationTest<T> {
 
     @WeldSetup
     public WeldInitiator weld = WeldInitiator.from(
-            M2PersistenceContextService.class,
+            M2PersistenceContextProvider.class,
             RequestDetailsDummy.class,
             TransactionExtension.class,
             getSubjectClass()
