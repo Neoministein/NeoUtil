@@ -1,11 +1,16 @@
 package com.neo.util.framework.helidon.impl.config;
 
+import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.config.ConfigValue;
+import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
 
+@Alternative
+@Priority(PriorityConstants.APPLICATION)
 @ApplicationScoped
 public class ConfigServiceImpl implements ConfigService {
 
