@@ -88,8 +88,12 @@ public class JanitorServiceImpl implements JanitorService {
         LOGGER.info("Executing all Janitor Jobs...");
         for (Map.Entry<String, JanitorJob> janitorJobEntry: janitorJobMap.entrySet()) {
             if (!isJanitorDisabled(janitorJobEntry.getKey())) {
-                LOGGER.info("Executing Janitor Job [{}]", janitorJobEntry.getKey());
-                janitorJobEntry.getValue().execute(localDate);
+                try {
+                    LOGGER.info("Executing Janitor Job [{}]", janitorJobEntry.getKey());
+                    janitorJobEntry.getValue().execute(localDate);
+                } catch (Exception ex) {
+                    LOGGER.info("Unexpected error occurred while processing Janitor Job [{}], action won't be retried.", janitorJobEntry.getKey());
+                }
             } else {
                 LOGGER.info("Skipping disabled Janitor Job [{}]", janitorJobEntry.getKey());
             }
