@@ -4,7 +4,6 @@ import com.neo.util.common.impl.enumeration.PersistenceOperation;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
 import com.neo.util.framework.database.impl.entity.PersonEntity;
-import com.neo.util.framework.impl.RequestContextExecutor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,8 +22,7 @@ class DatabaseProviderAuditIT extends AbstractIntegrationTest<DatabaseProvider> 
         PersonEntity person = new PersonEntity("Jaylene Leach",32,50.0, true);
 
         //Act
-        weld.select(RequestContextExecutor.class).get().execute(new RequestDetailsDummy(), () -> subject.create(person));
-
+        subject.create(person);
 
         person.setAge(33);
         subject.edit(person);

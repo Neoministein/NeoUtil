@@ -33,10 +33,10 @@ public class DatabaseAuditTrailProvider implements AuditTrailProvider {
 
     protected void createAuditTrail(PersistenceEntity entity, PersistenceOperation operation) {
         try {
-            EntityAuditTrail auditTrail = new EntityAuditTrail();
-            auditTrail.setOperation(operation.toString());
-            auditTrail.setClassType(entity.getClass().getSimpleName());
-            auditTrail.setObjectKey(entity.getPrimaryKey().toString());
+            EntityAuditTrail auditTrail = new EntityAuditTrail(
+                    entity.getPrimaryKey().toString(),
+                    entity.getClass().getSimpleName(),
+                    operation.toString());
             auditTrailRepository.create(auditTrail);
         } catch (Exception ex) {
             LOGGER.error("Unable to persist audit trail for {}:{}",

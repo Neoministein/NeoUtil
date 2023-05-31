@@ -11,14 +11,14 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
 
-//TODO REQUIRES TESTING
 @ApplicationScoped
 public class AuditJanitorJob implements JanitorJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuditJanitorJob.class);
 
-    private static final String CONFIG_AUDIT_RETENTION = "entity.audit.retention";
+    public static final String CONFIG_AUDIT_RETENTION = "entity.audit.retention";
 
     @Inject
     protected PersistenceContextProvider pcp;
@@ -41,7 +41,8 @@ public class AuditJanitorJob implements JanitorJob {
                 WHERE audit.createdOn < :retentionDate
                 """;
 
-        int deletedEntries = pcp.getEm().createQuery(query).setParameter("retentionDate", retentionDate).executeUpdate();
+        int deletedEntries = pcp.getEm().createQuery(query).setParameter("retentionDate", retentionDate.atStartOfDay(
+                ZoneId.systemDefault()).toInstant()).executeUpdate();
 
         LOGGER.info("Finished cleanup for EntityAuditTrail [{}] entries deleted", deletedEntries);
     }

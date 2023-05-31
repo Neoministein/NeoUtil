@@ -18,16 +18,26 @@ public class EntityAuditTrail extends AuditableDataBaseEntity implements Persist
     @Id
     @Column(name = PersistenceEntity.C_ID)
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    protected Long id;
 
-    @Column(name = C_OBJECT_KEY)
-    private String objectKey;
+    @Column(name = C_OBJECT_KEY, nullable = false)
+    protected String objectKey;
 
-    @Column(name = C_CLASS_TYPE)
-    private String classType;
+    @Column(name = C_CLASS_TYPE, nullable = false)
+    protected String classType;
 
-    @Column(name = C_OPERATION)
-    private String operation;
+    @Column(name = C_OPERATION, nullable = false)
+    protected String operation;
+
+    protected EntityAuditTrail() {
+        //Required by JPA
+    }
+
+    public EntityAuditTrail(String objectKey, String classType, String operation) {
+        this.objectKey = objectKey;
+        this.classType = classType;
+        this.operation = operation;
+    }
 
     @PreUpdate
     private void preUpdate() {

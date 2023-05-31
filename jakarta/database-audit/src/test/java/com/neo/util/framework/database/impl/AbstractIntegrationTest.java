@@ -27,4 +27,8 @@ public abstract class AbstractIntegrationTest<T> {
 
         subject = weld.select(getSubjectClass()).get();
     }
+
+    public <T> T getInstance(Class<T> clazz) {
+        return weld.select(clazz).get();
+    }
 }
