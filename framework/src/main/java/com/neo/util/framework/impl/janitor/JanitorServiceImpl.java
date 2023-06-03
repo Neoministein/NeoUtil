@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,9 +53,10 @@ public class JanitorServiceImpl implements JanitorService {
      */
     @Inject
     public void init(Instance<JanitorJob> janitorJobInstance) {
+        Map<String, JanitorJob> newMap = new HashMap<>();
         LOGGER.info("Registering JanitorJobs...");
         for (JanitorJob janitorJob: janitorJobInstance) {
-            JanitorJob existingJanitor =  janitorJobMap.putIfAbsent(janitorJob.getJanitorId(), janitorJob);
+            JanitorJob existingJanitor =  newMap.putIfAbsent(janitorJob.getJanitorId(), janitorJob);
 
             if (existingJanitor != null) {
                 throw new ConfigurationException(EX_DUPLICATED_JANITOR_JOB,
@@ -63,6 +65,7 @@ public class JanitorServiceImpl implements JanitorService {
 
             LOGGER.debug("Registered JanitorJob [{}]", janitorJob.getJanitorId());
         }
+        janitorJobMap = newMap;
         LOGGER.info("Finished registering JanitorJobs");
     }
 
