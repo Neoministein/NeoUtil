@@ -16,16 +16,16 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 @Transactional
-public abstract class AbstractEntityRepository<T extends PersistenceEntity> implements EntityRepository<T> {
+public abstract class AbstractDatabaseRepository<T extends PersistenceEntity> implements EntityRepository<T> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEntityRepository.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDatabaseRepository.class);
 
     @Inject
     protected PersistenceContextProvider pcs;
 
     protected final Class<T> clazz;
 
-    protected AbstractEntityRepository(Class<T> clazz) {
+    protected AbstractDatabaseRepository(Class<T> clazz) {
         this.clazz = clazz;
     }
 
