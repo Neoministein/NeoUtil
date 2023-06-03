@@ -10,12 +10,15 @@ import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.impl.json.JsonSchemaLoader;
 import com.networknt.schema.JsonSchema;
 import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.inject.spi.DeploymentException;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -28,6 +31,8 @@ import java.lang.reflect.Type;
  */
 @Consumes({"application/json", "text/json", "*/*"})
 public abstract class AbstractDtoReader<T> implements MessageBodyReader<T> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDtoReader.class);
 
     protected static final ExceptionDetails EX_UNKNOWN_JSON_SCHEMA = new ExceptionDetails(
             "framework/json/unknown-schema", "Invalid json schema to check against {0}.", true
@@ -49,8 +54,9 @@ public abstract class AbstractDtoReader<T> implements MessageBodyReader<T> {
 
     @PostConstruct
     protected void init() {
+        LOGGER.trace("Registering DTO reader for class [{}]", clazz.getSimpleName());
         schema = jsonSchemaLoader.getJsonSchema(getSchemaLocation())
-                .orElseThrow(() -> new ConfigurationException(EX_UNKNOWN_JSON_SCHEMA, getSchemaLocation()));
+                .orElseThrow(() -> new DeploymentException(new ConfigurationException(EX_UNKNOWN_JSON_SCHEMA, getSchemaLocation())));
     }
 
     @Override
