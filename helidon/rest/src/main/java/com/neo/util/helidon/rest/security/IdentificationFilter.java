@@ -3,7 +3,7 @@ package com.neo.util.helidon.rest.security;
 import com.neo.util.framework.api.connection.RequestContext;
 import com.neo.util.framework.impl.connection.HttpRequestDetails;
 import com.neo.util.framework.impl.connection.RequestDetailsProducer;
-import com.networknt.schema.format.InetAddressValidator;
+import com.networknt.org.apache.commons.validator.routines.InetAddressValidator;
 import io.helidon.webserver.ServerRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.Context;
