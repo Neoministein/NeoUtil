@@ -46,7 +46,7 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
 
     @Override
     public void execute(BuildContext context) {
-        Set<Class<?>> queueConsumerClasses = ReflectionUtils.getClassesByAnnotation(IncomingQueueConnection.class, context.srcLoader());
+        Set<Class<?>> queueConsumerClasses = ReflectionUtils.getClassesByAnnotation(IncomingQueueConnection.class, context.fullLoader());
         if (queueConsumerClasses.isEmpty()) {
             return;
         }

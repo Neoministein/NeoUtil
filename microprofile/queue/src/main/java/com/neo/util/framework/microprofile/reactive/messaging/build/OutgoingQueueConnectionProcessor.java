@@ -41,7 +41,7 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
 
     @Override
     public void execute(BuildContext context) {
-        Set<AnnotatedElement> queueProducerClasses = ReflectionUtils.getAnnotatedElement(OutgoingQueueConnection.class, context.srcLoader());
+        Set<AnnotatedElement> queueProducerClasses = ReflectionUtils.getAnnotatedElement(OutgoingQueueConnection.class, context.fullLoader());
         if (queueProducerClasses.isEmpty()) {
             return;
         }
