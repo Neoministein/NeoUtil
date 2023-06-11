@@ -8,11 +8,11 @@ import com.neo.util.framework.impl.connection.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.rest.api.security.Secured;
+import jakarta.enterprise.context.RequestScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.annotation.Priority;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.security.enterprise.credential.Credential;
 import jakarta.ws.rs.Priorities;
@@ -27,7 +27,7 @@ import java.util.Optional;
  */
 @Secured
 @Provider
-@ApplicationScoped
+@RequestScoped
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter implements ContainerRequestFilter {
 
