@@ -5,6 +5,7 @@ import com.neo.util.framework.api.connection.RequestDetails;
 import com.neo.util.framework.api.persistence.entity.AuditParameter;
 import com.neo.util.framework.api.persistence.entity.AuditTrailProvider;
 
+import com.neo.util.framework.database.persistence.AuditableDataBaseEntity;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.persistence.*;

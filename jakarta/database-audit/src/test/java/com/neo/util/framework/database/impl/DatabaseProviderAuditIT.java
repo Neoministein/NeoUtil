@@ -4,6 +4,7 @@ import com.neo.util.common.impl.enumeration.PersistenceOperation;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
 import com.neo.util.framework.database.impl.entity.PersonEntity;
+import com.neo.util.framework.database.persistence.EntityAuditTrail;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -5,6 +5,7 @@ import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.persistence.entity.AuditParameter;
 import com.neo.util.framework.api.persistence.entity.AuditTrailProvider;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
+import com.neo.util.framework.database.persistence.EntityAuditTrail;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Alternative;

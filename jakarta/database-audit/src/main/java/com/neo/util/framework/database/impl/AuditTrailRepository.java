@@ -1,5 +1,6 @@
 package com.neo.util.framework.database.impl;
 
+import com.neo.util.framework.database.persistence.EntityAuditTrail;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped

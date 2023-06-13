@@ -6,7 +6,7 @@
     <persistence-unit name="mainPersistence" transaction-type="JTA">
         <description>The production database</description>
         <jta-data-source>helidon-integration</jta-data-source>
-        <class>com.neo.util.framework.database.impl.EntityAuditTrail</class>
+        <class>com.neo.util.framework.database.persistence.EntityAuditTrail</class>
         <class>com.neo.util.helidon.rest.entity.TestPersonEntity</class>
         <class>com.neo.util.helidon.rest.entity.TestLimbEntity</class>
 

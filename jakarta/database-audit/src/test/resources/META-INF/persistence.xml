@@ -5,7 +5,7 @@
              version="3.0">
     <persistence-unit name="testPersistence" transaction-type="JTA">
         <description>The test database</description>
-        <class>com.neo.util.framework.database.impl.EntityAuditTrail</class>
+        <class>com.neo.util.framework.database.persistence.EntityAuditTrail</class>
         <class>com.neo.util.framework.database.impl.entity.PersonEntity</class>
         <class>com.neo.util.framework.database.impl.entity.AddressEntity</class>
         <class>com.neo.util.framework.database.impl.InstantConverter</class>

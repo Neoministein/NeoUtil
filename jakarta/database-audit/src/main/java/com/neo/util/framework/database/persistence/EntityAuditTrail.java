@@ -1,4 +1,4 @@
-package com.neo.util.framework.database.impl;
+package com.neo.util.framework.database.persistence;
 
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 

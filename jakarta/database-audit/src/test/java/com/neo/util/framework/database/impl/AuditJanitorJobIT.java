@@ -1,6 +1,7 @@
 package com.neo.util.framework.database.impl;
 
 import com.neo.util.framework.api.config.ConfigService;
+import com.neo.util.framework.database.persistence.EntityAuditTrail;
 import com.neo.util.framework.impl.config.BasicConfigService;
 import com.neo.util.framework.impl.config.BasicConfigValue;
 import org.junit.jupiter.api.Assertions;

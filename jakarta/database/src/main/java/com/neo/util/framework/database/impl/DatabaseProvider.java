@@ -31,7 +31,7 @@ public class DatabaseProvider implements EntityProvider {
     protected static final Logger LOGGER = LoggerFactory.getLogger(DatabaseProvider.class);
 
     @Inject
-    PersistenceContextProvider pcs;
+    protected PersistenceContextProvider pcs;
 
     @Override
     public void create(PersistenceEntity entity) {

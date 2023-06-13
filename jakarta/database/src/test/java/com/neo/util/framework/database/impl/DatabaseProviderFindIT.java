@@ -6,6 +6,7 @@ import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
 import com.neo.util.framework.database.impl.entity.PersonEntity;
+import com.neo.util.framework.database.persistence.AuditableDataBaseEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
