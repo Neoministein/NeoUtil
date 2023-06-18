@@ -25,7 +25,7 @@ public interface Cache {
      *
      * @return optional of the cached object
      */
-    Optional<Object> get(Object key);
+    <T> Optional<T> get(Object key);
 
     /**
      * Returns a lazy asynchronous action that will emit the cache value based on the key, obtaining that value from

@@ -46,16 +46,18 @@ public class CaffeineCache implements Cache {
     }
 
     @Override
-    public  Optional<Object> get(Object key) {
+    public <T> Optional<T> get(Object key) {
         LOGGER.trace("Hitting caffeine cache with key [{}]", key);
         CompletableFuture<Object> future = cache.getIfPresent(key);
         if (future == null) {
             return Optional.empty();
         }
         try {
-            return Optional.ofNullable(unwrapCacheValueOrThrowable(future).get());
+            return (Optional<T>) Optional.ofNullable(unwrapCacheValueOrThrowable(future).get());
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
+        } catch (ClassCastException ex) {
+            LOGGER.warn("Cannot cast for key [{}]", key);
         } catch (ExecutionException ignored) {}
 
 
