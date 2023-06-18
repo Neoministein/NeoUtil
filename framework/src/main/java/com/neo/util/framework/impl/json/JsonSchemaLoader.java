@@ -90,6 +90,11 @@ public class JsonSchemaLoader {
     }
 
     public Optional<JsonSchema> getJsonSchema(String path) {
-        return Optional.ofNullable(jsonSchemaMap.get(path));
+        JsonSchema schema = jsonSchemaMap.get(path);
+        if (schema != null) {
+            return Optional.of(schema);
+        }
+        LOGGER.warn("The json schema [{}] does not exist", path);
+        return Optional.empty();
     }
 }
