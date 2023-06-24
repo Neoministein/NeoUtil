@@ -36,6 +36,8 @@
 		<jackson.version>2.14.2</jackson.version>
 		<json-schema-generator.version>4.28.0</json-schema-generator.version>
 		<json-schema-validator.version>1.0.84</json-schema-validator.version>
+
+		<jobrunr.version>6.2.2-neoutil</jobrunr.version>
 		<!-- Caching -->
 		<caffeine.version>3.1.5</caffeine.version>
 
@@ -119,6 +121,7 @@
 		<module>jakarta/database</module>
 		<module>jakarta/database-audit</module>
 		<module>jakarta/rest</module>
+		<module>jakarta/jobrunr-queue</module>
 		<module>jakarta/cache-caffeine</module>
 		<module>microprofile</module>
 		<module>helidon</module>
