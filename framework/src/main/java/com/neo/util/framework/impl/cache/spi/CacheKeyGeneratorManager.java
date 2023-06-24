@@ -27,6 +27,7 @@ public class CacheKeyGeneratorManager {
     public CacheKeyGenerator getCacheKeyGenerator(Class<? extends CacheKeyGenerator> keyGeneratorClass) {
         return generators.computeIfAbsent(keyGeneratorClass, this::buildCacheKeyGenerator);
     }
+
     protected CacheKeyGenerator buildCacheKeyGenerator(Class<? extends CacheKeyGenerator> keyGeneratorClass) {
         Instance<? extends CacheKeyGenerator> keyGenInstance = keyGenerators.select(keyGeneratorClass);
         if (keyGenInstance.isResolvable()) {
@@ -37,7 +38,7 @@ public class CacheKeyGeneratorManager {
                 LOGGER.trace("Generating CacheKeyGenerator bean from constructor of class [{}]", keyGeneratorClass.getName());
                 return keyGeneratorClass.getConstructor().newInstance();
             } catch (NoSuchMethodException e) {
-                throw new CacheException("No default constructor found in cache key generator [="
+                throw new CacheException("No default constructor found in cache key generator ["
                         + keyGeneratorClass.getName() + "]", e);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new CacheException("Cache key generator instantiation failed", e);
