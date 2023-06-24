@@ -101,7 +101,7 @@
         <plugins>
             <plugin>
                 <groupId>com.neo.util</groupId>
-                <artifactId>neoutil-tool-unfork</artifactId>
+                <artifactId>unfork-maven-plugin</artifactId>
                 <version>1.0.0</version>
                 <executions>
                     <execution>
