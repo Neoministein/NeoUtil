@@ -85,6 +85,9 @@ public class BackgroundJobServerConfiguration {
         //CUSTOM START
         if (pollIntervalInSeconds < 5) {
             LOGGER.warn("The pollIntervalInSeconds should not be smaller than 5 - otherwise it will cause to much load on your SQL/noSQL datastore.");
+            if (pollIntervalInSeconds < 1) {
+                throw new IllegalArgumentException("The pollIntervalInSeconds can not be smaller than 1");
+            }
             //throw new IllegalArgumentException("The pollIntervalInSeconds can not be smaller than 5 - otherwise it will cause to much load on your SQL/noSQL datastore.");
         }
         //CUSTOM END
