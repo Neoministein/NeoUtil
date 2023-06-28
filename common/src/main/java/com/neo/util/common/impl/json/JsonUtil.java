@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Consumer;
 
 @SuppressWarnings("java:S2139")
 public class JsonUtil {
@@ -293,5 +294,11 @@ public class JsonUtil {
             }
         }
         return mainNode;
+    }
+
+    public static <T extends JsonNode> void ifPresent(T node, Consumer<T> consumer) {
+        if (node != null && !node.isNull()) {
+            consumer.accept(node);
+        }
     }
 }

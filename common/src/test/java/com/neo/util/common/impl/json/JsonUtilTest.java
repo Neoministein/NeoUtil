@@ -1,5 +1,6 @@
 package com.neo.util.common.impl.json;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -42,6 +43,28 @@ class JsonUtilTest {
 
         // no exception should be thrown
         Assertions.assertEquals("null", pojoString);
+    }
+
+    @Test
+    void testIfPresentNull() {
+        //Arrange
+        ObjectNode node = JsonUtil.emptyObjectNode();
+        Address address = new Address();
+        //Act
+        JsonUtil.ifPresent(node.get("City"), a -> address.setCity(a.asText()));
+        //Assert
+        Assertions.assertNull(address.getCity());
+    }
+
+    @Test
+    void testIfPresentNotNull() {
+        //Arrange
+        ObjectNode node = JsonUtil.emptyObjectNode().put("City", "Baden");
+        Address address = new Address();
+        //Act
+        JsonUtil.ifPresent(node.get("City"), a -> address.setCity(a.asText()));
+        //Assert
+        Assertions.assertNotNull(address.getCity());
     }
 
     public Address createAddress() {
