@@ -121,6 +121,7 @@
 		<module>jakarta/database</module>
 		<module>jakarta/database-audit</module>
 		<module>jakarta/rest</module>
+		<module>jakarta/rest-request-recorder</module>
 		<module>jakarta/jobrunr-queue</module>
 		<module>jakarta/cache-caffeine</module>
 		<module>microprofile</module>

@@ -8,7 +8,7 @@ import com.neo.util.framework.rest.api.security.Secured;
 
 import jakarta.annotation.Priority;
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -23,7 +23,7 @@ import java.util.Set;
 
 @Secured
 @Provider
-@ApplicationScoped
+@RequestScoped
 @Priority(Priorities.AUTHORIZATION)
 public class AuthorizationFilter implements ContainerRequestFilter {
 
