@@ -30,6 +30,7 @@
 
 		<!-- Reflection -->
 		<jandex.version>2.4.3.Final</jandex.version>
+		<jandex.plugin.version>1.0.6</jandex.plugin.version>
 		<org.reflections.version>0.10.2</org.reflections.version>
 
 		<!-- Jackson -->
@@ -72,6 +73,20 @@
 					<target>17</target>
 					<compilerArgs>--enable-preview</compilerArgs>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jboss.jandex</groupId>
+				<artifactId>jandex-maven-plugin</artifactId>
+				<version>${jandex.plugin.version}</version>
+				<executions>
+					<execution>
+						<id>make-index</id>
+						<goals>
+							<goal>jandex</goal>
+						</goals>
+						<phase>process-classes</phase>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<pluginManagement>
@@ -121,7 +136,6 @@
 		<module>jakarta/database</module>
 		<module>jakarta/database-audit</module>
 		<module>jakarta/rest</module>
-		<module>jakarta/rest-request-recorder</module>
 		<module>jakarta/jobrunr-queue</module>
 		<module>jakarta/cache-caffeine</module>
 		<module>microprofile</module>
