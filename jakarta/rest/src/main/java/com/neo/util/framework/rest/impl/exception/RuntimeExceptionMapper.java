@@ -25,7 +25,7 @@ public class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException>
 
     @Override
     public Response toResponse(RuntimeException ex) {
-        LOGGER.error("A [{}] occurred with message [{}] setting status to [200]",
+        LOGGER.error("A [{}] occurred with message [{}] setting status to [500]",
                 ex.getClass().getSimpleName(), ex.getMessage());
         return responseGenerator.error(500, EX_INTERNAL_RUNTIME_EXCEPTION);
     }
