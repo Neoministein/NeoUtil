@@ -9,8 +9,8 @@ public class AuditParameter {
      */
     private final PersistenceOperation operation;
 
-    public AuditParameter(PersistenceOperation synchronization) {
-        this.operation = synchronization;
+    public AuditParameter(PersistenceOperation operation) {
+        this.operation = operation;
     }
 
     public PersistenceOperation getOperation() {
