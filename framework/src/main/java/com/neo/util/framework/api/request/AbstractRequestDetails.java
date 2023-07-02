@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.connection;
+package com.neo.util.framework.api.request;
 
 import com.neo.util.common.impl.json.JsonUtil;
 import org.slf4j.MDC;

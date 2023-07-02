@@ -1,6 +1,6 @@
 package com.neo.util.framework.startup.impl.event;
 
-import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.startup.impl.ListenerSequenceRecorder;
 import jakarta.enterprise.context.ApplicationScoped;

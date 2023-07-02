@@ -1,6 +1,6 @@
 package com.neo.util.framework.database.impl;
 
-import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
 import com.neo.util.framework.database.impl.entity.PersonEntity;

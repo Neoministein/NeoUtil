@@ -1,6 +1,6 @@
 package com.neo.util.framework.jobrunr.queue.impl.config;
 
-import com.neo.util.framework.api.connection.RequestContext;
+import com.neo.util.framework.api.request.RequestContext;
 import com.neo.util.framework.api.queue.QueueListener;
 
 public class QueueListenerConfig {

@@ -2,14 +2,14 @@ package com.neo.util.framework.jobrunr.queue.impl;
 
 import com.neo.util.common.impl.MathUtils;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
-import com.neo.util.framework.api.connection.RequestContext;
-import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.api.request.RequestContext;
+import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.api.queue.QueueService;
 import com.neo.util.framework.impl.config.BasicConfigService;
 import com.neo.util.framework.impl.config.BasicConfigValue;
-import com.neo.util.framework.impl.connection.QueueRequestDetails;
+import com.neo.util.framework.impl.request.QueueRequestDetails;
 import com.neo.util.framework.jobrunr.queue.impl.config.JobRunnerConfigurator;
 import jakarta.enterprise.context.RequestScoped;
 import org.jboss.weld.environment.se.Weld;

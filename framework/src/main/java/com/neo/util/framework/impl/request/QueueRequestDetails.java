@@ -1,7 +1,7 @@
-package com.neo.util.framework.impl.connection;
+package com.neo.util.framework.impl.request;
 
-import com.neo.util.framework.api.connection.AbstractRequestDetails;
-import com.neo.util.framework.api.connection.RequestContext;
+import com.neo.util.framework.api.request.AbstractRequestDetails;
+import com.neo.util.framework.api.request.RequestContext;
 import com.neo.util.framework.api.queue.QueueMessage;
 
 /**

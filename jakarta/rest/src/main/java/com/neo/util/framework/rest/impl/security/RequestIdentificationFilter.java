@@ -1,14 +1,11 @@
-package com.neo.util.helidon.rest.security;
+package com.neo.util.framework.rest.impl.security;
 
-import com.neo.util.framework.api.connection.RequestContext;
-import com.neo.util.framework.impl.connection.HttpRequestDetails;
-import com.neo.util.framework.impl.connection.RequestDetailsProducer;
+import com.neo.util.framework.api.request.RequestContext;
+import com.neo.util.framework.impl.request.HttpRequestDetails;
+import com.neo.util.framework.impl.request.RequestDetailsProducer;
 import com.networknt.org.apache.commons.validator.routines.InetAddressValidator;
-import io.helidon.webserver.ServerRequest;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.ws.rs.core.Context;
-
 import jakarta.annotation.Priority;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
@@ -17,32 +14,44 @@ import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.ext.Provider;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Provider
 @Priority(100)
 @ApplicationScoped
-public class IdentificationFilter implements ContainerRequestFilter {
+public class RequestIdentificationFilter implements ContainerRequestFilter {
 
     public static final String X_REAL_IP = "X-Real-IP";
 
     public static final String X_FORWARDED_FOR = "X-Forwarded-For";
+
+    protected static final String INVALID_IP = "255.255.255.255";
+
+    protected static final AtomicInteger REQUEST_ID = new AtomicInteger();
 
     protected final String instanceUuid = UUID.randomUUID().toString();
 
     @Inject
     protected RequestDetailsProducer requestDetailsProvider;
 
-    @Context
-    protected ServerRequest serverRequest;
-
     @Override
     public void filter(ContainerRequestContext requestContext) {
-        requestDetailsProvider.setRequestDetails(new HttpRequestDetails(
-                getRemoteAddress(serverRequest, requestContext.getHeaders()), instanceUuid + ":" + serverRequest.requestId(),
-                new RequestContext.Http(requestContext.getMethod(), getUri(requestContext.getUriInfo()))));
+        requestDetailsProvider.setRequestDetails(
+                new HttpRequestDetails(
+                        getRemoteAddress(requestContext),
+                        createNewRequestId(),
+                        parseRequestContext(requestContext)));
     }
 
-    protected String getUri(UriInfo uriInfo) {
+    protected String createNewRequestId() {
+        return instanceUuid + ":" + REQUEST_ID.addAndGet(1);
+    }
+
+    protected RequestContext parseRequestContext(ContainerRequestContext requestContext) {
+        return new RequestContext.Http(requestContext.getMethod(), parseURI(requestContext.getUriInfo()));
+    }
+
+    protected String parseURI(UriInfo uriInfo) {
         return uriInfo.getRequestUri().toString().substring(uriInfo.getBaseUri().toString().length());
     }
 
@@ -51,7 +60,9 @@ public class IdentificationFilter implements ContainerRequestFilter {
      * </p>
      * Therefor the X-Real-IP and X-Forwarded-For are checked before the socket address is returned.
      */
-    protected String getRemoteAddress(ServerRequest serverRequest, MultivaluedMap<String, String> headers) {
+    protected String getRemoteAddress(ContainerRequestContext requestContext) {
+        MultivaluedMap<String, String> headers = requestContext.getHeaders();
+
         String remoteAddress = headers.getFirst(X_REAL_IP);
 
         if (remoteAddress != null && InetAddressValidator.getInstance().isValid(remoteAddress)) {
@@ -61,6 +72,6 @@ public class IdentificationFilter implements ContainerRequestFilter {
         if (remoteAddress != null && InetAddressValidator.getInstance().isValid(remoteAddress)) {
             return remoteAddress;
         }
-        return serverRequest.remoteAddress();
+        return INVALID_IP;
     }
 }

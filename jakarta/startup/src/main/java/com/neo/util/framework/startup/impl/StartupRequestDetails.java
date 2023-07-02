@@ -1,6 +1,6 @@
 package com.neo.util.framework.startup.impl;
 
-import com.neo.util.framework.api.connection.AbstractRequestDetails;
+import com.neo.util.framework.api.request.AbstractRequestDetails;
 
 import java.util.UUID;
 

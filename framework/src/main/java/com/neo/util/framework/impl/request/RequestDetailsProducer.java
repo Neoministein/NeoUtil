@@ -1,6 +1,6 @@
-package com.neo.util.framework.impl.connection;
+package com.neo.util.framework.impl.request;
 
-import com.neo.util.framework.api.connection.*;
+import com.neo.util.framework.api.request.*;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.inject.Produces;
 

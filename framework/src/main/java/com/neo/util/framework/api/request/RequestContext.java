@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.connection;
+package com.neo.util.framework.api.request;
 
 public interface RequestContext {
 

@@ -1,6 +1,6 @@
 package com.neo.util.framework.impl.persistence.entity;
 
-import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.persistence.entity.AuditParameter;
 import com.neo.util.framework.api.persistence.entity.AuditTrailProvider;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
@@ -16,7 +16,7 @@ public class DummyAuditTrailProvider implements AuditTrailProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(DummyAuditTrailProvider.class);
 
     @Inject
-    Provider<RequestDetails> requestDetailsProvider;
+    protected Provider<RequestDetails> requestDetailsProvider;
 
     @Override
     public void audit(PersistenceEntity entity, AuditParameter auditParameter) {

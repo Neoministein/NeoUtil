@@ -3,7 +3,7 @@ package com.neo.util.framework.rest.impl.security;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.CredentialsGenerator;
 import com.neo.util.framework.api.security.RolePrincipal;
-import com.neo.util.framework.impl.connection.HttpRequestDetails;
+import com.neo.util.framework.impl.request.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

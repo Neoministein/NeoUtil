@@ -23,7 +23,7 @@ import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.config.ConfigService;
-import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.api.persistence.aggregation.*;
 import com.neo.util.framework.api.persistence.criteria.*;

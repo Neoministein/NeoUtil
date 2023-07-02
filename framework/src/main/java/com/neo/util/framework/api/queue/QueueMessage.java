@@ -1,7 +1,7 @@
 package com.neo.util.framework.api.queue;
 
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.api.request.RequestDetails;
 
 import java.io.Serializable;
 import java.util.*;

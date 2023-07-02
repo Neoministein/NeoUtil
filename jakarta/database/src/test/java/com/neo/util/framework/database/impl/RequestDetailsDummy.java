@@ -1,8 +1,8 @@
 package com.neo.util.framework.database.impl;
 
 import com.neo.util.common.impl.RandomString;
-import com.neo.util.framework.api.connection.RequestContext;
-import com.neo.util.framework.api.connection.RequestDetails;
+import com.neo.util.framework.api.request.RequestContext;
+import com.neo.util.framework.api.request.RequestDetails;
 
 import java.time.Instant;
 
