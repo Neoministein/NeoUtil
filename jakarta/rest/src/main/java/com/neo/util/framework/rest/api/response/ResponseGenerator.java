@@ -37,4 +37,12 @@ public interface ResponseGenerator {
      * @return the response
      */
     Response error(int code, ExceptionDetails exceptionDetails, Object... arguments);
+
+    /**
+     * Retries to retrieve the error code from the given response object.
+     *
+     * @param entity the response entity
+     * @return the error code or {@link com.neo.util.common.impl.StringUtils#EMPTY}
+     */
+    String responseToErrorCode(Object entity);
 }
