@@ -15,6 +15,7 @@ import com.neo.util.framework.api.request.RequestContext;
 import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 import com.neo.util.framework.impl.JandexService;
+import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.impl.config.BasicConfigService;
 import com.neo.util.framework.impl.config.BasicConfigValue;
 import com.neo.util.framework.impl.request.SchedulerRequestDetails;
@@ -73,7 +74,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         };
         indexNamingService.postConstruct();
 
-        indexNamingService.initIndexProperties(new JandexService(null));
+        indexNamingService.initIndexProperties(new ReflectionService(new JandexService()));
         return indexNamingService;
     }
 

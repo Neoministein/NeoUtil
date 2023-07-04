@@ -4,6 +4,7 @@ import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.Searchable;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;
 import com.neo.util.framework.impl.JandexService;
+import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.impl.config.BasicConfigService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +32,7 @@ public class IndexNamingServiceImplTest {
             }
         };
         subject.postConstruct();
-        subject.initIndexProperties(new JandexService(null));
+        subject.initIndexProperties(new ReflectionService(new JandexService()));
     }
 
     @Test

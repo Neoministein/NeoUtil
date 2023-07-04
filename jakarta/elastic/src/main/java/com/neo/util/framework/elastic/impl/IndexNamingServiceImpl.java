@@ -1,19 +1,17 @@
 package com.neo.util.framework.elastic.impl;
 
 import com.neo.util.common.impl.StringUtils;
-import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.Searchable;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 
-import com.neo.util.framework.impl.JandexService;
+import com.neo.util.framework.impl.ReflectionService;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.inject.Inject;
-import org.jboss.jandex.AnnotationInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,20 +97,12 @@ public class IndexNamingServiceImpl implements IndexNamingService {
      * annotations on the searchable and cannot be changed at runtime.
      */
     @Inject
-    public void initIndexProperties(@Any JandexService jandexService) {
+    public void initIndexProperties(@Any ReflectionService reflectionService) {
         searchableIndexCache = new HashMap<>();
 
-        if (jandexService.getIndex().isPresent()) {
-            for (AnnotationInstance annotationInstance: jandexService.getAnnotationInstance(SearchableIndex.class)) {
-                Class<? extends Searchable> searchableClass = (Class<? extends Searchable>) jandexService.asClass(annotationInstance);
-                searchableIndexCache.put(searchableClass, searchableClass.getAnnotation(SearchableIndex.class));
-            }
-        } else {
-            LOGGER.warn("Unable to load Jandex Index. Falling back to reflections, this can drastically increase load time.");
-            for (AnnotatedElement annotatedElement: ReflectionUtils.getAnnotatedElement(SearchableIndex.class)) {
-                Class<? extends Searchable> searchableClass = (Class<? extends Searchable>) annotatedElement;
-                searchableIndexCache.put(searchableClass, searchableClass.getAnnotation(SearchableIndex.class));
-            }
+        for (AnnotatedElement annotatedElement: reflectionService.getAnnotatedElement(SearchableIndex.class)) {
+            Class<? extends Searchable> searchableClass = (Class<? extends Searchable>) annotatedElement;
+            searchableIndexCache.put(searchableClass, searchableClass.getAnnotation(SearchableIndex.class));
         }
     }
 
