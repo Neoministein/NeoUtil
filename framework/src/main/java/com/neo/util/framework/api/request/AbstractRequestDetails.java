@@ -1,6 +1,5 @@
 package com.neo.util.framework.api.request;
 
-import com.neo.util.common.impl.json.JsonUtil;
 import org.slf4j.MDC;
 
 import java.time.Instant;
@@ -35,6 +34,9 @@ public abstract class AbstractRequestDetails implements RequestDetails {
 
     @Override
     public String toString() {
-        return JsonUtil.toJson(this);
+        return "RequestId: [" + getRequestId()
+                + "], Caller: [" + getCaller()
+                + "], RequestStartDate: [" + getRequestStartDate().toString()
+                + "], RequestContext: [" + getRequestContext() + "]";
     }
 }

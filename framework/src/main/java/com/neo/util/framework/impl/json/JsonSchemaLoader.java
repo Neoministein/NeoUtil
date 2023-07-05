@@ -72,17 +72,17 @@ public class JsonSchemaLoader {
     }
 
     protected void addSchema(Map<String, JsonSchema> mapToFill, String basePath, String relativePath) {
-        LOGGER.debug("Loading schema at: {}{}", basePath, relativePath);
+        LOGGER.debug("Loading schema at: [{}{}]", basePath, relativePath);
         JsonSchema schema = JsonSchemaUtil.generateSchemaFromResource(basePath.concat(relativePath));
         mapToFill.put(relativePath, schema);
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Schema loaded: {}", schema.getSchemaNode().textValue());
+            LOGGER.trace("Schema loaded: [{}]", schema.getSchemaNode().textValue());
         }
     }
 
 
     public void onStartUp(@Observes ApplicationPreReadyEvent applicationPreReadyEvent) {
-        LOGGER.debug("Startup event received");
+        LOGGER.debug("ApplicationPreReadyEvent processed");
     }
 
     public Map<String, JsonSchema> getUnmodifiableMap() {

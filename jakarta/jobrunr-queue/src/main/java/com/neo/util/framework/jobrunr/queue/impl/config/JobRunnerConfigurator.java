@@ -41,11 +41,11 @@ public class JobRunnerConfigurator {
         boolean backGroundWorkerEnabled = configService.get(CONFIG_PREFIX + CONFIG_BACKGROUND_WORKER + CONFIG_ENABLED).asBoolean().orElse(true);
         int backGroundWorkers = configService.get(CONFIG_PREFIX + CONFIG_BACKGROUND_WORKER).asInt().orElse(DEFAULT_WORKERS);
         int pollInterval = configService.get(CONFIG_PREFIX + CONFIG_POLL_INTERVAL).asInt().orElse(DEFAULT_POLL_INTERVAL);
-        LOGGER.info("JobRunrConfiguration.backgroundJobServer: [{}], workers: [{}] pollIntervalInSeconds: [{}]", backGroundWorkerEnabled, backGroundWorkers, pollInterval);
+        LOGGER.info("JobRunrConfiguration, BackgroundJobServer: [{}], workers: [{}] pollIntervalInSeconds: [{}]", backGroundWorkerEnabled, backGroundWorkers, pollInterval);
 
         boolean dashboardEnabled = configService.get(CONFIG_PREFIX + CONFIG_DASHBOARD + CONFIG_ENABLED).asBoolean().orElse(false);
         int dashboardPort = configService.get(CONFIG_PREFIX + CONFIG_DASHBOARD).asInt().orElse(DEFAULT_DASHBOARD_PORT);
-        LOGGER.info("JobRunrConfiguration.dashboard: [{}], ports: [{}]", dashboardEnabled, dashboardPort);
+        LOGGER.info("JobRunrConfiguration, Dashboard: [{}], ports: [{}]", dashboardEnabled, dashboardPort);
 
 
         BackgroundJobServerConfiguration backgroundJobServerConfiguration = BackgroundJobServerConfiguration
@@ -61,10 +61,11 @@ public class JobRunnerConfigurator {
     }
 
     public void preReadyEvent(@Observes ApplicationPreReadyEvent applicationPreReadyEvent) {
-        LOGGER.debug("Startup event received");
+        LOGGER.debug("ApplicationPreReadyEvent processed");
     }
 
     public void shutDownEvent(@Observes ApplicationShutdownEvent applicationShutdownEvent) {
         JobRunr.destroy();
+        LOGGER.debug("ApplicationShutdownEvent processed");
     }
 }

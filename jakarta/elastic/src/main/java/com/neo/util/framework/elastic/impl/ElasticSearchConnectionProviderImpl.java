@@ -76,7 +76,7 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
         List<String> nodes = configService.get(NODE_CONFIG).asList(String.class).orElse(List.of(DEFAULT_URL));
 
         nodeList = nodes;
-        LOGGER.debug("Elasticsearch nodes {}", nodes);
+        LOGGER.info("Elasticsearch nodes {}", nodes);
         this.enabled = configService.get(ENABLED_CONFIG).asBoolean().orElse(false);
         if (enabled) {
             connect();
@@ -86,7 +86,7 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
     }
 
     public void onStartUp(@Observes ApplicationPreReadyEvent preReadyEvent) {
-        LOGGER.debug("Startup event received");
+        LOGGER.debug("ApplicationPreReadyEvent processed");
     }
 
     public ElasticsearchClient getApiClient() {
@@ -160,8 +160,8 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
         CredentialsProvider credentialsProvider = getCredentialsProvider();
 
         for (HttpHost node : nodes) {
-            LOGGER.info("Elasticsearch configuration. Protocol: {} Host:{} Port:{} ", node.getSchemeName(),
-                    node.getHostName(), node.getPort());
+            LOGGER.debug("Elasticsearch configuration. Protocol: [{}] Host: [{}] Port: [{}]",
+                    node.getSchemeName(), node.getHostName(), node.getPort());
         }
 
         RestClient restClient;
@@ -180,7 +180,7 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
 
         elasticsearchClient = new ElasticsearchClient(transport);
 
-        LOGGER.debug("Initializing elasticsearch complete");
+        LOGGER.debug("Initialization of Elasticsearch Connection complete");
 
         //On first initialization it's false and this is used to let the BulkIngester to be initialized by the ApplicationReadEvent
         if (initialized) {

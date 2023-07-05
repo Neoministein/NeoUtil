@@ -2,7 +2,6 @@ package com.neo.util.framework.caffeine.impl;
 
 import com.github.benmanes.caffeine.cache.AsyncCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.cache.Cache;
 import com.neo.util.framework.impl.cache.spi.CacheException;
 import org.slf4j.Logger;
@@ -32,10 +31,6 @@ public class CaffeineCache implements Cache {
         caffeineCacheInfo.expireAfterSeconds().ifPresent(val ->  builder.expireAfterWrite(val, TimeUnit.SECONDS));
         caffeineCacheInfo.initialCapacity().ifPresent(builder::initialCapacity);
         caffeineCacheInfo.maxCapacity().ifPresent(builder::maximumSize);
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Registered CaffeineCache with config values {}", JsonUtil.toJson(caffeineCacheInfo));
-        }
 
         cache = builder.buildAsync();
     }

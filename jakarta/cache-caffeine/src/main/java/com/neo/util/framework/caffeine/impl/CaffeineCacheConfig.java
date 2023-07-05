@@ -1,6 +1,5 @@
 package com.neo.util.framework.caffeine.impl;
 
-import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.config.Config;
 
 import java.util.Optional;
@@ -42,6 +41,9 @@ public record CaffeineCacheConfig(
 
     @Override
     public String toString() {
-        return JsonUtil.toJson(this);
+        return "CacheName: [" + cacheName
+                + "], ExpireAfterSeconds: [" + expireAfterSeconds.orElse(-1L)
+                + "], InitialCapacity: [" + initialCapacity.orElse(-1)
+                + "], MaxCapacity: [" + maxCapacity.orElse(-1) + "]";
     }
 }

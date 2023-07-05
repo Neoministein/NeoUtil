@@ -38,10 +38,11 @@ public class CaffeineCacheBuilder extends AbstractCacheBuilder implements CacheB
 
         Map<String, Cache> caffeineCacheMap = new HashMap<>(configs.size() + 1, 1.0F);
         for (CaffeineCacheConfig config: configs) {
-            LOGGER.debug("Building caffeine instance with config {}", config);
+            LOGGER.debug("Registered CaffeineCache, {}", config);
             caffeineCacheMap.put(config.cacheName(), new CaffeineCache(config));
         }
-        LOGGER.info("Finished building caffeine cache instances");
+
+        LOGGER.info("Registered [{}] CaffeineCaches [{}]",caffeineCacheMap.size() , caffeineCacheMap.keySet());
         return caffeineCacheMap;
     }
 
@@ -50,11 +51,11 @@ public class CaffeineCacheBuilder extends AbstractCacheBuilder implements CacheB
         Set<String> reflectionConfig = getCacheNames();
         Config config = configService.get(CONFIG_PREFIX);
         CaffeineCacheConfig defaultConfig = new CaffeineCacheConfig(config.get(DEFAULT_CONFIG));
-        LOGGER.trace("Default CaffeineCacheConfig loaded {}", defaultConfig);
+        LOGGER.trace("Default CaffeineCacheConfig loaded Config: {}", defaultConfig);
 
         ConfigValue<List<CaffeineCacheConfig>> caffeineCacheConfigs = config.get(INSTANCES_CONFIG).asList(node -> {
             reflectionConfig.remove(node.key());
-            LOGGER.trace("Creating CaffeineCacheConfig from config {}", node.key());
+            LOGGER.trace("Creating CaffeineCacheConfig from Config: {}", node.key());
             return new CaffeineCacheConfig(node, defaultConfig);
         });
 

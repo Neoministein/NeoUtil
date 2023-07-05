@@ -61,11 +61,12 @@ public class JobRunnerQueueService implements QueueService {
             if (newMap.containsKey(queueAnnotation.value())) {
                 throw new ConfigurationException(QueueService.EX_DUPLICATED_QUEUE, queueListener.getClass().getName(), newMap.get(queueAnnotation.value()));
             }
-            LOGGER.info("Registered queue {}", queueAnnotation.value());
+
+            LOGGER.debug("Registered Queue [{}], Listener [{}]", queueAnnotation.value(), queueListener.getClass().getSimpleName());
             newMap.put(queueAnnotation.value(), new QueueListenerConfig(queueAnnotation.value(), configService.get(
                     JobRunnerConfigurator.CONFIG_PREFIX + CONFIG_QUEUE + queueAnnotation.value()).asInt().orElse(0), queueListener));
-
         }
+        LOGGER.info("Registered [{}] Queues {}", newMap.size(), newMap.keySet());
         queueListenerMap = newMap;
     }
 
@@ -84,7 +85,7 @@ public class JobRunnerQueueService implements QueueService {
     }
 
     public void readyEvent(@Observes ApplicationReadyEvent applicationReadyEvent) {
-        LOGGER.debug("Startup event received");
+        LOGGER.debug("ApplicationReadyEvent processed");
     }
 
     public void queueAction(String queueName, QueueMessage message) {

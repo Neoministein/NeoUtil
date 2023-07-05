@@ -78,4 +78,9 @@ public class HttpRequestDetails extends AbstractRequestDetails {
     public String getCaller() {
         return getUser().map(Principal::getName).orElse(getRequestId());
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", RemoteAddress=[" + remoteAddress + "]";
+    }
 }

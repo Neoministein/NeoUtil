@@ -65,8 +65,9 @@ public class JanitorServiceImpl implements JanitorService {
 
             LOGGER.debug("Registered JanitorJob [{}]", janitorJob.getJanitorId());
         }
+
+        LOGGER.info("Registered [{}] JanitorJobs {}", newMap.size(), newMap.keySet());
         janitorJobMap = newMap;
-        LOGGER.info("Finished registering JanitorJobs");
     }
 
     @Override

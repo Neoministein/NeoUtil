@@ -62,7 +62,7 @@ public class ApplicationStartUp {
         stopWatch.start();
         applicationPreReadyEventEvent.fire(new ApplicationPreReadyEvent());
         stopWatch.stop();
-        LOGGER.info("Application ready pre event took: {} ms ", stopWatch.getElapsedTimeMs());
+        LOGGER.info("Application ready pre event took: [{}] ms ", stopWatch.getElapsedTimeMs());
     }
 
     protected void fireApplicationReadyEvent() {
@@ -71,7 +71,7 @@ public class ApplicationStartUp {
         stopWatch.start();
         applicationReadyEvent.fire(new ApplicationReadyEvent());
         stopWatch.stop();
-        LOGGER.info("Application Init event took: {} ms ", stopWatch.getElapsedTimeMs());
+        LOGGER.info("Application Init event took: [{}] ms ", stopWatch.getElapsedTimeMs());
     }
 
     protected void fireApplicationPostReadyEvent() {
@@ -80,7 +80,7 @@ public class ApplicationStartUp {
         stopWatch.start();
         applicationPostReadyEvent.fire(new ApplicationPostReadyEvent());
         stopWatch.stop();
-        LOGGER.info("Application ready post event took: {} ms ", stopWatch.getElapsedTimeMs());
+        LOGGER.info("Application ready post event took: [{}] ms ", stopWatch.getElapsedTimeMs());
     }
 
     protected void fireApplicationShutDownEvent() {
@@ -89,6 +89,6 @@ public class ApplicationStartUp {
         stopWatch.start();
         applicationShutdownEventEvent.fire(new ApplicationShutdownEvent());
         stopWatch.stop();
-        LOGGER.info("Application shutdown took: {} ms ", stopWatch.getElapsedTimeMs());
+        LOGGER.info("Application shutdown took: [{}] ms ", stopWatch.getElapsedTimeMs());
     }
 }

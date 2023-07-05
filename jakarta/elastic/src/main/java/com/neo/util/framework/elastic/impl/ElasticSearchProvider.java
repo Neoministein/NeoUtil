@@ -925,20 +925,18 @@ public class ElasticSearchProvider implements SearchProvider {
 
 
         long flushInterval = configService.get(FLUSH_INTERVAL_CONFIG).asInt().orElse(10);
-        LOGGER.info("BulkIngester.Builder FlushInterval: {}", flushInterval);
         builder.flushInterval(flushInterval, TimeUnit.SECONDS);
 
         int bulkAction = configService.get(BULK_ACTION_CONFIG).asInt().orElse(2500);
-        LOGGER.info("BulkIngester.Builder BulkActions: {}", bulkAction);
         builder.maxOperations(bulkAction);
 
         int concurrentRequests = configService.get(CONCURRENT_REQUEST_CONFIG).asInt().orElse(3);
-        LOGGER.info("BulkIngester.Builder ConcurrentRequests: {}", concurrentRequests);
         builder.maxConcurrentRequests(concurrentRequests);
 
         int bulkSize = configService.get(BULK_SIZE).asInt().orElse(10);
-        LOGGER.info("BulkIngester.Builder BulkSize: {}", bulkSize);
         builder.maxSize(bulkSize * BYTES_IN_MB);
+        LOGGER.info("BulkIngester.Builder, FlushInterval: [{}], BulkActions: [{}], ConcurrentRequests: [{}], BulkSize: [{}] MB",
+                flushInterval, bulkAction, concurrentRequests, bulkSize);
 
         return builder;
     }
