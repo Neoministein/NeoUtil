@@ -10,14 +10,9 @@ import jakarta.ws.rs.core.Response;
 public interface ResponseGenerator {
 
     /**
-     * A response with the status code and data in the response body
-     *
-     * @param code the status code
-     * @param errorCode the error code in the response body
-     * @param message the error message in the response body
-     * @return the response
+     * A header that should be added to a valid error response object
      */
-    Response error(int code, String errorCode, String message);
+    String VALID_BACKEND_ERROR = "validBackendError";
 
     /**
      * A response with the status code and data in the response body
@@ -37,6 +32,16 @@ public interface ResponseGenerator {
      * @return the response
      */
     Response error(int code, ExceptionDetails exceptionDetails, Object... arguments);
+
+    /**
+     * A response with the status code and data in the response body
+     *
+     * @param code the status code
+     * @param errorCode the error code in the response body
+     * @param message the error message in the response body
+     * @return the response
+     */
+    Response error(int code, String errorCode, String message);
 
     /**
      * Retries to retrieve the error code from the given response object.

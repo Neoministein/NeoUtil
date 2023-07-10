@@ -16,18 +16,22 @@ import jakarta.ws.rs.core.Response;
 public class DefaultResponseGenerator implements ResponseGenerator {
 
     @Override
-    public Response error(int code, String errorCode, String message) {
-        return Response.status(code).entity(errorObject(errorCode, message).toString()).build();
-    }
-
-    @Override
     public Response error(int code, CommonRuntimeException exceptionDetails) {
-        return Response.status(code).entity(errorObject(exceptionDetails.getExceptionId(), exceptionDetails.getMessage()).toString()).build();
+        return Response
+                .status(code)
+                .entity(errorObject(exceptionDetails.getExceptionId(), exceptionDetails.getMessage()).toString())
+                .header(VALID_BACKEND_ERROR, true)
+                .build();
     }
 
     @Override
     public Response error(int code, ExceptionDetails exceptionDetails, Object... arguments) {
         return error(code, new CommonRuntimeException(exceptionDetails, arguments));
+    }
+
+    @Override
+    public Response error(int code, String errorCode, String message) {
+        return error(code, new CommonRuntimeException(new ExceptionDetails(errorCode, message, false)));
     }
 
     @Override
