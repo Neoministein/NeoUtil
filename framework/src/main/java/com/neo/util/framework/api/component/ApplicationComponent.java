@@ -5,16 +5,6 @@ package com.neo.util.framework.api.component;
  */
 public interface ApplicationComponent {
 
-    /**
-     * Checks if the component is enabled
-     */
-    boolean enabled();
-
-    /**
-     * Reloads the components config
-     */
-    void reload();
-
     default String componentId() {
         return this.getClass().getSimpleName();
     }

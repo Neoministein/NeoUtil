@@ -1,4 +1,4 @@
-package com.neo.util.framework.impl.request;
+package com.neo.util.framework.rest.api.request;
 
 import com.neo.util.framework.api.request.AbstractRequestDetails;
 import com.neo.util.framework.api.request.RequestContext;

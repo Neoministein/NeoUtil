@@ -16,6 +16,17 @@ import jakarta.ws.rs.core.Response;
 class SecurityIT extends AbstractIntegrationTest {
 
     @Test
+    void unsecuredTest(WebTarget webTarget) {
+        //Arrange
+        //Act
+        Response response = webTarget.path(SecurityResource.RESOURCE_LOCATION).request()
+                .method("GET");
+        //Assert
+        Assertions.assertEquals(200, response.getStatus());
+        Assertions.assertFalse(response.hasEntity());
+    }
+
+    @Test
     void secureResourceTest(WebTarget webTarget) {
         //Arrange
         //Act

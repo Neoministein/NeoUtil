@@ -1,7 +1,7 @@
 package com.neo.util.helidon.rest.security;
 
 import com.neo.util.framework.api.request.RequestDetails;
-import com.neo.util.framework.impl.request.HttpRequestDetails;
+import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.rest.api.security.Secured;
 
 import jakarta.annotation.security.RolesAllowed;
@@ -26,6 +26,11 @@ public class SecurityResource {
 
     @Inject
     protected RequestDetails requestDetails;
+
+    @GET
+    public Response unsecured() {
+        return Response.ok().build();
+    }
 
     @GET
     @Secured

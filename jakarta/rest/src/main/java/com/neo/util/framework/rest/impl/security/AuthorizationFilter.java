@@ -1,8 +1,8 @@
 package com.neo.util.framework.rest.impl.security;
 
-import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.FrameworkConstants;
-import com.neo.util.framework.impl.request.HttpRequestDetails;
+import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import com.neo.util.framework.rest.api.security.Secured;
 
@@ -29,14 +29,14 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizationFilter.class);
 
-    @Inject
-    protected RequestDetails requestDetails;
-
     @Context
     protected ResourceInfo resourceInfo;
 
     @Inject
     protected ResponseGenerator responseGenerator;
+
+    @Inject
+    protected RequestDetails requestDetails;
 
     @Override
     public void filter(ContainerRequestContext containerRequest) {

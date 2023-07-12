@@ -1,13 +1,12 @@
 package com.neo.util.framework.rest.impl.security;
 
+import com.neo.util.common.impl.StringUtils;
 import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.security.CredentialsGenerator;
 import com.neo.util.framework.api.security.RolePrincipal;
-import com.neo.util.framework.api.FrameworkConstants;
-import com.neo.util.framework.impl.request.HttpRequestDetails;
+import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import com.neo.util.framework.api.security.AuthenticationProvider;
-import com.neo.util.framework.rest.api.security.Secured;
 import jakarta.enterprise.context.RequestScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ import java.util.Optional;
 /**
  * This filter provides base authentication functionality based on what the {@link AuthenticationProvider} and {@link  CredentialsGenerator} supports
  */
-@Secured
 @Provider
 @RequestScoped
 @Priority(Priorities.AUTHENTICATION)
@@ -47,26 +45,25 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext containerRequest) {
-        LOGGER.trace("Authentication attempt");
         String authorizationHeader = containerRequest.getHeaderString(HttpHeaders.AUTHORIZATION);
 
+        if(StringUtils.isEmpty(authorizationHeader)) {
+            return;
+        }
+
+        LOGGER.trace("Authentication attempt");
         try {
             Credential credential = credentialsGenerator.generate(authorizationHeader);
             Optional<RolePrincipal> principalOptional = authenticationProvider.authenticate(credential);
             if (principalOptional.isPresent()) {
                 LOGGER.trace("Authentication success");
                 ((HttpRequestDetails) requestDetails).setUser(principalOptional.get());
-                return;
+            } else {
+                LOGGER.trace("Authentication failure");
             }
-            LOGGER.info("Authentication failure");
-        } catch (IllegalArgumentException | IllegalStateException ex) {
-            LOGGER.info("Invalid authorization header");
-        }
-        abortWithUnauthorized(containerRequest);
-    }
 
-    protected void abortWithUnauthorized(ContainerRequestContext containerRequest) {
-        LOGGER.info("Aborting request with unauthorized");
-        containerRequest.abortWith(responseGenerator.error(401, FrameworkConstants.EX_UNAUTHORIZED));
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            LOGGER.debug("Invalid authorization header");
+        }
     }
 }

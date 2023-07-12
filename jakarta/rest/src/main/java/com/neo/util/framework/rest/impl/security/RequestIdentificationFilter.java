@@ -1,7 +1,7 @@
 package com.neo.util.framework.rest.impl.security;
 
 import com.neo.util.framework.api.request.RequestContext;
-import com.neo.util.framework.impl.request.HttpRequestDetails;
+import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.impl.request.RequestDetailsProducer;
 import com.networknt.org.apache.commons.validator.routines.InetAddressValidator;
 import jakarta.annotation.Priority;

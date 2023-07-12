@@ -3,8 +3,9 @@ package com.neo.util.framework.rest.impl.security;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.CredentialsGenerator;
 import com.neo.util.framework.api.security.RolePrincipal;
-import com.neo.util.framework.impl.request.HttpRequestDetails;
+import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -37,7 +38,7 @@ class AuthenticationFilterTest {
         credentialsGenerator = Mockito.mock(CredentialsGenerator.class);
         subject.credentialsGenerator = credentialsGenerator;
 
-        requestDetails = Mockito.mock(HttpRequestDetails.class);
+        requestDetails = new HttpRequestDetails(null, null, null);
         subject.requestDetails = requestDetails;
     }
 
@@ -61,7 +62,7 @@ class AuthenticationFilterTest {
         subject.filter(containerRequestContext);
         //Assert
 
-        Mockito.verify(requestDetails).setUser(rolePrincipal);
+        Assertions.assertTrue(requestDetails.getUser().isPresent());
         Mockito.verify(containerRequestContext, Mockito.times(0)).abortWith(Mockito.any());
     }
 
@@ -82,7 +83,7 @@ class AuthenticationFilterTest {
         subject.filter(containerRequestContext);
         //Assert
 
-        Mockito.verify(containerRequestContext).abortWith(Mockito.any());
+        Assertions.assertTrue(requestDetails.getUser().isEmpty());
     }
 
     @Test
@@ -99,7 +100,6 @@ class AuthenticationFilterTest {
 
         subject.filter(containerRequestContext);
         //Assert
-        Mockito.verify(requestDetails, Mockito.times(0)).setUser(Mockito.any());
-        Mockito.verify(containerRequestContext).abortWith(Mockito.any());
+        Assertions.assertTrue(requestDetails.getUser().isEmpty());
     }
 }

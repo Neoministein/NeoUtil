@@ -12,7 +12,7 @@ import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityProvider;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
-import com.neo.util.framework.impl.request.HttpRequestDetails;
+import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
