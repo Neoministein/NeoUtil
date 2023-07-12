@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class StartupRequestDetails extends AbstractRequestDetails {
 
-    protected StartupRequestDetails(String stage) {
+    public StartupRequestDetails(String stage) {
         super(stage + ":" + UUID.randomUUID(), new StartupContext(stage));
     }
 
