@@ -1,7 +1,9 @@
 package com.neo.util.framework.rest.impl.cache;
 
 import com.neo.util.framework.rest.api.cache.ClientCacheControl;
+import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import com.neo.util.framework.rest.impl.RestResourceUtils;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
@@ -13,6 +15,7 @@ import jakarta.ws.rs.ext.RuntimeDelegate;
 
 @ClientCacheControl
 @Provider
+@ApplicationScoped
 public class ClientCacheControlFilter implements ContainerResponseFilter {
 
     @Inject
@@ -21,7 +24,7 @@ public class ClientCacheControlFilter implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext requestContext,
                        ContainerResponseContext responseContext) {
-        if (responseContext.getStatus() == 200) {
+        if (responseContext.getStatus() < 500 && (responseContext.getStatus() == 200 || responseContext.getHeaders().containsKey(ResponseGenerator.VALID_BACKEND_ERROR))) {
             ClientCacheControl cacheAnnotation = restUtils.getAnnotation(ClientCacheControl.class).orElseThrow();
 
             CacheControl cacheControl = new CacheControl();
