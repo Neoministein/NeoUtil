@@ -155,7 +155,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         elasticSearchRepository = new ElasticSearchProvider();
         elasticSearchRepository.configService = configService;
         elasticSearchRepository.connection = connection;
-        elasticSearchRepository.indexerQueueService = new PretendIndexerNotificationService();
+        elasticSearchRepository.indexerQueueService = new DummyIndexerNotificationService();
         elasticSearchRepository.requestDetailsProvider = () -> requestDetails;
         elasticSearchRepository.indexNameService = indexNamingService;
         elasticSearchRepository.setupBulkIngester();

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
-public class PretendAuthenticationProvider implements AuthenticationProvider {
+public class DummyAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Optional<RolePrincipal> authenticate(Credential credential) {

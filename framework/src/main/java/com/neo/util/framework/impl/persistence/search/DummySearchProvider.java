@@ -10,16 +10,20 @@ import java.util.Collection;
 
 @ApplicationScoped
 @SuppressWarnings("java:S1186") //Default search implementation that does nothing
-public class PretendSearchProvider implements SearchProvider {
+public class DummySearchProvider implements SearchProvider {
+
+    protected boolean enabled = false;
+
+    protected Searchable searchable;
 
     @Override
     public void index(Searchable searchable) {
-
+        index(searchable, new IndexParameter());
     }
 
     @Override
     public void index(Searchable searchable, IndexParameter indexParameter) {
-
+        this.searchable = searchable;
     }
 
     @Override
@@ -104,6 +108,14 @@ public class PretendSearchProvider implements SearchProvider {
 
     @Override
     public boolean enabled() {
-        return false;
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public Searchable getSearchableToIndex() {
+        return searchable;
     }
 }

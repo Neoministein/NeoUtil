@@ -2,7 +2,7 @@ package com.neo.util.framework.elastic.impl;
 
 import com.neo.util.framework.api.queue.QueueMessage;
 
-public class PretendIndexerNotificationService extends IndexingQueueService {
+public class DummyIndexerNotificationService extends IndexingQueueService {
 
     protected QueueMessage queueMessage;
 
