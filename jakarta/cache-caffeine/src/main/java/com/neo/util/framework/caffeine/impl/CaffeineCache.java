@@ -66,19 +66,19 @@ public class CaffeineCache implements Cache {
 
     @Override
     public void put(Object key, Object value) {
-        LOGGER.debug("Caching value [{}] for key [{}]", value,  key);
+        LOGGER.trace("Caching value [{}] for key [{}]", value,  key);
         cache.put(key, CompletableFuture.completedFuture(value));
     }
 
     @Override
     public void putAll(Map<Object, Object> map) {
-        LOGGER.debug("Bulk caching values for keys [{}]", map.keySet());
+        LOGGER.trace("Bulk caching values for keys [{}]", map.keySet());
         cache.synchronous().putAll(map);
     }
 
     @Override
     public void invalidate(Object key) {
-        LOGGER.debug("Invalidating cache [{}] for key [{}]",cacheName, key);
+        LOGGER.trace("Invalidating cache [{}] for key [{}]",cacheName, key);
         cache.synchronous().invalidate(key);
     }
 
@@ -89,7 +89,7 @@ public class CaffeineCache implements Cache {
 
     @Override
     public void invalidateAll(Iterable<Object> keys) {
-        LOGGER.debug("Bulk invalidating cache [{}] for keys [{}]", cacheName, keys);
+        LOGGER.trace("Bulk invalidating cache [{}] for keys [{}]", cacheName, keys);
         cache.synchronous().invalidateAll(keys);
     }
 
