@@ -1,10 +1,12 @@
 package com.neo.util.framework.rest.impl.exception;
 
+import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.rest.impl.security.AuthenticationFilter;
 import com.neo.util.framework.rest.impl.security.RequestIdentificationFilter;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.NotAllowedException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
@@ -33,6 +35,9 @@ public class ClientErrorMapper implements ExceptionMapper<ClientErrorException> 
     protected ContainerRequestContext context;
 
     @Inject
+    protected jakarta.inject.Provider<RequestDetails> requestDetailsProvider;
+
+    @Inject
     protected RequestIdentificationFilter requestIdentificationFilter;
 
     @Inject
@@ -40,17 +45,17 @@ public class ClientErrorMapper implements ExceptionMapper<ClientErrorException> 
 
     @Override
     public Response toResponse(ClientErrorException ex) {
-        if (ex instanceof NotFoundException) {
+        //Manually running through the filters for logging since the request gets aborted before we even get to them
+        requestIdentificationFilter.filter(context);
+        authenticationFilter.filter(context);
+
+        if (ex instanceof NotFoundException || ex instanceof NotAllowedException) {
             LOGGER.warn("A [{}] occurred with message [{}] setting status to [{}]",
-                    ex.getClass().getSimpleName(), uriInfo.getPath(), ex.getResponse().getStatus());
+                    ex.getClass().getSimpleName(), requestDetailsProvider.get().getRequestContext(), ex.getResponse().getStatus());
         } else {
             LOGGER.warn("A [{}] occurred with message [{}] setting status to [{}]",
                     ex.getClass().getSimpleName(), ex.getMessage(), ex.getResponse().getStatus());
         }
-
-        //Manually running through the filters for logging since the request gets aborted before we even get to them
-        requestIdentificationFilter.filter(context);
-        authenticationFilter.filter(context);
 
         return ex.getResponse();
     }
