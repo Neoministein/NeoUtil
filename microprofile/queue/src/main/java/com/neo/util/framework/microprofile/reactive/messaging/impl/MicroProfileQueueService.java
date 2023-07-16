@@ -4,10 +4,11 @@ import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
-import com.neo.util.framework.api.queue.QueueListener;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.api.queue.QueueProducer;
 import com.neo.util.framework.api.queue.QueueService;
+import com.neo.util.framework.api.request.RequestDetails;
+import jakarta.inject.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,8 @@ import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
+
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +29,9 @@ import java.util.Map;
 public class MicroProfileQueueService implements QueueService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicroProfileQueueService.class);
+
+    @Inject
+    protected Provider<RequestDetails> requestDetailsProvider;
 
     protected Map<String, QueueProducer> queueProducerMap = new HashMap<>();
 
@@ -49,6 +55,11 @@ public class MicroProfileQueueService implements QueueService {
 
     protected void onStartUp(@Observes ApplicationPreReadyEvent preReadyEvent) {
         LOGGER.debug("Startup event received");
+    }
+
+    @Override
+    public void addToQueue(String queueName, Serializable payload) {
+        addToQueue(queueName, new QueueMessage(requestDetailsProvider.get(), "", payload));
     }
 
     @Override

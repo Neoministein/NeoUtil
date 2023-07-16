@@ -8,6 +8,7 @@ import com.neo.util.framework.api.queue.IncomingQueueConnection;
 import com.neo.util.framework.api.queue.QueueListener;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.api.queue.QueueService;
+import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.QueueRequestDetails;
 import com.neo.util.framework.jobrunr.queue.impl.config.JobRunnerConfigurator;
@@ -18,11 +19,13 @@ import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.jobrunr.jobs.lambdas.JobLambda;
 import org.jobrunr.scheduling.BackgroundJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -42,6 +45,9 @@ public class JobRunnerQueueService implements QueueService {
 
     @Inject
     protected RequestContextExecutor requestContextExecutor;
+
+    @Inject
+    protected Provider<RequestDetails> requestDetailsProvider;
 
     protected Map<String, QueueListenerConfig> queueListenerMap = new HashMap<>();
 
@@ -68,6 +74,11 @@ public class JobRunnerQueueService implements QueueService {
         }
         LOGGER.info("Registered [{}] Queues {}", newMap.size(), newMap.keySet());
         queueListenerMap = newMap;
+    }
+
+    @Override
+    public void addToQueue(String queueName, Serializable payload) {
+        addToQueue(queueName, new QueueMessage(requestDetailsProvider.get(), "", payload));
     }
 
     @Override
