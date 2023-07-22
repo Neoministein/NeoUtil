@@ -36,4 +36,6 @@ public final class PriorityConstants {
      * Start of range for late interceptors defined by testing specifications.
      */
     public static final int TEST = 5000;
+
+    private PriorityConstants() {}
 }

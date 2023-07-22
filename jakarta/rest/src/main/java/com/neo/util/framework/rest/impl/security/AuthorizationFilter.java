@@ -1,8 +1,7 @@
 package com.neo.util.framework.rest.impl.security;
 
 import com.neo.util.framework.api.FrameworkConstants;
-import com.neo.util.framework.api.request.RequestDetails;
-import com.neo.util.framework.rest.api.request.HttpRequestDetails;
+import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import com.neo.util.framework.rest.api.security.Secured;
 
@@ -36,7 +35,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     protected ResponseGenerator responseGenerator;
 
     @Inject
-    protected RequestDetails requestDetails;
+    protected UserRequestDetails userRequestDetails;
 
     @Override
     public void filter(ContainerRequestContext containerRequest) {
@@ -47,7 +46,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         }
 
         Set<String> roles = Set.of(rolesAllowed.value());
-        if (!((HttpRequestDetails) requestDetails).hasOneOfTheRoles(roles)) {
+        if (!userRequestDetails.hasOneOfTheRoles(roles)) {
             LOGGER.info("Aborting request with forbidden, one of the permissions is required {}", roles);
             containerRequest.abortWith(responseGenerator.error(403, FrameworkConstants.EX_FORBIDDEN));
         }

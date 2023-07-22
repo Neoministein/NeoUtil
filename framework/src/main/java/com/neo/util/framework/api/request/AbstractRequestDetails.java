@@ -11,14 +11,14 @@ public abstract class AbstractRequestDetails implements RequestDetails {
     protected final RequestContext requestContext;
 
     protected AbstractRequestDetails(String requestId, RequestContext requestContext) {
-        MDC.put("traceId", requestId);
+        MDC.put(TRACE_ID, requestId);
         this.requestStartDate = Instant.now();
         this.requestId = requestId;
         this.requestContext = requestContext;
     }
 
     @Override
-    public String getRequestId() {
+    public String getRequestIdentification() {
         return requestId;
     }
 
@@ -34,8 +34,8 @@ public abstract class AbstractRequestDetails implements RequestDetails {
 
     @Override
     public String toString() {
-        return "RequestId: [" + getRequestId()
-                + "], Caller: [" + getCaller()
+        return "RequestId: [" + getRequestIdentification()
+                + "], Initiator: [" + getInitiator()
                 + "], RequestStartDate: [" + getRequestStartDate().toString()
                 + "], RequestContext: [" + getRequestContext() + "]";
     }

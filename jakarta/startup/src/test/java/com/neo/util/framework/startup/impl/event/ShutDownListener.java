@@ -18,6 +18,6 @@ public class ShutDownListener {
     protected Provider<RequestDetails> requestDetails;
 
     protected void event(@Observes ApplicationShutdownEvent event) {
-        recorder.addToSequence(requestDetails.get().getCaller());
+        recorder.addToSequence(requestDetails.get().getInitiator());
     }
 }

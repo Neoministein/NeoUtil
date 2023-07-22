@@ -14,6 +14,14 @@ public class RequestDetailsProducer {
         return requestDetails;
     }
 
+    @Produces
+    public UserRequestDetails getUserRequestDetails() {
+        if (requestDetails instanceof UserRequestDetails userRequestDetails) {
+            return userRequestDetails;
+        }
+        return null;
+    }
+
     public void setRequestDetails(RequestDetails requestDetails) {
         this.requestDetails = requestDetails;
     }

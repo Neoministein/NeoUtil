@@ -25,7 +25,19 @@ public class QueueRequestDetails extends AbstractRequestDetails {
     }
 
     @Override
-    public String getCaller() {
+    public String getInitiator() {
         return originalCaller;
+    }
+
+    public record Context(String queueName) implements RequestContext {
+        @Override
+        public String type() {
+            return "Queue";
+        }
+
+        @Override
+        public String toString() {
+            return queueName;
+        }
     }
 }

@@ -21,7 +21,7 @@ public class DummyAuditTrailProvider implements AuditTrailProvider {
     @Override
     public void audit(PersistenceEntity entity, AuditParameter auditParameter) {
         LOGGER.info("AuditOperation by [{}] for [{}] primary key [{}] Operation: [{}]",
-                requestDetailsProvider.get().getCaller(),
+                requestDetailsProvider.get().getInitiator(),
                 entity.getClass().getSimpleName(),
                 entity.getPrimaryKey(),
                 auditParameter.getOperation());

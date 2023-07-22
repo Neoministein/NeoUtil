@@ -10,36 +10,41 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.security.enterprise.credential.BasicAuthenticationCredential;
 import jakarta.security.enterprise.credential.Credential;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class CredentialsGeneratorImpl implements CredentialsGenerator {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CredentialsGeneratorImpl.class);
 
     @Inject
     protected AuthenticationProvider authenticationProvider;
 
     @Override
     public Credential generate(String httpHeader) {
+        return generate(getHttpScheme(httpHeader), httpHeader);
+    }
+
+    protected Credential generate(String httpScheme, String httpHeader) {
+        if (authenticationProvider.getSupportedAuthenticationSchemes().contains(httpScheme.toUpperCase())) {
+            return switch (httpScheme.toUpperCase()) {
+                case AuthenticationScheme.BASIC -> new BasicAuthenticationCredential(httpHeader);
+                case AuthenticationScheme.BEARER -> new BearerCredentials(httpHeader);
+                default -> throw new IllegalStateException();
+            };
+        }
+        throw new IllegalStateException("Unsupported header scheme");
+    }
+
+    protected String getHttpScheme(String httpHeader) {
         if (StringUtils.isEmpty(httpHeader)) {
             throw new IllegalArgumentException("Header cannot be empty");
         }
 
         int index = httpHeader.indexOf(' ');
         if (index >= 0) {
-            String httpScheme = httpHeader.substring(0 ,index);
-            return generate(httpScheme, httpHeader);
-        }
-        throw new IllegalStateException("Unsupported header scheme");
-    }
-
-    protected Credential generate(String httpScheme, String httpHeader) {
-        if (authenticationProvider.getSupportedAuthenticationSchemes().contains(httpScheme.toUpperCase())) {
-            switch (httpScheme.toUpperCase()) {
-            case AuthenticationScheme.BASIC:
-                return new BasicAuthenticationCredential(httpHeader);
-            case AuthenticationScheme.BEARER:
-                return new BearerCredentials(httpHeader);
-            default:
-            }
+            return httpHeader.substring(0 ,index);
         }
         throw new IllegalStateException("Unsupported header scheme");
     }

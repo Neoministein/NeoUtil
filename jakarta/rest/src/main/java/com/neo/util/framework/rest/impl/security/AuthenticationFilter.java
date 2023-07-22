@@ -1,10 +1,9 @@
 package com.neo.util.framework.rest.impl.security;
 
 import com.neo.util.common.impl.StringUtils;
-import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.api.security.CredentialsGenerator;
 import com.neo.util.framework.api.security.RolePrincipal;
-import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import jakarta.enterprise.context.RequestScoped;
@@ -41,7 +40,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     protected CredentialsGenerator credentialsGenerator;
 
     @Inject
-    protected RequestDetails requestDetails;
+    protected UserRequestDetails requestDetails;
 
     @Override
     public void filter(ContainerRequestContext containerRequest) {
@@ -57,7 +56,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             Optional<RolePrincipal> principalOptional = authenticationProvider.authenticate(credential);
             if (principalOptional.isPresent()) {
                 LOGGER.trace("Authentication success");
-                ((HttpRequestDetails) requestDetails).setUser(principalOptional.get());
+                requestDetails.setUserIfPossible(principalOptional.get());
             } else {
                 LOGGER.trace("Authentication failure");
             }

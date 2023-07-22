@@ -41,7 +41,7 @@ public class QueueMessage implements Serializable {
     protected String message;
 
     public QueueMessage(RequestDetails requestDetails, String messageType, Serializable payload) {
-        this(requestDetails.getCaller(), requestDetails.getRequestId(), messageType, payload);
+        this(requestDetails.getInitiator(), requestDetails.getRequestIdentification(), messageType, payload);
     }
 
     public QueueMessage(String caller, String requestId, String messageType, Serializable payload) {

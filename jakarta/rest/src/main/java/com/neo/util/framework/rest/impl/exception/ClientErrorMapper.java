@@ -2,7 +2,7 @@ package com.neo.util.framework.rest.impl.exception;
 
 import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.rest.impl.security.AuthenticationFilter;
-import com.neo.util.framework.rest.impl.security.RequestIdentificationFilter;
+import com.neo.util.framework.rest.impl.security.IdentificationFilter;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ClientErrorException;
@@ -38,7 +38,7 @@ public class ClientErrorMapper implements ExceptionMapper<ClientErrorException> 
     protected jakarta.inject.Provider<RequestDetails> requestDetailsProvider;
 
     @Inject
-    protected RequestIdentificationFilter requestIdentificationFilter;
+    protected IdentificationFilter requestIdentificationFilter;
 
     @Inject
     protected AuthenticationFilter authenticationFilter;

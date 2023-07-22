@@ -86,7 +86,7 @@ public class JobRunnerQueueService implements QueueService {
         QueueListenerConfig config = queueListenerMap.computeIfAbsent(queueName, s -> {
                     throw new ConfigurationException(QueueService.EX_NON_EXISTENT_QUEUE, QueueListener.class.getSimpleName(), queueName); });
 
-        JobLambda action = () -> jobRunrCDIQueueEntryPoint.submit(queueName, message);
+        JobLambda action = () -> config.getQueueListener().onMessage(message);
 
         if (config.hasDelay()) {
             BackgroundJob.schedule(Instant.now().plus(Duration.ofSeconds(config.getDelayInSeconds())), action);

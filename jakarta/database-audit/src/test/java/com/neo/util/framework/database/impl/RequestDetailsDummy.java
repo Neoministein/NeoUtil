@@ -14,12 +14,12 @@ public class RequestDetailsDummy implements RequestDetails {
     protected RequestContext requestContext = null;
 
     @Override
-    public String getCaller() {
+    public String getInitiator() {
         return caller;
     }
 
     @Override
-    public String getRequestId() {
+    public String getRequestIdentification() {
         return requestId;
     }
 

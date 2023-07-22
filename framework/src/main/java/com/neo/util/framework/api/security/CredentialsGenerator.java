@@ -1,5 +1,6 @@
 package com.neo.util.framework.api.security;
 
+import com.neo.util.common.impl.exception.ValidationException;
 import jakarta.security.enterprise.credential.Credential;
 
 /**
@@ -17,5 +18,5 @@ public interface CredentialsGenerator {
      * @throws IllegalArgumentException the content isn't valid or according to the scheme
      * @throws IllegalStateException when the Http scheme isn't supported
      */
-    Credential generate(String httpHeader);
+    Credential generate(String httpHeader) throws ValidationException;
 }

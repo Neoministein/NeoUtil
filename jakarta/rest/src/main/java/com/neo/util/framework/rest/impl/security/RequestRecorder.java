@@ -2,7 +2,7 @@ package com.neo.util.framework.rest.impl.security;
 
 import com.neo.util.framework.api.component.ApplicationComponent;
 import com.neo.util.framework.api.persistence.search.SearchProvider;
-import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.impl.component.ApplicationComponentManager;
 import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
@@ -30,7 +30,7 @@ public class RequestRecorder implements ContainerResponseFilter, ApplicationComp
     public static final String FRAMEWORK_PROVIDED_ERROR = "FRAMEWORK_PROVIDED_ERROR";
 
     @Inject
-    protected RequestDetails requestDetails;
+    protected UserRequestDetails userRequestDetails;
 
     @Inject
     protected SearchProvider searchProvider;
@@ -51,7 +51,7 @@ public class RequestRecorder implements ContainerResponseFilter, ApplicationComp
             ContainerResponseContext resp) {
         if (enabled()) {
             try {
-                RequestSearchable searchable = parseRequestSearchable((HttpRequestDetails) requestDetails, req, resp);
+                RequestSearchable searchable = parseRequestSearchable((HttpRequestDetails) userRequestDetails, req, resp);
                 searchProvider.index(searchable);
                 LOGGER.trace("Status [{}] Context: [{}] Took: [{}]", resp.getStatus(), searchable.getContext(), searchable.getProcessTime());
             } catch (Exception ex) {
@@ -64,7 +64,7 @@ public class RequestRecorder implements ContainerResponseFilter, ApplicationComp
                                                        ContainerResponseContext resp) {
         return new RequestSearchable(
                 Instant.now(),
-                requestDetails.getRequestId(),
+                requestDetails.getRequestIdentification(),
                 requestDetails.getUser().map(Principal::getName).orElse(null),
                 requestDetails.getRemoteAddress(),
                 requestDetails.getRequestContext().toString(),

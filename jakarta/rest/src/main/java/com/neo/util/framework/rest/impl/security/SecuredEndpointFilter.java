@@ -1,8 +1,7 @@
 package com.neo.util.framework.rest.impl.security;
 
 import com.neo.util.framework.api.FrameworkConstants;
-import com.neo.util.framework.api.request.RequestDetails;
-import com.neo.util.framework.rest.api.request.HttpRequestDetails;
+import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import com.neo.util.framework.rest.api.security.Secured;
 import jakarta.annotation.Priority;
@@ -27,11 +26,11 @@ public class SecuredEndpointFilter implements ContainerRequestFilter {
     protected ResponseGenerator responseGenerator;
 
     @Inject
-    protected RequestDetails requestDetails;
+    protected UserRequestDetails userRequestDetails;
 
     @Override
     public void filter(ContainerRequestContext containerRequest) {
-        if (((HttpRequestDetails) requestDetails).getUser().isEmpty()) {
+        if (userRequestDetails.getUser().isEmpty()) {
             LOGGER.info("Aborting request with unauthorized");
             containerRequest.abortWith(responseGenerator.error(401, FrameworkConstants.EX_UNAUTHORIZED));
         }

@@ -6,13 +6,12 @@ import com.neo.util.common.impl.exception.NoContentFoundException;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.persistence.criteria.ExplicitSearchCriteria;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityProvider;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
-import com.neo.util.framework.rest.api.request.HttpRequestDetails;
+import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +48,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
     protected EntityProvider entityRepository;
 
     @Inject
-    protected RequestDetails requestDetails;
+    protected UserRequestDetails userRequestDetails;
 
     @Inject
     protected ResponseGenerator responseGenerator;
@@ -166,19 +165,15 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
     protected Class<?> getSerializationScope() {
         Class<?> serializationScope = Views.Public.class;
 
-        if (getRequestDetails().getUser().isPresent()) {
-            if (getRequestDetails().isInRole(ENTITY_PERM + getEntityClass().getSimpleName())) {
+        if (userRequestDetails.getUser().isPresent()) {
+            if (userRequestDetails.isInRole(ENTITY_PERM + getEntityClass().getSimpleName())) {
                 serializationScope = Views.Owner.class;
             }
 
-            if (getRequestDetails().isInRole(PERM_INTERNAL)) {
+            if (userRequestDetails.isInRole(PERM_INTERNAL)) {
                 serializationScope = Views.Internal.class;
             }
         }
         return serializationScope;
-    }
-
-    protected HttpRequestDetails getRequestDetails() {
-        return (HttpRequestDetails) requestDetails;
     }
 }

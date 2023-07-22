@@ -92,6 +92,6 @@ class JobRunrQueueIT {
     }
 
     private RequestDetails create(String queueName) {
-        return new QueueRequestDetails(queueName, UUID.randomUUID().toString(), new RequestContext.Queue(queueName));
+        return new QueueRequestDetails(queueName, UUID.randomUUID().toString(), new QueueRequestDetails.Context(queueName));
     }
 }

@@ -2,6 +2,7 @@ package com.neo.util.framework.jobrunr.queue.impl.config;
 
 import com.neo.util.framework.api.request.RequestContext;
 import com.neo.util.framework.api.queue.QueueListener;
+import com.neo.util.framework.impl.request.QueueRequestDetails;
 
 public class QueueListenerConfig {
 
@@ -12,7 +13,7 @@ public class QueueListenerConfig {
 
     public QueueListenerConfig(String queueName, int delayInSeconds, QueueListener queueListener) {
         this.queueName = queueName;
-        this.requestContext = new RequestContext.Queue(queueName);
+        this.requestContext = new QueueRequestDetails.Context(queueName);
         this.delayInSeconds = delayInSeconds;
         this.queueListener = queueListener;
     }

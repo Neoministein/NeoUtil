@@ -18,6 +18,6 @@ public class ReadyListener {
     protected Provider<RequestDetails> requestDetails;
 
     protected void event(@Observes ApplicationReadyEvent event) {
-        recorder.addToSequence(requestDetails.get().getCaller());
+        recorder.addToSequence(requestDetails.get().getInitiator());
     }
 }

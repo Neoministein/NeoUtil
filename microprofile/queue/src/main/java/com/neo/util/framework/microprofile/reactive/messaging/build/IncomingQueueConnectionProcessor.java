@@ -104,7 +104,7 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
                     .beginControlFlow("try")
                     .addStatement("final var queueMessage = $T.fromJson(msg, $T.class)", JsonUtil.class, QueueMessage.class)
                     .addStatement("requestContextExecutor.execute(new $T(queueMessage, new $T($S)), () -> queueConsumer.onMessage(queueMessage))",
-                            QueueRequestDetails.class, RequestContext.Queue.class, queueName)
+                            QueueRequestDetails.class, QueueRequestDetails.Context.class, queueName)
                     .nextControlFlow("catch($T ex)", ValidationException.class)
                     .addStatement("LOGGER.error($S, ex.getMessage())","Unable to parse incoming queue message [{}], action won't be retried.")
                     .nextControlFlow("catch($T ex)", Exception.class)

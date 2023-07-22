@@ -11,7 +11,7 @@ public class StartupRequestDetails extends AbstractRequestDetails {
     }
 
     @Override
-    public String getCaller() {
+    public String getInitiator() {
         return requestContext.toString();
     }
 }

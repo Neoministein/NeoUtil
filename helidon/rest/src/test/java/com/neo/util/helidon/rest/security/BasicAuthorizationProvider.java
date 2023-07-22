@@ -1,6 +1,7 @@
 package com.neo.util.helidon.rest.security;
 
 import com.neo.util.framework.api.PriorityConstants;
+import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.AuthenticationScheme;
 import com.neo.util.framework.api.security.RolePrincipal;
@@ -56,6 +57,11 @@ public class BasicAuthorizationProvider implements AuthenticationProvider {
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public void authenticate(UserRequestDetails userRequestDetails, Credential credential) {
+        authenticate(credential).ifPresent(userRequestDetails::setUserIfPossible);
     }
 
     @Override

@@ -22,6 +22,10 @@ public class JobRunrCDIQueueEntryPoint {
         queueServiceCdiProxy = (JobRunnerQueueService) proxy;
     }
 
+    public JobRunrCDIQueueEntryPoint() {
+        System.out.println();
+    }
+
     public void submit(String queueName, QueueMessage message) {
         queueServiceCdiProxy.queueAction(queueName, message);
     }

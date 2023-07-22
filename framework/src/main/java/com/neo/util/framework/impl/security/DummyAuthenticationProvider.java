@@ -1,5 +1,6 @@
 package com.neo.util.framework.impl.security;
 
+import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.RolePrincipal;
 
@@ -15,6 +16,12 @@ public class DummyAuthenticationProvider implements AuthenticationProvider {
     public Optional<RolePrincipal> authenticate(Credential credential) {
         return Optional.empty();
     }
+
+    @Override
+    public void authenticate(UserRequestDetails userRequestDetails,
+            Credential credential) {
+    }
+
 
     @Override
     public List<String> getSupportedAuthenticationSchemes() {

@@ -18,6 +18,7 @@ import com.neo.util.framework.impl.JandexService;
 import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.impl.config.BasicConfigService;
 import com.neo.util.framework.impl.config.BasicConfigValue;
+import com.neo.util.framework.impl.request.QueueRequestDetails;
 import com.neo.util.framework.impl.request.SchedulerRequestDetails;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.event.NotificationOptions;
@@ -62,7 +63,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
     ));
 
     protected static ElasticSearchConnectionProviderImpl connection = new ElasticSearchConnectionProviderImpl();
-    protected RequestDetails requestDetails = new SchedulerRequestDetails(new RandomString().nextString(), new RequestContext.Scheduler("integrationTest"));
+    protected RequestDetails requestDetails = new SchedulerRequestDetails(new RandomString().nextString(), new QueueRequestDetails.Context("integrationTest"));
     protected IndexNamingService indexNamingService = createIndexNameService(configService);
 
     IndexNamingService createIndexNameService(ConfigService cfg) {

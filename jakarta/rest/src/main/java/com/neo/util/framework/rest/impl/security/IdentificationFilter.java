@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Provider
 @Priority(100)
 @ApplicationScoped
-public class RequestIdentificationFilter implements ContainerRequestFilter {
+public class IdentificationFilter implements ContainerRequestFilter {
 
     public static final String X_REAL_IP = "X-Real-IP";
 
@@ -44,11 +44,11 @@ public class RequestIdentificationFilter implements ContainerRequestFilter {
     }
 
     protected String createNewRequestId() {
-        return instanceUuid + ":" + REQUEST_ID.addAndGet(1);
+        return "HTTP:" + REQUEST_ID.addAndGet(1);
     }
 
     protected RequestContext parseRequestContext(ContainerRequestContext requestContext) {
-        return new RequestContext.Http(requestContext.getMethod(), parseURI(requestContext.getUriInfo()));
+        return new HttpRequestDetails.Context(requestContext.getMethod(), parseURI(requestContext.getUriInfo()));
     }
 
     protected String parseURI(UriInfo uriInfo) {

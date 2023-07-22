@@ -18,7 +18,7 @@ public class PreReadyListener {
     protected Provider<RequestDetails> requestDetails;
 
     protected void event(@Observes ApplicationPreReadyEvent event) {
-        recorder.addToSequence(requestDetails.get().getCaller());
+        recorder.addToSequence(requestDetails.get().getInitiator());
     }
 
 }

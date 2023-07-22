@@ -8,14 +8,21 @@ import java.time.Instant;
 public interface RequestDetails {
 
     /**
-     * Returns the caller of the request
+     * The logging name for MDC
      */
-    String getCaller();
+    String TRACE_ID = "traceId";
+
+    /**
+     * Returns the initiator of the request
+     */
+    String getInitiator();
+
+    long getRequestId();
 
     /**
      * A unique identifier for the current request
      */
-    String getRequestId();
+    String getRequestIdentification();
 
     /**
      * The current context of the request

@@ -29,13 +29,13 @@ public class DataBaseAuditListener {
     @PrePersist
     protected void prePersist(AuditableDataBaseEntity entity) {
         final RequestDetails requestDetails = requestDetailsProvider.get();
-        setPersistData(entity,requestDetails.getCaller());
-        setUpdateData(entity, requestDetails.getCaller());
+        setPersistData(entity,requestDetails.getInitiator());
+        setUpdateData(entity, requestDetails.getInitiator());
     }
 
     @PreUpdate
     protected void preUpdate(AuditableDataBaseEntity entity) {
-        setUpdateData(entity, requestDetailsProvider.get().getCaller());
+        setUpdateData(entity, requestDetailsProvider.get().getInitiator());
     }
 
     protected void setPersistData(AuditableDataBaseEntity entity, String by) {

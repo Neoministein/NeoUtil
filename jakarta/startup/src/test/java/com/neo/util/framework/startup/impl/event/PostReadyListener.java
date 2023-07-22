@@ -18,7 +18,7 @@ public class PostReadyListener {
     protected Provider<RequestDetails> requestDetails;
 
     protected void event(@Observes ApplicationPostReadyEvent event) {
-        recorder.addToSequence(requestDetails.get().getCaller());
+        recorder.addToSequence(requestDetails.get().getInitiator());
     }
 
 }

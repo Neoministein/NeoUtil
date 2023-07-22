@@ -7,9 +7,11 @@ import com.neo.util.framework.jobrunr.queue.api.JobRunrStorageProvider;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.inject.spi.CDI;
 import jakarta.inject.Inject;
 import org.jobrunr.configuration.JobRunr;
 import org.jobrunr.server.BackgroundJobServerConfiguration;
+import org.jobrunr.server.JobActivator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +49,14 @@ public class JobRunnerConfigurator {
         int dashboardPort = configService.get(CONFIG_PREFIX + CONFIG_DASHBOARD).asInt().orElse(DEFAULT_DASHBOARD_PORT);
         LOGGER.info("JobRunrConfiguration, Dashboard: [{}], ports: [{}]", dashboardEnabled, dashboardPort);
 
+        JobActivator jobActivator = new JobActivator() {
+            @Override
+            public <T> T activateJob(Class<T> type) {
+                T t = CDI.current().select(type).get();
+
+                return t;
+            }
+        };
 
         BackgroundJobServerConfiguration backgroundJobServerConfiguration = BackgroundJobServerConfiguration
                 .usingStandardBackgroundJobServerConfiguration()
@@ -55,6 +65,7 @@ public class JobRunnerConfigurator {
 
         JobRunr.configure()
                 .useStorageProvider(jobRunrStorageProvider.get())
+                .useJobActivator(jobActivator)
                 .useBackgroundJobServerIf(backGroundWorkerEnabled, backgroundJobServerConfiguration)
                 .useDashboardIf(dashboardEnabled, dashboardPort)
                 .initialize();
