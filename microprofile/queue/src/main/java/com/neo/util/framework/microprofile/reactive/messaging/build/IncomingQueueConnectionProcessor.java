@@ -10,6 +10,7 @@ import com.neo.util.framework.api.request.RequestContext;
 import com.neo.util.framework.api.queue.IncomingQueueConnection;
 import com.neo.util.framework.api.queue.QueueListener;
 import com.neo.util.framework.api.queue.QueueMessage;
+import com.neo.util.framework.api.security.InstanceIdentification;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.QueueRequestDetails;
 import com.squareup.javapoet.*;
@@ -96,6 +97,10 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
                     .addModifiers(Modifier.PROTECTED)
                     .addAnnotation(Inject.class)
                     .build();
+            FieldSpec instanceIdentification = FieldSpec.builder(InstanceIdentification.class, "instanceIdentification")
+                    .addModifiers(Modifier.PROTECTED)
+                    .addAnnotation(Inject.class)
+                    .build();
             MethodSpec consumeMethodBuilder = MethodSpec.methodBuilder("consumeQueue")
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(AnnotationSpec.builder(Incoming.class)
@@ -103,7 +108,7 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
                     .addParameter(String.class, "msg")
                     .beginControlFlow("try")
                     .addStatement("final var queueMessage = $T.fromJson(msg, $T.class)", JsonUtil.class, QueueMessage.class)
-                    .addStatement("requestContextExecutor.execute(new $T(queueMessage, new $T($S)), () -> queueConsumer.onMessage(queueMessage))",
+                    .addStatement("requestContextExecutor.execute(new $T(instanceIdentification.getInstanceId(), queueMessage, new $T($S)), () -> queueConsumer.onMessage(queueMessage))",
                             QueueRequestDetails.class, QueueRequestDetails.Context.class, queueName)
                     .nextControlFlow("catch($T ex)", ValidationException.class)
                     .addStatement("LOGGER.error($S, ex.getMessage())","Unable to parse incoming queue message [{}], action won't be retried.")
@@ -119,6 +124,7 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
                     .addField(queueConsumer)
                     .addField(logger)
                     .addField(requestContextExecutor)
+                    .addField(instanceIdentification)
                     .build();
 
             LOGGER.debug("Generating src file {}Caller", queueConsumerClass.getSimpleName());

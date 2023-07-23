@@ -1,6 +1,7 @@
 package com.neo.util.framework.impl.request;
 
 import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.framework.impl.request.recording.RequestRecordingManager;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.context.control.RequestContextController;
@@ -23,6 +24,9 @@ public class RequestContextExecutor {
     @Inject
     protected RequestDetailsProducer requestDetailsProducer;
 
+    @Inject
+    protected RequestRecordingManager requestRecordManager;
+
     /**
      * Executes the runnable within a {@link RequestScoped} with the provided {@link RequestDetails}
      *
@@ -33,12 +37,16 @@ public class RequestContextExecutor {
         LOGGER.trace("Starting to executing within context, {}", requestDetails);
         RequestContextController requestContextController = requestContextControllerFactory.get();
         requestContextController.activate();
+
+        boolean failed = true;
         try {
             requestDetailsProducer.setRequestDetails(requestDetails);
             runnable.run();
+            failed = false;
         } finally {
+            requestRecordManager.recordRequest(requestDetails, failed);
             requestContextController.deactivate();
-            LOGGER.trace("Finished execution context [{}]", requestDetails.getRequestIdentification());
+            LOGGER.trace("Finished execution context [{}]", requestDetails.getRequestId());
         }
     }
 }

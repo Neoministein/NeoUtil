@@ -5,8 +5,8 @@ import com.neo.util.framework.api.request.RequestContext;
 
 public class WebsocketRequestDetails extends AbstractUserRequestDetails {
 
-    public WebsocketRequestDetails(String requestId, RequestContext requestContext) {
-        super(requestId, requestContext);
+    public WebsocketRequestDetails(String instanceId, RequestContext requestContext) {
+        super(instanceId, requestContext);
     }
 
     public record Context(String uri) implements RequestContext {

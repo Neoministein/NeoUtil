@@ -6,6 +6,7 @@ import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.api.event.ApplicationShutdownEvent;
+import com.neo.util.framework.api.security.InstanceIdentification;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import jakarta.annotation.Priority;
 import org.slf4j.Logger;
@@ -41,20 +42,27 @@ public class ApplicationStartUp {
     @Inject
     protected RequestContextExecutor requestContextExecutor;
 
+    @Inject
+    protected InstanceIdentification identification;
+
     /**
      * Fire initialization event
      */
     public void init( @Observes @Priority( PriorityConstants.LIBRARY_BEFORE ) @Initialized( ApplicationScoped.class ) Object init ) {
-        requestContextExecutor.execute(new StartupRequestDetails(ApplicationPreReadyEvent.EVENT_NAME), this::fireApplicationPreReadyEvent);
-        requestContextExecutor.execute(new StartupRequestDetails(ApplicationReadyEvent.EVENT_NAME), this::fireApplicationReadyEvent);
-        requestContextExecutor.execute(new StartupRequestDetails(ApplicationPostReadyEvent.EVENT_NAME), this::fireApplicationPostReadyEvent);
+        requestContextExecutor.execute(new StartupRequestDetails(
+                identification.getInstanceId(), ApplicationPreReadyEvent.EVENT_NAME), this::fireApplicationPreReadyEvent);
+        requestContextExecutor.execute(new StartupRequestDetails(
+                identification.getInstanceId(), ApplicationReadyEvent.EVENT_NAME), this::fireApplicationReadyEvent);
+        requestContextExecutor.execute(new StartupRequestDetails(
+                identification.getInstanceId(), ApplicationPostReadyEvent.EVENT_NAME), this::fireApplicationPostReadyEvent);
     }
 
     /**
      * Fire shutdown
      */
     public void destroy( @Observes @Priority( PriorityConstants.LIBRARY_BEFORE ) @Destroyed( ApplicationScoped.class ) Object init ) {
-        requestContextExecutor.execute(new StartupRequestDetails(ApplicationShutdownEvent.EVENT_NAME), this::fireApplicationShutDownEvent);
+        requestContextExecutor.execute(new StartupRequestDetails(
+                identification.getInstanceId(), ApplicationShutdownEvent.EVENT_NAME), this::fireApplicationShutDownEvent);
     }
 
 

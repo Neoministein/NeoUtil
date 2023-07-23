@@ -29,6 +29,7 @@ import com.neo.util.framework.api.persistence.aggregation.*;
 import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.search.*;
 import com.neo.util.framework.api.queue.QueueMessage;
+import com.neo.util.framework.api.security.InstanceIdentification;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionProvider;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionStatusEvent;
 import com.neo.util.framework.elastic.api.IndexNamingService;
@@ -88,6 +89,8 @@ public class ElasticSearchProvider implements SearchProvider {
     protected Provider<RequestDetails> requestDetailsProvider;
 
     @Inject
+    protected InstanceIdentification instanceIdentification;
+    @Inject
     protected IndexingQueueService indexerQueueService;
 
     @Inject
@@ -123,7 +126,8 @@ public class ElasticSearchProvider implements SearchProvider {
                     bulkQueueableSearchableList.add(buildQueueableSearchable(operation));
                 }
                 indexerQueueService.addToIndexingQueue(new QueueMessage("BulkIngester",
-                        "BulkIngester-" + executionId,
+                        executionId,
+                        instanceIdentification.getInstanceId(),
                         QueueableSearchable.RequestType.BULK.toString(), bulkQueueableSearchableList));
                 if (failure instanceof IllegalStateException illegalStateException) {
 
@@ -364,7 +368,8 @@ public class ElasticSearchProvider implements SearchProvider {
                             queueableSearchable.getRequestType().toString(), queueableSearchable));
                 } else {
                     indexerQueueService.addToIndexingQueue(new QueueMessage("BulkIngester",
-                            "BulkIngester-" + executionId,
+                            executionId,
+                            instanceIdentification.getInstanceId(),
                             queueableSearchable.getRequestType().toString(), queueableSearchable));
 
                 }

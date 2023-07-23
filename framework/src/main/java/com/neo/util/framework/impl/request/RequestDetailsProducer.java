@@ -15,6 +15,7 @@ public class RequestDetailsProducer {
     }
 
     @Produces
+    @UserRequest
     public UserRequestDetails getUserRequestDetails() {
         if (requestDetails instanceof UserRequestDetails userRequestDetails) {
             return userRequestDetails;

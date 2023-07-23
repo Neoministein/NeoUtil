@@ -4,6 +4,7 @@ import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
 import com.neo.util.framework.database.impl.entity.PersonEntity;
+import com.neo.util.framework.impl.request.DummyRequestDetails;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +42,7 @@ class DatabaseProviderAuditIT extends AbstractIntegrationTest<DatabaseProvider> 
     void requestUserTest() {
         //Arrange
         String expectedUser = "ExpectedUserName";
-        RequestDetailsDummy requestDetailsMock = (RequestDetailsDummy) weld.select(RequestDetails.class).get();
+        DummyRequestDetails requestDetailsMock = (DummyRequestDetails) weld.select(RequestDetails.class).get();
         requestDetailsMock.setCaller(expectedUser);
 
 

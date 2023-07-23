@@ -9,6 +9,7 @@ import jakarta.inject.Inject;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class ReflectionService {
@@ -43,6 +44,14 @@ public class ReflectionService {
             return jandexService.getAnnotatedElement(annotation);
         } else {
             return ReflectionUtils.getAnnotatedElement(annotation);
+        }
+    }
+
+    public Set<AnnotatedElement> getAnnotatedElement(Set<Class<? extends Annotation>> annotations) {
+        if (useJandex) {
+            return annotations.stream().map(jandexService::getAnnotatedElement).flatMap(Set::stream).collect(Collectors.toSet());
+        } else {
+            return annotations.stream().map(ReflectionUtils::getAnnotatedElement).flatMap(Set::stream).collect(Collectors.toSet());
         }
     }
 }

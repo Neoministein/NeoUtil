@@ -20,6 +20,17 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>jakarta.websocket</groupId>
+            <artifactId>jakarta.websocket-api</artifactId>
+            <version>${jakarta.websocket.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <version>${jakarta.ws.rs-api.version}</version>
+        </dependency>
         <!-- Test - Framework -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

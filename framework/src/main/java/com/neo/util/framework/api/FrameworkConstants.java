@@ -14,6 +14,9 @@ public final class FrameworkConstants {
     public static final ExceptionDetails EX_FORBIDDEN = new ExceptionDetails(
             "auth/forbidden", "The current request is forbidden",false);
 
+    public static final ExceptionDetails EX_UNSUPPORTED_AUTH_TYPE = new ExceptionDetails(
+            "auth/unsupported", "The provided authentication type is unsupported",false);
+
     private FrameworkConstants() {}
 
 }

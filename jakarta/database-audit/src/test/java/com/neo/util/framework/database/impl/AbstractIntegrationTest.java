@@ -1,6 +1,7 @@
 package com.neo.util.framework.database.impl;
 
 import com.neo.util.framework.database.impl.connection.JtaEnvironment;
+import com.neo.util.framework.impl.request.DummyRequestDetails;
 import com.neo.util.framework.impl.request.RequestDetailsProducer;
 import jakarta.enterprise.context.RequestScoped;
 import org.jboss.weld.environment.se.Weld;
@@ -23,7 +24,7 @@ public abstract class AbstractIntegrationTest<T> {
 
     @BeforeEach
     void init() {
-        weld.select(RequestDetailsProducer.class).get().setRequestDetails(new RequestDetailsDummy());
+        weld.select(RequestDetailsProducer.class).get().setRequestDetails(new DummyRequestDetails());
 
         subject = weld.select(getSubjectClass()).get();
     }

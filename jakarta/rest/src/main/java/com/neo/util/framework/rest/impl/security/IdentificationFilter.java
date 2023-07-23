@@ -1,6 +1,7 @@
 package com.neo.util.framework.rest.impl.security;
 
 import com.neo.util.framework.api.request.RequestContext;
+import com.neo.util.framework.api.security.InstanceIdentification;
 import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.impl.request.RequestDetailsProducer;
 import com.networknt.org.apache.commons.validator.routines.InetAddressValidator;
@@ -15,6 +16,7 @@ import jakarta.ws.rs.ext.Provider;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Provider
 @Priority(100)
@@ -27,9 +29,8 @@ public class IdentificationFilter implements ContainerRequestFilter {
 
     protected static final String INVALID_IP = "255.255.255.255";
 
-    protected static final AtomicInteger REQUEST_ID = new AtomicInteger();
-
-    protected final String instanceUuid = UUID.randomUUID().toString();
+    @Inject
+    protected InstanceIdentification identification;
 
     @Inject
     protected RequestDetailsProducer requestDetailsProvider;
@@ -38,13 +39,9 @@ public class IdentificationFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) {
         requestDetailsProvider.setRequestDetails(
                 new HttpRequestDetails(
+                        identification.getInstanceId(),
                         getRemoteAddress(requestContext),
-                        createNewRequestId(),
                         parseRequestContext(requestContext)));
-    }
-
-    protected String createNewRequestId() {
-        return "HTTP:" + REQUEST_ID.addAndGet(1);
     }
 
     protected RequestContext parseRequestContext(ContainerRequestContext requestContext) {

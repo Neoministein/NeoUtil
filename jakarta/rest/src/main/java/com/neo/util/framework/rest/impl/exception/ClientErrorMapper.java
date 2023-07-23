@@ -46,12 +46,17 @@ public class ClientErrorMapper implements ExceptionMapper<ClientErrorException> 
     @Override
     public Response toResponse(ClientErrorException ex) {
         //Manually running through the filters for logging since the request gets aborted before we even get to them
-        requestIdentificationFilter.filter(context);
-        authenticationFilter.filter(context);
+
+        RequestDetails requestDetails = requestDetailsProvider.get();
+        if (requestDetails == null) {
+            requestIdentificationFilter.filter(context);
+            authenticationFilter.filter(context);
+            requestDetails = requestDetailsProvider.get();
+        }
 
         if (ex instanceof NotFoundException || ex instanceof NotAllowedException) {
             LOGGER.warn("A [{}] occurred with message [{}] setting status to [{}]",
-                    ex.getClass().getSimpleName(), requestDetailsProvider.get().getRequestContext(), ex.getResponse().getStatus());
+                    ex.getClass().getSimpleName(),requestDetails.getRequestContext(), ex.getResponse().getStatus());
         } else {
             LOGGER.warn("A [{}] occurred with message [{}] setting status to [{}]",
                     ex.getClass().getSimpleName(), ex.getMessage(), ex.getResponse().getStatus());

@@ -15,11 +15,6 @@ public class HelidonRequestIdentificationFilter extends IdentificationFilter {
     protected ServerRequest serverRequest;
 
     @Override
-    protected String createNewRequestId() {
-        return instanceUuid + ":" + serverRequest.requestId();
-    }
-
-    @Override
     protected String getRemoteAddress(ContainerRequestContext requestContext) {
         String url = super.getRemoteAddress(requestContext);
 

@@ -1,6 +1,8 @@
 package com.neo.util.framework.rest.impl.security;
 
 import com.neo.util.common.impl.StringUtils;
+import com.neo.util.common.impl.exception.CommonRuntimeException;
+import com.neo.util.framework.api.request.UserRequest;
 import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.api.security.CredentialsGenerator;
 import com.neo.util.framework.api.security.RolePrincipal;
@@ -40,6 +42,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     protected CredentialsGenerator credentialsGenerator;
 
     @Inject
+    @UserRequest
     protected UserRequestDetails requestDetails;
 
     @Override
@@ -53,16 +56,9 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         LOGGER.trace("Authentication attempt");
         try {
             Credential credential = credentialsGenerator.generate(authorizationHeader);
-            Optional<RolePrincipal> principalOptional = authenticationProvider.authenticate(credential);
-            if (principalOptional.isPresent()) {
-                LOGGER.trace("Authentication success");
-                requestDetails.setUserIfPossible(principalOptional.get());
-            } else {
-                LOGGER.trace("Authentication failure");
-            }
-
-        } catch (IllegalArgumentException | IllegalStateException ex) {
-            LOGGER.debug("Invalid authorization header");
+            authenticationProvider.authenticate(requestDetails, credential);
+        } catch (CommonRuntimeException ex) {
+            LOGGER.debug("Invalid authorization header [{}]", ex.getExceptionId());
         }
     }
 }

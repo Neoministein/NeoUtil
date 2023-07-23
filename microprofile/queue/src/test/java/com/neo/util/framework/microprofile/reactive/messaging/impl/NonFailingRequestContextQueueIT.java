@@ -1,6 +1,5 @@
 package com.neo.util.framework.microprofile.reactive.messaging.impl;
 
-import com.neo.util.common.impl.RandomString;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.queue.RequestQueueConsumer;
@@ -15,7 +14,7 @@ import org.junit.jupiter.api.Test;
 @AddExtension(MessagingCdiExtension.class)
 class NonFailingRequestContextQueueIT {
 
-    protected static final QueueMessage BASIC_QUEUE_MESSAGE = new QueueMessage("A_CALLER", new RandomString().nextString(),"A_TYPE", "A_PAYLOAD");
+    protected static final QueueMessage BASIC_QUEUE_MESSAGE = new QueueMessage("A_CALLER", 0L, "A_INSTANCE","A_TYPE", "A_PAYLOAD");
 
     @Inject
     RequestQueueService requestQueueService;

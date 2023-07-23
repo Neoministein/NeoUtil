@@ -1,6 +1,7 @@
 package com.neo.util.framework.rest.impl.security;
 
 import com.neo.util.framework.api.FrameworkConstants;
+import com.neo.util.framework.api.request.UserRequest;
 import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import com.neo.util.framework.rest.api.security.Secured;
@@ -35,6 +36,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     protected ResponseGenerator responseGenerator;
 
     @Inject
+    @UserRequest
     protected UserRequestDetails userRequestDetails;
 
     @Override

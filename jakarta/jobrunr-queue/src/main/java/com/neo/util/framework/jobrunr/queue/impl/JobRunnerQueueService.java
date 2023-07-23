@@ -9,10 +9,10 @@ import com.neo.util.framework.api.queue.QueueListener;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.api.queue.QueueService;
 import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.framework.api.security.InstanceIdentification;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.QueueRequestDetails;
-import com.neo.util.framework.jobrunr.queue.impl.config.JobRunnerConfigurator;
-import com.neo.util.framework.jobrunr.queue.impl.config.QueueListenerConfig;
+import com.neo.util.framework.jobrunr.impl.JobRunnerConfigurator;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
@@ -47,15 +47,12 @@ public class JobRunnerQueueService implements QueueService {
     protected RequestContextExecutor requestContextExecutor;
 
     @Inject
+    protected InstanceIdentification instanceIdentification;
+
+    @Inject
     protected Provider<RequestDetails> requestDetailsProvider;
 
     protected Map<String, QueueListenerConfig> queueListenerMap = new HashMap<>();
-
-    protected JobRunrCDIQueueEntryPoint jobRunrCDIQueueEntryPoint;
-
-    public JobRunnerQueueService() {
-        this.jobRunrCDIQueueEntryPoint = new JobRunrCDIQueueEntryPoint();
-    }
 
     @Inject
     public void init(Instance<QueueListener> queueListeners) {
@@ -86,7 +83,7 @@ public class JobRunnerQueueService implements QueueService {
         QueueListenerConfig config = queueListenerMap.computeIfAbsent(queueName, s -> {
                     throw new ConfigurationException(QueueService.EX_NON_EXISTENT_QUEUE, QueueListener.class.getSimpleName(), queueName); });
 
-        JobLambda action = () -> config.getQueueListener().onMessage(message);
+        JobLambda action = () -> queueAction(queueName, message);
 
         if (config.hasDelay()) {
             BackgroundJob.schedule(Instant.now().plus(Duration.ofSeconds(config.getDelayInSeconds())), action);
@@ -103,7 +100,7 @@ public class JobRunnerQueueService implements QueueService {
         QueueListenerConfig config = queueListenerMap.get(queueName);
 
         try {
-            requestContextExecutor.execute(new QueueRequestDetails(message, config.getRequestContext()), () -> config.getQueueListener().onMessage(message));
+            requestContextExecutor.execute(new QueueRequestDetails(instanceIdentification.getInstanceId(), message, config.getRequestContext()), () -> config.getQueueListener().onMessage(message));
         } catch (RuntimeException ex) {
             LOGGER.error("Unexpected error occurred while processing a queue [{}], action won't be retried.", ex.getMessage());
             throw ex;

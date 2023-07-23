@@ -10,23 +10,29 @@ import com.neo.util.framework.api.queue.QueueMessage;
 public class QueueRequestDetails extends AbstractRequestDetails {
 
     /**
-     * The caller of the queue
+     * The details from the original caller
      */
-    protected final String originalCaller;
+    protected final long originalRequestId;
+    protected final String originalInitiator;
+    protected final String originalInstanceId;
 
-    public QueueRequestDetails(QueueMessage queueMessage, RequestContext requestContext) {
-        super(queueMessage.getRequestId(), requestContext);
-        this.originalCaller = queueMessage.getCaller();
+    public QueueRequestDetails(String instanceId, QueueMessage queueMessage, RequestContext requestContext) {
+        super(instanceId, requestContext);
+        this.originalRequestId = queueMessage.getRequestId();
+        this.originalInitiator = queueMessage.getInitiator();
+        this.originalInstanceId = queueMessage.getInstanceId();
     }
 
-    public QueueRequestDetails(String originalCaller, String requestId, RequestContext requestContext) {
-        super(requestId, requestContext);
-        this.originalCaller = originalCaller;
+    public QueueRequestDetails(String instanceId, String originalInitiator, long originalRequestId, String originalInstanceId, RequestContext requestContext) {
+        super(instanceId, requestContext);
+        this.originalRequestId = originalRequestId;
+        this.originalInitiator = originalInitiator;
+        this.originalInstanceId = originalInstanceId;
     }
 
     @Override
     public String getInitiator() {
-        return originalCaller;
+        return originalInitiator;
     }
 
     public record Context(String queueName) implements RequestContext {

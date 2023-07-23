@@ -16,15 +16,11 @@ import java.util.*;
  */
 public class QueueMessage implements Serializable {
 
-    /**
-     * The caller of the queue
-     */
-    protected String caller;
+    protected String initiator;
 
-    /**
-     * The request id
-     */
-    protected String requestId;
+    protected long requestId;
+
+    protected String instanceId;
 
     /**
      * The type of the queue message.
@@ -41,12 +37,13 @@ public class QueueMessage implements Serializable {
     protected String message;
 
     public QueueMessage(RequestDetails requestDetails, String messageType, Serializable payload) {
-        this(requestDetails.getInitiator(), requestDetails.getRequestIdentification(), messageType, payload);
+        this(requestDetails.getInitiator(), requestDetails.getRequestId(), requestDetails.getInstanceId(), messageType, payload);
     }
 
-    public QueueMessage(String caller, String requestId, String messageType, Serializable payload) {
-        this.caller = caller;
+    public QueueMessage(String initiator, long requestId, String instanceId, String messageType, Serializable payload) {
+        this.initiator = initiator;
         this.requestId = requestId;
+        this.instanceId = instanceId;
         this.messageType = messageType;
         this.message = JsonUtil.toJson(payload);
 
@@ -90,11 +87,15 @@ public class QueueMessage implements Serializable {
         return message;
     }
 
-    public String getCaller() {
-        return caller;
+    public String getInitiator() {
+        return initiator;
     }
 
-    public String getRequestId() {
+    public long getRequestId() {
         return requestId;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
     }
 }

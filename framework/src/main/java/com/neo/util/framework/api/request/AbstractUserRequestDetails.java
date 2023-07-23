@@ -9,13 +9,13 @@ public abstract class AbstractUserRequestDetails extends AbstractRequestDetails 
 
     protected RolePrincipal user = null;
 
-    protected AbstractUserRequestDetails(String requestId, RequestContext requestContext) {
-        super(requestId, requestContext);
+    protected AbstractUserRequestDetails(String instanceId, RequestContext requestContext) {
+        super(instanceId, requestContext);
     }
 
     @Override
     public Optional<RolePrincipal> getUser() {
-        return Optional.empty();
+        return Optional.ofNullable(user);
     }
 
     @Override

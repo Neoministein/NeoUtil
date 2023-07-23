@@ -11,8 +11,10 @@ import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityProvider;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
+import com.neo.util.framework.api.request.UserRequest;
 import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
+import jakarta.enterprise.inject.Alternative;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +50,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
     protected EntityProvider entityRepository;
 
     @Inject
+    @UserRequest
     protected UserRequestDetails userRequestDetails;
 
     @Inject

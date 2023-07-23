@@ -1,8 +1,8 @@
 package com.neo.util.helidon.rest.security;
 
 import com.neo.util.framework.impl.persistence.search.DummySearchProvider;
-import com.neo.util.framework.rest.impl.security.RequestRecorder;
-import com.neo.util.framework.rest.percistence.RequestSearchable;
+import com.neo.util.framework.rest.impl.request.HttpRequestRecordingFilter;
+import com.neo.util.framework.rest.percistence.HttpRequestSearchable;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
 import io.helidon.microprofile.tests.junit5.HelidonTest;
 import jakarta.inject.Inject;
@@ -31,11 +31,11 @@ class RequestRecorderIT extends AbstractIntegrationTest {
         //Act
         webTarget.path(SecurityResource.RESOURCE_LOCATION).request().method("GET");
         //Assert
-        RequestSearchable searchable = (RequestSearchable) searchProvider.getSearchableToIndex();
+        HttpRequestSearchable searchable = (HttpRequestSearchable) searchProvider.getSearchableToIndex();
         Assertions.assertNotNull(searchable);
 
         Assertions.assertNotNull(searchable.getRequestId());
-        Assertions.assertNull(searchable.getOwner());
+        Assertions.assertNull(searchable.getInitiator());
         Assertions.assertEquals("127.0.0.1", searchable.getRemoteAddress());
         Assertions.assertEquals("GET test/security", searchable.getContext());
         Assertions.assertEquals("200", searchable.getStatus());
@@ -55,11 +55,11 @@ class RequestRecorderIT extends AbstractIntegrationTest {
                 .method("GET");
 
         //Assert
-        RequestSearchable searchable = (RequestSearchable) searchProvider.getSearchableToIndex();
+        HttpRequestSearchable searchable = (HttpRequestSearchable) searchProvider.getSearchableToIndex();
         Assertions.assertNotNull(searchable);
 
         Assertions.assertNotNull(searchable.getRequestId());
-        Assertions.assertEquals(BasicAuthorizationProvider.NORMAL_PRINCIPAL.getName(), searchable.getOwner());
+        Assertions.assertEquals(BasicAuthorizationProvider.NORMAL_PRINCIPAL.getName(), searchable.getInitiator());
         Assertions.assertEquals("127.0.0.1", searchable.getRemoteAddress());
         Assertions.assertEquals("GET test/security/secure", searchable.getContext());
         Assertions.assertEquals("200", searchable.getStatus());
@@ -79,15 +79,15 @@ class RequestRecorderIT extends AbstractIntegrationTest {
                 .method("POST");
 
         //Assert
-        RequestSearchable searchable = (RequestSearchable) searchProvider.getSearchableToIndex();
+        HttpRequestSearchable searchable = (HttpRequestSearchable) searchProvider.getSearchableToIndex();
         Assertions.assertNotNull(searchable);
 
         Assertions.assertNotNull(searchable.getRequestId());
-        Assertions.assertEquals(BasicAuthorizationProvider.NORMAL_PRINCIPAL.getName(), searchable.getOwner());
+        Assertions.assertEquals(BasicAuthorizationProvider.NORMAL_PRINCIPAL.getName(), searchable.getInitiator());
         Assertions.assertEquals("127.0.0.1", searchable.getRemoteAddress());
         Assertions.assertEquals("POST test/security/secure", searchable.getContext());
         Assertions.assertEquals("405", searchable.getStatus());
-        Assertions.assertEquals(RequestRecorder.FRAMEWORK_PROVIDED_ERROR, searchable.getError());
+        Assertions.assertEquals(HttpRequestRecordingFilter.FRAMEWORK_PROVIDED_ERROR, searchable.getError());
         Assertions.assertTrue(searchable.getProcessTime() >= 0);
         Assertions.assertNotNull(searchable.getAgent());
         Assertions.assertNotNull(searchable.getCreationDate());
@@ -105,15 +105,15 @@ class RequestRecorderIT extends AbstractIntegrationTest {
                 .method("GET");
 
         //Assert
-        RequestSearchable searchable = (RequestSearchable) searchProvider.getSearchableToIndex();
+        HttpRequestSearchable searchable = (HttpRequestSearchable) searchProvider.getSearchableToIndex();
         Assertions.assertNotNull(searchable);
 
         Assertions.assertNotNull(searchable.getRequestId());
-        Assertions.assertEquals(BasicAuthorizationProvider.NORMAL_PRINCIPAL.getName(), searchable.getOwner());
+        Assertions.assertEquals(BasicAuthorizationProvider.NORMAL_PRINCIPAL.getName(), searchable.getInitiator());
         Assertions.assertEquals("127.0.0.1", searchable.getRemoteAddress());
         Assertions.assertEquals("GET test/security/unknown", searchable.getContext());
         Assertions.assertEquals("404", searchable.getStatus());
-        Assertions.assertEquals(RequestRecorder.FRAMEWORK_PROVIDED_ERROR, searchable.getError());
+        Assertions.assertEquals(HttpRequestRecordingFilter.FRAMEWORK_PROVIDED_ERROR, searchable.getError());
         Assertions.assertTrue(searchable.getProcessTime() >= 0);
         Assertions.assertNotNull(searchable.getAgent());
         Assertions.assertNotNull(searchable.getCreationDate());
@@ -130,15 +130,15 @@ class RequestRecorderIT extends AbstractIntegrationTest {
                 .method("GET");
 
         //Assert
-        RequestSearchable searchable = (RequestSearchable) searchProvider.getSearchableToIndex();
+        HttpRequestSearchable searchable = (HttpRequestSearchable) searchProvider.getSearchableToIndex();
         Assertions.assertNotNull(searchable);
 
         Assertions.assertNotNull(searchable.getRequestId());
-        Assertions.assertNull(searchable.getOwner());
+        Assertions.assertNull(searchable.getInitiator());
         Assertions.assertEquals("127.0.0.1", searchable.getRemoteAddress());
         Assertions.assertEquals("GET test/security/unknown", searchable.getContext());
         Assertions.assertEquals("404", searchable.getStatus());
-        Assertions.assertEquals(RequestRecorder.FRAMEWORK_PROVIDED_ERROR, searchable.getError());
+        Assertions.assertEquals(HttpRequestRecordingFilter.FRAMEWORK_PROVIDED_ERROR, searchable.getError());
         Assertions.assertTrue(searchable.getProcessTime() >= 0);
         Assertions.assertNotNull(searchable.getAgent());
         Assertions.assertNotNull(searchable.getCreationDate());

@@ -36,7 +36,7 @@ public class StringUtils {
      * @return an empty string if object is null
      */
     public static Object parseToEmptyString(Object o) {
-        return (o == null) ? "" : o;
+        return (o == null) ? EMPTY : o;
     }
 
     /**
@@ -96,6 +96,16 @@ public class StringUtils {
             result.write(buffer, 0, length);
         }
         return result.toString(charset);
+    }
+
+    /**
+     * Returns empty string if object is not a string otherwise the received object cast to a string
+     *
+     * @param o object to check
+     * @return an empty string if object is null
+     */
+    public static String toString(Object o) {
+        return (o instanceof String s) ? s : EMPTY;
     }
 
     /**

@@ -8,8 +8,8 @@ import com.neo.util.framework.api.request.RequestContext;
  */
 public class SchedulerRequestDetails extends AbstractRequestDetails {
 
-    public SchedulerRequestDetails(String requestId, RequestContext requestContext) {
-        super(requestId, requestContext);
+    public SchedulerRequestDetails(String instanceId, RequestContext requestContext) {
+        super(instanceId, requestContext);
     }
 
     @Override
@@ -17,7 +17,7 @@ public class SchedulerRequestDetails extends AbstractRequestDetails {
         return requestContext.toString();
     }
 
-    record Context(String scheduleName) implements RequestContext {
+    public record Context(String scheduleName) implements RequestContext {
         @Override
         public String type() {
             return "Scheduler";

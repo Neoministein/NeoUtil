@@ -186,6 +186,22 @@ public class RecurringJobBuilder {
         return this;
     }
 
+    //CUSTOM START
+    /**
+     * Allows to specify the schedule that will be used to create the recurringJobs.
+     *
+     * @param schedule the schedule that will be used to create the recurringJobs.
+     * @return the same builder instance which provides a fluent api
+     */
+    public RecurringJobBuilder withSchedule(Schedule schedule) {
+        if (this.schedule != null) {
+            throw new IllegalArgumentException("A schedule has already been provided.");
+        }
+        this.schedule = schedule;
+        return this;
+    }
+    //CUSTOM END
+
     /**
      * Allows to specify the zoneId that will be used to create the recurringJobs.
      * If no zoneId is set, the {@link ZoneId#systemDefault()} is used.

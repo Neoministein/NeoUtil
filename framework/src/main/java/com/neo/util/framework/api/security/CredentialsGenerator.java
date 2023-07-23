@@ -15,8 +15,7 @@ public interface CredentialsGenerator {
      *
      * @return a valid credential object
      *
-     * @throws IllegalArgumentException the content isn't valid or according to the scheme
-     * @throws IllegalStateException when the Http scheme isn't supported
+     * @throws ValidationException the content isn't valid or scheme isn't supported
      */
     Credential generate(String httpHeader) throws ValidationException;
 }

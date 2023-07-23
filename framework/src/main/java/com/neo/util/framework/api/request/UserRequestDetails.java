@@ -38,7 +38,7 @@ public interface UserRequestDetails extends RequestDetails {
      * Returns the initiator of the request
      */
     default String getInitiator() {
-        return getUser().map(Principal::getName).orElse(getRequestContext() + ":" + getRequestIdentification());
+        return getUser().map(Principal::getName).orElse(getFullRequestId());
     }
 
     /**
@@ -53,6 +53,8 @@ public interface UserRequestDetails extends RequestDetails {
 
     /**
      * Checks if the current user has all the roles
+     * <p>
+     * Will return false when there is no user present and collection is empty.
      *
      * @param roles the roles to check for
      * @return true if the current user has all the roles
@@ -63,11 +65,17 @@ public interface UserRequestDetails extends RequestDetails {
 
     /**
      * Checks if the current user has one the roles
+     * <p>
+     * Will return false when there is no user present and collection is empty.
      *
      * @param roles the roles to check for
-     * @return true if the current user has all the roles
+     * @return true if the current user has one the roles
      */
     default boolean hasOneOfTheRoles(Collection<String> roles) {
+        if (getUser().isPresent() && roles.isEmpty()) {
+            return true;
+        }
+
         return getUser().map(rolePrincipal -> rolePrincipal.getRoles().stream().anyMatch(roles::contains)).orElse(false);
     }
 }

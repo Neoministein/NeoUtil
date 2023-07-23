@@ -4,8 +4,12 @@ import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.api.event.ApplicationShutdownEvent;
+import com.neo.util.framework.impl.config.BasicConfigService;
+import com.neo.util.framework.impl.persistence.search.DummySearchProvider;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.RequestDetailsProducer;
+import com.neo.util.framework.impl.request.recording.RequestRecordingManager;
+import com.neo.util.framework.impl.security.BasicInstanceIdentification;
 import com.neo.util.framework.startup.impl.event.PostReadyListener;
 import com.neo.util.framework.startup.impl.event.PreReadyListener;
 import com.neo.util.framework.startup.impl.event.ReadyListener;
@@ -34,7 +38,12 @@ class ApplicationStartUpIT {
             ReadyListener.class,
             PreReadyListener.class,
             RequestDetailsProducer.class,
-            RequestContextExecutor.class
+            RequestContextExecutor.class,
+            BasicInstanceIdentification.class,
+            RequestRecordingManager.class,
+            DummySearchProvider.class,
+            StartupRequestRecorder.class,
+            BasicConfigService.class
     ).activate(RequestScoped.class).build();
 
     protected ListenerSequenceRecorder recorder;

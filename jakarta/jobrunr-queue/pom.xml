@@ -16,14 +16,8 @@
     <dependencies>
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-framework</artifactId>
+            <artifactId>neoutil-jobrunr</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jobrunr</groupId>
-            <artifactId>jobrunr</artifactId>
-            <version>${jobrunr.version}</version>
         </dependency>
 
         <!-- Test - Framework -->
