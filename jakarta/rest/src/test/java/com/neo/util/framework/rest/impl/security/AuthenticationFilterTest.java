@@ -3,18 +3,17 @@ package com.neo.util.framework.rest.impl.security;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.CredentialsGenerator;
-import com.neo.util.framework.api.security.RolePrincipal;
 import com.neo.util.framework.impl.security.CredentialsGeneratorImpl;
 import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
+import jakarta.security.enterprise.credential.Credential;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.HttpHeaders;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import jakarta.security.enterprise.credential.Credential;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.core.HttpHeaders;
 import java.util.Optional;
 
 class AuthenticationFilterTest {
@@ -40,7 +39,7 @@ class AuthenticationFilterTest {
         credentialsGenerator = Mockito.mock(CredentialsGenerator.class);
         subject.credentialsGenerator = credentialsGenerator;
 
-        requestDetails = new HttpRequestDetails(null, null, new HttpRequestDetails.Context(null, null));
+        requestDetails = new HttpRequestDetails(null, null, null, new HttpRequestDetails.Context(null, null));
         subject.requestDetails = requestDetails;
     }
 

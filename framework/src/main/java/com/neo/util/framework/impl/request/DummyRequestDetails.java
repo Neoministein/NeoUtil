@@ -11,8 +11,14 @@ public class DummyRequestDetails implements RequestDetails {
     protected long requestId = REQUEST_ID.addAndGet(1);
     protected String caller = "DUMMY";
     protected String instanceId = UUID.randomUUID().toString();
+    protected String traceId = UUID.randomUUID().toString();
     protected Instant receiveDate = Instant.now();
     protected RequestContext requestContext = null;
+
+    @Override
+    public String getTraceId() {
+        return traceId;
+    }
 
     @Override
     public String getInitiator() {

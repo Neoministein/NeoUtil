@@ -38,7 +38,7 @@ public interface UserRequestDetails extends RequestDetails {
      * Returns the initiator of the request
      */
     default String getInitiator() {
-        return getUser().map(Principal::getName).orElse(getFullRequestId());
+        return getUser().map(Principal::getName).orElse(getTraceId());
     }
 
     /**

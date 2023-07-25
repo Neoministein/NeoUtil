@@ -9,8 +9,8 @@ public abstract class AbstractUserRequestDetails extends AbstractRequestDetails 
 
     protected RolePrincipal user = null;
 
-    protected AbstractUserRequestDetails(String instanceId, RequestContext requestContext) {
-        super(instanceId, requestContext);
+    protected AbstractUserRequestDetails(String traceId, String instanceId, RequestContext requestContext) {
+        super(traceId, instanceId, requestContext);
     }
 
     @Override

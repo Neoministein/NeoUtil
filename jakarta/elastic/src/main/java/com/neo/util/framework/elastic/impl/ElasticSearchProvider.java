@@ -23,28 +23,27 @@ import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.config.ConfigService;
-import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.api.persistence.aggregation.*;
 import com.neo.util.framework.api.persistence.criteria.*;
 import com.neo.util.framework.api.persistence.search.*;
 import com.neo.util.framework.api.queue.QueueMessage;
-import com.neo.util.framework.api.security.InstanceIdentification;
+import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionProvider;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionStatusEvent;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 import com.neo.util.framework.elastic.api.aggregation.BucketScriptAggregation;
-import jakarta.inject.Provider;
-import jakarta.json.spi.JsonProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.json.spi.JsonProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.time.Instant;
@@ -89,8 +88,6 @@ public class ElasticSearchProvider implements SearchProvider {
     protected Provider<RequestDetails> requestDetailsProvider;
 
     @Inject
-    protected InstanceIdentification instanceIdentification;
-    @Inject
     protected IndexingQueueService indexerQueueService;
 
     @Inject
@@ -125,9 +122,8 @@ public class ElasticSearchProvider implements SearchProvider {
                 for (BulkOperation operation : request.operations()) {
                     bulkQueueableSearchableList.add(buildQueueableSearchable(operation));
                 }
-                indexerQueueService.addToIndexingQueue(new QueueMessage("BulkIngester",
-                        executionId,
-                        instanceIdentification.getInstanceId(),
+                indexerQueueService.addToIndexingQueue(new QueueMessage("BulkIngester-" + executionId,
+                        UUID.randomUUID().toString(),
                         QueueableSearchable.RequestType.BULK.toString(), bulkQueueableSearchableList));
                 if (failure instanceof IllegalStateException illegalStateException) {
 
@@ -367,9 +363,8 @@ public class ElasticSearchProvider implements SearchProvider {
                     indexerQueueService.addToIndexingQueue(new QueueMessage(requestDetailsProvider.get(),
                             queueableSearchable.getRequestType().toString(), queueableSearchable));
                 } else {
-                    indexerQueueService.addToIndexingQueue(new QueueMessage("BulkIngester",
-                            executionId,
-                            instanceIdentification.getInstanceId(),
+                    indexerQueueService.addToIndexingQueue(new QueueMessage("BulkIngester-" + executionId,
+                            UUID.randomUUID().toString(),
                             queueableSearchable.getRequestType().toString(), queueableSearchable));
 
                 }

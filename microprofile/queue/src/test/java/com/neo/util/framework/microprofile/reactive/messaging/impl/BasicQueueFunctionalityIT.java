@@ -5,7 +5,8 @@ import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.queue.BasicQueueConsumer;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.queue.BasicQueueService;
 import io.helidon.microprofile.messaging.MessagingCdiExtension;
-import io.helidon.microprofile.tests.junit5.*;
+import io.helidon.microprofile.tests.junit5.AddExtension;
+import io.helidon.microprofile.tests.junit5.HelidonTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Test;
 @AddExtension(MessagingCdiExtension.class)
 class BasicQueueFunctionalityIT {
 
-    protected static final QueueMessage BASIC_QUEUE_MESSAGE = new QueueMessage("A_CALLER", 0L, "A_INSTANCE","A_TYPE", "A_PAYLOAD");
+    protected static final QueueMessage BASIC_QUEUE_MESSAGE = new QueueMessage("A_CALLER","A_TRACE_ID","A_TYPE", "A_PAYLOAD");
 
     @Inject
     BasicQueueService basicQueueService;

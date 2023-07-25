@@ -18,9 +18,7 @@ public class QueueMessage implements Serializable {
 
     protected String initiator;
 
-    protected long requestId;
-
-    protected String instanceId;
+    protected String traceId;
 
     /**
      * The type of the queue message.
@@ -37,13 +35,12 @@ public class QueueMessage implements Serializable {
     protected String message;
 
     public QueueMessage(RequestDetails requestDetails, String messageType, Serializable payload) {
-        this(requestDetails.getInitiator(), requestDetails.getRequestId(), requestDetails.getInstanceId(), messageType, payload);
+        this(requestDetails.getInitiator(), requestDetails.getTraceId(), messageType, payload);
     }
 
-    public QueueMessage(String initiator, long requestId, String instanceId, String messageType, Serializable payload) {
+    public QueueMessage(String initiator, String traceId, String messageType, Serializable payload) {
         this.initiator = initiator;
-        this.requestId = requestId;
-        this.instanceId = instanceId;
+        this.traceId = traceId;
         this.messageType = messageType;
         this.message = JsonUtil.toJson(payload);
 
@@ -91,11 +88,7 @@ public class QueueMessage implements Serializable {
         return initiator;
     }
 
-    public long getRequestId() {
-        return requestId;
-    }
-
-    public String getInstanceId() {
-        return instanceId;
+    public String getTraceId() {
+        return traceId;
     }
 }

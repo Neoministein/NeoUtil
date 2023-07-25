@@ -2,8 +2,8 @@ package com.neo.util.framework.rest.impl.security;
 
 import com.neo.util.framework.api.request.RequestContext;
 import com.neo.util.framework.api.security.InstanceIdentification;
-import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.impl.request.RequestDetailsProducer;
+import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.networknt.org.apache.commons.validator.routines.InetAddressValidator;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -15,8 +15,6 @@ import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.ext.Provider;
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Provider
 @Priority(100)
@@ -39,9 +37,14 @@ public class IdentificationFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) {
         requestDetailsProvider.setRequestDetails(
                 new HttpRequestDetails(
+                        getTraceId(),
                         identification.getInstanceId(),
                         getRemoteAddress(requestContext),
                         parseRequestContext(requestContext)));
+    }
+
+    protected String getTraceId() {
+        return UUID.randomUUID().toString();
     }
 
     protected RequestContext parseRequestContext(ContainerRequestContext requestContext) {

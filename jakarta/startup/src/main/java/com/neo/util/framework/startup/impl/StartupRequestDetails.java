@@ -3,10 +3,12 @@ package com.neo.util.framework.startup.impl;
 import com.neo.util.framework.api.request.AbstractRequestDetails;
 import com.neo.util.framework.api.request.RequestContext;
 
+import java.util.UUID;
+
 public class StartupRequestDetails extends AbstractRequestDetails {
 
     public StartupRequestDetails(String instanceId, String stage) {
-        super(instanceId, new Context(stage));
+        super(UUID.randomUUID().toString() ,instanceId, new Context(stage));
     }
 
     @Override

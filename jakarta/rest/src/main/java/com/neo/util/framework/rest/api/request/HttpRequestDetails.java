@@ -13,8 +13,8 @@ public class HttpRequestDetails extends AbstractUserRequestDetails {
      */
     protected final String remoteAddress;
 
-    public HttpRequestDetails(String instanceId, String remoteAddress, RequestContext requestContext) {
-        super(instanceId ,requestContext);
+    public HttpRequestDetails(String traceId, String instanceId, String remoteAddress, RequestContext requestContext) {
+        super(traceId, instanceId ,requestContext);
         this.remoteAddress = remoteAddress;
     }
 

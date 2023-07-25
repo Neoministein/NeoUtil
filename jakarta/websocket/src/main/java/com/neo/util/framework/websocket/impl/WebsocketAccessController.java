@@ -17,6 +17,7 @@ import jakarta.ws.rs.core.HttpHeaders;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @ApplicationScoped
 public class WebsocketAccessController {
@@ -54,7 +55,13 @@ public class WebsocketAccessController {
     }
 
     protected UserRequestDetails createUserRequestDetails(Session session) {
-        return new WebsocketRequestDetails(instanceIdentification.getInstanceId(),
+        return new WebsocketRequestDetails(
+                getTraceId(),
+                instanceIdentification.getInstanceId(),
                 new WebsocketRequestDetails.Context(session.getRequestURI().toString()));
+    }
+
+    protected String getTraceId() {
+        return UUID.randomUUID().toString();
     }
 }

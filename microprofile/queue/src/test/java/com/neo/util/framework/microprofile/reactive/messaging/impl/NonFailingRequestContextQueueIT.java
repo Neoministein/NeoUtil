@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 @AddExtension(MessagingCdiExtension.class)
 class NonFailingRequestContextQueueIT {
 
-    protected static final QueueMessage BASIC_QUEUE_MESSAGE = new QueueMessage("A_CALLER", 0L, "A_INSTANCE","A_TYPE", "A_PAYLOAD");
+    protected static final QueueMessage BASIC_QUEUE_MESSAGE = new QueueMessage("A_CALLER", "A_TRACE_ID","A_TYPE", "A_PAYLOAD");
 
     @Inject
     RequestQueueService requestQueueService;

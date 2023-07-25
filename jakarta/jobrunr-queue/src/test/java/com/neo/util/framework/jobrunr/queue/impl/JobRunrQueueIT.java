@@ -2,10 +2,10 @@ package com.neo.util.framework.jobrunr.queue.impl;
 
 import com.neo.util.common.impl.MathUtils;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
-import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.api.queue.QueueService;
+import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.impl.config.BasicConfigService;
 import com.neo.util.framework.impl.config.BasicConfigValue;
 import com.neo.util.framework.impl.request.QueueRequestDetails;
@@ -16,7 +16,10 @@ import org.jboss.weld.junit5.WeldInitiator;
 import org.jboss.weld.junit5.WeldJunit5Extension;
 import org.jboss.weld.junit5.WeldSetup;
 import org.jobrunr.configuration.JobRunr;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.Instant;
@@ -90,6 +93,6 @@ class JobRunrQueueIT {
     }
 
     private RequestDetails create(String queueName) {
-        return new QueueRequestDetails("" ,queueName, 0L, "", new QueueRequestDetails.Context(queueName));
+        return new QueueRequestDetails("", "", "", new QueueRequestDetails.Context(queueName));
     }
 }

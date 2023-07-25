@@ -13,22 +13,20 @@ class JacksonSerializationTest {
     @Test
     void queueMessageTest() {
         //Arrange
-        long requestId = 0L;
+        String traceId = "aTraceId";
         String initiator = "aCaller";
-        String instanceId = "aInstanceId";
         String messageType = "testType";
         String payload = "a String Payload";
 
-        QueueMessage expected = new QueueMessage(initiator, requestId, instanceId,messageType, payload);
+        QueueMessage expected = new QueueMessage(initiator, traceId,messageType, payload);
         //Act
 
         String jsonString = JsonUtil.toJson(expected);
         QueueMessage result = JsonUtil.fromJson(jsonString, QueueMessage.class);
         //Assert
 
-        Assertions.assertEquals(requestId, result.getRequestId());
+        Assertions.assertEquals(traceId, result.getTraceId());
         Assertions.assertEquals(initiator, result.getInitiator());
-        Assertions.assertEquals(instanceId, result.getInstanceId());
         Assertions.assertEquals(messageType, result.getMessageType());
         Assertions.assertEquals(payload, result.getPayload());
     }
@@ -36,16 +34,16 @@ class JacksonSerializationTest {
     @Test
     void queueMessageListPayloadTest() {
         //Arrange
-        long requestId = 0;
         String initiator = "aCaller";
         String instanceId = "aInstanceId";
         String messageType = "testType";
+
         QueueableSearchable queueableSearchable = new QueueableSearchable("index","id",0L, QueueableSearchable.RequestType.INDEX);
         ArrayList<QueueableSearchable> payLoadList = new ArrayList<>();
         payLoadList.add(queueableSearchable);
 
 
-        QueueMessage expected = new QueueMessage(initiator,requestId,instanceId ,messageType, payLoadList);
+        QueueMessage expected = new QueueMessage(initiator, instanceId ,messageType, payLoadList);
         //Act
 
         String jsonString = JsonUtil.toJson(expected);

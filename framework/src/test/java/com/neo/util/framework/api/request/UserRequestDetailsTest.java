@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Set;
 
 class UserRequestDetailsTest {
@@ -14,7 +13,7 @@ class UserRequestDetailsTest {
 
     @BeforeEach
     void before() {
-        subject = new AbstractUserRequestDetails("", new Context()) {};
+        subject = new AbstractUserRequestDetails("", "", new Context()) {};
     }
 
 
