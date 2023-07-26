@@ -13,38 +13,46 @@ public class RequestSearchable extends AbstractSearchable implements Searchable 
 
     public static final String INDEX_NAME = "log-request";
 
-    protected Instant timestamp;
-    protected String requestId;
+    protected String traceId;
     protected String initiator;
+    protected String requestId;
+    protected String instanceId;
     protected String context;
     protected String contextType;
+    protected Instant timestamp;
     protected boolean failed;
     protected long processTime;
 
     public RequestSearchable(RequestDetails requestDetails, boolean failed) {
-        this.timestamp = requestDetails.getRequestStartDate();
-        this.requestId = Long.toString(requestDetails.getRequestId());
+        this.traceId = requestDetails.getTraceId();
         this.initiator = requestDetails.getInitiator();
+        this.requestId = Long.toString(requestDetails.getRequestId());
+        this.instanceId = requestDetails.getInstanceId();
         this.context = requestDetails.getRequestContext().toString();
         this.contextType = requestDetails.getRequestContext().type();
-        this.processTime = System.currentTimeMillis() - requestDetails.getRequestStartDate().toEpochMilli();
+        this.timestamp = requestDetails.getRequestStartDate();
         this.failed = failed;
+        this.processTime = System.currentTimeMillis() - requestDetails.getRequestStartDate().toEpochMilli();
     }
 
     protected RequestSearchable() {
         //Required by Jackson
     }
 
-    public Instant getTimestamp() {
-        return timestamp;
+    public String getTraceId() {
+        return traceId;
+    }
+
+    public String getInitiator() {
+        return initiator;
     }
 
     public String getRequestId() {
         return requestId;
     }
 
-    public String getInitiator() {
-        return initiator;
+    public String getInstanceId() {
+        return instanceId;
     }
 
     public String getContext() {
@@ -53,6 +61,10 @@ public class RequestSearchable extends AbstractSearchable implements Searchable 
 
     public String getContextType() {
         return contextType;
+    }
+
+    public Instant getTimestamp() {
+        return timestamp;
     }
 
     public boolean isFailed() {

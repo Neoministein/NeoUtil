@@ -18,14 +18,12 @@ public @interface FixedRateSchedule {
     /**
      * An application wide unique identifier for this schedule
      */
-    String id();
+    String value();
 
     /**
      * Fixed rate for periodical invocation.
      */
-    long value();
-
-    //TODO IMPL DEALY
+    long delay();
 
     /**
      * Time unit for interpreting supplied values.

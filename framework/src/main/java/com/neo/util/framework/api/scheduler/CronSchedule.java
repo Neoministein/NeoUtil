@@ -175,12 +175,10 @@ public @interface CronSchedule {
     /**
      * An application wide unique identifier for this schedule
      */
-    String id();
+    String value();
 
     /**
      * Cron expression specifying period for invocation.
      */
-    String value();
-
-    //TODO IMPL DEALY
+    String cron();
 }

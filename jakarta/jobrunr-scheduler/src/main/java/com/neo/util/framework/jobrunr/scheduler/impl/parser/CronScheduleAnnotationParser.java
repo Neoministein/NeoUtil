@@ -14,7 +14,7 @@ public class CronScheduleAnnotationParser implements ScheduleAnnotationParser<Cr
     @Override
     public SchedulerConfig parseToBasicConfig(Method method) {
         CronSchedule cronSchedule = method.getAnnotation(CronSchedule.class);
-        return new SchedulerConfig(cronSchedule.id(), method, () -> CronExpression.create(cronSchedule.value()));
+        return new SchedulerConfig(cronSchedule.value(), method, () -> CronExpression.create(cronSchedule.cron()));
     }
 
     @Override

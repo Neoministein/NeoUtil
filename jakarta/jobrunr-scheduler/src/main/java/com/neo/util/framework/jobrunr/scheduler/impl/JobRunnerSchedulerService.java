@@ -1,6 +1,7 @@
 package com.neo.util.framework.jobrunr.scheduler.impl;
 
 import com.neo.util.common.impl.exception.CommonRuntimeException;
+import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
@@ -12,7 +13,7 @@ import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.SchedulerRequestDetails;
 import com.neo.util.framework.jobrunr.scheduler.api.ScheduleAnnotationParser;
 import com.neo.util.framework.jobrunr.scheduler.api.SchedulerConfig;
-import com.neo.util.framework.jobrunr.scheduler.api.SchedulerService;
+import com.neo.util.framework.api.scheduler.SchedulerService;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
@@ -68,16 +69,22 @@ public class JobRunnerSchedulerService implements SchedulerService {
      * This is done only once at startup as no new Scheduler can be added at runtime.
      */
     @Inject
-    public void init(Instance<Object> instance) {
+    public void init(Instance<Object> instance, Instance<ScheduleAnnotationParser<?>> instance2) {
         Map<String, SchedulerConfig> newSchedulersMap = new HashMap<>();
         LOGGER.info("Registering Schedulers...");
-        for (ScheduleAnnotationParser<?> parser: instance.select(ScheduleAnnotationParser.class)) {
+
+        for (ScheduleAnnotationParser<?> parser: instance2) {
             LOGGER.trace("Found [{}] for Annotation [{}]", parser.getClass().getSimpleName(), parser.getType().getSimpleName());
 
             Set<AnnotatedElement> schedulerElements = reflectionService.getAnnotatedElement(parser.getType());
             for (AnnotatedElement schedulerElement : schedulerElements) {
                 Method schedulerMethod = (Method) schedulerElement;
                 SchedulerConfig config = parser.parseToBasicConfig(schedulerMethod);
+
+                if (newSchedulersMap.containsKey(config.getId())) {
+                    throw new DeploymentException(new ConfigurationException(EX_DUPLICATED_SCHEDULER, config.getId()));
+                }
+
                 config.setBeanInstance(getBeanInstance(schedulerMethod, instance));
                 newSchedulersMap.put(config.getId(), config);
                 LOGGER.debug("Registered Scheduler [{}]", config.getId());
@@ -108,7 +115,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
     }
 
     protected void startScheduler(SchedulerConfig schedulerConfig, boolean forceStart) {
-        LOGGER.info("Starting scheduler [{}], force [{}]", schedulerConfig.getId(), forceStart);
+        LOGGER.debug("Starting scheduler [{}], force [{}]", schedulerConfig.getId(), forceStart);
         try {
             Config config = configService.get("scheduler").get(schedulerConfig.getId());
             if (forceStart || config.get("enabled").asBoolean().orElse(true)) {
@@ -123,11 +130,11 @@ public class JobRunnerSchedulerService implements SchedulerService {
             } else {
                 stopScheduler(schedulerConfig.getId());
             }
-        } catch (InvalidCronExpressionException ex) {
+        } catch (InvalidCronExpressionException | IllegalArgumentException ex) {
             if (inStartupPhase) {
                 throw new DeploymentException(ex);
             }
-            throw new ValidationException(EX_INVALID_CHRON_EXPRESSION, ex.getMessage());
+            throw new ValidationException(EX_INVALID_CONFIG_EXPRESSION, ex.getMessage());
         }
     }
 

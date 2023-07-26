@@ -15,7 +15,7 @@ public class FixedRateScheduleAnnotationParser implements ScheduleAnnotationPars
     @Override
     public SchedulerConfig parseToBasicConfig(Method method) {
         FixedRateSchedule fixedRateSchedule = method.getAnnotation(FixedRateSchedule.class);
-        return new SchedulerConfig(fixedRateSchedule.id(), method, () -> new Interval(Duration.ofSeconds(fixedRateSchedule.timeUnit().toSeconds(fixedRateSchedule.value()))));
+        return new SchedulerConfig(fixedRateSchedule.value(), method, () -> new Interval(Duration.ofSeconds(fixedRateSchedule.timeUnit().toSeconds(fixedRateSchedule.delay()))));
     }
 
     @Override
