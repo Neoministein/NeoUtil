@@ -1,20 +1,24 @@
-package com.neo.util.framework.websocket;
+package com.neo.util.framework.websocket.impl.security;
 
 import com.neo.util.framework.websocket.api.WebserverHttpHeaderForwarding;
 import com.neo.util.framework.websocket.impl.AbstractWebsocketEndpoint;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.websocket.*;
+import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @ApplicationScoped
-@ServerEndpoint(value = "/websocket/{id}", configurator = WebserverHttpHeaderForwarding.class)
-public class SocketWithId extends AbstractWebsocketEndpoint {
+@ServerEndpoint(value = "/auth/{id}", configurator = WebserverHttpHeaderForwarding.class)
+public class AuthenticatedWebsocket extends AbstractWebsocketEndpoint {
 
     protected Map<String, String> messageMap = new HashMap<>();
+
+    protected Set<String> roles = new HashSet<>();
 
     @Override
     protected boolean secured() {
@@ -22,9 +26,13 @@ public class SocketWithId extends AbstractWebsocketEndpoint {
     }
 
     @Override
+    protected Set<String> requiredRoles() {
+        return roles;
+    }
+
+    @Override
     public void onOpen(Session session) throws IOException{
         System.out.println(session);
-        session.getBasicRemote().sendText("pong");
     }
 
     @Override
@@ -35,5 +43,9 @@ public class SocketWithId extends AbstractWebsocketEndpoint {
 
     public Map<String, String> getMessageMap() {
         return messageMap;
+    }
+
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
     }
 }

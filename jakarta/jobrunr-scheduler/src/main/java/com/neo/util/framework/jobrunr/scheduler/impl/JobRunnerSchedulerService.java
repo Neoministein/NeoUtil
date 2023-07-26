@@ -1,5 +1,6 @@
 package com.neo.util.framework.jobrunr.scheduler.impl;
 
+import com.neo.util.common.api.func.CheckedRunnable;
 import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ValidationException;
@@ -7,13 +8,13 @@ import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.config.ConfigValue;
 import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
+import com.neo.util.framework.api.scheduler.SchedulerService;
 import com.neo.util.framework.api.security.InstanceIdentification;
 import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.SchedulerRequestDetails;
 import com.neo.util.framework.jobrunr.scheduler.api.ScheduleAnnotationParser;
 import com.neo.util.framework.jobrunr.scheduler.api.SchedulerConfig;
-import com.neo.util.framework.api.scheduler.SchedulerService;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
@@ -158,17 +159,17 @@ public class JobRunnerSchedulerService implements SchedulerService {
         SchedulerConfig schedulerConfig = Optional.ofNullable(schedulers.get(id)).
                 orElseThrow(() -> new CommonRuntimeException(EX_INVALID_SCHEDULER_ID, id));
 
-        Runnable action = () -> {
-            try {
-                schedulerConfig.getMethod().invoke(schedulerConfig.getBeanInstance());
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                LOGGER.error("Unable to invoke [{}.{}] [{}]",
-                        schedulerConfig.getMethod().getDeclaringClass().getName(),
-                        schedulerConfig.getMethod().getName(), ex.getMessage());
-            }
-        };
+        CheckedRunnable<?> action = () -> schedulerConfig.getMethod().invoke(schedulerConfig.getBeanInstance());
 
-        requestContextExecutor.execute(new SchedulerRequestDetails(identification.getInstanceId(), schedulerConfig.getContext()), action);
+        try {
+            requestContextExecutor.executeChecked(new SchedulerRequestDetails(identification.getInstanceId(), schedulerConfig.getContext()), action);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            LOGGER.error("Unable to invoke [{}.{}] [{}]",
+                    schedulerConfig.getMethod().getDeclaringClass().getName(),
+                    schedulerConfig.getMethod().getName(), ex.getMessage());
+        } catch (Exception ex) {
+            LOGGER.error("An unexpected exception occurred ", ex);
+        }
     }
 
     @Override

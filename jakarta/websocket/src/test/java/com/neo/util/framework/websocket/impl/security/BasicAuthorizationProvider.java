@@ -1,4 +1,4 @@
-package com.neo.util.framework.websocket;
+package com.neo.util.framework.websocket.impl.security;
 
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.request.UserRequestDetails;

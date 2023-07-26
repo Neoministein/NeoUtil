@@ -8,7 +8,10 @@ public interface InstanceIdentification {
     String MDC_INSTANCE = "instance";
 
     /**
-     * The id of the current running instance
+     * A unique id of the current running instance.
+     * <p>
+     * This will method will be called to create an instance {@link com.neo.util.framework.api.request.RequestDetails}.
+     * Therefore {@link jakarta.enterprise.context.RequestScoped} will most likely not be establishes yet.
      */
     String getInstanceId();
 }
