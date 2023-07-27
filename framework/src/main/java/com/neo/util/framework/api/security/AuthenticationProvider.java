@@ -2,6 +2,7 @@ package com.neo.util.framework.api.security;
 
 import com.neo.util.framework.api.request.UserRequestDetails;
 import jakarta.security.enterprise.credential.Credential;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -15,10 +16,16 @@ public interface AuthenticationProvider {
      *
      * @param credential to authenticate against
      *
-     * @return
+     * @return the role principal if authentication is successful
      */
     Optional<RolePrincipal> authenticate(Credential credential);
 
+    /**
+     * Authenticates the given {@link UserRequestDetails}
+     *
+     * @param userRequestDetails the user to authenticate
+     * @param credential to authenticate against
+     */
     void authenticate(UserRequestDetails userRequestDetails, Credential credential);
 
     /**
