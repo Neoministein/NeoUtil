@@ -70,7 +70,7 @@ public class CacheInvalidateInterceptor extends CacheInterceptor {
     protected CompletableFuture<Void> invalidate(CacheInvalidate binding, List<Short> cacheKeyParameterPositions,
                                                InvocationContext invocationContext) {
         Cache cache = cacheManager.getCache(binding.cacheName()).orElseThrow();
-        Object key = getCacheKey(cache, binding.keyGenerator(), cacheKeyParameterPositions, invocationContext.getMethod(),
+        Object key = getCacheKey(binding.keyGenerator(), cacheKeyParameterPositions, invocationContext.getMethod(),
                 invocationContext.getParameters());
         LOGGER.debug("Invalidating entry with key [{}] from cache [{}]", key, binding.cacheName());
         return cache.invalidateAsync(key);

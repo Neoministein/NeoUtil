@@ -27,7 +27,7 @@ public class CacheResultInterceptor extends CacheInterceptor {
 
         CacheResult binding = interceptionContext.interceptorBindings().get(0);
         Cache cache = cacheManager.getCache(binding.cacheName()).orElseThrow();
-        Object key = getCacheKey(cache, binding.keyGenerator(), interceptionContext.cacheKeyParameterPositions(),
+        Object key = getCacheKey(binding.keyGenerator(), interceptionContext.cacheKeyParameterPositions(),
                 invocationContext.getMethod(), invocationContext.getParameters());
         LOGGER.debug("Loading cache entry with key [{}] from cache [{}]", key, binding.cacheName());
 

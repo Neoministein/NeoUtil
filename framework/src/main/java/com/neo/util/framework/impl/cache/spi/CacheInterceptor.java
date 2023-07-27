@@ -1,6 +1,5 @@
 package com.neo.util.framework.impl.cache.spi;
 
-import com.neo.util.framework.api.cache.Cache;
 import com.neo.util.framework.api.cache.CacheKeyGenerator;
 import com.neo.util.framework.api.cache.CacheManager;
 import com.neo.util.framework.api.cache.spi.CacheKeyParameterPositions;
@@ -50,14 +49,14 @@ public abstract class CacheInterceptor {
         return new CacheInterceptionContext<>(interceptorBindings, cacheKeyParameterPositions);
     }
 
-    protected Object getCacheKey(Cache cache, Class<? extends CacheKeyGenerator> keyGeneratorClass,
+    protected Object getCacheKey(Class<? extends CacheKeyGenerator> keyGeneratorClass,
                                  List<Short> cacheKeyParameterPositions, Method method, Object[] methodParameterValues) {
         if (keyGeneratorClass != UndefinedCacheKeyGenerator.class) {
             return cacheKeyGeneratorManager.getCacheKeyGenerator(keyGeneratorClass)
                     .generate(method, methodParameterValues);
         } else if (methodParameterValues == null || methodParameterValues.length == 0) {
-            // If the intercepted method doesn't have any parameter, then the default cache key will be used.
-            return cache.getName();
+            // If the intercepted method doesn't have any parameter, then the name of the method will be used.
+            return method.getName();
         } else if (cacheKeyParameterPositions.size() == 1) {
             // If @CacheKeyParameterPositions has only one parameter in the array, then this parameter will be used as the cache key.
             return methodParameterValues[cacheKeyParameterPositions.get(0)];
