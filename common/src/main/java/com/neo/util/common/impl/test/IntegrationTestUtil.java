@@ -2,7 +2,6 @@ package com.neo.util.common.impl.test;
 
 import com.neo.util.common.api.test.WakeupCondition;
 import com.neo.util.common.impl.ThreadUtils;
-
 import org.junit.jupiter.api.Assertions;
 
 import java.time.Instant;
@@ -21,6 +20,14 @@ public final class IntegrationTestUtil {
             .withZone(ZoneId.systemDefault());
 
     private IntegrationTestUtil() {}
+
+    /**
+     * This method waits for the {@link WakeupCondition} to be true. <p>
+     * If the max number of tries are exceeded, {@link  Assertions#fail()} will be invoked.
+     */
+    public static void sleepUntil(WakeupCondition wakeUpCondition) {
+        sleepUntil(100, 50, wakeUpCondition);
+    }
 
     /**
      * This method waits for the {@link WakeupCondition} to be true. <p>
