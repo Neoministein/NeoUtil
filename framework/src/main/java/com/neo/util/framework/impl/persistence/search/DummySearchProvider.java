@@ -3,7 +3,6 @@ package com.neo.util.framework.impl.persistence.search;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.framework.api.persistence.criteria.SearchCriteria;
 import com.neo.util.framework.api.persistence.search.*;
-
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.Collection;
@@ -28,12 +27,12 @@ public class DummySearchProvider implements SearchProvider {
 
     @Override
     public void index(Collection<? extends Searchable> searchableList) {
-
+        index(searchableList, new IndexParameter());
     }
 
     @Override
     public void index(Collection<? extends Searchable> searchableList, IndexParameter indexParameter) {
-
+        this.searchable = searchableList.stream().findFirst().orElse(null);
     }
 
     @Override
@@ -115,7 +114,8 @@ public class DummySearchProvider implements SearchProvider {
         this.enabled = enabled;
     }
 
-    public Searchable getSearchableToIndex() {
-        return searchable;
+    @SuppressWarnings("unchecked")
+    public <T extends Searchable> T getSearchableToIndex() {
+        return (T) searchable;
     }
 }
