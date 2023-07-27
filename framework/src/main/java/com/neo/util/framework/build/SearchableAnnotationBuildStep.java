@@ -29,7 +29,7 @@ public class SearchableAnnotationBuildStep implements BuildStep {
 
     public static final ExceptionDetails EX_MISSING_ANNOTATION = new ExceptionDetails(
             "compile/searchable/missing-annotation",
-            "The class [{}] which is implementing Searchable is missing the annotation [{}]", true
+            "The class [{0}] which is implementing Searchable is missing the annotation [{1}]", true
     );
 
     @Override

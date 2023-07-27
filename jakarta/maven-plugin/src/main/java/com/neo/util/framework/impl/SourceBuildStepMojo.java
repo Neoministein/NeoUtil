@@ -38,6 +38,10 @@ public class SourceBuildStepMojo extends AbstractMojo {
                 ClassLoaderUtils.generate(new ClassLoaderUtils.BuildConfig(
                         true, false, project.getArtifacts(), new File(project.getBuild().getOutputDirectory()))));
 
-        buildStepExecutor.executeBuildSteps(buildContext);
+        try {
+            buildStepExecutor.executeBuildSteps(buildContext);
+        } catch (Exception ex) {
+            throw new MojoExecutionException(ex);
+        }
     }
 }
