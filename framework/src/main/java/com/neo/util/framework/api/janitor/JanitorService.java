@@ -1,5 +1,7 @@
 package com.neo.util.framework.api.janitor;
 
+import com.neo.util.framework.api.scheduler.CronSchedule;
+
 import java.util.Collection;
 
 /**
@@ -24,6 +26,7 @@ public interface JanitorService {
     /**
      * Executes all {@link JanitorJob}
      */
+    @CronSchedule(value = "JanitorService", cron = "0 0 * * *")
     void executeAll();
 
     /**

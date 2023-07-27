@@ -11,6 +11,7 @@ import com.neo.util.framework.impl.JandexService;
 import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.impl.config.BasicConfigService;
 import com.neo.util.framework.impl.config.BasicConfigValue;
+import com.neo.util.framework.impl.janitor.JanitorServiceImpl;
 import com.neo.util.framework.impl.persistence.search.DummySearchProvider;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.RequestDetailsProducer;
@@ -53,7 +54,8 @@ class SchedulerServiceIT {
             CronScheduleAnnotationParser.class,
             FixedRateScheduleAnnotationParser.class,
             SchedulerRequestRecorder.class,
-            TestSchedulers.class
+            TestSchedulers.class,
+            JanitorServiceImpl.class
     ).build();
 
     protected SchedulerService schedulerService;
@@ -133,7 +135,6 @@ class SchedulerServiceIT {
 
         int basicDelay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
         Assertions.assertTrue(MathUtils.isInBounds(basicDelay,9000, 11000), "The delay " + basicDelay);
-        System.out.println(basicDelay);
     }
 
     @Test
@@ -163,6 +164,19 @@ class SchedulerServiceIT {
         weld.select(BasicConfigService.class).get().save(newConfig);
 
         Assertions.assertDoesNotThrow(() -> schedulerService.reload());
+    }
+
+    @Test
+    void annotatedInterface() {
+        setupSchedulers();
+        Instant start = Instant.now();
+        IntegrationTestUtil.sleepUntil(500, 30, () -> {
+            Assertions.assertEquals(1, testSchedulers.getInterfaceExecutionCount());
+            return true;
+        });
+
+        int basicDelay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
+        Assertions.assertTrue(MathUtils.isInBounds(basicDelay,4000, 6000), "The delay " + basicDelay);
     }
 
     protected void setupSchedulers() {

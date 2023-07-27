@@ -129,6 +129,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
 
                 BackgroundJob.createRecurrently(builder);
             } else {
+                LOGGER.debug("Not starting scheduler [{}] since it's not enabled", schedulerConfig.getId());
                 stopScheduler(schedulerConfig.getId());
             }
         } catch (InvalidCronExpressionException | IllegalArgumentException ex) {
@@ -163,12 +164,18 @@ public class JobRunnerSchedulerService implements SchedulerService {
 
         try {
             requestContextExecutor.executeChecked(new SchedulerRequestDetails(identification.getInstanceId(), schedulerConfig.getContext()), action);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+        } catch (IllegalArgumentException  ex) {
             LOGGER.error("Unable to invoke [{}.{}] [{}]",
                     schedulerConfig.getMethod().getDeclaringClass().getName(),
                     schedulerConfig.getMethod().getName(), ex.getMessage());
         } catch (Exception ex) {
-            LOGGER.error("An unexpected exception occurred ", ex);
+            if (ex instanceof IllegalAccessException || ex instanceof InvocationTargetException) {
+                LOGGER.error("Unable to invoke [{}.{}] [{}]",
+                        schedulerConfig.getMethod().getDeclaringClass().getName(),
+                        schedulerConfig.getMethod().getName(), ex.getMessage());
+            } else {
+                LOGGER.error("An unexpected exception occurred ", ex);
+            }
         }
     }
 
