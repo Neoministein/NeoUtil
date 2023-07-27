@@ -4,18 +4,18 @@ import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.Searchable;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;
 import com.neo.util.framework.api.security.RolePrincipal;
-import com.neo.util.framework.percistence.request.RequestSearchable;
+import com.neo.util.framework.percistence.request.RequestLogSearchable;
 import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 
-@SearchableIndex(indexName = RequestSearchable.INDEX_NAME, indexPeriod = IndexPeriod.DAILY)
-public class HttpRequestSearchable extends RequestSearchable implements Searchable {
+@SearchableIndex(indexName = RequestLogSearchable.INDEX_NAME, indexPeriod = IndexPeriod.DAILY)
+public class HttpRequestLogSearchable extends RequestLogSearchable implements Searchable {
 
     protected String remoteAddress;
     protected String status;
     protected String agent;
     protected String error;
 
-    public HttpRequestSearchable(HttpRequestDetails httpRequestDetails, int status, String agent, String error) {
+    public HttpRequestLogSearchable(HttpRequestDetails httpRequestDetails, int status, String agent, String error) {
         super(httpRequestDetails, status >= 400);
         this.remoteAddress = httpRequestDetails.getRemoteAddress();
         this.status = Integer.toString(status);
@@ -24,7 +24,7 @@ public class HttpRequestSearchable extends RequestSearchable implements Searchab
         this.initiator = httpRequestDetails.getUser().map(RolePrincipal::getName).orElse(null);
     }
 
-    protected HttpRequestSearchable() {
+    protected HttpRequestLogSearchable() {
         //Required by Jackson
     }
 

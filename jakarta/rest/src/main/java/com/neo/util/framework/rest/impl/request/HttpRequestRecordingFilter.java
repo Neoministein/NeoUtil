@@ -5,7 +5,7 @@ import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.impl.request.recording.RequestRecordingManager;
 import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
-import com.neo.util.framework.rest.percistence.HttpRequestSearchable;
+import com.neo.util.framework.rest.percistence.HttpRequestLogSearchable;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -37,14 +37,14 @@ public class HttpRequestRecordingFilter implements ContainerResponseFilter {
     public void filter(ContainerRequestContext req,
             ContainerResponseContext resp) {
         if (userRequestDetails != null) {
-            HttpRequestSearchable searchable = parseRequestSearchable((HttpRequestDetails) userRequestDetails, req, resp);
+            HttpRequestLogSearchable searchable = parseRequestSearchable((HttpRequestDetails) userRequestDetails, req, resp);
             requestRecordingManager.recordSearchable(searchable, HttpRequestDetails.class);
         }
     }
 
-    protected HttpRequestSearchable parseRequestSearchable(HttpRequestDetails requestDetails, ContainerRequestContext req,
-                                                           ContainerResponseContext resp) {
-        return new HttpRequestSearchable(
+    protected HttpRequestLogSearchable parseRequestSearchable(HttpRequestDetails requestDetails, ContainerRequestContext req,
+                                                              ContainerResponseContext resp) {
+        return new HttpRequestLogSearchable(
                 requestDetails,
                 resp.getStatus(),
                 Optional.ofNullable(req.getHeaders().get(HttpHeaders.USER_AGENT)).map(Object::toString).orElse(null),

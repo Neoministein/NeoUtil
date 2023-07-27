@@ -3,7 +3,7 @@ package com.neo.util.framework.impl.request.recording;
 import com.neo.util.framework.api.persistence.search.SearchProvider;
 import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.request.recording.RequestRecorder;
-import com.neo.util.framework.percistence.request.RequestSearchable;
+import com.neo.util.framework.percistence.request.RequestLogSearchable;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
@@ -40,7 +40,7 @@ public class RequestRecordingManager {
         }
     }
 
-    public void recordSearchable(RequestSearchable requestSearchable, Class<? extends RequestDetails> recorderClazz) {
+    public void recordSearchable(RequestLogSearchable requestSearchable, Class<? extends RequestDetails> recorderClazz) {
         RequestRecorder<?> requestRecorder = requestRecorderMap.get(recorderClazz);
 
         if(requestRecorder.enabled()) {

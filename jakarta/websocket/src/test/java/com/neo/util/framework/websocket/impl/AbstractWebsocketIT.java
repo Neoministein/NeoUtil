@@ -42,7 +42,7 @@ public class AbstractWebsocketIT {
         ClientEndpointConfig clientConfig = configBuilder.build();
 
         try {
-            return client.connectToServer(endpoint, clientConfig, new URI("ws://127.0.0.1:" + webTarget.getUri().getPort() + "/" + path));
+            return client.connectToServer(endpoint, clientConfig, new URI("ws://127.0.0.1:" + webTarget.getUri().getPort() + path));
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

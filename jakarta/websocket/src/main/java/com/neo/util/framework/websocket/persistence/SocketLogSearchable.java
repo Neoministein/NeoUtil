@@ -1,31 +1,28 @@
 package com.neo.util.framework.websocket.persistence;
 
-import com.neo.util.framework.api.persistence.search.AbstractSearchable;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;
-import jakarta.websocket.Session;
+import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.framework.percistence.request.AbstractLogSearchable;
 
 import java.time.Instant;
 
-@SearchableIndex(indexName = "socket-log", indexPeriod = IndexPeriod.MONTHLY)
-public class SocketLogSearchable extends AbstractSearchable {
+@SearchableIndex(indexName = SocketLogSearchable.INDEX_NAME, indexPeriod = IndexPeriod.MONTHLY)
+public class SocketLogSearchable extends AbstractLogSearchable {
 
-    private Instant timestamp;
-    private String socketId;
-    private String protocolVersion;
-    private String negotiatedSubProtocol;
-    private String requestUri;
+    public static final String INDEX_NAME = INDEX_PREFIX + "-socket";
 
-    private long incoming = 0;
-    private long outgoing = 0;
+    protected String initiator;
+    protected String context;
+    protected long incoming = 0;
+    protected long outgoing = 0;
 
 
-    public SocketLogSearchable(Session session) {
+    public SocketLogSearchable(RequestDetails requestDetails) {
+        super(requestDetails);
         this.timestamp = Instant.now();
-        this.socketId = session.getId();
-        this.protocolVersion = session.getProtocolVersion();
-        this.negotiatedSubProtocol = session.getNegotiatedSubprotocol();
-        this.requestUri = session.getRequestURI().toString();
+        this.initiator = requestDetails.getInitiator();
+        this.context = requestDetails.getRequestContext().toString();
     }
 
     //Required for Jackson
@@ -39,24 +36,12 @@ public class SocketLogSearchable extends AbstractSearchable {
         outgoing += toAdd;
     }
 
-    public Instant getTimestamp() {
-        return timestamp;
+    public String getInitiator() {
+        return initiator;
     }
 
-    public String getSocketId() {
-        return socketId;
-    }
-
-    public String getProtocolVersion() {
-        return protocolVersion;
-    }
-
-    public String getNegotiatedSubProtocol() {
-        return negotiatedSubProtocol;
-    }
-
-    public String getRequestUri() {
-        return requestUri;
+    public String getContext() {
+        return context;
     }
 
     public long getIncoming() {

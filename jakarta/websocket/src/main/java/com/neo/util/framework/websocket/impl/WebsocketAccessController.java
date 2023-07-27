@@ -37,12 +37,8 @@ public class WebsocketAccessController {
                 new WebsocketRequestDetails.Context(session.getRequestURI().toString()));
     }
     
-    public boolean authenticate(UserRequestDetails requestDetails, Map<String, List<String>> headers, boolean secured, Set<String> roles) {
-        if (!secured) {
-            return false;
-        }
-
-        boolean shouldDisconnect;
+    public boolean authenticate(UserRequestDetails requestDetails, Map<String, List<String>> headers, Set<String> roles) {
+        boolean failed;
         try {
             List<String> authHeader = headers.get(HttpHeaders.AUTHORIZATION);
             if (authHeader == null) {
@@ -52,12 +48,12 @@ public class WebsocketAccessController {
             Credential credential = credentialsGenerator.generate(authHeader.stream().findFirst().orElse(StringUtils.EMPTY));
             authenticationProvider.authenticate(requestDetails, credential);
 
-            shouldDisconnect = !requestDetails.hasOneOfTheRoles(roles);
+            failed = !requestDetails.hasOneOfTheRoles(roles);
         } catch (CommonRuntimeException ex) {
-            shouldDisconnect = true;
+            failed = true;
         }
 
-        return shouldDisconnect;
+        return failed;
     }
 
     protected String getTraceId() {

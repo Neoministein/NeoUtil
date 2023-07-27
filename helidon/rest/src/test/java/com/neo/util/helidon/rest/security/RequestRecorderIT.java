@@ -2,7 +2,7 @@ package com.neo.util.helidon.rest.security;
 
 import com.neo.util.framework.impl.persistence.search.DummySearchProvider;
 import com.neo.util.framework.rest.impl.request.HttpRequestRecordingFilter;
-import com.neo.util.framework.rest.percistence.HttpRequestSearchable;
+import com.neo.util.framework.rest.percistence.HttpRequestLogSearchable;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
 import io.helidon.microprofile.tests.junit5.HelidonTest;
 import jakarta.inject.Inject;
@@ -31,7 +31,7 @@ class RequestRecorderIT extends AbstractIntegrationTest {
         //Act
         webTarget.path(SecurityResource.RESOURCE_LOCATION).request().method("GET");
         //Assert
-        HttpRequestSearchable searchable = (HttpRequestSearchable) searchProvider.getSearchableToIndex();
+        HttpRequestLogSearchable searchable = searchProvider.getSearchableToIndex();
         Assertions.assertNotNull(searchable);
 
         Assertions.assertNotNull(searchable.getRequestId());
@@ -55,7 +55,7 @@ class RequestRecorderIT extends AbstractIntegrationTest {
                 .method("GET");
 
         //Assert
-        HttpRequestSearchable searchable = (HttpRequestSearchable) searchProvider.getSearchableToIndex();
+        HttpRequestLogSearchable searchable = searchProvider.getSearchableToIndex();
         Assertions.assertNotNull(searchable);
 
         Assertions.assertNotNull(searchable.getRequestId());
@@ -79,7 +79,7 @@ class RequestRecorderIT extends AbstractIntegrationTest {
                 .method("POST");
 
         //Assert
-        HttpRequestSearchable searchable = (HttpRequestSearchable) searchProvider.getSearchableToIndex();
+        HttpRequestLogSearchable searchable = searchProvider.getSearchableToIndex();
         Assertions.assertNotNull(searchable);
 
         Assertions.assertNotNull(searchable.getRequestId());
@@ -105,7 +105,7 @@ class RequestRecorderIT extends AbstractIntegrationTest {
                 .method("GET");
 
         //Assert
-        HttpRequestSearchable searchable = (HttpRequestSearchable) searchProvider.getSearchableToIndex();
+        HttpRequestLogSearchable searchable = searchProvider.getSearchableToIndex();
         Assertions.assertNotNull(searchable);
 
         Assertions.assertNotNull(searchable.getRequestId());
@@ -130,7 +130,7 @@ class RequestRecorderIT extends AbstractIntegrationTest {
                 .method("GET");
 
         //Assert
-        HttpRequestSearchable searchable = (HttpRequestSearchable) searchProvider.getSearchableToIndex();
+        HttpRequestLogSearchable searchable = searchProvider.getSearchableToIndex();
         Assertions.assertNotNull(searchable);
 
         Assertions.assertNotNull(searchable.getRequestId());

@@ -28,7 +28,7 @@ public abstract class AbstractMonitorableWebsocket extends AbstractWebsocketEndp
     }
 
     @Override
-    public void onMessage(Session session, String message) {
+    public void onMessage(Session session, String message) throws IOException {
         modifySearchableData(session, val -> val.addToIncoming(message.length()));
     }
 
@@ -38,9 +38,7 @@ public abstract class AbstractMonitorableWebsocket extends AbstractWebsocketEndp
 
         synchronized (session) {
             try {
-               session.getBasicRemote().sendText(message);
-            } catch (IOException ex) {
-                LOGGER.warn("Unable to broadcast message [{}] to session [{}]", ex.getMessage(), session.getId());
+               session.getAsyncRemote().sendText(message);
             } catch (IllegalArgumentException ex) {
                 LOGGER.warn("Provided message for session [{}] is null", session.getId());
             }
@@ -48,6 +46,6 @@ public abstract class AbstractMonitorableWebsocket extends AbstractWebsocketEndp
     }
 
     protected void modifySearchableData(Session session, Consumer<SocketLogSearchable> edit) {
-        edit.accept(socketData.computeIfAbsent(session, SocketLogSearchable::new));
+        edit.accept(socketData.computeIfAbsent(session, val -> new SocketLogSearchable(requestDetailsMap.get(val))));
     }
 }

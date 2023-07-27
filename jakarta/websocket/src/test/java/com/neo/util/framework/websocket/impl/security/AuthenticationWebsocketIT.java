@@ -27,7 +27,7 @@ class AuthenticationWebsocketIT extends AbstractWebsocketIT {
 
     @Test
     void noHeaderTest() throws IOException {
-        Session session = connectToWebsocket("auth/id-1", val -> {});
+        Session session = connectToWebsocket("/auth/id-1", val -> {});
         session.getBasicRemote().sendText("A message 1");
 
         ThreadUtils.simpleSleep(1000);
@@ -37,7 +37,7 @@ class AuthenticationWebsocketIT extends AbstractWebsocketIT {
 
     @Test
     void authenticationTest() throws IOException {
-        Session session = connectToWebsocket("auth/id-1", BasicAuthorizationProvider.NORMAL_TOKEN, val -> {});
+        Session session = connectToWebsocket("/auth/id-1", BasicAuthorizationProvider.NORMAL_TOKEN, val -> {});
         session.getBasicRemote().sendText("A message 1");
 
         IntegrationTestUtil.sleepUntil(100, 50, () -> {
@@ -48,7 +48,7 @@ class AuthenticationWebsocketIT extends AbstractWebsocketIT {
 
     @Test
     void authenticationFailureTest() throws IOException {
-        Session session = connectToWebsocket("auth/id1-","", val -> {});
+        Session session = connectToWebsocket("/auth/id1-","", val -> {});
         session.getBasicRemote().sendText("A message 1");
 
         ThreadUtils.simpleSleep(1000);
@@ -60,7 +60,7 @@ class AuthenticationWebsocketIT extends AbstractWebsocketIT {
     void authorizationTest() throws IOException {
         socketWithId.setRoles(Set.of("ADMIN"));
 
-        Session session = connectToWebsocket("auth/id-1", BasicAuthorizationProvider.ADMIN_TOKEN, val -> {});
+        Session session = connectToWebsocket("/auth/id-1", BasicAuthorizationProvider.ADMIN_TOKEN, val -> {});
         session.getBasicRemote().sendText("A message 1");
 
         IntegrationTestUtil.sleepUntil(100, 50, () -> {
@@ -73,7 +73,7 @@ class AuthenticationWebsocketIT extends AbstractWebsocketIT {
     void authorizationFailureTest() throws IOException {
         socketWithId.setRoles(Set.of("SUPER_ADMIN"));
 
-        Session session = connectToWebsocket("auth/id-1", BasicAuthorizationProvider.ADMIN_TOKEN, val -> {});
+        Session session = connectToWebsocket("/auth/id-1", BasicAuthorizationProvider.ADMIN_TOKEN, val -> {});
         session.getBasicRemote().sendText("A message 1");
 
         ThreadUtils.simpleSleep(1000);
