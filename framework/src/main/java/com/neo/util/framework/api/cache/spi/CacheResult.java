@@ -1,6 +1,5 @@
 package com.neo.util.framework.api.cache.spi;
 
-import com.neo.util.framework.api.cache.Cache;
 import com.neo.util.framework.api.cache.CacheKeyGenerator;
 import jakarta.enterprise.util.Nonbinding;
 import jakarta.interceptor.InterceptorBinding;
@@ -18,7 +17,7 @@ import java.lang.annotation.Target;
  * <ul>
  * <li>If a {@link CacheKeyGenerator} is specified with this annotation, then it is used to generate the cache key.
  * The {@link CacheKeyParameterPositions} will then be ignored. </li>
- * <li>Otherwise, if the method has no arguments, then the caches {@link Cache#getName()} will be used</li>
+ * <li>Otherwise, if the method has no arguments, then the name of the method will be used.</li>
  * <li>Otherwise, if the method has exactly one argument, then that argument is the cache key.</li>
  * <li>Otherwise, if the method has {@link CacheKeyParameterPositions} the defined parameter positions will then be used.</li>
  * <li>Otherwise, the cache key is an instance of {@link CompositeCacheKey} built from all the method arguments.</li>

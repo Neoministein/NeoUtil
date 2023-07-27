@@ -1,19 +1,14 @@
 package com.neo.util.framework.impl.cache;
 
-import com.neo.util.framework.api.cache.Cache;
 import com.neo.util.framework.api.cache.CacheKeyGenerator;
 import com.neo.util.framework.api.cache.spi.CompositeCacheKey;
 import com.neo.util.framework.api.cache.spi.UndefinedCacheKeyGenerator;
-import com.neo.util.framework.caffeine.impl.CaffeineCache;
-import com.neo.util.framework.caffeine.impl.CaffeineCacheConfig;
 import com.neo.util.framework.impl.cache.spi.CacheInterceptor;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -22,13 +17,13 @@ class CacheKeyGenerationTest {
     private static final TestCacheInterceptor TEST_CACHE_INTERCEPTOR = new TestCacheInterceptor();
 
     @Test
-    void defaultKeySTest() {
+    void methodNameTest() throws NoSuchMethodException {
         // We need a CaffeineCache instance to test the default key logic.
-        String cacheName = "test-cache";
+        String cacheName = "methodNameTest";
 
-        Cache cache = new CaffeineCache(new CaffeineCacheConfig(cacheName, Optional.empty(),Optional.empty(),Optional.empty()));
+        Method method = CacheKeyGenerationTest.class.getDeclaredMethod("methodNameTest");
 
-        Object actualKey = getCacheKey(cache, Collections.emptyList(), new Object[] {});
+        Object actualKey = getCacheKey(method, Collections.emptyList(), new Object[] {});
         assertEquals(cacheName, actualKey);
     }
 
@@ -67,22 +62,22 @@ class CacheKeyGenerationTest {
         assertEquals(expectedKey, actualKey);
     }
 
-    private Object getCacheKey(Cache cache, List<Short> cacheKeyParameterPositions, Object[] methodParameterValues) {
-        return TEST_CACHE_INTERCEPTOR.getCacheKey(cache, UndefinedCacheKeyGenerator.class, cacheKeyParameterPositions, null,
+    private Object getCacheKey(Method method, List<Short> cacheKeyParameterPositions, Object[] methodParameterValues) {
+        return TEST_CACHE_INTERCEPTOR.getCacheKey(UndefinedCacheKeyGenerator.class, cacheKeyParameterPositions, method,
                 methodParameterValues);
     }
 
     private Object getCacheKey(List<Short> cacheKeyParameterPositions, Object[] methodParameterValues) {
-        return TEST_CACHE_INTERCEPTOR.getCacheKey(null, UndefinedCacheKeyGenerator.class, cacheKeyParameterPositions, null,
+        return TEST_CACHE_INTERCEPTOR.getCacheKey(UndefinedCacheKeyGenerator.class, cacheKeyParameterPositions, null,
                 methodParameterValues);
     }
 
     // This inner class changes the CacheInterceptor#getCacheKey method visibility to public.
     private static class TestCacheInterceptor extends CacheInterceptor {
         @Override
-        public Object getCacheKey(Cache cache, Class<? extends CacheKeyGenerator> keyGeneratorClass,
+        public Object getCacheKey(Class<? extends CacheKeyGenerator> keyGeneratorClass,
                 List<Short> cacheKeyParameterPositions, Method method, Object[] methodParameterValues) {
-            return super.getCacheKey(cache, keyGeneratorClass, cacheKeyParameterPositions, method, methodParameterValues);
+            return super.getCacheKey(keyGeneratorClass, cacheKeyParameterPositions, method, methodParameterValues);
         }
     }
 }

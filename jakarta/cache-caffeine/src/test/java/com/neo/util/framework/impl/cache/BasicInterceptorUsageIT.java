@@ -69,7 +69,7 @@ class BasicInterceptorUsageIT extends AbstractCacheIT {
         // Action: default key cache entry invalidation.
         // Expected effect: STEP 2 cache entry removed.
         // Verified by: STEP 5.
-        subject.invalidate();
+        subject.invalidate("cachedMethod");
 
         // STEP 5
         // Action: same call as STEP 2.
@@ -137,7 +137,7 @@ class BasicInterceptorUsageIT extends AbstractCacheIT {
         }
 
         @CacheInvalidate(cacheName = CACHE_NAME)
-        public void invalidate() {
+        public void invalidate(String key) {
         }
 
         @CacheInvalidateAll(cacheName = CACHE_NAME)
