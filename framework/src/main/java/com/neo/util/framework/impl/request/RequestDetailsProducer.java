@@ -1,6 +1,8 @@
 package com.neo.util.framework.impl.request;
 
-import com.neo.util.framework.api.request.*;
+import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.framework.api.request.UserRequest;
+import com.neo.util.framework.api.request.UserRequestDetails;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.inject.Produces;
 
@@ -24,6 +26,8 @@ public class RequestDetailsProducer {
     }
 
     public void setRequestDetails(RequestDetails requestDetails) {
-        this.requestDetails = requestDetails;
+        if (requestDetails != null) {
+            this.requestDetails = requestDetails;
+        }
     }
 }
