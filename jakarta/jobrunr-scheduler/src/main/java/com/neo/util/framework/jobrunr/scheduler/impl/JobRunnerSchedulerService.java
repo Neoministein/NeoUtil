@@ -156,11 +156,13 @@ public class JobRunnerSchedulerService implements SchedulerService {
 
     @Override
     public void executeScheduler(String id) {
-        LOGGER.info("Executing scheduler [{}]", id);
         SchedulerConfig schedulerConfig = Optional.ofNullable(schedulers.get(id)).
                 orElseThrow(() -> new CommonRuntimeException(EX_INVALID_SCHEDULER_ID, id));
 
-        CheckedRunnable<?> action = () -> schedulerConfig.getMethod().invoke(schedulerConfig.getBeanInstance());
+        CheckedRunnable<?> action = () -> {
+            LOGGER.info("Executing scheduler [{}]", id);
+            schedulerConfig.getMethod().invoke(schedulerConfig.getBeanInstance());
+        };
 
         try {
             requestContextExecutor.executeChecked(new SchedulerRequestDetails(identification.getInstanceId(), schedulerConfig.getContext()), action);
