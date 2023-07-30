@@ -13,6 +13,8 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.ext.Provider;
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
+import java.util.concurrent.TimeUnit;
+
 @ClientCacheControl
 @Provider
 @ApplicationScoped
@@ -28,8 +30,8 @@ public class ClientCacheControlFilter implements ContainerResponseFilter {
             ClientCacheControl cacheAnnotation = restUtils.getAnnotation(ClientCacheControl.class).orElseThrow();
 
             CacheControl cacheControl = new CacheControl();
-            cacheControl.setMaxAge(cacheAnnotation.maxAge());
-            cacheControl.setSMaxAge(cacheAnnotation.sMaxAge());
+            cacheControl.setMaxAge(parseTimeUnit(cacheAnnotation.maxAge(), cacheAnnotation.timeUnit()));
+            cacheControl.setSMaxAge(parseTimeUnit(cacheAnnotation.sMaxAge(), cacheAnnotation.timeUnit()));
             cacheControl.setPrivate(cacheAnnotation.privateFlag());
             cacheControl.setNoCache(cacheAnnotation.noCache());
             cacheControl.setNoStore(cacheAnnotation.noStore());
@@ -41,5 +43,12 @@ public class ClientCacheControlFilter implements ContainerResponseFilter {
                             .toString(cacheControl));
             responseContext.getHeaders().add(HttpHeaders.EXPIRES, cacheAnnotation.maxAge());
         }
+    }
+
+    protected int parseTimeUnit(int value, TimeUnit timeUnit) {
+        if (value == -1) {
+            return -1;
+        }
+        return (int) timeUnit.toSeconds(value);
     }
 }

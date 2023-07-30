@@ -4,8 +4,10 @@ import jakarta.ws.rs.NameBinding;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.util.concurrent.TimeUnit;
 
-import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
@@ -34,6 +36,11 @@ public @interface ClientCacheControl {
      * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.3">HTTP/1.1 section 14.9.3</a>
      */
     int sMaxAge() default -1;
+
+    /**
+     * Time unit for interpreting supplied values.
+     */
+    TimeUnit timeUnit() default TimeUnit.SECONDS;
 
     /**
      * Corresponds to the private cache control directive.
