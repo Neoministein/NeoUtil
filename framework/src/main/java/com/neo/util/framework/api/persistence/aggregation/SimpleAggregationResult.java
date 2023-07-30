@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 /**
  * Defines aggregations result from a {@link SimpleFieldAggregation}
  */
-public record SimpleAggregationResult(String name, Object value) implements AggregationResult {
+public record SimpleAggregationResult(String name, Number value) implements AggregationResult {
 
     @Override
     public String getName() {
@@ -13,7 +13,7 @@ public record SimpleAggregationResult(String name, Object value) implements Aggr
     }
 
     @JsonValue
-    public Object getValue() {
+    public Number getValue() {
         return value;
     }
 }
