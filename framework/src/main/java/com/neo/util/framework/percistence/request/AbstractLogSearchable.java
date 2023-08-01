@@ -10,49 +10,49 @@ public abstract class AbstractLogSearchable extends AbstractSearchable implement
 
     public static final String INDEX_PREFIX = "log";
 
-    protected String traceId;
-    protected String requestId;
-    protected String instanceId;
-    protected String contextType;
     protected Instant timestamp;
+    protected String instance;
+    protected String contextType;
+    protected String requestId;
+    protected String traceId;
 
     protected AbstractLogSearchable(RequestDetails requestDetails) {
-        this.traceId = requestDetails.getTraceId();
-        this.requestId = Long.toString(requestDetails.getRequestId());
-        this.instanceId = requestDetails.getInstanceId();
-        this.contextType = requestDetails.getRequestContext().type();
         this.timestamp = requestDetails.getRequestStartDate();
+        this.instance = requestDetails.getInstanceId();
+        this.contextType = requestDetails.getRequestContext().type();
+        this.requestId = Long.toString(requestDetails.getRequestId());
+        this.traceId = requestDetails.getTraceId();
     }
 
-    protected AbstractLogSearchable(String traceId, String requestId, String instanceId, String contextType, Instant timestamp) {
-        this.traceId = traceId;
-        this.requestId = requestId;
-        this.instanceId = instanceId;
-        this.contextType = contextType;
+    protected AbstractLogSearchable(Instant timestamp, String instanceId, String contextType, String requestId, String traceId) {
         this.timestamp = timestamp;
+        this.instance = instanceId;
+        this.contextType = contextType;
+        this.requestId = requestId;
+        this.traceId = traceId;
     }
 
     protected AbstractLogSearchable() {
         //Required by Jackson
     }
 
-    public String getTraceId() {
-        return traceId;
+    public Instant getTimestamp() {
+        return timestamp;
     }
 
-    public String getRequestId() {
-        return requestId;
-    }
-
-    public String getInstanceId() {
-        return instanceId;
+    public String getInstance() {
+        return instance;
     }
 
     public String getContextType() {
         return contextType;
     }
 
-    public Instant getTimestamp() {
-        return timestamp;
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public String getTraceId() {
+        return traceId;
     }
 }
