@@ -3,7 +3,6 @@ package com.neo.util.framework.elastic.impl;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.framework.api.persistence.search.*;
 import org.junit.Assert;
@@ -12,7 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 
@@ -158,6 +159,18 @@ public class ElasticSearchRepositoryIT extends AbstractElasticIntegrationTest {
 		String uuid = UUID.randomUUID().toString();
 		Searchable dummySearchable = getBasicSearchable(uuid);
 		BulkOperation indexRequest = elasticSearchRepository.buildIndexOperation(dummySearchable);
+		QueueableSearchable transportSearchable = elasticSearchRepository.buildQueueableSearchable(indexRequest);
+
+		elasticSearchRepository.process(transportSearchable);
+
+		validateDocumentInIndex(uuid, INDEX_NAME_FOR_QUERY, true);
+	}
+
+	@Test
+	public void incomingQueueUpsertTest() {
+		String uuid = UUID.randomUUID().toString();
+		Searchable dummySearchable = getBasicSearchable(uuid);
+		BulkOperation indexRequest = elasticSearchRepository.buildUpdateOperation(dummySearchable, true);
 		QueueableSearchable transportSearchable = elasticSearchRepository.buildQueueableSearchable(indexRequest);
 
 		elasticSearchRepository.process(transportSearchable);

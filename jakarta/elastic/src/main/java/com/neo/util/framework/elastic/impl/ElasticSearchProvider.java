@@ -842,12 +842,11 @@ public class ElasticSearchProvider implements SearchProvider {
     protected BulkOperation buildUpdateOperation(QueueableSearchable queueableSearchable) {
         UpdateAction.Builder<Object, Object> action = new UpdateAction.Builder<>()
                 .docAsUpsert(queueableSearchable.getUpsert())
-                .withJson(new StringReader(queueableSearchable.getJsonSource()));
+                .doc(parseStringToJson(queueableSearchable.getJsonSource()));
 
         UpdateOperation.Builder<Object, Object> updateRequest = new UpdateOperation.Builder<>()
                 .index(queueableSearchable.getIndex())
                 .id(queueableSearchable.getId())
-                .withJson(new StringReader(queueableSearchable.getJsonSource()))
                 .action(action.build());
         if (queueableSearchable.getVersion() != null && !StringUtils.isEmpty(queueableSearchable.getId())) {
             updateRequest.version(queueableSearchable.getVersion()).versionType(VersionType.ExternalGte);
@@ -953,7 +952,7 @@ public class ElasticSearchProvider implements SearchProvider {
     public boolean exceptionIsToBeRetried(ErrorCause errorCause) {
         //TODO FIND IT OUT
         if (LOGGER.isErrorEnabled()) {
-            LOGGER.error("An error occurred during an elastic operation {}", JsonUtil.toJson(errorCause));
+            LOGGER.error("An error occurred during an elastic operation: [{}], causedBy: [{}]", errorCause.reason(), errorCause.causedBy());
         }
         return true;
     }
@@ -969,12 +968,12 @@ public class ElasticSearchProvider implements SearchProvider {
 
     protected QueueableSearchable buildQueueableSearchable(IndexOperation<?> request) {
         return new QueueableSearchable(request.index(), request.id(), request.version(), request.routing(),
-                request.document().toString(), QueueableSearchable.RequestType.INDEX);
+                parseElasticJsonSource(request.document()), QueueableSearchable.RequestType.INDEX);
     }
 
     protected QueueableSearchable buildQueueableSearchable(UpdateOperation<?,?> request) {
         return new QueueableSearchable(request.index(), request.id(), null, request.routing(),
-                request.action().doc().toString(),
+                parseElasticJsonSource(request.action().doc()),
                 Boolean.TRUE.equals(request.action().docAsUpsert()),
                 QueueableSearchable.RequestType.UPDATE);
 
@@ -985,11 +984,23 @@ public class ElasticSearchProvider implements SearchProvider {
                 QueueableSearchable.RequestType.DELETE);
     }
 
-    protected JsonData parseObjectNode(JsonNode objectNode) {
+    protected String parseElasticJsonSource(Object request) {
+        if (request instanceof JsonData data) {
+            return data.toJson().toString();
+        } else {
+            return request.toString();
+        }
+    }
+
+    protected JsonData parseObjectNode(JsonNode jsonNode) {
+        return parseStringToJson(jsonNode.toString());
+    }
+
+    protected JsonData parseStringToJson(String jsonSource) {
         JsonpMapper jsonpMapper = getApiClient()._transport().jsonpMapper();
         JsonProvider jsonProvider = jsonpMapper.jsonProvider();
 
-        return JsonData.from(jsonProvider.createParser(new StringReader(objectNode.toString())), jsonpMapper);
+        return JsonData.from(jsonProvider.createParser(new StringReader(jsonSource)), jsonpMapper);
     }
 
     protected List<String> getIndicesOfSearchable(Class<? extends Searchable> searchableClazz) {
