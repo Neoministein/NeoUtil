@@ -19,7 +19,7 @@ public class TestSchedulers implements InterfaceWithSchedule {
     }
 
     @CronSchedule(value = "cron", cron = "0/5 * * * * *")
-    protected void cron() {
+    void cron() {
         cronExecutionCount++;
     }
 

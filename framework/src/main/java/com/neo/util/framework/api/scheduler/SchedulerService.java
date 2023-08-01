@@ -9,8 +9,10 @@ import com.neo.util.common.impl.exception.ExceptionDetails;
  */
 public interface SchedulerService {
 
+    ExceptionDetails EX_METHOD_NOT_ACCESSABLE = new ExceptionDetails(
+            "scheduler/method-not-accessible", "Scheduler is not accessible [{0}.{1}].", true);
     ExceptionDetails EX_DUPLICATED_SCHEDULER = new ExceptionDetails(
-            "queue/duplicated-scheduler-configured","Duplicated scheduler present [{0}].",true);
+            "scheduler/duplicated-scheduler-configured","Duplicated scheduler present [{0}].",true);
 
     ExceptionDetails EX_INVALID_SCHEDULER_ID = new ExceptionDetails(
             "scheduler/invalid-id", "The provided scheduler id [{0}] does not exist.", true);

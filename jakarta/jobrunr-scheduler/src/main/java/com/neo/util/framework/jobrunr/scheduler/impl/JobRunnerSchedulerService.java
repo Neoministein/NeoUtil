@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -87,6 +88,13 @@ public class JobRunnerSchedulerService implements SchedulerService {
                 }
 
                 config.setBeanInstance(getBeanInstance(schedulerMethod, instance));
+
+                if (Modifier.isPrivate(schedulerMethod.getModifiers()) || !schedulerMethod.trySetAccessible()) {
+                    throw new DeploymentException(new ConfigurationException(EX_METHOD_NOT_ACCESSABLE,
+                            schedulerMethod.getDeclaringClass().getName(),
+                            schedulerMethod.getName()));
+                }
+
                 newSchedulersMap.put(config.getId(), config);
                 LOGGER.debug("Registered Scheduler [{}]", config.getId());
             }
