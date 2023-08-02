@@ -30,7 +30,7 @@ public class WebsocketAccessController {
     @Inject
     protected AuthenticationProvider authenticationProvider;
 
-    public UserRequestDetails createUserRequestDetails(Session session) {
+    public WebsocketRequestDetails createUserRequestDetails(Session session) {
         return new WebsocketRequestDetails(
                 getTraceId(),
                 instanceIdentification.getInstanceId(),

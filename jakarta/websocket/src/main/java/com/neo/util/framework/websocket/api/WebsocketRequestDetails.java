@@ -9,6 +9,11 @@ public class WebsocketRequestDetails extends AbstractUserRequestDetails {
         super(traceId, instanceId, requestContext);
     }
 
+    @Override
+    public void updateMDC() {
+        super.updateMDC();
+    }
+
     public record Context(String uri) implements RequestContext {
         @Override
         public String type() {

@@ -1,8 +1,7 @@
 package com.neo.util.framework.websocket.impl;
 
-import com.neo.util.framework.api.request.RequestDetails;
-import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
+import com.neo.util.framework.websocket.api.WebsocketRequestDetails;
 import jakarta.inject.Inject;
 import jakarta.websocket.*;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -14,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractWebsocketEndpoint {
 
-    protected Map<Session, RequestDetails> requestDetailsMap = new ConcurrentHashMap<>();
+    protected Map<Session, WebsocketRequestDetails> requestDetailsMap = new ConcurrentHashMap<>();
 
     @Inject
     protected WebsocketAccessController websocketAccessController;
@@ -38,7 +37,7 @@ public abstract class AbstractWebsocketEndpoint {
 
     @OnOpen
     public void setupContext(Session session, EndpointConfig config) throws IOException {
-        UserRequestDetails requestDetails = websocketAccessController.createUserRequestDetails(session);
+        WebsocketRequestDetails requestDetails = websocketAccessController.createUserRequestDetails(session);
         requestDetailsMap.put(session, requestDetails);
 
         executor.executeChecked(requestDetails, () -> {
@@ -57,12 +56,16 @@ public abstract class AbstractWebsocketEndpoint {
 
     @OnMessage
     public void preMessageSetup(Session session, String message) throws IOException {
-        executor.executeChecked(requestDetailsMap.get(session), () -> onMessage(session, message));
+        WebsocketRequestDetails requestDetails = requestDetailsMap.get(session);
+        requestDetails.updateMDC();
+        executor.executeChecked(requestDetails, () -> onMessage(session, message));
     }
 
     @OnClose
     public void preCloseSetup(Session session) throws IOException {
-        executor.executeChecked(requestDetailsMap.get(session), () -> onClose(session));
+        WebsocketRequestDetails requestDetails = requestDetailsMap.get(session);
+        requestDetails.updateMDC();
+        executor.executeChecked(requestDetails, () -> onClose(session));
     }
 
     protected String getPathParameter(Session session, String name) {
