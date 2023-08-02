@@ -84,6 +84,18 @@ public class StringUtils {
      *  Converts an {@link InputStream} to a {@link String}
      *
      * @param inputStream the input stream to process
+     * @return the consent of the input stream
+     *
+     * @throws IOException if something goes wrong
+     */
+    public static String toString(InputStream inputStream) throws IOException {
+        return toString(inputStream, Charset.defaultCharset());
+    }
+
+    /**
+     *  Converts an {@link InputStream} to a {@link String}
+     *
+     * @param inputStream the input stream to process
      * @param charset the charset to convert it to
      * @return the consent of the input stream
      *

@@ -13,6 +13,7 @@ import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
 import co.elastic.clients.elasticsearch.indices.GetIndexRequest;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.JsonpMapper;
+import co.elastic.clients.util.BinaryData;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.enumeration.Association;
@@ -987,8 +988,14 @@ public class ElasticSearchProvider implements SearchProvider {
     protected String parseElasticJsonSource(Object request) {
         if (request instanceof JsonData data) {
             return data.toJson().toString();
+        } if (request instanceof BinaryData binaryData) {
+            try {
+                return StringUtils.toString(binaryData.asInputStream());
+            } catch (IOException ex) {
+                throw new IllegalArgumentException("Cannot parse ElasticJson source " + request, ex);
+            }
         } else {
-            return request.toString();
+            throw new IllegalArgumentException("Cannot parse ElasticJson source " + request);
         }
     }
 
