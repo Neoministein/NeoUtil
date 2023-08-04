@@ -1,20 +1,27 @@
 package com.neo.util.framework.jobrunr.queue.impl;
 
-import com.neo.util.framework.api.request.RequestContext;
 import com.neo.util.framework.api.queue.QueueListener;
+import com.neo.util.framework.api.request.RequestContext;
 import com.neo.util.framework.impl.request.QueueRequestDetails;
+
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 public class QueueListenerConfig {
 
     protected final String queueName;
     protected final RequestContext requestContext;
-    protected final int delayInSeconds;
+    protected final int retry;
+    protected final int delay;
+    protected final TimeUnit timeUnit;
     protected final QueueListener queueListener;
 
-    public QueueListenerConfig(String queueName, int delayInSeconds, QueueListener queueListener) {
+    public QueueListenerConfig(String queueName, int retry, int delay, TimeUnit timeUnit, QueueListener queueListener) {
         this.queueName = queueName;
         this.requestContext = new QueueRequestDetails.Context(queueName);
-        this.delayInSeconds = delayInSeconds;
+        this.retry = retry;
+        this.delay = delay;
+        this.timeUnit = timeUnit;
         this.queueListener = queueListener;
     }
 
@@ -26,12 +33,21 @@ public class QueueListenerConfig {
         return requestContext;
     }
 
-    public boolean hasDelay() {
-        return delayInSeconds > 0;
+
+    public int getRetry() {
+        return retry;
     }
 
-    public int getDelayInSeconds() {
-        return delayInSeconds;
+    public TimeUnit getTimeUnit() {
+        return timeUnit;
+    }
+
+    public int getDelay() {
+        return delay;
+    }
+
+    public Duration getDuration() {
+        return Duration.ofSeconds(getTimeUnit().toSeconds(getDelay()));
     }
 
     public QueueListener getQueueListener() {

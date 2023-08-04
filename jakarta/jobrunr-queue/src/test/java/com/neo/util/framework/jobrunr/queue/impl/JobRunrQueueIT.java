@@ -3,8 +3,8 @@ package com.neo.util.framework.jobrunr.queue.impl;
 import com.neo.util.common.impl.MathUtils;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
+import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.api.queue.QueueMessage;
-import com.neo.util.framework.api.queue.QueueService;
 import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.impl.config.BasicConfigService;
 import com.neo.util.framework.impl.config.BasicConfigValue;
@@ -30,26 +30,32 @@ class JobRunrQueueIT {
 
     private static final BasicConfigValue<Integer> POOL_INTERVAL = new BasicConfigValue<>(JobRunnerConfigurator.CONFIG_PREFIX + JobRunnerConfigurator.CONFIG_POLL_INTERVAL, 1);
 
-    private static final BasicConfigValue<Integer> DELAY_5_SEC = new BasicConfigValue<>(JobRunnerConfigurator.CONFIG_PREFIX + JobRunnerQueueService.CONFIG_QUEUE + DelayedQueueListener.QUEUE_NAME, 5);
+    private static final BasicConfigValue<Integer> DELAY_5_SEC = new BasicConfigValue<>("queue." + DelayedQueueListener.QUEUE_NAME + ".delay", 5);
+    private static final BasicConfigValue<Integer> RETRY = new BasicConfigValue<>("queue." + RetryQueueListener.QUEUE_NAME + ".retry", 5);
 
     @WeldSetup
     protected WeldInitiator weld = WeldInitiator.from(new Weld()).activate(RequestScoped.class).build();
 
-    protected QueueService queueService;
+    protected JobRunnerQueueService queueService;
 
     protected BasicQueueListener basicQueueListener;
     protected DelayedQueueListener delayedQueueListener;
+    protected RetryQueueListener retryQueueListener;
 
     @BeforeEach
     void init() {
         weld.select(BasicConfigService.class).get().save(POOL_INTERVAL);
         weld.select(BasicConfigService.class).get().save(DELAY_5_SEC);
+        weld.select(BasicConfigService.class).get().save(RETRY);
 
         weld.select(JobRunnerConfigurator.class).get().preReadyEvent(new ApplicationPreReadyEvent());
 
         queueService = weld.select(JobRunnerQueueService.class).get();
+        queueService.readyEvent(new ApplicationReadyEvent());
+
         basicQueueListener = weld.select(BasicQueueListener.class).get();
         delayedQueueListener = weld.select(DelayedQueueListener.class).get();
+        retryQueueListener = weld.select(RetryQueueListener.class).get();
     }
 
     @AfterEach
@@ -90,6 +96,18 @@ class JobRunrQueueIT {
 
         int delay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
         Assertions.assertTrue(MathUtils.isInBounds(delay,4000, 6000), "The delay " + delay);
+
+        //RetryTest
+
+        QueueMessage retryMessage = new QueueMessage(create(RetryQueueListener.QUEUE_NAME), "messageType", "retryPayload");
+
+        queueService.addToQueue(RetryQueueListener.QUEUE_NAME, retryMessage);
+
+        IntegrationTestUtil.sleepUntil(500, 30, () -> {
+            Assertions.assertFalse(retryQueueListener.isFirst());
+            Assertions.assertNotNull(retryQueueListener.getLastMessage());
+            return true;
+        });
     }
 
     private RequestDetails create(String queueName) {
