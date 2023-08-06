@@ -52,7 +52,7 @@ public class ReflectionUtils {
      * @param <T> the annotation type
      */
     public  static  <T extends Annotation> List<T> getAnnotationInstance(Class<T> annotationClazz, ClassLoader classLoader) {
-        return getClassesByAnnotation(annotationClazz, classLoader)
+        return getAnnotatedElement(annotationClazz, classLoader)
                 .stream()
                 .map(clazz -> clazz.getAnnotation(annotationClazz))
                 .toList();
