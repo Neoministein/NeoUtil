@@ -9,7 +9,7 @@ import com.neo.util.framework.api.request.RequestContext;
 public class HttpRequestDetails extends AbstractUserRequestDetails {
 
     /**
-     * Rhe remote address of the caller
+     * The remote address of the caller
      */
     protected final String remoteAddress;
 

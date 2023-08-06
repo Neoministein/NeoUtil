@@ -5,6 +5,7 @@ import com.neo.util.framework.websocket.api.WebsocketRequestDetails;
 import jakarta.inject.Inject;
 import jakarta.websocket.*;
 import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import java.io.IOException;
 import java.util.Map;
@@ -37,13 +38,14 @@ public abstract class AbstractWebsocketEndpoint {
 
     @OnOpen
     public void setupContext(Session session, EndpointConfig config) throws IOException {
-        WebsocketRequestDetails requestDetails = websocketAccessController.createUserRequestDetails(session);
+        MultivaluedMap<String, String> headers = getStoredObject(config, HttpHeaders.class.getSimpleName());
+        WebsocketRequestDetails requestDetails = websocketAccessController.createUserRequestDetails(session, headers);
         requestDetailsMap.put(session, requestDetails);
 
         executor.executeChecked(requestDetails, () -> {
             boolean shouldDisconnect = websocketAccessController.authenticate(
                     requestDetails,
-                    getStoredObject(config, HttpHeaders.class.getSimpleName()),
+                    headers,
                     requiredRoles());
 
             if (shouldDisconnect && secured()) {

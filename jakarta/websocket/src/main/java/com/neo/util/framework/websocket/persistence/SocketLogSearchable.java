@@ -2,8 +2,8 @@ package com.neo.util.framework.websocket.persistence;
 
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;
-import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.percistence.request.AbstractLogSearchable;
+import com.neo.util.framework.websocket.api.WebsocketRequestDetails;
 
 import java.time.Instant;
 
@@ -14,15 +14,17 @@ public class SocketLogSearchable extends AbstractLogSearchable {
 
     protected String initiator;
     protected String context;
+    protected String remoteAddress;
     protected long incoming = 0;
     protected long outgoing = 0;
 
 
-    public SocketLogSearchable(RequestDetails requestDetails) {
+    public SocketLogSearchable(WebsocketRequestDetails requestDetails) {
         super(requestDetails);
         this.timestamp = Instant.now();
         this.initiator = requestDetails.getInitiator();
         this.context = requestDetails.getRequestContext().toString();
+        this.remoteAddress = requestDetails.getRemoteAddress();
     }
 
     //Required for Jackson
