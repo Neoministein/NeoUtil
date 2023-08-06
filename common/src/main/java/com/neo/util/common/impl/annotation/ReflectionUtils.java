@@ -15,6 +15,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,21 @@ public class ReflectionUtils {
      */
     public static Set<Class<?>> getClassesByAnnotation(Class<? extends Annotation> annotation) {
         return getClassesByAnnotation(annotation, ThreadUtils.classLoader());
+    }
+
+    /**
+     * Returns a List of the instances of the annotation.
+     *
+     * @param annotationClazz the annotation to find
+     * @param classLoader the classloader to search through
+     * @return a List of instances of the annotation
+     * @param <T> the annotation type
+     */
+    public  static  <T extends Annotation> List<T> getAnnotationInstance(Class<T> annotationClazz, ClassLoader classLoader) {
+        return getClassesByAnnotation(annotationClazz, classLoader)
+                .stream()
+                .map(clazz -> clazz.getAnnotation(annotationClazz))
+                .toList();
     }
 
     /**
