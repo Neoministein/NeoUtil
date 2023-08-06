@@ -33,6 +33,7 @@ public class SourceBuildStepMojo extends AbstractMojo {
         BuildContext buildContext = new BuildContext(
                 project.getBuild().getDirectory() + "/generated-sources/annotations",
                 project.getBuild().getOutputDirectory(),
+                project.getBuild().getDirectory(),
                 ClassLoaderUtils.generate(new ClassLoaderUtils.BuildConfig(
                         false, false, project.getArtifacts(), new File(project.getBuild().getOutputDirectory()))),
                 ClassLoaderUtils.generate(new ClassLoaderUtils.BuildConfig(

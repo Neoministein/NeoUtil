@@ -33,6 +33,7 @@ public class TestBuildStepMojo extends AbstractMojo {
         BuildContext buildContext = new BuildContext(
                 project.getBuild().getDirectory() + "/generated-test-sources/test-annotations",
                 project.getBuild().getTestOutputDirectory(),
+                project.getBuild().getDirectory(),
                 ClassLoaderUtils.generate(new ClassLoaderUtils.BuildConfig(
                         false, false, project.getArtifacts(), new File(project.getBuild().getTestOutputDirectory()))),
                 ClassLoaderUtils.generate(new ClassLoaderUtils.BuildConfig(
