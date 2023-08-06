@@ -1,16 +1,15 @@
 package com.neo.util.framework.jobrunr.queue.impl;
 
 import com.neo.util.common.impl.exception.ConfigurationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.event.ApplicationReadyEvent;
-import com.neo.util.framework.api.queue.IncomingQueueConnection;
-import com.neo.util.framework.api.queue.QueueListener;
-import com.neo.util.framework.api.queue.QueueMessage;
-import com.neo.util.framework.api.queue.QueueService;
+import com.neo.util.framework.api.queue.*;
 import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.security.InstanceIdentification;
+import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.impl.request.QueueRequestDetails;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import jakarta.annotation.Priority;
@@ -26,10 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.lang.reflect.AnnotatedElement;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Priority(PriorityConstants.APPLICATION)
 @Alternative
@@ -37,6 +37,9 @@ import java.util.concurrent.TimeUnit;
 public class JobRunnerQueueService implements QueueService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobRunnerQueueService.class);
+
+    public static final ExceptionDetails EX_MISSING_OUTGOING = new ExceptionDetails(
+            "queue/missing-outgoing-annotation", "The JobRunner implementation also requires an outgoing annotation for [{0}]", true);
 
     @Inject
     protected ConfigService configService;
@@ -50,33 +53,47 @@ public class JobRunnerQueueService implements QueueService {
     @Inject
     protected Provider<RequestDetails> requestDetailsProvider;
 
-    protected Map<String, QueueListenerConfig> queueListenerMap = new HashMap<>();
+    protected Map<String, JobRunnerQueueConfig> queueListenerMap = new HashMap<>();
 
     public void readyEvent(@Observes ApplicationReadyEvent applicationReadyEvent) {
         LOGGER.debug("ApplicationReadyEvent processed");
     }
 
     @Inject
-    public void init(Instance<QueueListener> queueListeners) {
-        Map<String, QueueListenerConfig> newMap = new HashMap<>();
+    public void init(Instance<QueueListener> queueListeners, ReflectionService reflectionService) {
+        Map<String, OutgoingQueue> queueConnectionMap = new HashMap<>();
+        for (AnnotatedElement annotatedElement: reflectionService.getAnnotatedElement(OutgoingQueue.class)) {
+            OutgoingQueue annotation = annotatedElement.getAnnotation(OutgoingQueue.class);
+            queueConnectionMap.put(annotation.value(), annotation);
+        }
+
+        Map<String, JobRunnerQueueConfig> newMap = new HashMap<>();
+        Config queueConfig = configService.get("queue");
+
         for (QueueListener queueListener: queueListeners) {
             Class<?> clazz = queueListener.getClass().getSuperclass();
 
-            IncomingQueueConnection queueAnnotation = clazz.getAnnotation(IncomingQueueConnection.class);
-            if (newMap.containsKey(queueAnnotation.value())) {
-                throw new ConfigurationException(QueueService.EX_DUPLICATED_QUEUE, queueListener.getClass().getName(), newMap.get(queueAnnotation.value()));
+            IncomingQueue incomingAnnotation = clazz.getAnnotation(IncomingQueue.class);
+
+            if (newMap.containsKey(incomingAnnotation.value())) {
+                throw new ConfigurationException(QueueService.EX_DUPLICATED_QUEUE, queueListener.getClass().getName(), newMap.get(incomingAnnotation.value()));
             }
 
-            Config queueConfig = configService.get("queue").get(queueAnnotation.value());
-            int retry = queueConfig.get("retry").asInt().orElse(0);
-            int delay = queueConfig.get("delay").asInt().orElse(0);
-            TimeUnit timeUnit = queueConfig.get("time-unit").asString().map(TimeUnit::valueOf).orElse(TimeUnit.SECONDS);
+            OutgoingQueue outgoingConnection = queueConnectionMap.get(incomingAnnotation.value());
+            if (outgoingConnection == null) {
+                throw new ConfigurationException(EX_MISSING_OUTGOING, incomingAnnotation.value());
+            }
 
-            LOGGER.debug("Registered Queue [{}], Listener [{}]", queueAnnotation.value(), queueListener.getClass().getSimpleName());
-            newMap.put(queueAnnotation.value(), new QueueListenerConfig(queueAnnotation.value(), retry, delay, timeUnit, queueListener));
+            LOGGER.debug("Registered Queue [{}], Listener [{}]", incomingAnnotation.value(), queueListener.getClass().getSimpleName());
+            newMap.put(incomingAnnotation.value(), new JobRunnerQueueConfig(queueConfig, outgoingConnection, queueListener));
         }
         LOGGER.info("Registered [{}] Queues {}", newMap.size(), newMap.keySet());
         queueListenerMap = newMap;
+    }
+
+    @Override
+    public Collection<String> getQueueNames() {
+        return queueListenerMap.keySet();
     }
 
     @Override
@@ -86,14 +103,19 @@ public class JobRunnerQueueService implements QueueService {
 
     @Override
     public void addToQueue(String queueName, QueueMessage message) {
-        QueueListenerConfig config = queueListenerMap.computeIfAbsent(queueName, s -> {
+        JobRunnerQueueConfig config = queueListenerMap.computeIfAbsent(queueName, s -> {
                     throw new ConfigurationException(QueueService.EX_NON_EXISTENT_QUEUE, QueueListener.class.getSimpleName(), queueName); });
 
         BackgroundJob.create(createJob(config, message));
     }
 
+    @Override
+    public QueueConfig getQueueConfig(String queueName) {
+        return queueListenerMap.get(queueName);
+    }
+
     public void queueAction(String queueName, QueueMessage message) {
-        QueueListenerConfig config = queueListenerMap.get(queueName);
+        JobRunnerQueueConfig config = queueListenerMap.get(queueName);
 
         try {
             requestContextExecutor.execute(new QueueRequestDetails(instanceIdentification.getInstanceId(), message, config.getRequestContext()), () -> config.getQueueListener().onMessage(message));
@@ -104,7 +126,7 @@ public class JobRunnerQueueService implements QueueService {
 
     }
 
-    protected JobBuilder createJob(QueueListenerConfig config, QueueMessage message) {
+    protected JobBuilder createJob(JobRunnerQueueConfig config, QueueMessage message) {
         JobBuilder jobBuilder = JobBuilder.aJob();
         jobBuilder.withDetails(() -> queueAction(config.getQueueName(), message));
         jobBuilder.scheduleAt(Instant.now().plus(config.getDuration()));

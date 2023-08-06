@@ -6,26 +6,30 @@ import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.build.BuildContext;
 import com.neo.util.framework.api.build.BuildStep;
-import com.neo.util.framework.api.request.RequestContext;
-import com.neo.util.framework.api.queue.IncomingQueueConnection;
+import com.neo.util.framework.api.queue.IncomingQueue;
 import com.neo.util.framework.api.queue.QueueListener;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.api.security.InstanceIdentification;
-import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.QueueRequestDetails;
+import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.squareup.javapoet.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.lang.model.element.*;
+import javax.lang.model.element.Modifier;
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletionStage;
 
 /**
- * Generates a microprofile specific impl for a {@link IncomingQueueConnection}
+ * Generates a microprofile specific impl for a {@link IncomingQueue}
  */
 public class IncomingQueueConnectionProcessor implements BuildStep {
 
@@ -47,11 +51,11 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
 
     @Override
     public void execute(BuildContext context) {
-        Set<Class<?>> queueConsumerClasses = ReflectionUtils.getClassesByAnnotation(IncomingQueueConnection.class, context.fullLoader());
+        Set<Class<?>> queueConsumerClasses = ReflectionUtils.getClassesByAnnotation(IncomingQueue.class, context.fullLoader());
         if (queueConsumerClasses.isEmpty()) {
             return;
         }
-        LOGGER.debug("Generating associated files for {} annotation", IncomingQueueConnection.class.getName());
+        LOGGER.debug("Generating associated files for {} annotation", IncomingQueue.class.getName());
 
         Set<Class<?>> incomingInstances = ReflectionUtils.getClassesByAnnotation(Incoming.class, context.fullLoader());
         for (Class<?> incomingClass: incomingInstances) {
@@ -63,7 +67,7 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
             if (!QueueListener.class.isAssignableFrom(queueConsumer)) {
                 throw new IllegalStateException(queueConsumer.getName() + " must implement " + QueueListener.class.getName());
             }
-            String queueName = queueConsumer.getAnnotation(IncomingQueueConnection.class).value();
+            String queueName = queueConsumer.getAnnotation(IncomingQueue.class).value();
 
             Class<?> existingQueueAnnotationClass = existingIncomingAnnotation.get(queueName);
             if (existingQueueAnnotationClass != null) {
@@ -103,17 +107,26 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
                     .build();
             MethodSpec consumeMethodBuilder = MethodSpec.methodBuilder("consumeQueue")
                     .addModifiers(Modifier.PUBLIC)
+                    .addAnnotation(AnnotationSpec.get(getAcknowledgment()))
+                    .returns(ParameterizedTypeName.get(ClassName.get(CompletionStage.class), ClassName.get(Void.class)))
                     .addAnnotation(AnnotationSpec.builder(Incoming.class)
                             .addMember(BASIC_ANNOTATION_FIELD_NAME,"$S" , QUEUE_PREFIX + queueName).build())
-                    .addParameter(String.class, "msg")
+                    .addParameter(ParameterizedTypeName.get(Message.class, String.class),"msg")
+                    .addStatement("$T $N", QueueMessage.class, "queueMessage")
                     .beginControlFlow("try")
-                    .addStatement("final var queueMessage = $T.fromJson(msg, $T.class)", JsonUtil.class, QueueMessage.class)
-                    .addStatement("requestContextExecutor.execute(new $T(instanceIdentification.getInstanceId(), queueMessage, new $T($S)), () -> queueConsumer.onMessage(queueMessage))",
-                            QueueRequestDetails.class, QueueRequestDetails.Context.class, queueName)
+                    .addStatement("$N = $T.fromJson($N.getPayload(), $T.class)", "queueMessage", JsonUtil.class, "msg", QueueMessage.class)
                     .nextControlFlow("catch($T ex)", ValidationException.class)
                     .addStatement("LOGGER.error($S, ex.getMessage())","Unable to parse incoming queue message [{}], action won't be retried.")
+                    .addStatement("return msg.ack()")
+                    .endControlFlow()
+
+                    .beginControlFlow("try")
+                    .addStatement("requestContextExecutor.execute(new $T(instanceIdentification.getInstanceId(), queueMessage, new $T($S)), () -> queueConsumer.onMessage(queueMessage))",
+                            QueueRequestDetails.class, QueueRequestDetails.Context.class, queueName)
+                    .addStatement("return msg.ack()")
                     .nextControlFlow("catch($T ex)", Exception.class)
-                    .addStatement("LOGGER.error($S, ex.getMessage())","Unexpected error occurred while processing a queue [{}], action won't be retried.")
+                    .addStatement("LOGGER.error($S, ex.getMessage())","Unexpected error occurred while processing a queue [{}], action will be retried based on the rety policy.")
+                    .addStatement("return msg.nack(ex)")
                     .endControlFlow()
                     .build();
 
@@ -133,5 +146,20 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
         } catch (Exception ex) {
             throw new IllegalArgumentException("Unable to generate src file for " + queueConsumerClass.getSimpleName(), ex);
         }
+    }
+
+    public Acknowledgment getAcknowledgment() {
+        return new Acknowledgment() {
+
+            @Override
+            public Class<Acknowledgment> annotationType() {
+                return Acknowledgment.class;
+            }
+
+            @Override
+            public Strategy value() {
+                return Acknowledgment.Strategy.MANUAL;
+            }
+        };
     }
 }

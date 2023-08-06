@@ -4,18 +4,21 @@ import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.build.BuildContext;
 import com.neo.util.framework.api.build.BuildStep;
-import com.neo.util.framework.api.queue.OutgoingQueueConnection;
+import com.neo.util.framework.api.queue.OutgoingQueue;
 import com.neo.util.framework.api.queue.QueueProducer;
+import com.neo.util.framework.microprofile.reactive.messaging.api.ReactiveMessageTransformer;
+import com.neo.util.framework.microprofile.reactive.messaging.api.ReactiveMessageTransformerService;
 import com.squareup.javapoet.*;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
+import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
 import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 import org.reactivestreams.FlowAdapters;
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.lang.model.element.*;
+import javax.lang.model.element.Modifier;
 import java.io.File;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
@@ -25,7 +28,7 @@ import java.util.Set;
 import java.util.concurrent.SubmissionPublisher;
 
 /**
- * Generates a microprofile specific impl for a {@link OutgoingQueueConnection}
+ * Generates a microprofile specific impl for a {@link OutgoingQueue}
  */
 public class OutgoingQueueConnectionProcessor implements BuildStep {
 
@@ -41,12 +44,12 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
 
     @Override
     public void execute(BuildContext context) {
-        Set<AnnotatedElement> queueProducerClasses = ReflectionUtils.getAnnotatedElement(OutgoingQueueConnection.class, context.fullLoader());
+        Set<AnnotatedElement> queueProducerClasses = ReflectionUtils.getAnnotatedElement(OutgoingQueue.class, context.fullLoader());
         if (queueProducerClasses.isEmpty()) {
             return;
         }
 
-        LOGGER.debug("Generating associated files for {} annotation", OutgoingQueueConnection.class.getName());
+        LOGGER.debug("Generating associated files for {} annotation", OutgoingQueue.class.getName());
         Set<AnnotatedElement> incomingClasses = ReflectionUtils.getAnnotatedElement((Outgoing.class));
         for (AnnotatedElement element: incomingClasses) {
             Method method = (Method) element;
@@ -57,7 +60,7 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
 
         for (AnnotatedElement element: queueProducerClasses) {
             Class<?> executionMethod = (Class<?>) element;
-            String queueName = element.getAnnotation(OutgoingQueueConnection.class).value();
+            String queueName = element.getAnnotation(OutgoingQueue.class).value();
 
             Class<?> existingQueueAnnotationClass = existingOutgoingAnnotation.get(QUEUE_PREFIX + queueName);
             if (existingQueueAnnotationClass != null) {
@@ -88,6 +91,16 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
                     .addModifiers(Modifier.PROTECTED, Modifier.FINAL)
                     .initializer("new $T<>()", SubmissionPublisher.class)
                     .build();
+            FieldSpec messageTransformer = FieldSpec.builder(TypeName.get(ReactiveMessageTransformer.class), "reactiveMessageTransformer")
+                    .addModifiers(Modifier.PROTECTED, Modifier.FINAL)
+                    .build();
+            MethodSpec constructor = MethodSpec.constructorBuilder()
+                    .addModifiers(Modifier.PUBLIC)
+                    .addAnnotation(Inject.class)
+                    .addParameter(ReactiveMessageTransformerService.class, "messageTransformerService")
+                    .addStatement("this.$N = $N.getTransformer($S)", "reactiveMessageTransformer", "messageTransformerService", queueName)
+                    .build();
+
             MethodSpec addToQueue = MethodSpec.methodBuilder("addToQueue")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(void.class)
@@ -97,10 +110,10 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
                     .build();
             MethodSpec produceToQueue = MethodSpec.methodBuilder("addToQueue")
                     .addModifiers(Modifier.PUBLIC)
-                    .returns(ParameterizedTypeName.get(Publisher.class, String.class))
+                    .returns(ParameterizedTypeName.get(PublisherBuilder.class, Object.class))
                     .addAnnotation(AnnotationSpec.builder(Outgoing.class)
                             .addMember(BASIC_ANNOTATION_FIELD_NAME, "$S", QUEUE_PREFIX + queueName).build())
-                    .addStatement("return $T.fromPublisher($T.toPublisher(emitter)).buildRs()", ReactiveStreams.class, FlowAdapters.class)
+                    .addStatement("return $T.fromPublisher($T.toPublisher(emitter)).map(reactiveMessageTransformer.getMessageTransformer($S))", ReactiveStreams.class, FlowAdapters.class, queueName)
                     .build();
             MethodSpec getQueueName = MethodSpec.methodBuilder("getQueueName")
                     .addModifiers(Modifier.PUBLIC)
@@ -113,10 +126,12 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(ApplicationScoped.class)
                     .addSuperinterface(QueueProducer.class)
+                    .addMethod(constructor)
                     .addMethod(addToQueue)
                     .addMethod(produceToQueue)
                     .addMethod(getQueueName)
                     .addField(queueEmitter)
+                    .addField(messageTransformer)
                     .build();
 
             JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();

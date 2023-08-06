@@ -3,6 +3,7 @@ package com.neo.util.framework.api.queue;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * This interface is an abstraction to the different Queue implementations in Jakarta, Helidon and Quarkus.
@@ -18,6 +19,11 @@ public interface QueueService {
             "queue/non-existent-queue", "The [{0}] [{1}] does not exist", true);
 
     /**
+     * Returns a collection of all queue names.
+     */
+    Collection<String> getQueueNames();
+
+    /**
      * The utility method is here to be used for the most commonly used cases to send notification messages to other
      * processes.
      */
@@ -27,4 +33,9 @@ public interface QueueService {
      * Enqueues the messages as a {@link QueueMessage} into the given Queue.
      */
     void addToQueue(String queueName, QueueMessage message);
+
+    /**
+     * Returns the config for the provided queue name
+     */
+    QueueConfig getQueueConfig(String queueName);
 }

@@ -1,17 +1,17 @@
 package com.neo.util.framework.elastic.impl;
 
-import com.neo.util.framework.api.persistence.search.SearchProvider;
 import com.neo.util.framework.api.persistence.search.QueueableSearchable;
-import com.neo.util.framework.api.queue.IncomingQueueConnection;
+import com.neo.util.framework.api.persistence.search.SearchProvider;
+import com.neo.util.framework.api.queue.IncomingQueue;
 import com.neo.util.framework.api.queue.QueueListener;
 import com.neo.util.framework.api.queue.QueueMessage;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
 import java.util.List;
 
 @ApplicationScoped
-@IncomingQueueConnection(IndexingQueueService.QUEUE_NAME)
+@IncomingQueue(IndexingQueueService.QUEUE_NAME)
 public class IndexingQueueConsumer implements QueueListener {
 
     @Inject
