@@ -19,7 +19,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.Instance;
-import jakarta.enterprise.inject.spi.DeploymentException;
 import jakarta.inject.Inject;
 import org.jobrunr.jobs.lambdas.JobLambda;
 import org.jobrunr.scheduling.BackgroundJob;
@@ -84,15 +83,15 @@ public class JobRunnerSchedulerService implements SchedulerService {
                 SchedulerConfig config = parser.parseToBasicConfig(schedulerMethod);
 
                 if (newSchedulersMap.containsKey(config.getId())) {
-                    throw new DeploymentException(new ConfigurationException(EX_DUPLICATED_SCHEDULER, config.getId()));
+                    throw new ConfigurationException(EX_DUPLICATED_SCHEDULER, config.getId());
                 }
 
                 config.setBeanInstance(getBeanInstance(schedulerMethod, instance));
 
                 if (Modifier.isPrivate(schedulerMethod.getModifiers()) || !schedulerMethod.trySetAccessible()) {
-                    throw new DeploymentException(new ConfigurationException(EX_METHOD_NOT_ACCESSABLE,
+                    throw new ConfigurationException(EX_METHOD_NOT_ACCESSABLE,
                             schedulerMethod.getDeclaringClass().getName(),
-                            schedulerMethod.getName()));
+                            schedulerMethod.getName());
                 }
 
                 newSchedulersMap.put(config.getId(), config);
@@ -141,9 +140,6 @@ public class JobRunnerSchedulerService implements SchedulerService {
                 stopScheduler(schedulerConfig.getId());
             }
         } catch (InvalidCronExpressionException | IllegalArgumentException ex) {
-            if (inStartupPhase) {
-                throw new DeploymentException(ex);
-            }
             throw new ValidationException(EX_INVALID_CONFIG_EXPRESSION, ex.getMessage());
         }
     }

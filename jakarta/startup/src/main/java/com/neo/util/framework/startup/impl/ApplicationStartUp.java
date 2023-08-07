@@ -9,6 +9,7 @@ import com.neo.util.framework.api.event.ApplicationShutdownEvent;
 import com.neo.util.framework.api.security.InstanceIdentification;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import jakarta.annotation.Priority;
+import jakarta.enterprise.inject.spi.DeploymentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,12 +50,18 @@ public class ApplicationStartUp {
      * Fire initialization event
      */
     public void init( @Observes @Priority( PriorityConstants.LIBRARY_BEFORE ) @Initialized( ApplicationScoped.class ) Object init ) {
-        requestContextExecutor.execute(new StartupRequestDetails(
-                identification.getInstanceId(), ApplicationPreReadyEvent.EVENT_NAME), this::fireApplicationPreReadyEvent);
-        requestContextExecutor.execute(new StartupRequestDetails(
-                identification.getInstanceId(), ApplicationReadyEvent.EVENT_NAME), this::fireApplicationReadyEvent);
-        requestContextExecutor.execute(new StartupRequestDetails(
-                identification.getInstanceId(), ApplicationPostReadyEvent.EVENT_NAME), this::fireApplicationPostReadyEvent);
+        try {
+            requestContextExecutor.execute(new StartupRequestDetails(
+                    identification.getInstanceId(), ApplicationPreReadyEvent.EVENT_NAME), this::fireApplicationPreReadyEvent);
+            requestContextExecutor.execute(new StartupRequestDetails(
+                    identification.getInstanceId(), ApplicationReadyEvent.EVENT_NAME), this::fireApplicationReadyEvent);
+            requestContextExecutor.execute(new StartupRequestDetails(
+                    identification.getInstanceId(), ApplicationPostReadyEvent.EVENT_NAME), this::fireApplicationPostReadyEvent);
+        } catch (Exception ex) {
+            LOGGER.error("An error occurred during the startup process of type, [{}] with message [{}]. Throwing DeploymentException",
+                    ex.getClass().getSimpleName(), ex.getMessage());
+            throw new DeploymentException(ex);
+        }
     }
 
     /**
