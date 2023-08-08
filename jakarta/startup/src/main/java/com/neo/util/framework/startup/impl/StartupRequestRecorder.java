@@ -13,11 +13,6 @@ public class StartupRequestRecorder extends AbstractRequestRecorder<StartupReque
     }
 
     @Override
-    public boolean enabled() {
-        return false;
-    }
-
-    @Override
     public Class<StartupRequestDetails> getRequestType() {
         return StartupRequestDetails.class;
     }
