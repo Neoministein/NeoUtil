@@ -18,10 +18,10 @@ public @interface SearchableIndex {
     /**
      * The index period
      */
-    IndexPeriod indexPeriod() default IndexPeriod.DEFAULT;
+    IndexPeriod indexPeriod() default IndexPeriod.YEARLY;
 
     /**
      * Retention Period of the index
      */
-    RetentionPeriod retentionPeriod() default RetentionPeriod.DEFAULT;
+    RetentionPeriod retentionPeriod() default RetentionPeriod.KEEP;
 }

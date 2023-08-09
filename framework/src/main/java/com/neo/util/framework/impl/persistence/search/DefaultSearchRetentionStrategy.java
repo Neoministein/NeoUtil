@@ -36,7 +36,7 @@ public class DefaultSearchRetentionStrategy implements SearchRetentionStrategy {
         LOGGER.info("Checking if index [{}] should be deleted", searchableIndex.indexName());
 
         LOGGER.debug("The retention period of index [{}] is marked as [{}]", searchableIndex.indexName(), searchableIndex.retentionPeriod());
-        if (RetentionPeriod.EXTERNAL == searchableIndex.retentionPeriod()) {
+        if (RetentionPeriod.INDEX_BASED != searchableIndex.retentionPeriod()) {
             return false;
         }
         LOGGER.debug("The index period of index [{}] is marked as [{}]", searchableIndex.indexName(), searchableIndex.indexPeriod());
@@ -79,7 +79,6 @@ public class DefaultSearchRetentionStrategy implements SearchRetentionStrategy {
             case MONTHLY ->  configService.get(MONTHLY_CONFIG).asInt().map(Period::ofDays).orElse(Period.ofYears(1));
             case YEARLY ->  configService.get(YEARLY_CONFIG).asInt().map(Period::ofDays).orElse(Period.ofYears(10));
             case EXTERNAL, ALL ->  null;
-            case DEFAULT ->  getRetentionFromConfig(IndexPeriod.getDefault()).orElse(null);
         };
         LOGGER.trace("The IndexPeriod [{}] retention is configured as [{}]", indexPeriod, retention);
         return Optional.ofNullable(retention);

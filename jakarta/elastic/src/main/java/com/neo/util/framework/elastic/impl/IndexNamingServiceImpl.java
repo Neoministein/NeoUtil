@@ -6,7 +6,6 @@ import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.Searchable;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;
 import com.neo.util.framework.elastic.api.IndexNamingService;
-
 import com.neo.util.framework.impl.ReflectionService;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -201,7 +200,6 @@ public class IndexNamingServiceImpl implements IndexNamingService {
             case MONTHLY -> INDEX_DATE_FORMAT_MONTH;
             case YEARLY -> INDEX_DATE_FORMAT_YEAR;
             case ALL, EXTERNAL -> null;
-            case DEFAULT -> getDateFormatter(IndexPeriod.getDefault());
         };
     }
 

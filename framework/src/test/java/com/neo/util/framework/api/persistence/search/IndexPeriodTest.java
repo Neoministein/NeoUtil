@@ -21,7 +21,6 @@ class IndexPeriodTest {
         LocalDate weekly = IndexPeriod.getNextRollOverDate(IndexPeriod.WEEKLY, dateToTest).orElseThrow();
         LocalDate monthly = IndexPeriod.getNextRollOverDate(IndexPeriod.MONTHLY, dateToTest).orElseThrow();
         LocalDate yearly = IndexPeriod.getNextRollOverDate(IndexPeriod.YEARLY, dateToTest).orElseThrow();
-        LocalDate defaultPeriod = IndexPeriod.getNextRollOverDate(IndexPeriod.DEFAULT, dateToTest).orElseThrow();
         Optional<LocalDate> all = IndexPeriod.getNextRollOverDate(IndexPeriod.ALL, dateToTest);
         Optional<LocalDate> external = IndexPeriod.getNextRollOverDate(IndexPeriod.EXTERNAL, dateToTest);
 
@@ -30,7 +29,6 @@ class IndexPeriodTest {
         Assertions.assertEquals(LocalDate.of(2023, 5, 22), weekly);
         Assertions.assertEquals(LocalDate.of(2023, 6, 1), monthly);
         Assertions.assertEquals(LocalDate.of(2024, 1, 1), yearly);
-        Assertions.assertEquals(LocalDate.of(2024, 1, 1), defaultPeriod);
         Assertions.assertTrue(all.isEmpty());
         Assertions.assertTrue(external.isEmpty());
     }

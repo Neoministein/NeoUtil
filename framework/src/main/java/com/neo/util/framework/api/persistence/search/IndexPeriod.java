@@ -1,6 +1,9 @@
 package com.neo.util.framework.api.persistence.search;
 
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Optional;
 
@@ -26,22 +29,7 @@ public enum IndexPeriod {
     /**
      * The index period is externally handled
      */
-    EXTERNAL,
-
-    /**
-     * The default index period which is defines in {@link #getDefault()}
-     */
-    DEFAULT;
-
-    /**
-     * The default index period
-     *
-     * @return returns the default index period
-     */
-    public static IndexPeriod getDefault() {
-        // Don't return default
-        return YEARLY;
-    }
+    EXTERNAL;
 
     public static Optional<LocalDate> getNextRollOverDate(IndexPeriod indexPeriod, LocalDate localDate) {
         ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());
@@ -51,7 +39,6 @@ public enum IndexPeriod {
             case MONTHLY -> zonedDateTime.with(TemporalAdjusters.lastDayOfMonth()).plusDays(1).toLocalDate();
             case YEARLY -> zonedDateTime.with(TemporalAdjusters.lastDayOfYear()).plusDays(1).toLocalDate();
             case ALL, EXTERNAL -> null;
-            case DEFAULT -> getNextRollOverDate(IndexPeriod.getDefault(), localDate).orElse(null);
         };
         return Optional.ofNullable(rollOver);
     }
