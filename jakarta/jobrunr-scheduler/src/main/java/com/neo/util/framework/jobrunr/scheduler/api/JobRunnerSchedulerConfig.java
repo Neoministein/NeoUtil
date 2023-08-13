@@ -1,5 +1,6 @@
 package com.neo.util.framework.jobrunr.scheduler.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.neo.util.framework.api.scheduler.SchedulerConfig;
 import org.jobrunr.scheduling.Schedule;
 
@@ -8,10 +9,13 @@ import java.util.function.Supplier;
 
 public class JobRunnerSchedulerConfig extends SchedulerConfig {
 
+    @JsonIgnore
     protected final Method method;
     //This is done since the creation time of the object is important to how the calculation works
+    @JsonIgnore
     protected final Supplier<Schedule> schedule;
 
+    @JsonIgnore
     protected Object beanInstance;
 
 
