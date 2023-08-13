@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 
 public interface ScheduleAnnotationParser<T extends Annotation> {
 
-    SchedulerConfig parseToBasicConfig(Method method);
+    JobRunnerSchedulerConfig parseToBasicConfig(Method method);
 
     Class<T> getType();
 }

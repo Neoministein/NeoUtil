@@ -2,6 +2,8 @@ package com.neo.util.framework.api.scheduler;
 
 import com.neo.util.common.impl.exception.ExceptionDetails;
 
+import java.util.Set;
+
 /**
  * This interface is an abstraction to the different Scheduler implementations.
  * <p>
@@ -19,6 +21,10 @@ public interface SchedulerService {
 
     ExceptionDetails EX_INVALID_CONFIG_EXPRESSION = new ExceptionDetails(
             "scheduler/invalid-chron", "The configured expression is invalid because [{0}].", true);
+    /**
+     * Returns the config for the provided scheduler name
+     */
+    SchedulerConfig getSchedulerConfig(String id);
 
     /**
      * Manually executes the provided scheduler
@@ -48,4 +54,9 @@ public interface SchedulerService {
      * Reload all schedulers from configuration.
      */
     void reload();
+
+    /**
+     * Returns a collection of all scheduler ids.
+     */
+    Set<String> getSchedulerIds();
 }
