@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.lang.reflect.AnnotatedElement;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Priority(PriorityConstants.APPLICATION)
 @Alternative
@@ -92,7 +92,7 @@ public class JobRunnerQueueService implements QueueService {
     }
 
     @Override
-    public Collection<String> getQueueNames() {
+    public Set<String> getQueueNames() {
         return queueListenerMap.keySet();
     }
 

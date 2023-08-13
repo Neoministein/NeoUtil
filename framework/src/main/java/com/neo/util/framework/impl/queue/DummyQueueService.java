@@ -6,7 +6,6 @@ import com.neo.util.framework.api.queue.QueueService;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Set;
 
 @ApplicationScoped
@@ -14,7 +13,7 @@ import java.util.Set;
 public class DummyQueueService implements QueueService {
 
     @Override
-    public Collection<String> getQueueNames() {
+    public Set<String> getQueueNames() {
         return Set.of();
     }
 

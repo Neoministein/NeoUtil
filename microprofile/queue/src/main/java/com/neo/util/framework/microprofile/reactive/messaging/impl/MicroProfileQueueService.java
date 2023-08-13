@@ -22,9 +22,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.lang.reflect.AnnotatedElement;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Priority(PriorityConstants.APPLICATION)
 @Alternative
@@ -75,7 +75,7 @@ public class MicroProfileQueueService implements QueueService {
     }
 
     @Override
-    public Collection<String> getQueueNames() {
+    public Set<String> getQueueNames() {
         return queueProducerMap.keySet();
     }
 

@@ -3,7 +3,7 @@ package com.neo.util.framework.api.queue;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.Set;
 
 /**
  * This interface is an abstraction to the different Queue implementations in Jakarta, Helidon and Quarkus.
@@ -21,7 +21,7 @@ public interface QueueService {
     /**
      * Returns a collection of all queue names.
      */
-    Collection<String> getQueueNames();
+    Set<String> getQueueNames();
 
     /**
      * The utility method is here to be used for the most commonly used cases to send notification messages to other
