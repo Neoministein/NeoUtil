@@ -6,11 +6,18 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.json.JsonUtil;
+import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionProvider;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionStatusEvent;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Priority;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -20,11 +27,6 @@ import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Event;
-import jakarta.enterprise.event.Observes;
-import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +87,7 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
         }
     }
 
-    public void onStartUp(@Observes ApplicationPreReadyEvent preReadyEvent) {
+    public void onStartUp(@Observes @Priority(PriorityConstants.LIBRARY_BEFORE) ApplicationPreReadyEvent preReadyEvent) {
         LOGGER.debug("ApplicationPreReadyEvent processed");
     }
 
