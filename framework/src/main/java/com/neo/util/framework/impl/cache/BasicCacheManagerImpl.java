@@ -11,7 +11,10 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @ApplicationScoped
 public class BasicCacheManagerImpl implements CacheManager {
@@ -30,7 +33,7 @@ public class BasicCacheManagerImpl implements CacheManager {
     }
 
     @Override
-    public Collection<String> getCacheNames() {
+    public Set<String> getCacheNames() {
         return keys;
     }
 

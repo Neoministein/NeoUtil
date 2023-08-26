@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public interface SchedulerService {
 
-    ExceptionDetails EX_METHOD_NOT_ACCESSABLE = new ExceptionDetails(
+    ExceptionDetails EX_METHOD_NOT_ACCESSIBLE = new ExceptionDetails(
             "scheduler/method-not-accessible", "Scheduler is not accessible [{0}.{1}].", true);
     ExceptionDetails EX_DUPLICATED_SCHEDULER = new ExceptionDetails(
             "scheduler/duplicated-scheduler-configured","Duplicated scheduler present [{0}].",true);
@@ -30,7 +30,7 @@ public interface SchedulerService {
      * Manually executes the provided scheduler
      *
      * @param id the id of the scheduler
-     * @throws com.neo.util.common.impl.exception.CommonRuntimeException if id doesn't exist
+     * @throws com.neo.util.common.impl.exception.NoContentFoundException if id doesn't exist
      */
     void executeScheduler(String id);
 
@@ -38,7 +38,7 @@ public interface SchedulerService {
      * Manually starts the scheduler
      *
      * @param id the id of the scheduler
-     * @throws com.neo.util.common.impl.exception.CommonRuntimeException if id doesn't exist
+     * @throws com.neo.util.common.impl.exception.NoContentFoundException if id doesn't exist
      */
     void startScheduler(String id);
 
@@ -46,7 +46,7 @@ public interface SchedulerService {
      * Manually stops the scheduler
      *
      * @param id the id of the scheduler
-     * @throws com.neo.util.common.impl.exception.CommonRuntimeException if id doesn't exist
+     * @throws com.neo.util.common.impl.exception.NoContentFoundException if id doesn't exist
      */
     void stopScheduler(String id);
 

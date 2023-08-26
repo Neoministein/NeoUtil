@@ -1,8 +1,8 @@
 package com.neo.util.framework.jobrunr.scheduler.impl;
 
 import com.neo.util.common.api.func.CheckedRunnable;
-import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.ConfigurationException;
+import com.neo.util.common.impl.exception.NoContentFoundException;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.config.Config;
@@ -95,7 +95,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
                 config.setBeanInstance(getBeanInstance(schedulerMethod, instance));
 
                 if (Modifier.isPrivate(schedulerMethod.getModifiers()) || !schedulerMethod.trySetAccessible()) {
-                    throw new ConfigurationException(EX_METHOD_NOT_ACCESSABLE,
+                    throw new ConfigurationException(EX_METHOD_NOT_ACCESSIBLE,
                             schedulerMethod.getDeclaringClass().getName(),
                             schedulerMethod.getName());
                 }
@@ -111,7 +111,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
 
     public JobRunnerSchedulerConfig getSchedulerConfig(String id) {
         return Optional.ofNullable(schedulers.get(id)).
-                orElseThrow(() -> new CommonRuntimeException(EX_INVALID_SCHEDULER_ID, id));
+                orElseThrow(() -> new NoContentFoundException(EX_INVALID_SCHEDULER_ID, id));
     }
 
     @Override
