@@ -2,8 +2,8 @@ package com.neo.util.framework.api.cache;
 
 import com.neo.util.framework.api.cache.spi.CacheName;
 
-import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * This interface can be used to retrieve all existing {@link Cache} objects
@@ -16,7 +16,7 @@ public interface CacheManager {
      *
      * @return names of all caches
      */
-    Collection<String> getCacheNames();
+    Set<String> getCacheNames();
 
     /**
      * Gets the cache identified by the given name.
