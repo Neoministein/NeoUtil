@@ -31,6 +31,16 @@ public class StringUtils {
     }
 
     /**
+     * Checks if string is not null or empty
+     *
+     * @param s string to check
+     * @return true if it's not null or empty
+     */
+    public static boolean isPresent(String s) {
+        return s != null && s.trim().length() != 0;
+    }
+
+    /**
      * Returns empty string if object is null otherwise the received object
      * @param o object to check
      * @return an empty string if object is null
