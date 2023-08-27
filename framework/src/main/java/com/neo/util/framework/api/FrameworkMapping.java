@@ -1,5 +1,7 @@
 package com.neo.util.framework.api;
 
+import com.neo.util.common.impl.StringUtils;
+
 import java.time.Duration;
 import java.util.EnumSet;
 import java.util.Optional;
@@ -23,6 +25,10 @@ public final class FrameworkMapping {
     }
 
     public static <E extends Enum<E>> Optional<E> parseEnumFromString(Class<E> clazz, String value) {
+        if (StringUtils.isEmpty(value)) {
+            return Optional.empty();
+        }
+
         value = value.trim();
         for (E type : EnumSet.allOf(clazz)) {
             if (type.name().equalsIgnoreCase(value)) {
