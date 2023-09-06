@@ -11,14 +11,15 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Iterator;
+import java.util.TimeZone;
 import java.util.function.Consumer;
 
 @SuppressWarnings("java:S2139")
@@ -85,7 +86,7 @@ public class JsonUtil {
         try {
             jsonString = MAPPER.writeValueAsString(pojo);
         } catch (JsonProcessingException ex) {
-            LOGGER.error("Error while creating json string from pojo:{}, exception:{} ", pojo, ex.getMessage());
+            LOGGER.error("Error while creating json string from pojo: [{}], exception: [{}]", pojo, ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
         return jsonString;
@@ -102,7 +103,7 @@ public class JsonUtil {
         try {
             return MAPPER.readTree(json);
         } catch (IOException ex) {
-            LOGGER.error("Error while parsing JSON node from json string:{}, exception:{} ", json, ex.getMessage());
+            LOGGER.error("Error while parsing JSON node from json string: [{}], exception: [{}]", json, ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
     }
@@ -124,7 +125,7 @@ public class JsonUtil {
 
             return node;
         } catch (IOException ex) {
-            LOGGER.error("Error while parsing JSON node from input stream, exception:{} ", ex.getMessage());
+            LOGGER.error("Error while parsing JSON node from input stream, exception: [{}]", ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
     }
@@ -142,7 +143,7 @@ public class JsonUtil {
         try {
             return MAPPER.writerWithView(serializationScope).writeValueAsString(pojo);
         } catch (JsonProcessingException ex) {
-            LOGGER.error("Error while creating json string from pojo:{}, exception:{} ", pojo, ex.getMessage());
+            LOGGER.error("Error while creating json string from pojo: [{}], exception: [{}]", pojo.getClass().getSimpleName(), ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
     }
@@ -161,7 +162,7 @@ public class JsonUtil {
         try {
             return MAPPER.treeToValue(json, clazz);
         } catch (IOException ex) {
-            LOGGER.error("Error while creating pojo from JsonNode:{}, exception:{} ", json, ex.getMessage());
+            LOGGER.error("Error while creating Pojo: [{}] from JsonNode: [{}], exception: [{}]", clazz.getSimpleName(), json, ex.getMessage());
 
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
@@ -181,7 +182,7 @@ public class JsonUtil {
         try {
             return MAPPER.readValue(json, clazz);
         } catch (IOException ex) {
-            LOGGER.error("Error while creating pojo from json string:{}, exception:{} ", json, ex.getMessage());
+            LOGGER.error("Error while creating pojo from Json-String [{}], Exception [{}]", json, ex.getMessage());
 
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
@@ -202,7 +203,7 @@ public class JsonUtil {
         try {
             return MAPPER.readerWithView(serializationScope).readValue(json, clazz);
         } catch (IOException ex) {
-            LOGGER.error("Error while creating pojo from json string:{}, exception:{} ", json, ex.getMessage());
+            LOGGER.error("Error while creating pojo from Json-String [{}], Exception [{}]", json, ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
     }
@@ -264,7 +265,7 @@ public class JsonUtil {
         try {
             return MAPPER.readerForUpdating(pojo).withView(serializationScope).readValue(json, clazz);
         } catch (IOException ex) {
-            LOGGER.error("Error while updating existing pojo from json string:{}, exception:{} ", json, ex.getMessage());
+            LOGGER.error("Error while updating existing pojo from Json-String [{}], Exception [{}]", json, ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
     }
