@@ -68,11 +68,20 @@ public abstract class AbstractDtoReader<T> implements MessageBodyReader<T> {
     public T readFrom(Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType,
             MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
             throws WebApplicationException {
+        JsonNode input;
         try {
-            JsonNode input = JsonUtil.fromJson(entityStream);
+            input = JsonUtil.fromJson(entityStream);
+        } catch (ValidationException ex) {
+            throw ExceptionUtils.asExternal(ex);
+        }
+
+        try {
             JsonSchemaUtil.isValidOrThrow(input, schema);
             return JsonUtil.fromJson(input, type);
         } catch (ValidationException ex) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("The parsed json does not match the dto schema [{}]", JsonUtil.toJson(input));
+            }
             throw ExceptionUtils.asExternal(ex);
         }
     }
