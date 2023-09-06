@@ -116,7 +116,13 @@ public class JsonUtil {
      */
     public static JsonNode fromJson(InputStream is) {
         try {
-            return MAPPER.readTree(is);
+            JsonNode node = MAPPER.readTree(is);
+            if (node == null) {
+                LOGGER.error("Error while parsing JSON node from input stream, exception: [No content is found from InputStream]");
+                throw new ValidationException(EX_INTERNAL_JSON_EXCEPTION, "No content is found from InputStream");
+            }
+
+            return node;
         } catch (IOException ex) {
             LOGGER.error("Error while parsing JSON node from input stream, exception:{} ", ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
