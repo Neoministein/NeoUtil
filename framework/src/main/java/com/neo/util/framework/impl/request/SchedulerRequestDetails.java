@@ -16,7 +16,7 @@ public class SchedulerRequestDetails extends AbstractRequestDetails {
 
     @Override
     public String getInitiator() {
-        return requestContext.toString();
+        return "Scheduler:" + requestContext.toString();
     }
 
     public record Context(String scheduleName) implements RequestContext {

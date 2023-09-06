@@ -13,7 +13,7 @@ public class StartupRequestDetails extends AbstractRequestDetails {
 
     @Override
     public String getInitiator() {
-        return requestContext.toString();
+        return "Startup:" + requestContext.toString();
     }
 
     public record Context(String stage) implements RequestContext {

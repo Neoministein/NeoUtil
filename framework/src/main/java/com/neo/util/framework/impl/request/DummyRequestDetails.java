@@ -9,7 +9,7 @@ import java.util.UUID;
 public class DummyRequestDetails implements RequestDetails {
 
     protected long requestId = REQUEST_ID.addAndGet(1);
-    protected String caller = "DUMMY";
+    protected String caller = UUID.randomUUID().toString();
     protected String instanceId = UUID.randomUUID().toString();
     protected String traceId = UUID.randomUUID().toString();
     protected Instant receiveDate = Instant.now();
@@ -22,7 +22,7 @@ public class DummyRequestDetails implements RequestDetails {
 
     @Override
     public String getInitiator() {
-        return caller;
+        return "Dummy:" + caller;
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.framework.api.security.RolePrincipal;
 
-import java.security.Principal;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -38,7 +37,7 @@ public interface UserRequestDetails extends RequestDetails {
      * Returns the initiator of the request
      */
     default String getInitiator() {
-        return getUser().map(Principal::getName).orElse(getTraceId());
+        return getUser().map(principal -> "User:" + principal.getName()).orElse("Trace:" + getTraceId());
     }
 
     /**
