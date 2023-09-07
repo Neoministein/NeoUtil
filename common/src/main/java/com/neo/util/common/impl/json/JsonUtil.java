@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -118,7 +119,7 @@ public class JsonUtil {
     public static JsonNode fromJson(InputStream is) {
         try {
             JsonNode node = MAPPER.readTree(is);
-            if (node == null) {
+            if (node == null || node instanceof MissingNode) {
                 LOGGER.error("Error while parsing JSON node from input stream, exception: [No content is found from InputStream]");
                 throw new ValidationException(EX_INTERNAL_JSON_EXCEPTION, "No content is found from InputStream");
             }
