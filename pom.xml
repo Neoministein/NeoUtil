@@ -150,6 +150,7 @@
 	<modules>
 		<module>tools</module>
 		<module>unfork/jobrunr</module>
+		<module>unfork/helidon-websocket-webserver</module>
 		<module>unfork/helidon-websocket</module>
 		<module>common</module>
 		<module>framework</module>
