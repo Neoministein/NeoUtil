@@ -1,8 +1,8 @@
 package com.neo.util.framework.database.impl;
 
-import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
+import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.database.impl.entity.PersonEntity;
 import com.neo.util.framework.impl.request.DummyRequestDetails;
 import org.junit.jupiter.api.Assertions;
@@ -55,11 +55,11 @@ class DatabaseProviderAuditIT extends AbstractIntegrationTest<DatabaseProvider> 
 
 
         EntityResult<PersonEntity> entityResult = subject.fetch(new EntityQuery<>(PersonEntity.class));
-        PersonEntity result = entityResult.getFirst().get();
+        PersonEntity result = entityResult.getFirst().orElseThrow();
         //Assert
 
-        Assertions.assertEquals(expectedUser, result.getCreatedBy());
-        Assertions.assertEquals(expectedUser, result.getUpdatedBy());
+        Assertions.assertEquals("Dummy:" + expectedUser, result.getCreatedBy());
+        Assertions.assertEquals("Dummy:" + expectedUser, result.getUpdatedBy());
         Assertions.assertTrue(result.getCreatedOn().isBefore(result.getUpdatedOn()));
     }
 }

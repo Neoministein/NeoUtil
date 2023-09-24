@@ -29,6 +29,8 @@ import java.util.List;
 @ExtendWith(WeldJunit5Extension.class)
 class ApplicationStartUpIT {
 
+    private static final String PREFIX = "Startup:";
+
     @WeldSetup
     public WeldInitiator weld = WeldInitiator.from(
             ApplicationStartUp.class,
@@ -64,9 +66,9 @@ class ApplicationStartUpIT {
 
         //List gets updated since it's the same instance as in the recorder
         Assertions.assertEquals(List.of(
-                ApplicationPreReadyEvent.EVENT_NAME,
-                ApplicationReadyEvent.EVENT_NAME,
-                ApplicationPostReadyEvent.EVENT_NAME,
-                ApplicationShutdownEvent.EVENT_NAME), callSequence);
+                PREFIX + ApplicationPreReadyEvent.EVENT_NAME,
+                PREFIX + ApplicationReadyEvent.EVENT_NAME,
+                PREFIX + ApplicationPostReadyEvent.EVENT_NAME,
+                PREFIX + ApplicationShutdownEvent.EVENT_NAME), callSequence);
     }
 }
