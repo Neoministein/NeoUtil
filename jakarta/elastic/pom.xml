@@ -83,7 +83,7 @@
                     <useSystemClassLoader>true</useSystemClassLoader>
                     <!-- -Dtests.security.manager=false is needed otherwise the ESTestCase fails to initialize -->
                     <argLine>-Xms384m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError
-                        -Dtests.security.manager=false
+                        -Dtests.security.manager=false -Dlog4j.configurationFile=log4j2.properties
                         --enable-preview</argLine>
                 </configuration>
             </plugin>
