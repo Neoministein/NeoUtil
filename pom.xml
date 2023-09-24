@@ -54,12 +54,11 @@
 		<jboss.classfilewriter.version>1.2.5.Final</jboss.classfilewriter.version> <!-- This is due to @Transactional not working on 1.2.4.Final -->
 
 		<!-- Maven -->
-		<maven.core.version>3.9.3</maven.core.version>
-		<maven.testing.version>3.3.0</maven.testing.version>
-		<maven.tools.version>3.6.4</maven.tools.version>
-		<maven.plugin.plugin.version>3.7.0</maven.plugin.plugin.version>
-		<surefire.version>3.0.0-M8</surefire.version>
-		<build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
+		<maven.core.version>3.9.4</maven.core.version>
+		<maven.tools.version>3.9.0</maven.tools.version>
+		<maven.plugin.plugin.version>3.9.0</maven.plugin.plugin.version>
+		<surefire.version>3.1.2</surefire.version>
+		<build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
 		<compiler.plugin.version>3.11.0</compiler.plugin.version>
 	</properties>
 
