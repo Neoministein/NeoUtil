@@ -5,10 +5,10 @@ import java.io.Serializable;
 /**
  * If this Criteria is applied to a field, the field must be between one or both values based on which ones are provided.
  */
-public abstract class RangeBasedSearchCriteria extends ExplicitSearchCriteria {
+public abstract class RangeBasedSearchCriteria extends FieldSearchCriteria {
 
     protected RangeBasedSearchCriteria(String fieldName, boolean not) {
-        super(fieldName, null, not);
+        super(fieldName, not);
     }
 
     public abstract Serializable getFrom();
