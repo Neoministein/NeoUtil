@@ -48,7 +48,7 @@
 		<!-- Testing -->
 		<junit.version>5.9.3</junit.version>
 		<mockito.version>5.3.1</mockito.version>
-		<h2.version>2.1.214</h2.version>
+		<h2.version>2.2.224</h2.version>
 		<weld.version>5.1.0.Final</weld.version>
 		<weld-junit.version>4.0.0.Final</weld-junit.version>
 		<jboss.classfilewriter.version>1.2.5.Final</jboss.classfilewriter.version> <!-- This is due to @Transactional not working on 1.2.4.Final -->
