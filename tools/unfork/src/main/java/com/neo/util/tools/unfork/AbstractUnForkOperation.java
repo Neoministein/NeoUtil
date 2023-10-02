@@ -1,7 +1,7 @@
 package com.neo.util.tools.unfork;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -13,6 +13,9 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.LocalArtifactRequest;
+import org.eclipse.aether.repository.LocalArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class AbstractUnForkOperation extends AbstractMojo {
 
@@ -28,17 +32,14 @@ public abstract class AbstractUnForkOperation extends AbstractMojo {
     @Parameter(defaultValue = "${project}")
     protected MavenProject project;
 
-    @Parameter(defaultValue = "${localRepository}")
-    protected ArtifactRepository localRepository;
+    @Parameter(defaultValue = "${repositorySystemSession}")
+    protected RepositorySystemSession repositorySystemSession;
 
-    @Parameter(defaultValue = "${project.remoteArtifactRepositories}")
-    protected List<ArtifactRepository> remoteRepositories;
+    @Component
+    private RepositorySystem repositorySystem;
 
     @Component
     protected ResolutionErrorHandler resolutionErrorHandler;
-
-    @Component
-    protected RepositorySystem repositorySystem;
 
     protected void extract(String sourceDirectory, String resourceDirectory, String sourcesClassifier,
             String resourcesClassifier) throws MojoExecutionException {
@@ -124,23 +125,42 @@ public abstract class AbstractUnForkOperation extends AbstractMojo {
     protected Artifact resolveArtifactFromMaven(String groupId, String artifactId, String version, String type,
             String classifier) throws MojoExecutionException {
 
-        Artifact dummyartifact = repositorySystem.createArtifactWithClassifier(groupId, artifactId, version, type,
+        Artifact dummyArtifact = repositorySystem.createArtifactWithClassifier(groupId, artifactId, version, type,
                 classifier);
+        return resolveArtifactFromMavenLocal(dummyArtifact)
+                .or(() -> resolveArtifactFromRemote(dummyArtifact))
+                .orElseThrow(() -> new MojoExecutionException("Unable to resolve artifact" + dummyArtifact));
+    }
 
+    protected Optional<Artifact> resolveArtifactFromMavenLocal(Artifact dummyArtifact) {
+        LOGGER.debug("Looking in local maven repository for artifact: [{}]", dummyArtifact);
+        org.eclipse.aether.artifact.Artifact dummyEclipseArtifact = RepositoryUtils.toArtifact(dummyArtifact);
+
+        LocalArtifactResult localArtifactResult = repositorySystemSession.getLocalRepositoryManager().find(repositorySystemSession, new LocalArtifactRequest(dummyEclipseArtifact, List.of(),null));
+
+        if (localArtifactResult.isAvailable() && localArtifactResult.getFile().exists()) {
+            LOGGER.debug("LocalArtifactResult, found: [true] location [{}]", localArtifactResult.getFile());
+            dummyArtifact.setFile(localArtifactResult.getFile());
+            return Optional.of(dummyArtifact);
+        }
+        LOGGER.debug("LocalArtifactResult, found: [false] location [null]");
+        return Optional.empty();
+    }
+
+    protected Optional<Artifact> resolveArtifactFromRemote(Artifact dummyArtifact) {
+        LOGGER.debug("Looking in remote maven repository for artifact: [{}]", dummyArtifact);
         ArtifactResolutionRequest artifactResolutionRequest = new ArtifactResolutionRequest()
-                .setArtifact(dummyartifact)
-                .setLocalRepository(localRepository)
-                .setRemoteRepositories(remoteRepositories);
-
+                .setArtifact(dummyArtifact)
+                .setRemoteRepositories(project.getRemoteArtifactRepositories());
+        repositorySystem.resolve(artifactResolutionRequest);
         ArtifactResolutionResult artifactResolutionResult = repositorySystem.resolve(artifactResolutionRequest);
 
         try {
             resolutionErrorHandler.throwErrors(artifactResolutionRequest, artifactResolutionResult);
         } catch (ArtifactResolutionException ex) {
-            throw new MojoExecutionException("Unable to resolve artifact", ex);
+            return Optional.empty();
         }
 
-        return artifactResolutionResult.getArtifacts().stream().findFirst().orElseThrow(() ->
-                new MojoExecutionException("Unable to resolve artifact" + dummyartifact));
+        return artifactResolutionResult.getArtifacts().stream().findFirst();
     }
 }
