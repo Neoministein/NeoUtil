@@ -1,7 +1,7 @@
 package com.neo.util.helidon.rest.security;
 
 import com.neo.util.framework.rest.impl.security.IdentificationFilter;
-import io.helidon.webserver.ServerRequest;
+import io.helidon.webserver.http.ServerRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Specializes;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -19,7 +19,7 @@ public class HelidonRequestIdentificationFilter extends IdentificationFilter {
         String url = super.getRemoteAddress(requestContext);
 
         if (IdentificationFilter.INVALID_IP.equals(url)) {
-            return serverRequest.remoteAddress();
+            return serverRequest.remotePeer().host();
         }
         return url;
     }

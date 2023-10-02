@@ -4,14 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.rest.impl.entity.AbstractEntityRestEndpoint;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
-import io.helidon.microprofile.tests.junit5.HelidonTest;
-import org.junit.jupiter.api.*;
-
-import jakarta.inject.Inject;
+import io.helidon.microprofile.testing.junit5.HelidonTest;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.junit.jupiter.api.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @HelidonTest(resetPerTest = true)

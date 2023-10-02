@@ -3,8 +3,8 @@ package com.neo.util.helidon.rest.entity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.json.JsonUtil;
-import io.helidon.microprofile.tests.junit5.AddBean;
-import io.helidon.microprofile.tests.junit5.HelidonTest;
+import io.helidon.microprofile.testing.junit5.AddBean;
+import io.helidon.microprofile.testing.junit5.HelidonTest;
 
 @HelidonTest
 @AddBean(TestPersonResource.class)

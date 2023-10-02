@@ -4,7 +4,7 @@ import com.neo.util.framework.impl.persistence.search.DummySearchProvider;
 import com.neo.util.framework.rest.impl.request.HttpRequestRecordingFilter;
 import com.neo.util.framework.rest.percistence.HttpRequestLogSearchable;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
-import io.helidon.microprofile.tests.junit5.HelidonTest;
+import io.helidon.microprofile.testing.junit5.HelidonTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.HttpHeaders;

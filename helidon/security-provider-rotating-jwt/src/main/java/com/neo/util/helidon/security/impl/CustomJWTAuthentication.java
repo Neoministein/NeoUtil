@@ -3,18 +3,16 @@ package com.neo.util.helidon.security.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.KeyUtils;
 import com.neo.util.common.impl.ResourceUtil;
-import com.neo.util.common.impl.exception.ConfigurationException;
-import com.neo.util.common.impl.exception.ValidationException;
-import com.neo.util.common.impl.exception.ExceptionDetails;
-import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.exception.CommonRuntimeException;
+import com.neo.util.common.impl.exception.ConfigurationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.ValidationException;
+import com.neo.util.common.impl.json.JsonUtil;
 import io.helidon.config.Config;
 import io.helidon.security.*;
 import io.helidon.security.spi.AuthenticationProvider;
-import io.helidon.security.spi.OutboundSecurityProvider;
 import io.helidon.security.spi.ProviderConfig;
-import io.helidon.security.spi.SynchronousProvider;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
@@ -26,7 +24,7 @@ import java.lang.annotation.Annotation;
 import java.security.Key;
 import java.util.*;
 
-public class CustomJWTAuthentication extends SynchronousProvider implements AuthenticationProvider, OutboundSecurityProvider {
+public class CustomJWTAuthentication implements AuthenticationProvider {
 
     private static final Logger LOGGER =  LoggerFactory.getLogger(CustomJWTAuthentication.class);
 
@@ -86,7 +84,7 @@ public class CustomJWTAuthentication extends SynchronousProvider implements Auth
     }
 
     @Override
-    protected AuthenticationResponse syncAuthenticate(ProviderRequest providerRequest) {
+    public AuthenticationResponse authenticate(ProviderRequest providerRequest) {
         MDC.put("traceId", providerRequest.securityContext().id());
         LOGGER.info("Authentication attempt");
         try {
@@ -137,19 +135,6 @@ public class CustomJWTAuthentication extends SynchronousProvider implements Auth
             LOGGER.error("Unknown server error", ex);
             return AuthenticationResponse.failed("Internal authentication error");
         }
-    }
-
-    @Override
-    protected AuthorizationResponse syncAuthorize(ProviderRequest providerRequest) {
-        LOGGER.error("Authorization attempt");
-        return AuthorizationResponse.builder().build();
-    }
-
-    @Override
-    protected OutboundSecurityResponse syncOutbound(ProviderRequest providerRequest,
-            SecurityEnvironment outboundEnv, EndpointConfig outboundEndpointConfig) {
-        LOGGER.error("Outbound attempt");
-        return OutboundSecurityResponse.abstain();
     }
 
     private String getJWTToken(Map<String, List<String>> headers) {

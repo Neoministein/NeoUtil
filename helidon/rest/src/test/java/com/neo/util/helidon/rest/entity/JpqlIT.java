@@ -1,10 +1,8 @@
 package com.neo.util.helidon.rest.entity;
 
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
-import io.helidon.microprofile.tests.junit5.AddBean;
-import io.helidon.microprofile.tests.junit5.HelidonTest;
+import io.helidon.microprofile.testing.junit5.HelidonTest;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
