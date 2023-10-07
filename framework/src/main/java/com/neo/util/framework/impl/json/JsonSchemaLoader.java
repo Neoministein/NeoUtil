@@ -1,14 +1,13 @@
 package com.neo.util.framework.impl.json;
 
 import com.neo.util.common.impl.ResourceUtil;
-import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
+import com.neo.util.framework.impl.ReflectionService;
 import com.networknt.schema.JsonSchema;
-import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
@@ -16,7 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * This class loads all {@link JsonSchema} on startup and provided an UnmodifiableMap {@link Map} for all classes which require them.
@@ -31,27 +33,19 @@ public class JsonSchemaLoader {
     protected Map<String, JsonSchema> jsonSchemaMap;
 
     @Inject
-    protected ConfigService configService;
-
-    @PostConstruct
-    public void init() {
+    public void init(ReflectionService reflectionService, ConfigService configService) {
         LOGGER.info("Pre-loading json schemas");
         Map<String, JsonSchema> mapToFill = new HashMap<>();
 
         String relativePath = FrameworkConstants.JSON_SCHEMA_LOCATION.concat("/");
 
         try {
-            for (String filePath: ResourceUtil.getResourceFileAsList(FrameworkConstants.JSON_SCHEMA_INDEX)) {
+            for (String filePath: reflectionService.getResources("^configuration/schema.*\\.json$")) {
                 addSchema(mapToFill, relativePath,
                         filePath.substring(relativePath.length()));
             }
         } catch (ConfigurationException ex) {
             LOGGER.warn("Unable to load json schema index [{}]. Falling back to reflections", ex.getMessage());
-            for (String filePath: ReflectionUtils.getResources(
-                    FrameworkConstants.JSON_SCHEMA_LOCATION, ReflectionUtils.JSON_FILE_ENDING)) {
-                addSchema(mapToFill, relativePath,
-                        filePath.substring(relativePath.length()));
-            }
         }
 
         configService.get("json.schema.externalFolder").asString().asOptional().ifPresent(config ->

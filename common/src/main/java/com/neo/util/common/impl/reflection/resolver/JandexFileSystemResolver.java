@@ -1,6 +1,8 @@
-package com.neo.util.common.impl.annotation.resolver;
+package com.neo.util.common.impl.reflection.resolver;
 
-import com.neo.util.common.api.annoation.JandexResolver;
+import com.neo.util.common.api.func.CheckedConsumer;
+import com.neo.util.common.api.reflection.IndexResolver;
+import com.neo.util.common.impl.reflection.Rendex;
 import org.jboss.jandex.Index;
 import org.jboss.jandex.Indexer;
 import org.slf4j.Logger;
@@ -14,6 +16,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.Enumeration;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -22,7 +25,7 @@ import java.util.zip.ZipInputStream;
  * The Jandex Files is in a FileSystem, so most likely a development environment.
  * The Jandex file won't be read. All .class files will be scanned
  */
-public class JandexFileSystemResolver implements JandexResolver {
+public class JandexFileSystemResolver implements IndexResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JandexFileSystemResolver.class);
 
@@ -31,14 +34,53 @@ public class JandexFileSystemResolver implements JandexResolver {
     }
 
     @Override
-    public Optional<Index> getIndex(URL url) {
+    public Optional<Index> getJandex(URL url) {
         String path = url.getPath();
 
         if (path.endsWith(JANDEX_FILE_NAME)) {
             path = path.substring(0, path.length() - JANDEX_INDEX_NAME.length());
         }
 
+        AtomicBoolean checkedConsumerCalled = new AtomicBoolean(false);
         Indexer indexer = new Indexer();
+        
+        fileSystemResolver(path, entry -> {
+            checkedConsumerCalled.set(true);
+            if (isClass(entry.getName())) {
+                entry.indexEntry(indexer);
+            }
+        });
+        
+        if (checkedConsumerCalled.get()) {
+            return Optional.of(indexer.complete());
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Rendex> getRendex(URL url) {
+        String path = url.getPath();
+
+        if (path.endsWith(RENDEX_FILE_NAME)) {
+            path = path.substring(0, path.length() - RENDEX_INDEX_NAME.length());
+        }
+        AtomicBoolean checkedConsumerCalled = new AtomicBoolean(false);
+        Rendex rendex = new Rendex();
+
+        fileSystemResolver(path, entry -> {
+            checkedConsumerCalled.set(true);
+            if (!isClass(entry.getName())) {
+                entry.indexEntry(rendex);
+            }
+        });
+
+        if (checkedConsumerCalled.get()) {
+            return Optional.of(rendex);
+        }
+        return Optional.empty();
+    }
+
+    protected void fileSystemResolver(String path, CheckedConsumer<Entry, IOException> entryCheckedConsumer) {
         boolean nested = false;
         File file;
 
@@ -51,40 +93,37 @@ public class JandexFileSystemResolver implements JandexResolver {
         }
 
         if(!file.canRead()) {
-            return Optional.empty();
+            return;
         }
 
         try {
             if (file.isDirectory()) {
-                handleDirectory(new DirectoryEntry().setFile(file), indexer);
+                handleDirectory(new DirectoryEntry().setFile(file), entryCheckedConsumer);
             } else {
                 if(nested) {
-                    handleNestedFile(path, file, indexer);
+                    handleNestedFile(path, file, entryCheckedConsumer);
                 } else {
-                    handleFile(file, indexer);
+                    handleFile(file, entryCheckedConsumer);
                 }
             }
         } catch (Exception ex) {
             LOGGER.trace("Cannot get Jandex index file from: [{}], [{}]", path, ex.getMessage());
-            return Optional.empty();
         }
-        return Optional.of(indexer.complete());
     }
 
 
-
-    protected void handleFile(File file, Indexer indexer) throws IOException {
+    protected void handleFile(File file, CheckedConsumer<Entry, IOException> entryCheckedConsumer) throws IOException {
         LOGGER.trace("Handle archive file: [{}]", file);
         try (ZipFile zip = new ZipFile(file)) {
             Enumeration<? extends ZipEntry> entries = zip.entries();
             ZipFileEntry entry = new ZipFileEntry(PROTOCOL_JAR + ":" + file.toURI().toURL().toExternalForm() + JAR_URL_SEPARATOR);
             while (entries.hasMoreElements()) {
-                add(entry.setName(entries.nextElement().getName()), indexer);
+                add(entry.setName(entries.nextElement().getName()), entryCheckedConsumer);
             }
         }
     }
 
-    protected void handleDirectory(DirectoryEntry entry, Indexer indexer) throws IOException {
+    protected void handleDirectory(DirectoryEntry entry, CheckedConsumer<Entry, IOException> entryCheckedConsumer) throws IOException {
         LOGGER.trace("Handle archive file: [{}]", entry.getFile());
         File[] files = entry.getFile().listFiles();
         String parentPath = entry.getName();
@@ -96,15 +135,15 @@ public class JandexFileSystemResolver implements JandexResolver {
             }
             entry.setFile(child);
             if (child.isDirectory()) {
-                handleDirectory(entry, indexer);
+                handleDirectory(entry, entryCheckedConsumer);
             } else {
-                add(entry, indexer);
+                add(entry, entryCheckedConsumer);
             }
             entry.setPath(parentPath);
         }
     }
 
-    protected void handleNestedFile(String path, File file, Indexer indexer) throws IOException {
+    protected void handleNestedFile(String path, File file, CheckedConsumer<Entry, IOException> entryCheckedConsumer) throws IOException {
         LOGGER.trace("Handle nested archive  File: [{}]  Path: [{}]", file, path);
 
         String nestedEntryName = path.substring(path.indexOf(JAR_URL_SEPARATOR) + JAR_URL_SEPARATOR.length());
@@ -127,12 +166,12 @@ public class JandexFileSystemResolver implements JandexResolver {
                     try (ZipInputStream nestedZip = new ZipInputStream(zip.getInputStream(zipEntry))) {
                         ZipEntry nestedEntry;
                         while ((nestedEntry = nestedZip.getNextEntry()) != null) {
-                            add(entry.setName(nestedEntry.getName()), indexer);
+                            add(entry.setName(nestedEntry.getName()), entryCheckedConsumer);
                         }
                     }
                 } else if (zipEntry.getName().startsWith(nestedEntryName)) {
                     // Nested file entries
-                    add(getZipFileEntry(file, zipEntry).setName(zipEntry.getName().substring(nestedEntryName.length() + 1)), indexer);
+                    add(getZipFileEntry(file, zipEntry).setName(zipEntry.getName().substring(nestedEntryName.length() + 1)), entryCheckedConsumer);
                 }
             }
         }
@@ -145,10 +184,8 @@ public class JandexFileSystemResolver implements JandexResolver {
         return new ZipFileEntry(PROTOCOL_JAR + ":" + file.toURI().toURL().toExternalForm() + JAR_URL_SEPARATOR + zipEntry.getName());
     }
 
-    protected void add(Entry entry, Indexer indexer) throws IOException {
-        if (isClass(entry.getName())) {
-            entry.indexEntry(indexer);
-        }
+    protected void add(Entry entry, CheckedConsumer<Entry, IOException> entryCheckedConsumer) throws IOException {
+        entryCheckedConsumer.accept(entry);
     }
 
     /**
@@ -159,6 +196,10 @@ public class JandexFileSystemResolver implements JandexResolver {
         String getName();
 
         void indexEntry(Indexer indexer) throws IOException;
+
+        default void indexEntry(Rendex rendex) throws IOException {
+            rendex.addFile(getName());
+        }
 
     }
 

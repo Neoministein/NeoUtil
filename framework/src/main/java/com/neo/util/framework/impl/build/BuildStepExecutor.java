@@ -1,6 +1,5 @@
 package com.neo.util.framework.impl.build;
 
-import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.framework.api.build.BuildContext;
 import com.neo.util.framework.api.build.BuildStep;
 import com.neo.util.framework.impl.cache.spi.CacheException;
@@ -18,7 +17,7 @@ public class BuildStepExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(BuildStepExecutor.class);
 
     public void executeBuildSteps(BuildContext buildContext) {
-        Set<Class<? extends BuildStep>> buildStepClasses = ReflectionUtils.getSubTypesOf(BuildStep.class, buildContext.fullLoader());
+        Set<Class<? extends BuildStep>> buildStepClasses = buildContext.fullReflection().getSubTypesOf(BuildStep.class);
 
         List<BuildStep> buildSteps = buildStepClasses.stream()
                 .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))

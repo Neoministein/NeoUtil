@@ -1,13 +1,12 @@
 package com.neo.util.common.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Utilities for {@link String}
@@ -118,6 +117,31 @@ public class StringUtils {
             result.write(buffer, 0, length);
         }
         return result.toString(charset);
+    }
+
+    /**
+     *  Converts an {@link InputStream} to a {@link List<String>} seperated by newline
+     *
+     * @param inputStream the input stream to process
+     * @return the consent of the input stream
+     *
+     * @throws IOException if something goes wrong
+     */
+    public static List<String> readLines(InputStream inputStream) {
+        return readLines(inputStream, Charset.defaultCharset());
+    }
+
+    /**
+     *  Converts an {@link InputStream} to a {@link List<String>} seperated by newline
+     *
+     * @param inputStream the input stream to process
+     * @param charset the charset to convert it to
+     * @return the consent of the input stream
+     *
+     * @throws IOException if something goes wrong
+     */
+    public static List<String> readLines(InputStream inputStream, Charset charset) {
+        return new BufferedReader(new InputStreamReader(inputStream, charset)).lines().collect(Collectors.toList());
     }
 
     /**

@@ -4,13 +4,11 @@ import com.github.victools.jsonschema.generator.*;
 import com.github.victools.jsonschema.module.jackson.JacksonModule;
 import com.github.victools.jsonschema.module.jackson.JacksonOption;
 import com.github.victools.jsonschema.module.jakarta.validation.JakartaValidationModule;
-import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.build.BuildContext;
 import com.neo.util.framework.api.build.BuildStep;
 import com.neo.util.framework.rest.api.parser.InboundDto;
-import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,9 +39,9 @@ public class InboundDtoSchemaBuildStep implements BuildStep {
         LOGGER.info("Generating schemas for classes annotated with {}", InboundDto.class.getSimpleName());
 
         LOGGER.debug("Generating schemas for src...");
-        ReflectionUtils.getReflections(context.srcLoader()).get(Scanners.TypesAnnotated.with(InboundDto.class)).forEach(className -> {
-            LOGGER.debug("Found class: {}", className);
-            saveSchema(className, context);
+        context.fullReflection().getClassesByAnnotation(InboundDto.class).forEach(clazz -> {
+            LOGGER.debug("Found class: {}", clazz);
+            saveSchema(clazz, context);
         });
     }
 
@@ -52,18 +50,17 @@ public class InboundDtoSchemaBuildStep implements BuildStep {
         return PriorityConstants.LIBRARY_BEFORE;
     }
 
-    protected void saveSchema(String className, BuildContext buildContext) {
+    protected void saveSchema(Class<?> clazz, BuildContext buildContext) {
         try {
-            Class<?> clazz = buildContext.fullLoader().loadClass(className);
             File schemaFile = new File(generateFileLocation(clazz, buildContext.resourceOutPutDirectory()));
             Files.deleteIfExists(schemaFile.toPath());
 
             schemaFile.getParentFile().mkdirs();
             Files.writeString(schemaFile.toPath(), schemaGenerator.generateSchema(clazz).toPrettyString());
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
-        LOGGER.info("Generated schema for {}", className);
+        LOGGER.info("Generated schema for {}", clazz);
     }
 
     protected String generateFileLocation(Class<?> clazz, String outputDir) {

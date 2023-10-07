@@ -1,6 +1,8 @@
-package com.neo.util.common.impl.annotation.resolver;
+package com.neo.util.common.impl.reflection.resolver;
 
-import com.neo.util.common.api.annoation.JandexResolver;
+import com.neo.util.common.api.func.CheckedFunction;
+import com.neo.util.common.api.reflection.IndexResolver;
+import com.neo.util.common.impl.reflection.Rendex;
 import org.jboss.jandex.Index;
 import org.jboss.jandex.IndexReader;
 import org.jboss.jandex.UnsupportedVersion;
@@ -9,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -19,28 +22,35 @@ import java.util.zip.ZipFile;
 /**
  * Resolves and reads a Jandex File inside a Jar archive
  */
-public class JandexJarResolver implements JandexResolver {
+public class JandexJarResolver implements IndexResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JandexJarResolver.class);
 
+    @Override
+    public Optional<Index> getJandex(URL url) {
+        return readFile(JANDEX_INDEX_NAME, url, is -> new IndexReader(is).read());
+    }
 
-    public Optional<Index> getIndex(URL url) {
+    @Override
+    public Optional<Rendex> getRendex(URL url) {
+        return readFile(RENDEX_INDEX_NAME, url, is -> new Rendex(is));
+    }
+
+    public <T> Optional<T> readFile(String filename, URL url, CheckedFunction<InputStream, T, IOException> checkedFunction) {
         String archive = getArchiveReference(url);
         try (ZipFile zip = new ZipFile(archive)) {
             //Opens the bean archive and tries to find the index file
-            ZipEntry entry = zip.getEntry(JANDEX_INDEX_NAME);
+            ZipEntry entry = zip.getEntry(filename);
             if (entry != null) {
-                LOGGER.trace("Jandex index file found");
-                Index index = new IndexReader(zip.getInputStream(entry)).read();
-
-                return Optional.of(index);
+                LOGGER.trace("Index file found");
+                return Optional.of(checkedFunction.apply(zip.getInputStream(entry)));
             }
         } catch (IllegalArgumentException ex) {
-            LOGGER.trace("The Jandex index file is not valid: [{}]", archive);
+            LOGGER.trace("The Index file is not valid: [{}]", archive);
         } catch (UnsupportedVersion ex) {
-            LOGGER.trace("The version of Jandex index file is not supported: [{}]", archive);
+            LOGGER.trace("The version of Index file is not supported: [{}]", archive);
         } catch (IOException ex) {
-            LOGGER.trace("Cannot get Jandex index file from: [{}], [{}]", archive, ex.getMessage());
+            LOGGER.trace("Cannot get Index file from: [{}], [{}]", archive, ex.getMessage());
         }
 
         return Optional.empty();

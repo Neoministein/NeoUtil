@@ -1,6 +1,5 @@
 package com.neo.util.framework.build;
 
-import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.build.BuildContext;
@@ -25,8 +24,8 @@ public class JsonSchemaIndexBuildStep implements BuildStep {
     public void execute(BuildContext context) {
         LOGGER.info("Generating index files for all json schemas located inside {}", FrameworkConstants.JSON_SCHEMA_LOCATION);
 
-        Set<String> srcFiles = ReflectionUtils.getResources(
-                FrameworkConstants.JSON_SCHEMA_LOCATION, ReflectionUtils.JSON_FILE_ENDING, context.fullLoader());
+        Set<String> srcFiles = context.fullReflection().getResources("^configuration/schema.*\\.json$");
+
         generateIndexFile(srcFiles, context.resourceOutPutDirectory());
     }
 

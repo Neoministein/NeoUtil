@@ -3,11 +3,11 @@ package com.neo.util.framework.jobrunr.scheduler.impl;
 import com.neo.util.common.impl.MathUtils;
 import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.ValidationException;
+import com.neo.util.common.impl.reflection.IndexReflectionProvider;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
 import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.api.scheduler.SchedulerService;
-import com.neo.util.framework.impl.JandexService;
 import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.impl.config.BasicConfigService;
 import com.neo.util.framework.impl.config.BasicConfigValue;
@@ -45,7 +45,7 @@ class SchedulerServiceIT {
             BasicConfigService.class,
             BasicInstanceIdentification.class,
             ReflectionService.class,
-            JandexService.class,
+            IndexReflectionProvider.class,
             RequestContextExecutor.class,
             RequestDetailsProducer.class,
             RequestRecordingManager.class,

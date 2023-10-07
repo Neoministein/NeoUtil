@@ -1,6 +1,5 @@
 package com.neo.util.framework.microprofile.reactive.messaging.build.config;
 
-import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.build.BuildContext;
 import com.neo.util.framework.api.build.BuildStep;
@@ -18,7 +17,7 @@ public class ActiveMQConfigBuildStep implements BuildStep {
     public void execute(BuildContext context) {
         StringBuilder sb = new StringBuilder("<address-settings>\n");
 
-        for (OutgoingQueue annotation: ReflectionUtils.getAnnotationInstance(OutgoingQueue.class, context.fullLoader())) {
+        for (OutgoingQueue annotation: context.fullReflection().getAnnotationInstance(OutgoingQueue.class)) {
             sb.append(createAddressSettings(annotation.value(), annotation.retry(), annotation.delay(), annotation.timeUnit()));
         }
         sb.append("</address-settings>");

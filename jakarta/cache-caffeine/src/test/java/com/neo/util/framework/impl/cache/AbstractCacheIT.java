@@ -1,8 +1,8 @@
 package com.neo.util.framework.impl.cache;
 
+import com.neo.util.common.impl.reflection.IndexReflectionProvider;
 import com.neo.util.framework.api.cache.spi.CacheName;
 import com.neo.util.framework.caffeine.impl.CaffeineCacheBuilder;
-import com.neo.util.framework.impl.JandexService;
 import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.impl.cache.spi.CacheKeyGeneratorManager;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -36,7 +36,7 @@ public abstract class AbstractCacheIT {
         classes.add(CacheKeyGeneratorManager.class);
         classes.add(CaffeineCacheBuilder.class);
         classes.add(ConfigServiceProducer.class);
-        classes.add(JandexService.class);
+        classes.add(IndexReflectionProvider.class);
         classes.add(ReflectionService.class);
         return classes;
     }

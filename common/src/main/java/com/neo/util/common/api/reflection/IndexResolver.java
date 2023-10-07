@@ -1,5 +1,6 @@
-package com.neo.util.common.api.annoation;
+package com.neo.util.common.api.reflection;
 
+import com.neo.util.common.impl.reflection.Rendex;
 import org.jboss.jandex.Index;
 
 import java.net.URL;
@@ -8,7 +9,10 @@ import java.util.Optional;
 /**
  * Handles the reference to a Jandex File
  */
-public interface JandexResolver {
+public interface IndexResolver {
+
+    String RENDEX_FILE_NAME = "rendex.idx";
+    String RENDEX_INDEX_NAME = "META-INF/" + RENDEX_FILE_NAME;
 
     String JANDEX_FILE_NAME = "jandex.idx";
     String JANDEX_INDEX_NAME = "META-INF/" + JANDEX_FILE_NAME;
@@ -30,5 +34,14 @@ public interface JandexResolver {
      *
      * @return a parsed index, if possible.
      */
-    Optional<Index> getIndex(URL url);
+    Optional<Index> getJandex(URL url);
+
+    /**
+     * Read the index at the associated url.
+     *
+     * @param url to the jandex file
+     *
+     * @return a parsed index, if possible.
+     */
+    Optional<Rendex> getRendex(URL url);
 }

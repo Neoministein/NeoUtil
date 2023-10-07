@@ -7,20 +7,17 @@ import co.elastic.clients.elasticsearch.indices.*;
 import com.carrotsearch.randomizedtesting.annotations.ThreadLeakScope;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.neo.util.common.impl.RandomString;
 import com.neo.util.common.impl.StringUtils;
+import com.neo.util.common.impl.ThreadUtils;
+import com.neo.util.common.impl.reflection.IndexReflectionProvider;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
 import com.neo.util.framework.api.config.ConfigService;
-import com.neo.util.framework.api.request.RequestContext;
 import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.elastic.api.IndexNamingService;
-import com.neo.util.framework.impl.JandexService;
 import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.impl.config.BasicConfigService;
 import com.neo.util.framework.impl.config.BasicConfigValue;
 import com.neo.util.framework.impl.request.DummyRequestDetails;
-import com.neo.util.framework.impl.request.QueueRequestDetails;
-import com.neo.util.framework.impl.request.SchedulerRequestDetails;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.event.NotificationOptions;
 import jakarta.enterprise.util.TypeLiteral;
@@ -41,7 +38,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletionStage;
 
 @ESIntegTestCase.ClusterScope(scope = ESIntegTestCase.Scope.TEST, numDataNodes = 0)
@@ -76,7 +76,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         };
         indexNamingService.postConstruct();
 
-        indexNamingService.initIndexProperties(new ReflectionService(new JandexService()));
+        indexNamingService.initIndexProperties(new ReflectionService(new IndexReflectionProvider(ThreadUtils.classLoader())));
         return indexNamingService;
     }
 

@@ -1,57 +1,50 @@
 package com.neo.util.framework.impl;
 
-import com.neo.util.common.impl.annotation.ReflectionUtils;
-import com.neo.util.framework.api.config.ConfigService;
-import jakarta.annotation.PostConstruct;
+import com.neo.util.common.api.reflection.ReflectionProvider;
+import com.neo.util.common.impl.ThreadUtils;
+import com.neo.util.common.impl.reflection.IndexReflectionProvider;
+import com.neo.util.framework.api.PriorityConstants;
+import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
+import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
+import jakarta.enterprise.event.Observes;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class ReflectionService {
 
-    @Inject
-    protected ConfigService configService;
-
-    @Inject
-    protected JandexService jandexService;
-
-    protected boolean useJandex;
+    protected ReflectionProvider reflectionProvider;
 
     public ReflectionService() {
-        //Required for CDI
+        reflectionProvider = new IndexReflectionProvider(ThreadUtils.classLoader());
     }
 
-    public ReflectionService(JandexService jandexService) {
+    public ReflectionService(ReflectionProvider reflectionProvider) {
         //For testing purposes
-        this.jandexService = jandexService;
-        this.useJandex = jandexService != null;
-    }
-
-    @PostConstruct
-    public void reload() {
-        useJandex = jandexService.jandexFilesFound() &&
-                configService.get("reflection.useJandex").asBoolean().orElse(true);
-
+        this.reflectionProvider = reflectionProvider;
     }
 
     public Set<AnnotatedElement> getAnnotatedElement(Class<? extends Annotation> annotation) {
-        if (useJandex) {
-            return jandexService.getAnnotatedElement(annotation);
-        } else {
-            return ReflectionUtils.getAnnotatedElement(annotation);
-        }
+        return reflectionProvider.getAnnotatedElement(annotation);
     }
 
-    public Set<AnnotatedElement> getAnnotatedElement(Set<Class<? extends Annotation>> annotations) {
-        if (useJandex) {
-            return annotations.stream().map(jandexService::getAnnotatedElement).flatMap(Set::stream).collect(Collectors.toSet());
-        } else {
-            return annotations.stream().map(ReflectionUtils::getAnnotatedElement).flatMap(Set::stream).collect(Collectors.toSet());
-        }
+    /**
+     * Returns a set of resources which meet the given criteria
+     *
+     * @param regex a regex pattern to filter the result by
+     * @return a set of resources which meet the given criteria
+     */
+    public Set<String> getResources(String regex) {
+        return reflectionProvider.getResources(regex);
+    }
+
+    /**
+     * Reflection should no longer be needed after startup and the resource should be freed
+     */
+    public void init(@Observes @Priority(PriorityConstants.PLATFORM_AFTER + 1) ApplicationPostReadyEvent event) {
+        reflectionProvider = null;
     }
 }
