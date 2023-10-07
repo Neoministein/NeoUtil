@@ -176,6 +176,7 @@
 		<module>jakarta/database-audit</module>
 		<module>jakarta/rest</module>
 		<module>jakarta/websocket</module>
+		<module>jakarta/request-recording-searchable</module>
 		<module>jakarta/jobrunr</module>
 		<module>jakarta/jobrunr-queue</module>
 		<module>jakarta/jobrunr-scheduler</module>

@@ -1,11 +1,12 @@
-package com.neo.util.framework.api.request.recording;
+package com.neo.util.framework.request.impl.recorders;
 
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.framework.request.api.RequestSearchableParser;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 
-public abstract class AbstractRequestRecorder<T extends RequestDetails> implements RequestRecorder<T> {
+public abstract class AbstractRequestRecorder<T extends RequestDetails> implements RequestSearchableParser<T> {
 
     private static final String REQUEST_RECORDING_PREFIX = "request.recorder.";
 

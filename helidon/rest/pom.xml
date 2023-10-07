@@ -92,6 +92,12 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-request-recording-searchable</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>io.helidon.microprofile.testing</groupId>

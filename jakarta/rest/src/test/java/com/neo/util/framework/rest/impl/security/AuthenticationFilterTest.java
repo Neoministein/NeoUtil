@@ -39,7 +39,7 @@ class AuthenticationFilterTest {
         credentialsGenerator = Mockito.mock(CredentialsGenerator.class);
         subject.credentialsGenerator = credentialsGenerator;
 
-        requestDetails = new HttpRequestDetails(null, null, null, new HttpRequestDetails.Context(null, null));
+        requestDetails = new HttpRequestDetails(null, null, null, null, new HttpRequestDetails.Context(null, null));
         subject.requestDetails = requestDetails;
     }
 
