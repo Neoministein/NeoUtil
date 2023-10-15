@@ -115,7 +115,7 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
                     .beginControlFlow("try")
                     .addStatement("$N = $T.fromJson($N.getPayload(), $T.class)", "queueMessage", JsonUtil.class, "msg", QueueMessage.class)
                     .nextControlFlow("catch($T ex)", ValidationException.class)
-                    .addStatement("LOGGER.error($S, ex.getMessage())","Unable to parse incoming queue message [{}], action won't be retried.")
+                    .addStatement("LOGGER.error($S, ex)","Unable to parse incoming queue message. Action won't be retried.")
                     .addStatement("return msg.ack()")
                     .endControlFlow()
 
@@ -124,7 +124,7 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
                             QueueRequestDetails.class, QueueRequestDetails.Context.class, queueName)
                     .addStatement("return msg.ack()")
                     .nextControlFlow("catch($T ex)", Exception.class)
-                    .addStatement("LOGGER.error($S, ex.getMessage())","Unexpected error occurred while processing a queue [{}], action will be retried based on the rety policy.")
+                    .addStatement("LOGGER.error($S, ex)","Unexpected error occurred while processing a queue message. Action will be retried based on the retry policy.")
                     .addStatement("return msg.nack(ex)")
                     .endControlFlow()
                     .build();

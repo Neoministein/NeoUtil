@@ -2,7 +2,6 @@ package com.neo.util.framework.impl.build;
 
 import com.neo.util.framework.api.build.BuildContext;
 import com.neo.util.framework.api.build.BuildStep;
-import com.neo.util.framework.impl.cache.spi.CacheException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,11 +34,11 @@ public class BuildStepExecutor {
         try {
             LOGGER.trace("Instantiating BuildStep constructor of class [{}]", buildStep.getName());
             return buildStep.getConstructor().newInstance();
-        } catch (NoSuchMethodException e) {
-            throw new CacheException("No default constructor found on BuildStep [="
-                    + buildStep.getName() + "]", e);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new CacheException("BuildStep instantiation failed", e);
+        } catch (NoSuchMethodException ex) {
+            throw new IllegalStateException("No default constructor found on BuildStep [="
+                    + buildStep.getName() + "]", ex);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
+            throw new IllegalStateException("BuildStep instantiation failed", ex);
         }
     }
 }

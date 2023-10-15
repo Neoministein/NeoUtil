@@ -120,7 +120,7 @@ public class JobRunnerQueueService implements QueueService {
         try {
             requestContextExecutor.execute(new QueueRequestDetails(instanceIdentification.getInstanceId(), message, config.getRequestContext()), () -> config.getQueueListener().onMessage(message));
         } catch (RuntimeException ex) {
-            LOGGER.error("Unexpected error occurred while processing a queue [{}], action won't be retried.", ex.getMessage());
+            LOGGER.error("Unexpected error occurred while processing a queue message. Action will be retried based on the retry policy.", ex);
             throw ex;
         }
 

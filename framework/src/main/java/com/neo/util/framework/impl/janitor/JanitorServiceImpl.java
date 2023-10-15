@@ -8,7 +8,6 @@ import com.neo.util.framework.api.config.ConfigValue;
 import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
 import com.neo.util.framework.api.janitor.JanitorJob;
 import com.neo.util.framework.api.janitor.JanitorService;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.Instance;
@@ -96,7 +95,7 @@ public class JanitorServiceImpl implements JanitorService {
                     LOGGER.info("Executing Janitor Job [{}]", janitorJobEntry.getKey());
                     janitorJobEntry.getValue().execute(localDate);
                 } catch (Exception ex) {
-                    LOGGER.info("Unexpected error occurred while processing Janitor Job [{}], action won't be retried.", janitorJobEntry.getKey());
+                    LOGGER.info("Unexpected error occurred while processing Janitor Job [{}], action won't be retried.", janitorJobEntry.getKey(), ex);
                 }
             } else {
                 LOGGER.info("Skipping disabled Janitor Job [{}]", janitorJobEntry.getKey());

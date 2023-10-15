@@ -57,8 +57,7 @@ public class ApplicationStartUp {
             requestContextExecutor.execute(new StartupRequestDetails(
                     identification.getInstanceId(), ApplicationPostReadyEvent.EVENT_NAME), this::fireApplicationPostReadyEvent);
         } catch (Exception ex) {
-            LOGGER.error("An error occurred during the startup process of type, [{}] with message [{}]. Throwing DeploymentException",
-                    ex.getClass().getSimpleName(), ex.getMessage());
+            LOGGER.error("An error occurred during the startup process. Throwing DeploymentException", ex);
             throw new DeploymentException(ex);
         }
     }

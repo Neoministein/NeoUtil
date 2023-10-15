@@ -195,7 +195,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
                         schedulerConfig.getMethod().getDeclaringClass().getName(),
                         schedulerConfig.getMethod().getName(), ex.getMessage());
             } else {
-                LOGGER.error("An unexpected exception occurred ", ex);
+                LOGGER.error("An unexpected exception while executing a scheduler.", ex);
             }
         }
         schedulerConfig.setLastExecutionFailed(failed);
