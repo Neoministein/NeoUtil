@@ -10,7 +10,6 @@ import com.neo.util.framework.api.queue.QueueType;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -56,23 +55,23 @@ public class HelidonConfigBuildStep implements BuildStep {
     }
 
     protected String createIncoming(String queueName, QueueType type) {
-        String format = """
-                      from-{0}:
+        return STR.
+                """
+                      from-\{queueName}:
                         connector: helidon-jms
-                        destination: {0}
-                        type: {1}
+                        destination: \{queueName}
+                        type: \{type.name().toLowerCase()}
                 """;
-        return MessageFormat.format(format, queueName, type.name().toLowerCase());
     }
 
     protected String createOutgoing(String queueName, QueueType type) {
-        String format = """
-                      to-{0}:
+        return STR.
+               """
+                      to-\{queueName}:
                         connector: helidon-jms
-                        destination: {0}
-                        type: {1}
+                        destination: \{queueName}
+                        type: \{type.name().toLowerCase()}
                 """;
-        return MessageFormat.format(format, queueName, type.name().toLowerCase());
     }
 
     @Override

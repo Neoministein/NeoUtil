@@ -8,7 +8,6 @@ import com.neo.util.framework.api.queue.OutgoingQueue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 
 public class ActiveMQConfigBuildStep implements BuildStep {
@@ -29,13 +28,13 @@ public class ActiveMQConfigBuildStep implements BuildStep {
     }
 
     protected String createAddressSettings(String queueName, int retry, int delay, TimeUnit timeUnit) {
-        String format = """
-                    <address-setting match="{0}">
-                       <max-delivery-attempts>{1}</max-delivery-attempts>
-                       <redelivery-delay>{2}</redelivery-delay>
+        return STR.
+                """
+                    <address-setting match="\{queueName}">
+                       <max-delivery-attempts>\{retry}</max-delivery-attempts>
+                       <redelivery-delay>\{timeUnit.toMillis(delay)}</redelivery-delay>
                     </address-setting>
                 """;
-        return MessageFormat.format(format, queueName, retry, timeUnit.toMillis(delay));
     }
 
         @Override
