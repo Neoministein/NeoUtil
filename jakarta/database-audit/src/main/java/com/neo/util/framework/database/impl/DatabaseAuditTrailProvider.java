@@ -3,7 +3,7 @@ package com.neo.util.framework.database.impl;
 import com.neo.util.common.impl.enumeration.PersistenceOperation;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.persistence.entity.AuditParameter;
-import com.neo.util.framework.api.persistence.entity.AuditTrailProvider;
+import com.neo.util.framework.api.persistence.entity.EntityAuditTrailProvider;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.database.persistence.EntityAuditTrail;
 import jakarta.annotation.Priority;
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 @Alternative
 @Priority(PriorityConstants.APPLICATION)
 @ApplicationScoped
-public class DatabaseAuditTrailProvider implements AuditTrailProvider {
+public class DatabaseAuditTrailProvider implements EntityAuditTrailProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseAuditTrailProvider.class);
 

@@ -10,10 +10,12 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.ext.Provider;
 
+import java.util.List;
 import java.util.UUID;
 
 @Provider
@@ -40,6 +42,7 @@ public class IdentificationFilter implements ContainerRequestFilter {
                         getTraceId(),
                         identification.getInstanceId(),
                         getRemoteAddress(requestContext),
+                        getUserAgent(requestContext),
                         parseRequestContext(requestContext)));
     }
 
@@ -49,10 +52,6 @@ public class IdentificationFilter implements ContainerRequestFilter {
 
     protected RequestContext parseRequestContext(ContainerRequestContext requestContext) {
         return new HttpRequestDetails.Context(requestContext.getMethod(), parseURI(requestContext.getUriInfo()));
-    }
-
-    protected String parseURI(UriInfo uriInfo) {
-        return uriInfo.getRequestUri().toString().substring(uriInfo.getBaseUri().toString().length());
     }
 
     /**
@@ -73,5 +72,18 @@ public class IdentificationFilter implements ContainerRequestFilter {
             return remoteAddress;
         }
         return INVALID_IP;
+    }
+
+    protected String getUserAgent(ContainerRequestContext requestContext) {
+        List<String> useragent = requestContext.getHeaders().get(HttpHeaders.USER_AGENT);
+        if (useragent == null) {
+            return null;
+        } else {
+            return useragent.toString();
+        }
+    }
+
+    protected String parseURI(UriInfo uriInfo) {
+        return uriInfo.getRequestUri().toString().substring(uriInfo.getBaseUri().toString().length());
     }
 }

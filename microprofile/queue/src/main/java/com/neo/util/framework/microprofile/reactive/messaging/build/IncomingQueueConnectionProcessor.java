@@ -1,6 +1,5 @@
 package com.neo.util.framework.microprofile.reactive.messaging.build;
 
-import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
@@ -51,13 +50,13 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
 
     @Override
     public void execute(BuildContext context) {
-        Set<Class<?>> queueConsumerClasses = ReflectionUtils.getClassesByAnnotation(IncomingQueue.class, context.fullLoader());
+        Set<Class<?>> queueConsumerClasses = context.fullReflection().getClassesByAnnotation(IncomingQueue.class);
         if (queueConsumerClasses.isEmpty()) {
             return;
         }
         LOGGER.debug("Generating associated files for {} annotation", IncomingQueue.class.getName());
 
-        Set<Class<?>> incomingInstances = ReflectionUtils.getClassesByAnnotation(Incoming.class, context.fullLoader());
+        Set<Class<?>> incomingInstances = context.fullReflection().getClassesByAnnotation(Incoming.class);
         for (Class<?> incomingClass: incomingInstances) {
             existingIncomingAnnotation.put(incomingClass.getAnnotation(Incoming.class).value(), incomingClass);
         }

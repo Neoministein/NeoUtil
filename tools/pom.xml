@@ -11,6 +11,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>unfork</module>
+        <module>rendex-maven-plugin</module>
     </modules>
 </project>

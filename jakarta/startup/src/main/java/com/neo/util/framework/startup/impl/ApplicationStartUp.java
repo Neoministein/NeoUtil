@@ -1,6 +1,6 @@
 package com.neo.util.framework.startup.impl;
 
-import com.neo.util.common.impl.StopWatch;;
+import com.neo.util.common.impl.StopWatch;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
@@ -9,16 +9,15 @@ import com.neo.util.framework.api.event.ApplicationShutdownEvent;
 import com.neo.util.framework.api.security.InstanceIdentification;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import jakarta.annotation.Priority;
-import jakarta.enterprise.inject.spi.DeploymentException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Destroyed;
 import jakarta.enterprise.context.Initialized;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.inject.spi.DeploymentException;
 import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class start services

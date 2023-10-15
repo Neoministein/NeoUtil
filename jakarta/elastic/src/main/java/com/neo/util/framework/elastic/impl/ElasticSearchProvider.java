@@ -626,12 +626,11 @@ public class ElasticSearchProvider implements SearchProvider {
     protected Aggregation buildAggregation(SearchAggregation aggregation) {
         return switch (aggregation) {
             case SimpleFieldAggregation simpleFieldAgg -> buildAggregation(simpleFieldAgg);
-            case CriteriaAggregation criteriaAggregation && !criteriaAggregation.getSearchCriteriaMap().isEmpty() ->
-                    buildAggregation(criteriaAggregation);
+            case CriteriaAggregation criteriaAggregation -> buildAggregation(criteriaAggregation);
             case TermAggregation termAggregation -> buildAggregation(termAggregation);
             case BucketScriptAggregation bucketScriptAggregation -> buildAggregation(bucketScriptAggregation);
             case null -> throw new IllegalStateException("SearchAggregation unsupported class: null");
-            case default -> throw new IllegalStateException("SearchAggregation unsupported class: " + aggregation.getClass().getName());
+            default -> throw new IllegalStateException("SearchAggregation unsupported class: " + aggregation.getClass().getName());
         };
     }
 
@@ -739,8 +738,7 @@ public class ElasticSearchProvider implements SearchProvider {
             case CardinalityAggregate cardinalityAggregate ->
                     new SimpleAggregationResult(key, cardinalityAggregate.value());
             case null -> throw new IllegalStateException("Unsupported aggregations variant received: null");
-            case default ->
-                    throw new IllegalStateException("Unsupported aggregations variant received:" + variant._aggregateKind());
+            default -> throw new IllegalStateException("Unsupported aggregations variant received:" + variant._aggregateKind());
         };
     }
 

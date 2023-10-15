@@ -3,20 +3,18 @@ package com.neo.util.framework.jobrunr.scheduler.impl;
 import com.neo.util.common.impl.MathUtils;
 import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.ValidationException;
+import com.neo.util.common.impl.reflection.IndexReflectionProvider;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
 import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.api.scheduler.SchedulerService;
-import com.neo.util.framework.impl.JandexService;
 import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.impl.config.BasicConfigService;
 import com.neo.util.framework.impl.config.BasicConfigValue;
 import com.neo.util.framework.impl.janitor.JanitorServiceImpl;
-import com.neo.util.framework.impl.persistence.search.DummySearchProvider;
+import com.neo.util.framework.impl.request.DummyRequestAuditProvider;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.RequestDetailsProducer;
-import com.neo.util.framework.impl.request.recording.RequestRecordingManager;
-import com.neo.util.framework.impl.request.recording.SchedulerRequestRecorder;
 import com.neo.util.framework.impl.security.BasicInstanceIdentification;
 import com.neo.util.framework.jobrunr.impl.JobRunnerConfigurator;
 import com.neo.util.framework.jobrunr.impl.JobRunnerInMemoryStorageProvider;
@@ -45,15 +43,13 @@ class SchedulerServiceIT {
             BasicConfigService.class,
             BasicInstanceIdentification.class,
             ReflectionService.class,
-            JandexService.class,
+            IndexReflectionProvider.class,
             RequestContextExecutor.class,
             RequestDetailsProducer.class,
-            RequestRecordingManager.class,
-            DummySearchProvider.class,
+            DummyRequestAuditProvider.class,
             JobRunnerSchedulerService.class,
             CronScheduleAnnotationParser.class,
             FixedRateScheduleAnnotationParser.class,
-            SchedulerRequestRecorder.class,
             TestSchedulers.class,
             JanitorServiceImpl.class
     ).build();

@@ -1,6 +1,5 @@
 package com.neo.util.framework.microprofile.reactive.messaging.build.config;
 
-import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.build.BuildContext;
 import com.neo.util.framework.api.build.BuildStep;
@@ -36,7 +35,7 @@ public class HelidonConfigBuildStep implements BuildStep {
 
         sb.append("    outgoing:\n");
 
-        for (OutgoingQueue annotation: ReflectionUtils.getAnnotationInstance(OutgoingQueue.class, context.fullLoader())) {
+        for (OutgoingQueue annotation: context.fullReflection().getAnnotationInstance(OutgoingQueue.class)) {
             queueTypeMap.put(annotation.value(), annotation.type());
 
             sb.append(createOutgoing(annotation.value(), annotation.type()));
@@ -44,7 +43,7 @@ public class HelidonConfigBuildStep implements BuildStep {
 
         sb.append("    incoming:\n");
 
-        for (IncomingQueue annotation: ReflectionUtils.getAnnotationInstance(IncomingQueue.class, context.fullLoader())) {
+        for (IncomingQueue annotation: context.fullReflection().getAnnotationInstance(IncomingQueue.class)) {
 
             sb.append(createIncoming(annotation.value(), Optional.ofNullable(queueTypeMap.get(annotation.value())).orElse(QueueType.UNKNOWN)));
         }

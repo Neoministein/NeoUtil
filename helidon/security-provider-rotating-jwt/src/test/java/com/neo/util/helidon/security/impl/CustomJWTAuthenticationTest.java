@@ -3,10 +3,7 @@ package com.neo.util.helidon.security.impl;
 import com.neo.util.common.impl.KeyUtils;
 import io.helidon.config.Config;
 import io.helidon.config.ConfigValue;
-import io.helidon.security.AuthenticationResponse;
-import io.helidon.security.ProviderRequest;
-import io.helidon.security.SecurityContext;
-import io.helidon.security.SecurityEnvironment;
+import io.helidon.security.*;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -67,9 +64,9 @@ class CustomJWTAuthenticationTest extends AbstractJWTTest {
         Mockito.doReturn(headers).when(se).headers();
         Mockito.doReturn(se).when(providerRequest).env();
 
-        AuthenticationResponse result = subject.syncAuthenticate(providerRequest);
+        AuthenticationResponse result = subject.authenticate(providerRequest);
         //Assert
-        Assertions.assertTrue(result.status().isSuccess());
+        Assertions.assertEquals(SecurityResponse.SecurityStatus.SUCCESS, result.status());
 
     }
 
@@ -96,9 +93,9 @@ class CustomJWTAuthenticationTest extends AbstractJWTTest {
         Mockito.doReturn(se).when(providerRequest).env();
         //Act
 
-        AuthenticationResponse result = subject.syncAuthenticate(providerRequest);
+        AuthenticationResponse result = subject.authenticate(providerRequest);
         //Assert
-        Assertions.assertTrue(result.status().isSuccess());
+        Assertions.assertEquals(SecurityResponse.SecurityStatus.SUCCESS, result.status());
     }
 
     @Test
@@ -117,10 +114,10 @@ class CustomJWTAuthenticationTest extends AbstractJWTTest {
         Mockito.doReturn(se).when(providerRequest).env();
         //Act
 
-        AuthenticationResponse result = subject.syncAuthenticate(providerRequest);
+        AuthenticationResponse result = subject.authenticate(providerRequest);
 
         //Assert
-        Assertions.assertFalse(result.status().isSuccess());
+        Assertions.assertNotEquals(SecurityResponse.SecurityStatus.SUCCESS, result.status());
         Assertions.assertEquals("No JWT Token found",result.description().get());
     }
 
@@ -148,9 +145,9 @@ class CustomJWTAuthenticationTest extends AbstractJWTTest {
         Mockito.doReturn(se).when(providerRequest).env();
         //Act
 
-        AuthenticationResponse result = subject.syncAuthenticate(providerRequest);
+        AuthenticationResponse result = subject.authenticate(providerRequest);
         //Assert
-        Assertions.assertFalse(result.status().isSuccess());
+        Assertions.assertNotEquals(SecurityResponse.SecurityStatus.SUCCESS, result.status());
         Assertions.assertEquals("Token has expired", result.description().get());
     }
 
@@ -177,9 +174,9 @@ class CustomJWTAuthenticationTest extends AbstractJWTTest {
         Mockito.doReturn(se).when(providerRequest).env();
         //Act
 
-        AuthenticationResponse result = subject.syncAuthenticate(providerRequest);
+        AuthenticationResponse result = subject.authenticate(providerRequest);
         //Assert
-        Assertions.assertFalse(result.status().isSuccess());
+        Assertions.assertNotEquals(SecurityResponse.SecurityStatus.SUCCESS, result.status());
         Assertions.assertEquals("Not a valid token", result.description().get());
     }
 
@@ -206,9 +203,9 @@ class CustomJWTAuthenticationTest extends AbstractJWTTest {
         Mockito.doReturn(se).when(providerRequest).env();
         //Act
 
-        AuthenticationResponse result = subject.syncAuthenticate(providerRequest);
+        AuthenticationResponse result = subject.authenticate(providerRequest);
         //Assert
-        Assertions.assertFalse(result.status().isSuccess());
+        Assertions.assertNotEquals(SecurityResponse.SecurityStatus.SUCCESS, result.status());
         Assertions.assertEquals("Token signature is invalid", result.description().get());
     }
 
@@ -235,9 +232,9 @@ class CustomJWTAuthenticationTest extends AbstractJWTTest {
         Mockito.doReturn(se).when(providerRequest).env();
         //Act
 
-        AuthenticationResponse result = subject.syncAuthenticate(providerRequest);
+        AuthenticationResponse result = subject.authenticate(providerRequest);
         //Assert
-        Assertions.assertFalse(result.status().isSuccess());
+        Assertions.assertNotEquals(SecurityResponse.SecurityStatus.SUCCESS, result.status());
         Assertions.assertEquals("Token signature is invalid", result.description().get());
     }
 
@@ -264,9 +261,9 @@ class CustomJWTAuthenticationTest extends AbstractJWTTest {
         Mockito.doReturn(se).when(providerRequest).env();
         //Act
 
-        AuthenticationResponse result = subject.syncAuthenticate(providerRequest);
+        AuthenticationResponse result = subject.authenticate(providerRequest);
 
         //Assert
-        Assertions.assertTrue(result.status().isSuccess());
+        Assertions.assertEquals(SecurityResponse.SecurityStatus.SUCCESS, result.status());
     }
 }

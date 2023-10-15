@@ -1,6 +1,5 @@
 package com.neo.util.framework.rest.build;
 
-import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.build.BuildContext;
 import com.neo.util.framework.api.build.BuildStep;
@@ -34,7 +33,7 @@ public class InboundDtoParserBuildStep implements BuildStep {
 
     @Override
     public void execute(BuildContext context) {
-        Set<Class<?>> inboundDtoSet = ReflectionUtils.getClassesByAnnotation(InboundDto.class, context.srcLoader());
+        Set<Class<?>> inboundDtoSet = context.srcReflection().getClassesByAnnotation(InboundDto.class);
 
         if (inboundDtoSet.isEmpty()) {
             return;

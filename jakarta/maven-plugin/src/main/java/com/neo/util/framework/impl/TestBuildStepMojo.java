@@ -1,5 +1,6 @@
 package com.neo.util.framework.impl;
 
+import com.neo.util.common.impl.reflection.JavaReflectionProvider;
 import com.neo.util.framework.api.build.BuildContext;
 import com.neo.util.framework.impl.build.BuildStepExecutor;
 import org.apache.maven.plugin.AbstractMojo;
@@ -34,10 +35,12 @@ public class TestBuildStepMojo extends AbstractMojo {
                 project.getBuild().getDirectory() + "/generated-test-sources/test-annotations",
                 project.getBuild().getTestOutputDirectory(),
                 project.getBuild().getDirectory(),
+                new JavaReflectionProvider(
                 ClassLoaderUtils.generate(new ClassLoaderUtils.BuildConfig(
-                        false, false, project.getArtifacts(), new File(project.getBuild().getTestOutputDirectory()))),
+                        false, false, project.getArtifacts(), new File(project.getBuild().getTestOutputDirectory())))),
+                new JavaReflectionProvider(
                 ClassLoaderUtils.generate(new ClassLoaderUtils.BuildConfig(
-                        true, true, project.getArtifacts(), new File(project.getBuild().getOutputDirectory()), new File(project.getBuild().getTestOutputDirectory()))));
+                        true, true, project.getArtifacts(), new File(project.getBuild().getOutputDirectory()), new File(project.getBuild().getTestOutputDirectory())))));
 
         try {
             buildStepExecutor.executeBuildSteps(buildContext);

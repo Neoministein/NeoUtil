@@ -5,8 +5,8 @@ import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.queue.BasicQueueConsumer;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.queue.BasicQueueService;
 import io.helidon.microprofile.messaging.MessagingCdiExtension;
-import io.helidon.microprofile.tests.junit5.AddExtension;
-import io.helidon.microprofile.tests.junit5.HelidonTest;
+import io.helidon.microprofile.testing.junit5.AddExtension;
+import io.helidon.microprofile.testing.junit5.HelidonTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 

@@ -35,7 +35,8 @@ public class HelidonConfigWrapper implements Config {
         case VALUE -> Type.VALUE;
             case OBJECT -> Type.OBJECT;
             case LIST -> Type.LIST;
-            case MISSING, null -> Type.MISSING;
+            case MISSING -> Type.MISSING;
+            case null -> Type.MISSING;
         };
     }
 

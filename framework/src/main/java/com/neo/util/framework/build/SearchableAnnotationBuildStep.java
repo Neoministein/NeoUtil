@@ -1,6 +1,5 @@
 package com.neo.util.framework.build;
 
-import com.neo.util.common.impl.annotation.ReflectionUtils;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.framework.api.PriorityConstants;
@@ -34,7 +33,7 @@ public class SearchableAnnotationBuildStep implements BuildStep {
 
     @Override
     public void execute(BuildContext buildContext) {
-        Set<Class<? extends Searchable>> searchableClasses = ReflectionUtils.getSubTypesOf(Searchable.class, buildContext.fullLoader());
+        Set<Class<? extends Searchable>> searchableClasses = buildContext.fullReflection().getSubTypesOf(Searchable.class);
         for (Class<? extends Searchable> clazz: searchableClasses) {
             if (Modifier.isAbstract(clazz.getModifiers())) {
                 continue;

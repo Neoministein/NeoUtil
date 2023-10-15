@@ -25,3 +25,6 @@ hs_err_pid*
 #IntelliJ
 *.iml
 .idea
+
+#The root target folder is normally not generated, but done due to io.smallrye:jandex-maven-plugin
+target

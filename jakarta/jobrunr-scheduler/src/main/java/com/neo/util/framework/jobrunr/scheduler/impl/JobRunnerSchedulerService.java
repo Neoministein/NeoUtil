@@ -61,12 +61,9 @@ public class JobRunnerSchedulerService implements SchedulerService {
     protected InstanceIdentification identification;
 
     @Inject
-    protected ReflectionService reflectionService;
-
-    @Inject
     protected RequestContextExecutor requestContextExecutor;
 
-    public void applicationReadyEvent(@Observes ApplicationPostReadyEvent applicationPostReadyEvent) {
+    public void applicationReadyEvent(@Observes @Priority(PriorityConstants.LIBRARY_AFTER) ApplicationPostReadyEvent applicationPostReadyEvent) {
         LOGGER.debug("ApplicationPostReadyEvent processed");
         inStartupPhase = false;
     }
@@ -76,7 +73,8 @@ public class JobRunnerSchedulerService implements SchedulerService {
      * This is done only once at startup as no new Scheduler can be added at runtime.
      */
     @Inject
-    public void init(Instance<Object> instance, Instance<ScheduleAnnotationParser<?>> instance2) {
+    public void init(Instance<Object> instance, Instance<ScheduleAnnotationParser<?>> instance2,
+                     ReflectionService reflectionService) {
         Map<String, JobRunnerSchedulerConfig> newSchedulersMap = new HashMap<>();
         LOGGER.info("Registering Schedulers...");
 

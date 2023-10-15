@@ -100,13 +100,13 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.neo.util</groupId>
+                <groupId>com.neoministein.tools</groupId>
                 <artifactId>unfork-maven-plugin</artifactId>
                 <version>1.0.0</version>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>neoutil-unfork-source</goal>
+                            <goal>unfork-source</goal>
                         </goals>
                     </execution>
                 </executions>

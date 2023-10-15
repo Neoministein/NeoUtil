@@ -67,7 +67,7 @@ public class HelidonConfigValueWrapper<T> implements ConfigValue<T> {
     }
 
     @Override
-    public <U> Optional<U> flatMap(Function<? super T, Optional<U>> mapper) {
+    public <U> Optional<U> flatMap(Function<? super T, Optional<? extends U>> mapper) {
         return configValue.flatMap(mapper);
     }
 

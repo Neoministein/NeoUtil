@@ -13,14 +13,41 @@ public class HttpRequestDetails extends AbstractUserRequestDetails {
      */
     protected final String remoteAddress;
 
-    public HttpRequestDetails(String traceId, String instanceId, String remoteAddress, RequestContext requestContext) {
+    protected final String agent;
+
+    protected int status = -1;
+
+    protected String error = null;
+
+    public HttpRequestDetails(String traceId, String instanceId, String remoteAddress, String  agent, RequestContext requestContext) {
         super(traceId, instanceId ,requestContext);
         this.remoteAddress = remoteAddress;
+        this.agent = agent;
     }
 
 
     public String getRemoteAddress() {
         return remoteAddress;
+    }
+
+    public String getAgent() {
+        return agent;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    public String getError() {
+        return error;
     }
 
     @Override

@@ -92,10 +92,16 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-request-recording-searchable</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
-            <groupId>io.helidon.microprofile.tests</groupId>
-            <artifactId>helidon-microprofile-tests-junit5</artifactId>
+            <groupId>io.helidon.microprofile.testing</groupId>
+            <artifactId>helidon-microprofile-testing-junit5</artifactId>
             <version>${helidon.version}</version>
             <scope>test</scope>
         </dependency>
@@ -160,6 +166,28 @@
                         <goals>
                             <goal>test-BuildStep</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.neo.util</groupId>
+                <artifactId>rendex-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <id>make-index-test</id>
+                        <goals>
+                            <goal>rendex</goal>
+                        </goals>
+                        <phase>process-test-classes</phase>
+                        <configuration>
+                            <indexDir>${project.build.directory}/test-classes/META-INF</indexDir>
+                            <fileSets>
+                                <fileSet>
+                                    <directory>${project.build.directory}/test-classes/</directory>
+                                </fileSet>
+                            </fileSets>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

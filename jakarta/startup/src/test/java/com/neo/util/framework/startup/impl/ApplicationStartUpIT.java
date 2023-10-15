@@ -5,10 +5,9 @@ import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.api.event.ApplicationShutdownEvent;
 import com.neo.util.framework.impl.config.BasicConfigService;
-import com.neo.util.framework.impl.persistence.search.DummySearchProvider;
+import com.neo.util.framework.impl.request.DummyRequestAuditProvider;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.RequestDetailsProducer;
-import com.neo.util.framework.impl.request.recording.RequestRecordingManager;
 import com.neo.util.framework.impl.security.BasicInstanceIdentification;
 import com.neo.util.framework.startup.impl.event.PostReadyListener;
 import com.neo.util.framework.startup.impl.event.PreReadyListener;
@@ -29,6 +28,8 @@ import java.util.List;
 @ExtendWith(WeldJunit5Extension.class)
 class ApplicationStartUpIT {
 
+    private static final String PREFIX = "Startup:";
+
     @WeldSetup
     public WeldInitiator weld = WeldInitiator.from(
             ApplicationStartUp.class,
@@ -40,9 +41,7 @@ class ApplicationStartUpIT {
             RequestDetailsProducer.class,
             RequestContextExecutor.class,
             BasicInstanceIdentification.class,
-            RequestRecordingManager.class,
-            DummySearchProvider.class,
-            StartupRequestRecorder.class,
+            DummyRequestAuditProvider.class,
             BasicConfigService.class
     ).activate(RequestScoped.class).build();
 
@@ -64,9 +63,9 @@ class ApplicationStartUpIT {
 
         //List gets updated since it's the same instance as in the recorder
         Assertions.assertEquals(List.of(
-                ApplicationPreReadyEvent.EVENT_NAME,
-                ApplicationReadyEvent.EVENT_NAME,
-                ApplicationPostReadyEvent.EVENT_NAME,
-                ApplicationShutdownEvent.EVENT_NAME), callSequence);
+                PREFIX + ApplicationPreReadyEvent.EVENT_NAME,
+                PREFIX + ApplicationReadyEvent.EVENT_NAME,
+                PREFIX + ApplicationPostReadyEvent.EVENT_NAME,
+                PREFIX + ApplicationShutdownEvent.EVENT_NAME), callSequence);
     }
 }

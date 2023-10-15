@@ -4,14 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.rest.impl.exception.RuntimeExceptionMapper;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
-import io.helidon.microprofile.tests.junit5.AddBean;
-import io.helidon.microprofile.tests.junit5.HelidonTest;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
+import io.helidon.microprofile.testing.junit5.AddBean;
+import io.helidon.microprofile.testing.junit5.HelidonTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 @HelidonTest
 @AddBean(ExceptionResource.class)
@@ -78,7 +77,7 @@ class ExceptionHandlingIT extends AbstractIntegrationTest {
     @Test
     void notFound() {
         //Arrange
-        String responseMessage = "No handler found for path: " + ExceptionResource.RESOURCE_LOCATION + "/notFound";
+        String responseMessage = "Endpoint not found";
 
         //Act
         Response response = webTarget.path(ExceptionResource.RESOURCE_LOCATION + "/notFound").request().method("GET");

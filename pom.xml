@@ -10,17 +10,17 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<maven.compiler.source>17</maven.compiler.source>
-		<maven.compiler.target>17</maven.compiler.target>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
 		<!-- Jakarta -->
-		<jakarta.persistence-api.version>3.0.0</jakarta.persistence-api.version>
-		<jakarta.enterprise.cdi-api.version>3.0.0</jakarta.enterprise.cdi-api.version>
+		<jakarta.persistence-api.version>3.1.0</jakarta.persistence-api.version>
+		<jakarta.enterprise.cdi-api.version>4.0.1</jakarta.enterprise.cdi-api.version>
 		<jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
 		<jakarta.transaction-api.version>2.0.1</jakarta.transaction-api.version>
-		<jakarta.ws.rs-api.version>3.0.0</jakarta.ws.rs-api.version>
+		<jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
 		<jakarta.security.enterprise-api.version>3.0.0</jakarta.security.enterprise-api.version>
 		<jakarta.validation.version>3.0.2</jakarta.validation.version>
-		<jakarta.websocket.version>2.0.0</jakarta.websocket.version>
+		<jakarta.websocket.version>2.1.0</jakarta.websocket.version>
 
 		<!-- Logging -->
 		<slf4j.version>2.0.7</slf4j.version>
@@ -30,8 +30,8 @@
 		<javapoet.version>1.13.0</javapoet.version>
 
 		<!-- Reflection -->
-		<jandex.version>2.4.3.Final</jandex.version>
-		<jandex.plugin.version>1.0.6</jandex.plugin.version>
+		<jandex.version>3.1.5</jandex.version>
+		<jandex.plugin.version>3.1.5</jandex.plugin.version>
 		<org.reflections.version>0.10.2</org.reflections.version>
 
 		<!-- Jackson -->
@@ -44,23 +44,23 @@
 		<caffeine.version>3.1.5</caffeine.version>
 
 		<!-- MP Implementation -->
-		<helidon.version>3.2.2</helidon.version>
+		<helidon.version>4.0.0-RC1</helidon.version>
 		<!-- Testing -->
 		<junit.version>5.9.3</junit.version>
 		<mockito.version>5.3.1</mockito.version>
-		<h2.version>2.1.214</h2.version>
-		<weld.version>4.0.3.Final</weld.version>
-		<weld-junit.version>3.1.0.Final</weld-junit.version>
+		<h2.version>2.2.224</h2.version>
+		<weld.version>5.1.0.Final</weld.version>
+		<weld-junit.version>4.0.0.Final</weld-junit.version>
 		<jboss.classfilewriter.version>1.2.5.Final</jboss.classfilewriter.version> <!-- This is due to @Transactional not working on 1.2.4.Final -->
 
 		<!-- Maven -->
-		<maven.core.version>3.9.3</maven.core.version>
-		<maven.testing.version>3.3.0</maven.testing.version>
-		<maven.tools.version>3.6.4</maven.tools.version>
-		<maven.plugin.plugin.version>3.7.0</maven.plugin.plugin.version>
-		<surefire.version>3.0.0-M8</surefire.version>
-		<build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
+		<maven.core.version>3.9.4</maven.core.version>
+		<maven.tools.version>3.9.0</maven.tools.version>
+		<maven.plugin.plugin.version>3.9.0</maven.plugin.plugin.version>
+		<surefire.version>3.1.2</surefire.version>
+		<build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
 		<compiler.plugin.version>3.11.0</compiler.plugin.version>
+		<plexus-utils.version>3.5.0</plexus-utils.version>
 	</properties>
 
 	<build>
@@ -70,16 +70,31 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.10.1</version>
 				<configuration>
-					<source>17</source>
-					<target>17</target>
+					<source>21</source>
+					<target>21</target>
 					<compilerArgs>--enable-preview</compilerArgs>
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.jboss.jandex</groupId>
+				<groupId>io.smallrye</groupId>
 				<artifactId>jandex-maven-plugin</artifactId>
 				<version>${jandex.plugin.version}</version>
 				<executions>
+					<execution>
+						<id>make-index</id>
+						<goals>
+							<goal>jandex</goal>
+						</goals>
+						<phase>process-classes</phase>
+						<configuration>
+							<indexDir>${project.build.directory}/classes/META-INF</indexDir>
+							<fileSets>
+								<fileSet>
+									<directory>${project.build.directory}/classes/</directory>
+								</fileSet>
+							</fileSets>
+						</configuration>
+					</execution>
 					<execution>
 						<id>make-index-test</id>
 						<goals>
@@ -87,6 +102,7 @@
 						</goals>
 						<phase>process-test-classes</phase>
 						<configuration>
+							<indexDir>${project.build.directory}/test-classes/META-INF</indexDir>
 							<fileSets>
 								<fileSet>
 									<directory>${project.build.directory}/test-classes/</directory>
@@ -110,6 +126,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -150,8 +167,6 @@
 	<modules>
 		<module>tools</module>
 		<module>unfork/jobrunr</module>
-		<module>unfork/helidon-webserver-websocket</module>
-		<module>unfork/helidon-microprofile-websocket</module>
 		<module>common</module>
 		<module>framework</module>
 		<module>jakarta/maven-plugin</module>
@@ -161,6 +176,7 @@
 		<module>jakarta/database-audit</module>
 		<module>jakarta/rest</module>
 		<module>jakarta/websocket</module>
+		<module>jakarta/request-recording-searchable</module>
 		<module>jakarta/jobrunr</module>
 		<module>jakarta/jobrunr-queue</module>
 		<module>jakarta/jobrunr-scheduler</module>
