@@ -9,7 +9,7 @@ import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.json.JsonUtil;
-import io.helidon.config.Config;
+import io.helidon.common.config.Config;
 import io.helidon.security.*;
 import io.helidon.security.spi.AuthenticationProvider;
 import io.helidon.security.spi.ProviderConfig;
@@ -56,7 +56,7 @@ public class CustomJWTAuthentication implements AuthenticationProvider {
             parser = Jwts.parserBuilder().setSigningKey(retrievePrivateKeyFromFile()).build();
         }
 
-        //TODO impl Websocket to get blcoked tockens
+        //TODO impl Websocket to get blocked tokens
     }
 
     @Override
