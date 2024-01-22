@@ -77,7 +77,7 @@ class ExceptionHandlingIT extends AbstractIntegrationTest {
     @Test
     void notFound() {
         //Arrange
-        String responseMessage = "Endpoint not found";
+        String responseMessage = "Not Found";
 
         //Act
         Response response = webTarget.path(ExceptionResource.RESOURCE_LOCATION + "/notFound").request().method("GET");

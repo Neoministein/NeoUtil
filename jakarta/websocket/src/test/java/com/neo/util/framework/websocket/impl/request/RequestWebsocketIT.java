@@ -26,15 +26,15 @@ class RequestWebsocketIT extends AbstractWebsocketIT {
     @Test
     void test() throws IOException {
         Session session_1 = connectToWebsocket("/request/id-1", val -> {});
-        IntegrationTestUtil.sleepUntil(() -> assertRequestDetails(requestWebsocket.getRequestDetails(), "/request/id-1"));
+        IntegrationTestUtil.sleepUntil(() -> assertRequestDetails(requestWebsocket.getRequestDetails(), "ws:/request/id-1"));
 
         Session session_2 = connectToWebsocket("/request/id-2", val -> {});
-        IntegrationTestUtil.sleepUntil(() -> assertRequestDetails(requestWebsocket.getRequestDetails(), "/request/id-2"));
+        IntegrationTestUtil.sleepUntil(() -> assertRequestDetails(requestWebsocket.getRequestDetails(), "ws:/request/id-2"));
 
         session_1.getBasicRemote().sendText("A message 1");
-        IntegrationTestUtil.sleepUntil(() -> assertRequestDetails(requestWebsocket.getRequestDetails(), "/request/id-1"));
+        IntegrationTestUtil.sleepUntil(() -> assertRequestDetails(requestWebsocket.getRequestDetails(), "ws:/request/id-1"));
         session_2.getBasicRemote().sendText("A message 1");
-        IntegrationTestUtil.sleepUntil(() -> assertRequestDetails(requestWebsocket.getRequestDetails(), "/request/id-2"));
+        IntegrationTestUtil.sleepUntil(() -> assertRequestDetails(requestWebsocket.getRequestDetails(), "ws:/request/id-2"));
 
         session_1.close();
         session_2.close();
