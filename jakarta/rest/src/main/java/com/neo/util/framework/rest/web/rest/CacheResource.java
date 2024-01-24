@@ -41,10 +41,4 @@ public class CacheResource {
         Cache cache = cacheManager.getCache(id).orElseThrow(() -> new NoContentFoundException(EX_CACHE_DOES_NOT_EXIST, id));
         cache.invalidateAll();
     }
-
-    @GET
-    @Path("test")
-    public String clearCache() {
-        return "<h1> Test <h1/>";
-    }
 }
