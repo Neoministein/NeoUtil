@@ -43,6 +43,13 @@
             <version>${json-schema-validator.version}</version>
         </dependency>
 
+        <!-- Html -->
+        <dependency>
+            <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+            <artifactId>owasp-java-html-sanitizer</artifactId>
+            <version>20220608.1</version>
+        </dependency>
+
         <!-- Class generation and Reflection -->
         <dependency>
             <groupId>org.reflections</groupId>
