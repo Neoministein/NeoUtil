@@ -11,6 +11,7 @@ import jakarta.enterprise.event.Observes;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.util.List;
 import java.util.Set;
 
 @ApplicationScoped
@@ -29,6 +30,10 @@ public class ReflectionService {
 
     public Set<AnnotatedElement> getAnnotatedElement(Class<? extends Annotation> annotation) {
         return reflectionProvider.getAnnotatedElement(annotation);
+    }
+
+    public <T extends Annotation> List<T> getAnnotationInstance(Class<T> annotationClazz) {
+        return reflectionProvider.getAnnotationInstance(annotationClazz);
     }
 
     /**

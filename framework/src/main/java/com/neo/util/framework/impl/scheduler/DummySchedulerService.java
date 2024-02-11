@@ -11,7 +11,7 @@ public class DummySchedulerService implements SchedulerService {
 
     @Override
     public SchedulerConfig getSchedulerConfig(String id) {
-        return null;
+        return new SchedulerConfig("TestScheduler", false);
     }
 
     @Override
@@ -36,6 +36,6 @@ public class DummySchedulerService implements SchedulerService {
 
     @Override
     public Set<String> getSchedulerIds() {
-        return Set.of();
+        return Set.of("");
     }
 }

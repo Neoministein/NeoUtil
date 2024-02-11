@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "description": "user name"
+    },
+    "data": {
+      "type": "object"
+    },
+    "context": {
+      "type": "string"
+    },
+    "status": {
+      "type": "integer"
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "apiVersion",
+    "data",
+    "context",
+    "status"
+  ]
+}

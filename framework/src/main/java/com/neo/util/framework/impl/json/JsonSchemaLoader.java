@@ -2,6 +2,7 @@ package com.neo.util.framework.impl.json;
 
 import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.exception.ConfigurationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.config.ConfigService;
@@ -29,6 +30,9 @@ import java.util.Optional;
 public class JsonSchemaLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonSchemaLoader.class);
+
+    public static final ExceptionDetails INVALID_SCHEDULER_ID = new ExceptionDetails(
+            "json-schema/invalid-id", "The json-schema path [{0}] may not have whitespaces.", true);
 
     protected Map<String, JsonSchema> jsonSchemaMap;
 
@@ -67,6 +71,9 @@ public class JsonSchemaLoader {
 
     protected void addSchema(Map<String, JsonSchema> mapToFill, String basePath, String relativePath) {
         LOGGER.debug("Loading schema at: [{}{}]", basePath, relativePath);
+        if (relativePath.contains(" ")) {
+            throw new ConfigurationException(INVALID_SCHEDULER_ID, relativePath);
+        }
         JsonSchema schema = JsonSchemaUtil.generateSchemaFromResource(basePath.concat(relativePath));
         mapToFill.put(relativePath, schema);
         if (LOGGER.isTraceEnabled()) {

@@ -1,20 +1,30 @@
 package com.neo.util.framework.api.scheduler;
 
+import com.neo.util.common.impl.exception.ConfigurationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.framework.api.request.RequestContext;
 import com.neo.util.framework.impl.request.SchedulerRequestDetails;
+import jakarta.annotation.Nullable;
 
 import java.time.Instant;
 
 public class SchedulerConfig {
+
+    public static final ExceptionDetails INVALID_SCHEDULER_ID = new ExceptionDetails(
+            "scheduler/invalid-id", "The scheduler id [{0}] may not have whitespaces.", true);
 
     protected final String id;
     protected final RequestContext context;
 
     protected boolean enabled;
     protected Instant lastExecution = null;
-    protected Boolean lastExecutionFailed = null;
+    protected boolean lastExecutionFailed = false;
 
     public SchedulerConfig(String id, boolean enabled) {
+        if (id.contains(" ")) {
+            throw new ConfigurationException(INVALID_SCHEDULER_ID, id);
+        }
+
         this.id = id;
         this.enabled = enabled;
         this.context = new SchedulerRequestDetails.Context(id);
@@ -38,6 +48,7 @@ public class SchedulerConfig {
         this.enabled = enabled;
     }
 
+    @Nullable
     public Instant getLastExecution() {
         return lastExecution;
     }
@@ -46,11 +57,11 @@ public class SchedulerConfig {
         this.lastExecution = lastExecution;
     }
 
-    public Boolean getLastExecutionFailed() {
+    public boolean getLastExecutionFailed() {
         return lastExecutionFailed;
     }
 
-    public void setLastExecutionFailed(Boolean lastExecutionFailed) {
+    public void setLastExecutionFailed(boolean lastExecutionFailed) {
         this.lastExecutionFailed = lastExecutionFailed;
     }
 }

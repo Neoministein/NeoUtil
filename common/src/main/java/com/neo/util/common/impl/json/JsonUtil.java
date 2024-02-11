@@ -94,6 +94,26 @@ public class JsonUtil {
     }
 
     /**
+     * Create a Json String from a pojo. Exceptions are caught and a new {@link ValidationException} is
+     * thrown.
+     *
+     * @param pojo to object convert
+     *
+     * @return the json string
+     */
+    public static String toPrettyJson(Object pojo) {
+        String jsonString;
+
+        try {
+            jsonString = MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(pojo);
+        } catch (JsonProcessingException ex) {
+            LOGGER.error("Error while creating json string from pojo: [{}], exception: [{}]", pojo, ex.getMessage());
+            throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
+        }
+        return jsonString;
+    }
+
+    /**
      * Creates a {@link JsonNode} from a {@link String}. Exceptions are caught and a new {@link ValidationException} is
      * thrown.
      *

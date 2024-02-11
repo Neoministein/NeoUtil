@@ -3,7 +3,7 @@ package com.neo.util.common.impl.html;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static com.neo.util.common.impl.html.HtmlStringTemplate.HTMX;
+import static com.neo.util.common.impl.html.HtmlStringTemplate.HTML;
 
 class HtmlStringTemplateTest {
 
@@ -13,9 +13,9 @@ class HtmlStringTemplateTest {
         String badCode = "<script> alert('Test')";
 
         //Act
-        String sanitized = HTMX."<h1> \{badCode} </h1>";
+        HtmlElement sanitized = HTML."<h1> \{badCode} </h1>";
 
         //Assert
-        Assertions.assertFalse(sanitized.contains("alert"));
+        Assertions.assertFalse(sanitized.content().contains("alert"));
     }
 }

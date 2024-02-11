@@ -1,12 +1,14 @@
-package com.neo.util.framework.rest.web.rest;
+package com.neo.util.framework.rest.web;
 
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
+@ApplicationScoped
 public class CORSFilter implements ContainerResponseFilter {
 
     @Override

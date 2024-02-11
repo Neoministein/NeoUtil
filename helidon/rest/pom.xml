@@ -189,6 +189,21 @@
                             </fileSets>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>make-index</id>
+                        <goals>
+                            <goal>rendex</goal>
+                        </goals>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <indexDir>${project.build.directory}/classes/META-INF</indexDir>
+                            <fileSets>
+                                <fileSet>
+                                    <directory>${project.build.directory}/classes/</directory>
+                                </fileSet>
+                            </fileSets>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

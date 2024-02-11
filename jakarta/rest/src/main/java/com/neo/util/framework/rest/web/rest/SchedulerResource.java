@@ -14,10 +14,16 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 public class SchedulerResource {
 
-    public static final String RESOURCE_LOCATION = "admin/api/scheduler";
+    public static final String RESOURCE_LOCATION = "/admin/api/scheduler";
 
     @Inject
     protected SchedulerService schedulerService;
+
+    @GET
+    @Path("{id}")
+    public SchedulerConfig getSchedulerConfig(@PathParam("id") String id) {
+        return schedulerService.getSchedulerConfig(id);
+    }
 
     @GET
     public List<SchedulerConfig> getSchedulerConfig() {

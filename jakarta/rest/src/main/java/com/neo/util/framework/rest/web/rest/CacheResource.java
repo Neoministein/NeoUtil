@@ -25,7 +25,7 @@ public class CacheResource {
     protected CacheManager cacheManager;
 
     @GET
-    public Set<String> cacheName() {
+    public Set<String> getCacheNames() {
         return cacheManager.getCacheNames();
     }
 
