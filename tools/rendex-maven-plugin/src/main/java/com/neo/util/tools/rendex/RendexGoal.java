@@ -129,6 +129,10 @@ public class RendexGoal extends AbstractMojo {
             getLog().info("Rendex execution skipped");
             return;
         }
+        if ("pom".equals(mavenProject.getPackaging())) {
+            getLog().info("Rendex execution skipped - packaging: pom");
+        }
+
 
         if (fileSets == null) {
             fileSets = new ArrayList<>();
