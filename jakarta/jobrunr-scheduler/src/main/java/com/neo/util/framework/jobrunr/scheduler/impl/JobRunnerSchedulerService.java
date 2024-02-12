@@ -9,6 +9,7 @@ import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.config.ConfigValue;
 import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
+import com.neo.util.framework.api.scheduler.SchedulerConfig;
 import com.neo.util.framework.api.scheduler.SchedulerService;
 import com.neo.util.framework.api.security.InstanceIdentification;
 import com.neo.util.framework.impl.ReflectionService;
@@ -16,7 +17,6 @@ import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.SchedulerRequestDetails;
 import com.neo.util.framework.jobrunr.scheduler.api.JobRunnerSchedulerConfig;
 import com.neo.util.framework.jobrunr.scheduler.api.ScheduleAnnotationParser;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
@@ -39,20 +39,21 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Priority(PriorityConstants.APPLICATION)
 @Alternative
 @ApplicationScoped
 public class JobRunnerSchedulerService implements SchedulerService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobRunnerSchedulerService.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobRunnerSchedulerService.class);
 
-    private boolean inStartupPhase = true;
-    private Map<String, JobRunnerSchedulerConfig> schedulers = new HashMap<>();
+    private final Map<String, JobRunnerSchedulerConfig> schedulers = new ConcurrentHashMap<>();
+
+    private boolean inStartupPhase;
 
     @Inject
     protected ConfigService configService;
@@ -65,20 +66,18 @@ public class JobRunnerSchedulerService implements SchedulerService {
 
     public void applicationReadyEvent(@Observes @Priority(PriorityConstants.LIBRARY_AFTER) ApplicationPostReadyEvent applicationPostReadyEvent) {
         LOGGER.debug("ApplicationPostReadyEvent processed");
-        inStartupPhase = false;
     }
 
     /**
      * Initializes the mapping for the {@link JobRunnerSchedulerConfig}.
-     * This is done only once at startup as no new Scheduler can be added at runtime.
      */
     @Inject
-    public void init(Instance<Object> instance, Instance<ScheduleAnnotationParser<?>> instance2,
-                     ReflectionService reflectionService) {
-        Map<String, JobRunnerSchedulerConfig> newSchedulersMap = new HashMap<>();
+    public JobRunnerSchedulerService(Instance<Object> instance, Instance<ScheduleAnnotationParser<?>> parsers,
+                                     ReflectionService reflectionService) {
         LOGGER.info("Registering Schedulers...");
+        this.inStartupPhase = true;
 
-        for (ScheduleAnnotationParser<?> parser: instance2) {
+        for (ScheduleAnnotationParser<?> parser: parsers) {
             LOGGER.trace("Found [{}] for Annotation [{}]", parser.getClass().getSimpleName(), parser.getType().getSimpleName());
 
             Set<AnnotatedElement> schedulerElements = reflectionService.getAnnotatedElement(parser.getType());
@@ -86,7 +85,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
                 Method schedulerMethod = (Method) schedulerElement;
                 JobRunnerSchedulerConfig config = parser.parseToBasicConfig(schedulerMethod);
 
-                if (newSchedulersMap.containsKey(config.getId())) {
+                if (schedulers.containsKey(config.getId())) {
                     throw new ConfigurationException(EX_DUPLICATED_SCHEDULER, config.getId());
                 }
 
@@ -98,14 +97,17 @@ public class JobRunnerSchedulerService implements SchedulerService {
                             schedulerMethod.getName());
                 }
 
-                newSchedulersMap.put(config.getId(), config);
+                schedulers.put(config.getId(), config);
                 LOGGER.debug("Registered Scheduler [{}]", config.getId());
             }
         }
 
-        LOGGER.info("Registered [{}] JanitorJobs {}", newSchedulersMap.size(), newSchedulersMap.keySet());
-        schedulers = newSchedulersMap;
+        LOGGER.info("Registered [{}] JanitorJobs {}", schedulers.size(), schedulers.keySet());
+        reload();
+
+        this.inStartupPhase = false;
     }
+
 
     public JobRunnerSchedulerConfig getSchedulerConfig(String id) {
         return Optional.ofNullable(schedulers.get(id)).
@@ -113,7 +115,6 @@ public class JobRunnerSchedulerService implements SchedulerService {
     }
 
     @Override
-    @PostConstruct
     public void reload() {
         LOGGER.info("Starting schedulers...");
         for (JobRunnerSchedulerConfig schedulerConfig: schedulers.values()) {
@@ -128,7 +129,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
     }
 
     @Override
-    public void startScheduler(String id) {
+    public void start(String id) {
         LOGGER.info("Starting scheduler [{}]", id);
         startScheduler(getSchedulerConfig(id), true);
     }
@@ -138,7 +139,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
         try {
             Config config = configService.get("scheduler").get(schedulerConfig.getId());
             if (forceStart || config.get("enabled").asBoolean().orElse(true)) {
-                JobLambda action = () -> executeScheduler(schedulerConfig.getId());
+                JobLambda action = () -> execute(schedulerConfig.getId());
 
                 RecurringJobBuilder builder = RecurringJobBuilder.aRecurringJob()
                         .withId(schedulerConfig.getId())
@@ -149,7 +150,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
                 schedulerConfig.setEnabled(true);
             } else {
                 LOGGER.debug("Not starting scheduler [{}] since it's not enabled", schedulerConfig.getId());
-                stopScheduler(schedulerConfig.getId());
+                stop(schedulerConfig.getId());
             }
         } catch (InvalidCronExpressionException | IllegalArgumentException ex) {
             schedulerConfig.setEnabled(false);
@@ -172,7 +173,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
     }
 
     @Override
-    public void executeScheduler(String id) {
+    public void execute(String id) {
         JobRunnerSchedulerConfig schedulerConfig = getSchedulerConfig(id);
 
         CheckedRunnable<?> action = () -> {
@@ -203,7 +204,10 @@ public class JobRunnerSchedulerService implements SchedulerService {
     }
 
     @Override
-    public void stopScheduler(String id) {
+    public void stop(String id) {
+        SchedulerConfig schedulerConfig = getSchedulerConfig(id);
+        schedulerConfig.setEnabled(false);
+
         BackgroundJob.delete(id);
         if (!inStartupPhase) {
             LOGGER.info("Stopping scheduler [{}]", id);

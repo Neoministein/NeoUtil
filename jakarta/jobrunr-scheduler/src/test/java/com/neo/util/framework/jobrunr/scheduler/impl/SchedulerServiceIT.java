@@ -72,15 +72,15 @@ class SchedulerServiceIT {
     void unknownSchedulers() {
         setupSchedulers();
 
-        Assertions.assertThrows(CommonRuntimeException.class, () -> schedulerService.executeScheduler(""));
-        Assertions.assertThrows(CommonRuntimeException.class, () -> schedulerService.startScheduler(""));
+        Assertions.assertThrows(CommonRuntimeException.class, () -> schedulerService.execute(""));
+        Assertions.assertThrows(CommonRuntimeException.class, () -> schedulerService.start(""));
     }
 
     @Test
     void executeScheduler() {
         setupSchedulers();
 
-        schedulerService.executeScheduler("interval");
+        schedulerService.execute("interval");
         Assertions.assertEquals(1, testSchedulers.getIntervalExecutionCount());
     }
 
@@ -103,7 +103,7 @@ class SchedulerServiceIT {
     @Test
     void stopScheduler() {
         setupSchedulers();
-        schedulerService.stopScheduler("cron");
+        schedulerService.stop("cron");
         Instant start = Instant.now();
         IntegrationTestUtil.sleepUntil(500, 30, () -> {
             Assertions.assertEquals(1, testSchedulers.getIntervalExecutionCount());

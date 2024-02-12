@@ -26,7 +26,6 @@ public class JsonSchemaHtmxResource {
 
     @GET
     public HtmlElement getMainTable() {
-        //language=HTML
         return HTML.
                 """
                 <h5 class="card-title">Json Schema</h5>

@@ -2,10 +2,10 @@ package com.neo.util.framework.impl.janitor;
 
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
-import com.neo.util.framework.api.config.Config;
+import com.neo.util.common.impl.exception.NoContentFoundException;
 import com.neo.util.framework.api.config.ConfigService;
-import com.neo.util.framework.api.config.ConfigValue;
 import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
+import com.neo.util.framework.api.janitor.JanitorConfig;
 import com.neo.util.framework.api.janitor.JanitorJob;
 import com.neo.util.framework.api.janitor.JanitorService;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -15,11 +15,12 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ApplicationScoped
 public class JanitorServiceImpl implements JanitorService {
@@ -37,10 +38,9 @@ public class JanitorServiceImpl implements JanitorService {
             "janitor/non-existent-janitor", "The Janitor [{0}] does not exist", true
     );
 
-    @Inject
-    protected ConfigService configService;
+    protected final ConfigService configService;
 
-    protected Map<String, JanitorJob> janitorJobMap;
+    protected final Map<String, JanitorConfig> janitorJobMap = new ConcurrentHashMap<>();
 
     protected void postReadyEvent(@Observes ApplicationPostReadyEvent applicationPostReadyEvent) {
         LOGGER.info("Post Ready Event received");
@@ -48,14 +48,18 @@ public class JanitorServiceImpl implements JanitorService {
 
     /**
      * Initializes the mapping to the {@link JanitorJob}.
-     * This is done only once at startup as no new Janitors should be added at runtime.
      */
     @Inject
-    public void init(Instance<JanitorJob> janitorJobInstance) {
-        Map<String, JanitorJob> newMap = new HashMap<>();
+    public JanitorServiceImpl(Instance<JanitorJob> janitorJobInstance, ConfigService configService) {
         LOGGER.info("Registering JanitorJobs...");
+        this.configService = configService;
+
         for (JanitorJob janitorJob: janitorJobInstance) {
-            JanitorJob existingJanitor =  newMap.putIfAbsent(janitorJob.getJanitorId(), janitorJob);
+            boolean enabled = configService.get(CONFIG_PREFIX + janitorJob.getJanitorId() + CONFIG_DISABLED_POSTFIX).asBoolean().orElse(false);
+
+            JanitorConfig janitorConfig = new JanitorConfig(janitorJob.getJanitorId(), enabled, janitorJob);
+
+            JanitorConfig existingJanitor =  janitorJobMap.putIfAbsent(janitorJob.getJanitorId(), janitorConfig);
 
             if (existingJanitor != null) {
                 throw new ConfigurationException(EX_DUPLICATED_JANITOR_JOB,
@@ -65,23 +69,18 @@ public class JanitorServiceImpl implements JanitorService {
             LOGGER.debug("Registered JanitorJob [{}]", janitorJob.getJanitorId());
         }
 
-        LOGGER.info("Registered [{}] JanitorJobs {}", newMap.size(), newMap.keySet());
-        janitorJobMap = newMap;
+        LOGGER.info("Registered [{}] JanitorJobs {}", janitorJobMap.size(), janitorJobMap.keySet());
     }
 
     @Override
-    public Collection<String> getJanitorNames() {
-        return janitorJobMap.keySet();
+    public JanitorConfig getJanitorConfig(String janitorId) throws NoContentFoundException {
+        return Optional.ofNullable(janitorJobMap.get(janitorId)).orElseThrow(() -> new NoContentFoundException(EX_NON_EXISTENT_JANITOR_JOB, janitorId));
     }
 
     @Override
     public void execute(String janitorId) {
-        Optional<JanitorJob> optionalJanitorJob = Optional.ofNullable(janitorJobMap.get(janitorId));
-
-        JanitorJob janitorJob = optionalJanitorJob.orElseThrow(() ->  new ConfigurationException(EX_NON_EXISTENT_JANITOR_JOB));
-
         LOGGER.info("Executing Janitor Job [{}]", janitorId);
-        janitorJob.execute(LocalDate.now());
+        getJanitorConfig(janitorId).getJanitorJob().execute(LocalDate.now());
     }
 
     @Override
@@ -89,35 +88,38 @@ public class JanitorServiceImpl implements JanitorService {
         LocalDate localDate = LocalDate.now();
 
         LOGGER.info("Executing all Janitor Jobs...");
-        for (Map.Entry<String, JanitorJob> janitorJobEntry: janitorJobMap.entrySet()) {
-            if (!isJanitorDisabled(janitorJobEntry.getKey())) {
+        for (JanitorConfig janitorConfig: janitorJobMap.values()) {
+            if (janitorConfig.isEnabled()) {
                 try {
-                    LOGGER.info("Executing Janitor Job [{}]", janitorJobEntry.getKey());
-                    janitorJobEntry.getValue().execute(localDate);
+                    LOGGER.info("Executing Janitor Job [{}]", janitorConfig.getId());
+                    janitorConfig.setLastExecution(Instant.now());
+                    janitorConfig.getJanitorJob().execute(localDate);
+                    janitorConfig.setLastExecutionFailed(false);
                 } catch (Exception ex) {
-                    LOGGER.info("Unexpected error occurred while processing Janitor Job [{}], action won't be retried.", janitorJobEntry.getKey(), ex);
+                    LOGGER.info("Unexpected error occurred while processing Janitor Job [{}], action won't be retried.", janitorConfig.getId(), ex);
+                    janitorConfig.setLastExecutionFailed(true);
                 }
             } else {
-                LOGGER.info("Skipping disabled Janitor Job [{}]", janitorJobEntry.getKey());
+                LOGGER.info("Skipping disabled Janitor Job [{}]", janitorConfig.getId());
             }
         }
         LOGGER.info("Finished executing all Janitor Jobs");
     }
 
     @Override
-    public void disableJanitor(String janitorId) {
-        LOGGER.info("Disabling Janitor Job [{}]", janitorId);
-        if (!janitorJobMap.containsKey(janitorId)) {
-            throw new ConfigurationException(EX_NON_EXISTENT_JANITOR_JOB);
-        }
-
-        ConfigValue<Boolean> configValue = configService.newConfig(CONFIG_PREFIX + janitorId + CONFIG_DISABLED_POSTFIX, true);
-        configService.save(configValue);
+    public void enable(String janitorId) {
+        LOGGER.info("Enabling Janitor Job [{}]", janitorId);
+        getJanitorConfig(janitorId).setEnabled(true);
     }
 
-    protected boolean isJanitorDisabled(String janitorId) {
-        Config janitorConfig = configService.get(CONFIG_PREFIX + janitorId + CONFIG_DISABLED_POSTFIX);
+    @Override
+    public void disable(String janitorId) {
+        LOGGER.info("Disabling Janitor Job [{}]", janitorId);
+        getJanitorConfig(janitorId).setEnabled(false);
+    }
 
-        return janitorConfig.asBoolean().orElse(false);
+    @Override
+    public Set<String> getJanitorIds() {
+        return janitorJobMap.keySet();
     }
 }

@@ -1,35 +1,40 @@
 package com.neo.util.framework.rest.web.rest;
 
-import com.neo.util.framework.api.scheduler.SchedulerConfig;
-import com.neo.util.framework.api.scheduler.SchedulerService;
+import com.neo.util.framework.api.janitor.JanitorService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
-import java.util.List;
-
 @ApplicationScoped
-@Path(SchedulerResource.RESOURCE_LOCATION)
+@Path(JanitorResource.RESOURCE_LOCATION)
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-public class SchedulerResource {
+public class JanitorResource {
 
-    public static final String RESOURCE_LOCATION = "/admin/api/scheduler";
+    public static final String RESOURCE_LOCATION = "/admin/api/janitor";
+
+    protected final JanitorService janitorService;
 
     @Inject
-    protected SchedulerService schedulerService;
-
+    public JanitorResource(JanitorService janitorService) {
+        this.janitorService = janitorService;
+    }
+/*
     @GET
-    @Path("{id}")
-    public SchedulerConfig getSchedulerConfig(@PathParam("id") String id) {
-        return schedulerService.getSchedulerConfig(id);
+    public Set<String> getJanitorNames() {
+        return janitorService.getJanitorNames();
     }
 
-    @GET
-    public List<SchedulerConfig> getSchedulerConfig() {
-        return schedulerService.getSchedulerIds().stream()
-                .map(ids -> schedulerService.getSchedulerConfig(ids))
-                .toList();
+    @POST
+    public void executeAll() {
+        janitorService.executeAll();
+    }
+
+    @POST
+    @Path("{id}")
+    public void execute(@PathParam("id") String id) {
+        janitorService.execute(id);
     }
 
     @GET
@@ -44,18 +49,18 @@ public class SchedulerResource {
     @POST
     @Path("/execute/{id}")
     public void executeScheduler(@PathParam("id") String id) {
-        schedulerService.execute(id);
+        schedulerService.executeScheduler(id);
     }
 
     @POST
     @Path("/start/{id}")
     public void startScheduler(@PathParam("id") String id) {
-        schedulerService.start(id);
+        schedulerService.startScheduler(id);
     }
 
     @POST
     @Path("/stop/{id}")
     public void stopScheduler(@PathParam("id") String id) {
-        schedulerService.stop(id);
-    }
+        schedulerService.stopScheduler(id);
+    }*/
 }

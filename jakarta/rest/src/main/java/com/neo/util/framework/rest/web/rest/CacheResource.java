@@ -37,7 +37,7 @@ public class CacheResource {
 
     @POST
     @Path("/{id}/clear")
-    public void clearCache(@QueryParam("id") String id) {
+    public void clearCache(@PathParam("id") String id) {
         Cache cache = cacheManager.getCache(id).orElseThrow(() -> new NoContentFoundException(EX_CACHE_DOES_NOT_EXIST, id));
         cache.invalidateAll();
     }

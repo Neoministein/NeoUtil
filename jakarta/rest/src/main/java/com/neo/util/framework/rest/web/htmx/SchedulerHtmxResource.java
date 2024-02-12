@@ -26,6 +26,8 @@ public class SchedulerHtmxResource {
     public static final String P_START = "/start/";
     public static final String P_STOP = "/stop/";
 
+    public static final String P_EXECUTE = "/execute/";
+
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm.ss")
             .withZone(ZoneId.systemDefault());
 
@@ -53,21 +55,31 @@ public class SchedulerHtmxResource {
     }
 
     @POST
-    @Path(P_STOP+ "{id}")
+    @Path(P_STOP + "{id}")
     public HtmlElement stopScheduler(@PathParam("id") String id) {
         schedulerResource.stopScheduler(id);
         return parseToggleButton(schedulerResource.getSchedulerConfig(id));
+    }
+
+    @POST
+    @Path(P_EXECUTE + "{id}")
+    public void executeScheduler(@PathParam("id") String id) {
+        schedulerResource.executeScheduler(id);
     }
 
     public HtmlElement parseFullConfig(SchedulerConfig config) {
         return HTML.
                 """
                 <tr>
-                    <td>\{ config.getId() }</td>
+                    <td>\{config.getId()}</td>
                     <td>
                         <div class="form-check form-switch">
                             \{parseToggleButton(config)}
-                            <button>=></button>
+                            <button type="button"
+                                hx-post="\{RESOURCE_LOCATION + P_EXECUTE + config.getId()}"
+                                class="btn btn-light">
+                                    =>
+                            </button>
                         </div>
                     </td>
                     <td class="col">Last Execution: \{parseTime(config.getLastExecution())}</td>

@@ -1,6 +1,7 @@
 package com.neo.util.framework.api.scheduler;
 
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.NoContentFoundException;
 
 import java.util.Set;
 
@@ -21,34 +22,32 @@ public interface SchedulerService {
 
     ExceptionDetails EX_INVALID_CONFIG_EXPRESSION = new ExceptionDetails(
             "scheduler/invalid-chron", "The configured expression is invalid because [{0}].", true);
-    /**
-     * Returns the config for the provided scheduler name
-     */
-    SchedulerConfig getSchedulerConfig(String id);
 
     /**
      * Manually executes the provided scheduler
      *
-     * @param id the id of the scheduler
-     * @throws com.neo.util.common.impl.exception.NoContentFoundException if id doesn't exist
+     * @param schedulerId the id of the scheduler
      */
-    void executeScheduler(String id);
+    void execute(String schedulerId) throws NoContentFoundException;
 
     /**
      * Manually starts the scheduler
      *
-     * @param id the id of the scheduler
-     * @throws com.neo.util.common.impl.exception.NoContentFoundException if id doesn't exist
+     * @param schedulerId the id of the scheduler
      */
-    void startScheduler(String id);
+    void start(String schedulerId) throws NoContentFoundException;
 
     /**
      * Manually stops the scheduler
      *
-     * @param id the id of the scheduler
-     * @throws com.neo.util.common.impl.exception.NoContentFoundException if id doesn't exist
+     * @param schedulerId the id of the scheduler
      */
-    void stopScheduler(String id);
+    void stop(String schedulerId) throws NoContentFoundException;
+
+    /**
+     * Returns the config for the provided scheduler name
+     */
+    SchedulerConfig getSchedulerConfig(String schedulerId) throws NoContentFoundException;
 
     /**
      * Reload all schedulers from configuration.

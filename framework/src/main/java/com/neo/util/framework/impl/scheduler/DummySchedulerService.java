@@ -15,17 +15,17 @@ public class DummySchedulerService implements SchedulerService {
     }
 
     @Override
-    public void executeScheduler(String id) {
+    public void execute(String id) {
 
     }
 
     @Override
-    public void startScheduler(String id) {
+    public void start(String id) {
 
     }
 
     @Override
-    public void stopScheduler(String id) {
+    public void stop(String id) {
 
     }
 
