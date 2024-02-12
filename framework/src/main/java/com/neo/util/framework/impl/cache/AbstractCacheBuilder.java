@@ -39,6 +39,9 @@ public abstract class AbstractCacheBuilder implements CacheBuilder {
             cacheNames.add(element.getAnnotation(CacheInvalidateAll.class).cacheName());
         }
 
+        //This is done to not create cache instances for the SPI references for the interceptor implementation
+        cacheNames.remove("");
+
         return cacheNames;
     }
 }
