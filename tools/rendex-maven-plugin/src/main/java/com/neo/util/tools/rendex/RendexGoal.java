@@ -171,7 +171,7 @@ public class RendexGoal extends AbstractMojo {
         LOGGER.info("Saving Rendex index: [{}]", indexFile);
         try {
             Files.createDirectories(indexFile.toPath().getParent());
-            Files.writeString(indexFile.toPath(), resourceIndex.stream().collect(Collectors.joining(System.getProperty("line.separator"))));
+            Files.writeString(indexFile.toPath(), resourceIndex.stream().sorted().collect(Collectors.joining(System.getProperty("line.separator"))));
         } catch (IOException e) {
             throw new MojoExecutionException("Could not save index " + indexFile, e);
         }
@@ -188,7 +188,7 @@ public class RendexGoal extends AbstractMojo {
         scanner.setBasedir(dir);
         String[] files = findFilesToIndex(fileSet, scanner);
         for (String file : files) {
-            if (!isResourceFile(".class")) {
+            if (isResourceFile(file)) {
                 resourceIndex.add(file);
                 if (isVerbose()) {
                     //getLog().info("Indexed " + info.name() + " (" + info.annotationsCount() + " annotations)");
