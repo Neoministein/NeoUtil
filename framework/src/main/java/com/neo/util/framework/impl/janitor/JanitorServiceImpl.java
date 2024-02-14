@@ -79,26 +79,29 @@ public class JanitorServiceImpl implements JanitorService {
 
     @Override
     public void execute(String janitorId) {
-        LOGGER.info("Executing Janitor Job [{}]", janitorId);
-        getJanitorConfig(janitorId).getJanitorJob().execute(LocalDate.now());
+        execute(getJanitorConfig(janitorId), LocalDate.now());
+    }
+
+    protected void execute(JanitorConfig janitorConfig, LocalDate now) {
+        try {
+            LOGGER.info("Executing Janitor Job [{}]", janitorConfig.getId());
+            janitorConfig.getJanitorJob().execute(now);
+            janitorConfig.setLastExecutionFailed(false);
+        } catch (Exception ex) {
+            LOGGER.info("Unexpected error occurred while processing Janitor Job [{}], action won't be retried.", janitorConfig.getId(), ex);
+            janitorConfig.setLastExecutionFailed(true);
+        }
+        janitorConfig.setLastExecution(Instant.now());
     }
 
     @Override
     public void executeAll() {
-        LocalDate localDate = LocalDate.now();
+        LocalDate now = LocalDate.now();
 
         LOGGER.info("Executing all Janitor Jobs...");
         for (JanitorConfig janitorConfig: janitorJobMap.values()) {
             if (janitorConfig.isEnabled()) {
-                try {
-                    LOGGER.info("Executing Janitor Job [{}]", janitorConfig.getId());
-                    janitorConfig.setLastExecution(Instant.now());
-                    janitorConfig.getJanitorJob().execute(localDate);
-                    janitorConfig.setLastExecutionFailed(false);
-                } catch (Exception ex) {
-                    LOGGER.info("Unexpected error occurred while processing Janitor Job [{}], action won't be retried.", janitorConfig.getId(), ex);
-                    janitorConfig.setLastExecutionFailed(true);
-                }
+                execute(janitorConfig, now);
             } else {
                 LOGGER.info("Skipping disabled Janitor Job [{}]", janitorConfig.getId());
             }

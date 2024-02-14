@@ -20,6 +20,10 @@ public class CacheHtmxResource {
 
     public static final String RESOURCE_LOCATION = "/admin/html/cache";
 
+    public static final String P_RELOAD = "/reload";
+
+    public static final String P_CLEAR = "/clear";
+
     @Inject
     @CacheName("Test")
     protected Cache cache;
@@ -34,7 +38,7 @@ public class CacheHtmxResource {
                 <h5 class="card-title">
                     Cache
                     <button type="button"
-                        hx-post="\{RESOURCE_LOCATION}/reload"
+                        hx-post="\{RESOURCE_LOCATION + P_RELOAD}"
                         hx-swap="none"
                         class="btn btn-danger">
                             Reload Caches
@@ -42,20 +46,20 @@ public class CacheHtmxResource {
                 </h5>
                 <table class="table table-striped">
                     <tbody>
-                        \{cacheResource.getCacheNames().stream().map(this::test)}
+                        \{cacheResource.getCacheNames().stream().map(this::getCacheRow)}
                     </tbody>
                 </table>
                 """;
     }
 
-    public HtmlElement test(String cacheName) {
+    protected HtmlElement getCacheRow(String cacheName) {
         return HTML.
                 """
                 <tr>
                     <td>\{cacheName}</td>
                     <td>
                         <button type="button"
-                            hx-post="\{RESOURCE_LOCATION}/\{cacheName}/clear"}"
+                            hx-post="\{RESOURCE_LOCATION + "/" + cacheName + P_CLEAR}"}"
                             hx-swap="none"
                             class="btn btn-warning">
                                 Clear Cache
@@ -66,13 +70,13 @@ public class CacheHtmxResource {
     }
 
     @POST
-    @Path("/reload")
+    @Path(P_RELOAD)
     public void reload() {
         cacheResource.reload();
     }
 
     @POST
-    @Path("/{id}/clear")
+    @Path("/{id}" + P_CLEAR)
     public void clearCache(@PathParam("id") String id) {
         cacheResource.clearCache(id);
     }

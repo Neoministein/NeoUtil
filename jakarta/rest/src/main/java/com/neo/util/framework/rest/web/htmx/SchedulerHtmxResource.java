@@ -9,10 +9,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-
 import static com.neo.util.common.impl.html.HtmlStringTemplate.HTML;
 
 @ApplicationScoped
@@ -28,11 +24,15 @@ public class SchedulerHtmxResource {
 
     public static final String P_EXECUTE = "/execute/";
 
-    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm.ss")
-            .withZone(ZoneId.systemDefault());
+    protected final SchedulerResource schedulerResource;
+    protected final ResourceFormattingService resourceFormttingService;
 
     @Inject
-    protected SchedulerResource schedulerResource;
+    public SchedulerHtmxResource(SchedulerResource schedulerResource, ResourceFormattingService resourceFormttingService) {
+        this.schedulerResource = schedulerResource;
+        this.resourceFormttingService = resourceFormttingService;
+    }
+
 
     @GET
     public HtmlElement getSchedulerConfig() {
@@ -63,26 +63,29 @@ public class SchedulerHtmxResource {
 
     @POST
     @Path(P_EXECUTE + "{id}")
-    public void executeScheduler(@PathParam("id") String id) {
+    public HtmlElement executeScheduler(@PathParam("id") String id) {
         schedulerResource.executeScheduler(id);
+        return parseFullConfig(schedulerResource.getSchedulerConfig(id));
     }
 
     public HtmlElement parseFullConfig(SchedulerConfig config) {
         return HTML.
                 """
-                <tr>
+                <tr id="\{config.getId()}">
                     <td>\{config.getId()}</td>
                     <td>
                         <div class="form-check form-switch">
                             \{parseToggleButton(config)}
                             <button type="button"
                                 hx-post="\{RESOURCE_LOCATION + P_EXECUTE + config.getId()}"
+                                hx-target="#\{config.getId()}"
+                                hx-swap="outerHTML"
                                 class="btn btn-light">
                                     =>
                             </button>
                         </div>
                     </td>
-                    <td class="col">Last Execution: \{parseTime(config.getLastExecution())}</td>
+                    <td class="col">Last Execution: \{resourceFormttingService.toDateSecond(config.getLastExecution())}</td>
                 </tr>
                 """ ;
     }
@@ -96,9 +99,5 @@ public class SchedulerHtmxResource {
                        hx-trigger="click"
                        class="form-check-input" \{config.isEnabled() ? "checked" : ""}/>
                 """;
-    }
-
-    private String parseTime(TemporalAccessor temporalAccessor) {
-        return temporalAccessor != null ? TIME_FORMAT.format(temporalAccessor) : "UNKNOWN";
     }
 }
