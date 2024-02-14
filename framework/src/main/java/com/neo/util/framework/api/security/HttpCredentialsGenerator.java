@@ -6,7 +6,7 @@ import jakarta.security.enterprise.credential.Credential;
 /**
  * Parses incoming request data to credentials
  */
-public interface CredentialsGenerator {
+public interface HttpCredentialsGenerator {
 
     /**
      * Parses incoming header to a {@link Credential} object.

@@ -6,16 +6,15 @@ import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.AuthenticationScheme;
-import com.neo.util.framework.api.security.CredentialsGenerator;
+import com.neo.util.framework.api.security.HttpCredentialsGenerator;
 import com.neo.util.framework.api.security.credential.BearerCredentials;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.security.enterprise.credential.BasicAuthenticationCredential;
 import jakarta.security.enterprise.credential.Credential;
 
 @ApplicationScoped
-public class CredentialsGeneratorImpl implements CredentialsGenerator {
+public class HttpCredentialsGeneratorImpl implements HttpCredentialsGenerator {
 
     public static final ExceptionDetails EX_BASIC_INVALID = new ExceptionDetails(
             "auth/basic-invalid", "The provided basic token is invalid", false);

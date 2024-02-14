@@ -5,7 +5,6 @@ import com.neo.util.framework.api.request.UserRequest;
 import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import com.neo.util.framework.rest.api.security.Secured;
-
 import jakarta.annotation.Priority;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
@@ -44,7 +43,10 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         LOGGER.trace("Accessing secured endpoint");
         RolesAllowed rolesAllowed = resourceInfo.getResourceMethod().getAnnotation(RolesAllowed.class);
         if (rolesAllowed == null) {
-            return;
+            rolesAllowed = resourceInfo.getResourceClass().getAnnotation(RolesAllowed.class);
+            if (rolesAllowed == null) {
+                return;
+            }
         }
 
         Set<String> roles = Set.of(rolesAllowed.value());

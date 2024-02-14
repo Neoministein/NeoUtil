@@ -3,7 +3,7 @@ package com.neo.util.framework.websocket.impl;
 import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.api.security.AuthenticationProvider;
-import com.neo.util.framework.api.security.CredentialsGenerator;
+import com.neo.util.framework.api.security.HttpCredentialsGenerator;
 import com.neo.util.framework.api.security.InstanceIdentification;
 import com.neo.util.framework.websocket.api.WebsocketRequestDetails;
 import com.networknt.org.apache.commons.validator.routines.InetAddressValidator;
@@ -30,7 +30,7 @@ public class WebsocketAccessController {
     protected InstanceIdentification instanceIdentification;
 
     @Inject
-    protected CredentialsGenerator credentialsGenerator;
+    protected HttpCredentialsGenerator httpCredentialsGenerator;
 
     @Inject
     protected AuthenticationProvider authenticationProvider;
@@ -51,7 +51,7 @@ public class WebsocketAccessController {
                 return failed;
             }
 
-            Credential credential = credentialsGenerator.generate(authHeader);
+            Credential credential = httpCredentialsGenerator.generate(authHeader);
             authenticationProvider.authenticate(requestDetails, credential);
 
             failed = !requestDetails.hasOneOfTheRoles(roles);

@@ -2,8 +2,8 @@ package com.neo.util.framework.rest.impl.security;
 
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.framework.api.security.AuthenticationProvider;
-import com.neo.util.framework.api.security.CredentialsGenerator;
-import com.neo.util.framework.impl.security.CredentialsGeneratorImpl;
+import com.neo.util.framework.api.security.HttpCredentialsGenerator;
+import com.neo.util.framework.impl.security.HttpCredentialsGeneratorImpl;
 import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import jakarta.security.enterprise.credential.Credential;
@@ -23,7 +23,7 @@ class AuthenticationFilterTest {
 
     AuthenticationProvider authenticationProvider;
     ResponseGenerator responseGenerator;
-    CredentialsGenerator credentialsGenerator;
+    HttpCredentialsGenerator credentialsGenerator;
     HttpRequestDetails requestDetails;
 
     @BeforeEach
@@ -36,8 +36,8 @@ class AuthenticationFilterTest {
         responseGenerator = Mockito.mock(ResponseGenerator.class);
         subject.responseGenerator = responseGenerator;
 
-        credentialsGenerator = Mockito.mock(CredentialsGenerator.class);
-        subject.credentialsGenerator = credentialsGenerator;
+        credentialsGenerator = Mockito.mock(HttpCredentialsGenerator.class);
+        subject.httpCredentialsGenerator = credentialsGenerator;
 
         requestDetails = new HttpRequestDetails(null, null, null, null, new HttpRequestDetails.Context(null, null));
         subject.requestDetails = requestDetails;
@@ -71,7 +71,7 @@ class AuthenticationFilterTest {
         ContainerRequestContext containerRequestContext = Mockito.mock(ContainerRequestContext.class);
         Mockito.doReturn(httpHeader).when(containerRequestContext).getHeaderString(HttpHeaders.AUTHORIZATION);
 
-        Mockito.doThrow(new ValidationException(CredentialsGeneratorImpl.EX_BASIC_INVALID)).when(credentialsGenerator).generate(httpHeader);
+        Mockito.doThrow(new ValidationException(HttpCredentialsGeneratorImpl.EX_BASIC_INVALID)).when(credentialsGenerator).generate(httpHeader);
 
         //Act
 
