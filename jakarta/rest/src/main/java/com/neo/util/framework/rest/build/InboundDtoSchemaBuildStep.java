@@ -64,7 +64,7 @@ public class InboundDtoSchemaBuildStep implements BuildStep {
     }
 
     protected String generateFileLocation(Class<?> clazz, String outputDir) {
-        StringBuilder file = new StringBuilder(outputDir + "/" + FrameworkConstants.JSON_SCHEMA_LOCATION + "/" + InboundDtoParserBuildStep.INBOUND_DTO_SCHEMA_LOCATION);
+        StringBuilder file = new StringBuilder(outputDir + "/" + FrameworkConstants.JSON_SCHEMA_LOCATION + InboundDtoParserBuildStep.INBOUND_DTO_SCHEMA_LOCATION);
         if (clazz.getSimpleName().indexOf('$') == -1) {
             file.append(clazz.getSimpleName()).append(".json");
         }  else {

@@ -11,7 +11,6 @@ import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.ThreadUtils;
 import com.neo.util.common.impl.reflection.IndexReflectionProvider;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
-import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 import com.neo.util.framework.impl.ReflectionService;
@@ -39,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
@@ -63,22 +61,9 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
             ElasticSearchProvider.FLUSH_INTERVAL_CONFIG, 1
     ));
 
-    protected static ElasticSearchConnectionProviderImpl connection = new ElasticSearchConnectionProviderImpl();
+    protected static ElasticSearchConnectionProviderImpl connection;
     protected RequestDetails requestDetails = new DummyRequestDetails();
-    protected IndexNamingService indexNamingService = createIndexNameService(configService);
-
-    IndexNamingService createIndexNameService(ConfigService cfg) {
-        IndexNamingServiceImpl indexNamingService = new IndexNamingServiceImpl() {
-            {
-                configService = cfg;
-                searchableIndexCache = new HashMap<>();
-            }
-        };
-        indexNamingService.postConstruct();
-
-        indexNamingService.initIndexProperties(new ReflectionService(new IndexReflectionProvider(ThreadUtils.classLoader())));
-        return indexNamingService;
-    }
+    protected IndexNamingService indexNamingService = new IndexNamingServiceImpl(configService, new ReflectionService(new IndexReflectionProvider(ThreadUtils.classLoader())));
 
     @Override
     protected boolean ignoreExternalCluster() {
@@ -135,8 +120,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         LOGGER.info("Elasticsearch node started at [{}]", restClient.getNodes().get(0).getHost().toString());
         configService.save(new BasicConfigValue<>(
                 ElasticSearchConnectionProviderImpl.NODE_CONFIG, List.of(restClient.getNodes().get(0).getHost().toString())));
-        connection.configService = configService;
-        connection.connectionStatusEvent = new EventMock<>();
+
 
         initialiseElasticSearchProvider();
     }
@@ -152,14 +136,9 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
     }
 
     protected void initialiseElasticSearchProvider() {
-        connection.postConstruct();
+        connection = new ElasticSearchConnectionProviderImpl(configService, new EventMock<>());
         connection.connect();
-        elasticSearchRepository = new ElasticSearchProvider();
-        elasticSearchRepository.configService = configService;
-        elasticSearchRepository.connection = connection;
-        elasticSearchRepository.indexerQueueService = new DummyIndexerNotificationService();
-        elasticSearchRepository.requestDetailsProvider = () -> requestDetails;
-        elasticSearchRepository.indexNameService = indexNamingService;
+        elasticSearchRepository = new ElasticSearchProvider(configService, () -> requestDetails, new DummyIndexerNotificationService(), indexNamingService, connection);
         elasticSearchRepository.setupBulkIngester();
     }
 

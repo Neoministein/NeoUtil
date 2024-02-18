@@ -19,10 +19,13 @@ public class CacheKeyGeneratorManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheKeyGeneratorManager.class);
 
+    protected final Instance<CacheKeyGenerator> keyGenerators;
     protected Map<Class<? extends CacheKeyGenerator>, CacheKeyGenerator> generators = new ConcurrentHashMap<>();
 
     @Inject
-    protected Instance<CacheKeyGenerator> keyGenerators;
+    public CacheKeyGeneratorManager(Instance<CacheKeyGenerator> keyGenerators) {
+        this.keyGenerators = keyGenerators;
+    }
 
     public CacheKeyGenerator getCacheKeyGenerator(Class<? extends CacheKeyGenerator> keyGeneratorClass) {
         return generators.computeIfAbsent(keyGeneratorClass, this::buildCacheKeyGenerator);

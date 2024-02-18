@@ -7,9 +7,7 @@ import com.neo.util.framework.api.persistence.search.Searchable;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 import com.neo.util.framework.impl.ReflectionService;
-import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Any;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,28 +50,19 @@ public class IndexNamingServiceImpl implements IndexNamingService {
     protected static final DateTimeFormatter INDEX_DATE_FORMAT_YEAR = DateTimeFormatter.ofPattern("yyyy")
             .withZone(ZoneId.systemDefault());
 
-    protected String mappingVersion;
-    protected String indexPrefix;
-    protected String indexPostFix;
-
-    @Inject
-    protected ConfigService configService;
+    protected final String mappingVersion;
+    protected final String indexPrefix;
+    protected final String indexPostFix;
 
     /** Cache that saves the annotation information of each searchable */
-    protected Map<Class<? extends Searchable>, SearchableIndex> searchableIndexCache;
+    protected final Map<Class<? extends Searchable>, SearchableIndex> searchableIndexCache = new HashMap<>();
 
-    /**
-     * Create a new IndexNameServiceImpl.
-     */
-    public IndexNamingServiceImpl() {
-        super();
-    }
-
-    /**
-     * postConstruct logic.
-     */
-    @PostConstruct
-    public void postConstruct() {
+    @Inject
+    public IndexNamingServiceImpl(ConfigService configService, ReflectionService reflectionService) {
+        for (AnnotatedElement annotatedElement: reflectionService.getAnnotatedElement(SearchableIndex.class)) {
+            Class<? extends Searchable> searchableClass = (Class<? extends Searchable>) annotatedElement;
+            searchableIndexCache.put(searchableClass, searchableClass.getAnnotation(SearchableIndex.class));
+        }
 
         mappingVersion = configService.get(MAPPING_VERSION_CONFIG).asString().orElse(DEFAULT_MAPPING_VERSION);
 
@@ -89,20 +78,6 @@ public class IndexNamingServiceImpl implements IndexNamingService {
             postfix = INDEX_SEPARATOR + postfix.toLowerCase();
         }
         this.indexPostFix = postfix;
-    }
-
-    /**
-     * Initializes the index names for each searchable. This is done only once at startup as it is defined by the
-     * annotations on the searchable and cannot be changed at runtime.
-     */
-    @Inject
-    public void initIndexProperties(@Any ReflectionService reflectionService) {
-        searchableIndexCache = new HashMap<>();
-
-        for (AnnotatedElement annotatedElement: reflectionService.getAnnotatedElement(SearchableIndex.class)) {
-            Class<? extends Searchable> searchableClass = (Class<? extends Searchable>) annotatedElement;
-            searchableIndexCache.put(searchableClass, searchableClass.getAnnotation(SearchableIndex.class));
-        }
     }
 
     public String getIndexName(Searchable searchable) {

@@ -12,9 +12,9 @@ import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.impl.config.BasicConfigService;
 import com.neo.util.framework.impl.config.BasicConfigValue;
 import com.neo.util.framework.impl.janitor.JanitorServiceImpl;
-import com.neo.util.framework.impl.request.DummyRequestAuditProvider;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.RequestDetailsProducer;
+import com.neo.util.framework.impl.request.Slf4jRequestAuditProvider;
 import com.neo.util.framework.impl.security.BasicInstanceIdentification;
 import com.neo.util.framework.jobrunr.impl.JobRunnerConfigurator;
 import com.neo.util.framework.jobrunr.impl.JobRunnerInMemoryStorageProvider;
@@ -46,7 +46,7 @@ class SchedulerServiceIT {
             IndexReflectionProvider.class,
             RequestContextExecutor.class,
             RequestDetailsProducer.class,
-            DummyRequestAuditProvider.class,
+            Slf4jRequestAuditProvider.class,
             JobRunnerSchedulerService.class,
             CronScheduleAnnotationParser.class,
             FixedRateScheduleAnnotationParser.class,

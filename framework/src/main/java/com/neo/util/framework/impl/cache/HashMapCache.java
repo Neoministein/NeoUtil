@@ -9,13 +9,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public class BasicCache implements Cache {
+public class HashMapCache implements Cache {
 
 
     protected final Map<Object, Object> cache = new ConcurrentHashMap<>();
     protected final String cacheName;
 
-    public BasicCache(String cacheName) {
+    public HashMapCache(String cacheName) {
         this.cacheName = cacheName;
     }
 

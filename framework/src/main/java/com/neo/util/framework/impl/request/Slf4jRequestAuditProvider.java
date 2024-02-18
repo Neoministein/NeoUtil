@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
-public class DummyRequestAuditProvider implements RequestAuditProvider {
+public class Slf4jRequestAuditProvider implements RequestAuditProvider {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DummyRequestAuditProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Slf4jRequestAuditProvider.class);
 
     @Override
     public <T extends RequestDetails> void audit(T requestDetails, boolean failed) {

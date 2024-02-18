@@ -19,8 +19,12 @@ public class HttpCredentialsGeneratorImpl implements HttpCredentialsGenerator {
     public static final ExceptionDetails EX_BASIC_INVALID = new ExceptionDetails(
             "auth/basic-invalid", "The provided basic token is invalid", false);
 
+    protected final AuthenticationProvider authenticationProvider;
+
     @Inject
-    protected AuthenticationProvider authenticationProvider;
+    public HttpCredentialsGeneratorImpl(AuthenticationProvider authenticationProvider) {
+        this.authenticationProvider = authenticationProvider;
+    }
 
     @Override
     public Credential generate(String httpHeader) {

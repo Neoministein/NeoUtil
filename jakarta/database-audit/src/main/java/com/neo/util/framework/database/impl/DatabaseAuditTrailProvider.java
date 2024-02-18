@@ -21,8 +21,12 @@ public class DatabaseAuditTrailProvider implements EntityAuditTrailProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseAuditTrailProvider.class);
 
+    protected final AuditTrailRepository auditTrailRepository;
+
     @Inject
-    protected AuditTrailRepository auditTrailRepository;
+    public DatabaseAuditTrailProvider(AuditTrailRepository auditTrailRepository) {
+        this.auditTrailRepository = auditTrailRepository;
+    }
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRES_NEW)

@@ -4,7 +4,6 @@ import com.neo.util.framework.api.cache.Cache;
 import com.neo.util.framework.api.cache.CacheBuilder;
 import com.neo.util.framework.api.cache.CacheManager;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
-import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
@@ -20,13 +19,18 @@ import java.util.Set;
 public class BasicCacheManagerImpl implements CacheManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BasicCacheManagerImpl.class);
 
+    protected final CacheBuilder cacheBuilder;
+
     protected Set<String> keys;
     protected Map<String, Cache> cacheMap = new HashMap<>();
 
     @Inject
-    protected CacheBuilder cacheBuilder;
+    public BasicCacheManagerImpl(CacheBuilder cacheBuilder) {
+        this.cacheBuilder = cacheBuilder;
+        initializeCaches();
+    }
 
-    @PostConstruct
+
     protected void initializeCaches() {
         cacheMap = cacheBuilder.build();
         keys = cacheMap.keySet();

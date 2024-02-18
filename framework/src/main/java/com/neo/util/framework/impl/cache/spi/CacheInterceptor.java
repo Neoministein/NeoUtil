@@ -5,7 +5,6 @@ import com.neo.util.framework.api.cache.CacheManager;
 import com.neo.util.framework.api.cache.spi.CacheKeyParameterPositions;
 import com.neo.util.framework.api.cache.spi.CompositeCacheKey;
 import com.neo.util.framework.api.cache.spi.UndefinedCacheKeyGenerator;
-import jakarta.inject.Inject;
 import jakarta.interceptor.Interceptor.Priority;
 import jakarta.interceptor.InvocationContext;
 import org.slf4j.Logger;
@@ -25,11 +24,13 @@ public abstract class CacheInterceptor {
 
     public static final int BASE_PRIORITY = Priority.PLATFORM_BEFORE;
 
-    @Inject
-    protected CacheKeyGeneratorManager cacheKeyGeneratorManager;
+    protected final CacheManager cacheManager;
+    protected final CacheKeyGeneratorManager cacheKeyGeneratorManager;
 
-    @Inject
-    protected CacheManager cacheManager;
+    protected CacheInterceptor(CacheManager cacheManager, CacheKeyGeneratorManager cacheKeyGeneratorManager) {
+        this.cacheManager = cacheManager;
+        this.cacheKeyGeneratorManager = cacheKeyGeneratorManager;
+    }
 
     protected <T> CacheInterceptionContext<T> getInterceptionContext(InvocationContext invocationContext,
             Function<Annotation, Set<T>> interceptorBindingFunc) {

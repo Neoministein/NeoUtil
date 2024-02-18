@@ -3,21 +3,20 @@ package com.neo.util.framework.database.impl;
 import com.neo.util.common.impl.StopWatch;
 import com.neo.util.common.impl.enumeration.Association;
 import com.neo.util.framework.api.persistence.criteria.*;
-import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
-import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityProvider;
+import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
+import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.database.api.PersistenceContextProvider;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.NoResultException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,24 +29,28 @@ public class DatabaseProvider implements EntityProvider {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DatabaseProvider.class);
 
+    protected final PersistenceContextProvider pcp;
+
     @Inject
-    protected PersistenceContextProvider pcs;
+    public DatabaseProvider(PersistenceContextProvider pcp) {
+        this.pcp = pcp;
+    }
 
     @Override
     public void create(PersistenceEntity entity) {
-        pcs.getEm().persist(entity);
+        pcp.getEm().persist(entity);
         LOGGER.debug("Created entity {}:{}", entity.getClass().getSimpleName(),  entity);
     }
 
     @Override
     public void edit(PersistenceEntity entity) {
-        pcs.getEm().merge(entity);
+        pcp.getEm().merge(entity);
         LOGGER.debug("Edited entity {}:{}",entity.getClass().getSimpleName(), entity);
     }
 
     @Override
     public void remove(PersistenceEntity entity) {
-        pcs.getEm().remove(pcs.getEm().merge(entity));
+        pcp.getEm().remove(pcp.getEm().merge(entity));
         LOGGER.debug("Removed entity {}:{}",entity.getClass().getSimpleName(), entity);
     }
 
@@ -55,7 +58,7 @@ public class DatabaseProvider implements EntityProvider {
     public <X extends PersistenceEntity> Optional<X> fetch(Object primaryKey, Class<X> entityClazz) {
         try {
             LOGGER.trace("Searching for entity {}:{}", entityClazz.getSimpleName(), primaryKey);
-            return Optional.ofNullable(pcs.getEm().find(entityClazz, primaryKey));
+            return Optional.ofNullable(pcp.getEm().find(entityClazz, primaryKey));
         } catch (NoResultException | IllegalArgumentException  ex) {
             LOGGER.trace("Unable to find entity {}:{}", entityClazz.getSimpleName(), primaryKey);
             return Optional.empty();
@@ -71,7 +74,7 @@ public class DatabaseProvider implements EntityProvider {
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        CriteriaBuilder cb = pcs.getEm().getCriteriaBuilder();
+        CriteriaBuilder cb = pcp.getEm().getCriteriaBuilder();
 
         CriteriaQuery<X> cQuery = cb.createQuery(parameters.getEntityClass());
 
@@ -81,7 +84,7 @@ public class DatabaseProvider implements EntityProvider {
 
         cQuery.orderBy(mapOrders(parameters.getSorting(), cb, root));
 
-        TypedQuery<X> typedQuery = pcs.getEm().createQuery(cQuery);
+        TypedQuery<X> typedQuery = pcp.getEm().createQuery(cQuery);
 
         if (parameters.getMaxResults().isPresent()) {
             typedQuery = typedQuery.setMaxResults(parameters.getMaxResults().get());
@@ -107,11 +110,11 @@ public class DatabaseProvider implements EntityProvider {
     }
 
     public <X> int count(List<? extends SearchCriteria> filters, Class<X> entityClass) {
-        CriteriaBuilder cb = pcs.getEm().getCriteriaBuilder();
+        CriteriaBuilder cb = pcp.getEm().getCriteriaBuilder();
         CriteriaQuery<Object> cq = cb.createQuery();
         Root<X> root = cq.from(entityClass);
         cq.select(cb.count(root));
-        Query q = pcs.getEm().createQuery(cq);
+        Query q = pcp.getEm().createQuery(cq);
         cq.where(addSearchFilters(filters, cb, root));
         return ((Long) q.getSingleResult()).intValue();
     }

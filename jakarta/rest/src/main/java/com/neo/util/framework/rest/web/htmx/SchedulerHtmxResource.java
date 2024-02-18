@@ -25,12 +25,12 @@ public class SchedulerHtmxResource {
     public static final String P_EXECUTE = "/execute/";
 
     protected final SchedulerResource schedulerResource;
-    protected final ResourceFormattingService resourceFormttingService;
+    protected final ResourceFormattingService resourceFormattingService;
 
     @Inject
-    public SchedulerHtmxResource(SchedulerResource schedulerResource, ResourceFormattingService resourceFormttingService) {
+    public SchedulerHtmxResource(SchedulerResource schedulerResource, ResourceFormattingService resourceFormattingService) {
         this.schedulerResource = schedulerResource;
-        this.resourceFormttingService = resourceFormttingService;
+        this.resourceFormattingService = resourceFormattingService;
     }
 
 
@@ -85,7 +85,7 @@ public class SchedulerHtmxResource {
                             </button>
                         </div>
                     </td>
-                    <td class="col">Last Execution: \{resourceFormttingService.toDateSecond(config.getLastExecution())}</td>
+                    <td class="col">Last Execution: \{ resourceFormattingService.toDateSecond(config.getLastExecution())}</td>
                 </tr>
                 """ ;
     }

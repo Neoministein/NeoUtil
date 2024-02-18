@@ -14,8 +14,12 @@ import java.util.List;
 @IncomingQueue(IndexingQueueService.QUEUE_NAME)
 public class IndexingQueueConsumer implements QueueListener {
 
-    @Inject
     protected SearchProvider searchRepository;
+
+    @Inject
+    public IndexingQueueConsumer(SearchProvider searchRepository) {
+        this.searchRepository = searchRepository;
+    }
 
     @Override
     public void onMessage(QueueMessage message) {

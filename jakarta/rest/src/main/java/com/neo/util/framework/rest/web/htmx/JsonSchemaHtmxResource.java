@@ -4,7 +4,6 @@ import com.neo.util.common.impl.html.HtmlElement;
 import com.neo.util.framework.rest.web.htmx.navigation.HtmxNavigationElement;
 import com.neo.util.framework.rest.web.rest.JsonSchemaResource;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -21,8 +20,11 @@ public class JsonSchemaHtmxResource {
 
     public static final String RESOURCE_LOCATION = "/admin/html/json-schema";
 
-    @Inject
     protected JsonSchemaResource jsonSchemaResource;
+
+    public JsonSchemaHtmxResource(JsonSchemaResource jsonSchemaResource) {
+        this.jsonSchemaResource = jsonSchemaResource;
+    }
 
     @GET
     public HtmlElement getMainTable() {

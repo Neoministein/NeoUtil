@@ -1,12 +1,13 @@
 package com.neo.util.framework.caffeine.impl;
 
 import com.neo.util.framework.api.PriorityConstants;
-import com.neo.util.framework.impl.cache.AbstractCacheBuilder;
 import com.neo.util.framework.api.cache.Cache;
 import com.neo.util.framework.api.cache.CacheBuilder;
 import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.config.ConfigValue;
+import com.neo.util.framework.impl.ReflectionService;
+import com.neo.util.framework.impl.cache.AbstractCacheBuilder;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Alternative;
@@ -28,8 +29,13 @@ public class CaffeineCacheBuilder extends AbstractCacheBuilder implements CacheB
     protected static final String DEFAULT_CONFIG = "default";
     protected static final String INSTANCES_CONFIG = "instances";
 
+    protected final ConfigService configService;
+
     @Inject
-    protected ConfigService configService;
+    public CaffeineCacheBuilder(ConfigService configService, ReflectionService reflectionService) {
+        super(reflectionService);
+        this.configService = configService;
+    }
 
     @Override
     public Map<String, Cache> build() {

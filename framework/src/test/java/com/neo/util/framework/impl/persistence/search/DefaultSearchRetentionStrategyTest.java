@@ -24,10 +24,9 @@ class DefaultSearchRetentionStrategyTest {
 
     @BeforeEach
     void before() {
-        subject = new DefaultSearchRetentionStrategy();
-
         basicConfigService = new BasicConfigService(new HashMap<>());
-        subject.configService = basicConfigService;
+
+        subject = new DefaultSearchRetentionStrategy(basicConfigService);
     }
 
     @Test

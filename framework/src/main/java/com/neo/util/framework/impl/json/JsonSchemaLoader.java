@@ -34,22 +34,16 @@ public class JsonSchemaLoader {
     public static final ExceptionDetails INVALID_SCHEDULER_ID = new ExceptionDetails(
             "json-schema/invalid-id", "The json-schema path [{0}] may not have whitespaces.", true);
 
-    protected Map<String, JsonSchema> jsonSchemaMap;
+    protected final Map<String, JsonSchema> jsonSchemaMap;
 
     @Inject
-    public void init(ReflectionService reflectionService, ConfigService configService) {
+    public JsonSchemaLoader(ConfigService configService, ReflectionService reflectionService) {
         LOGGER.info("Pre-loading json schemas");
         Map<String, JsonSchema> mapToFill = new HashMap<>();
 
-        String relativePath = FrameworkConstants.JSON_SCHEMA_LOCATION.concat("/");
-
-        try {
-            for (String filePath: reflectionService.getResources("^configuration/schema.*\\.json$")) {
-                addSchema(mapToFill, relativePath,
-                        filePath.substring(relativePath.length()));
-            }
-        } catch (ConfigurationException ex) {
-            LOGGER.warn("Unable to load json schema index [{}]. Falling back to reflections", ex.getMessage());
+        for (String filePath: reflectionService.getResources("^configuration/schema.*\\.json$")) {
+            addSchema(mapToFill, FrameworkConstants.JSON_SCHEMA_LOCATION,
+                    filePath.substring(FrameworkConstants.JSON_SCHEMA_LOCATION.length()));
         }
 
         configService.get("json.schema.externalFolder").asString().asOptional().ifPresent(config ->

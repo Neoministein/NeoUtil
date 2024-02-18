@@ -1,8 +1,6 @@
 package com.neo.util.framework.rest.web.htmx;
 
 import com.neo.util.common.impl.html.HtmlElement;
-import com.neo.util.framework.api.cache.Cache;
-import com.neo.util.framework.api.cache.spi.CacheName;
 import com.neo.util.framework.rest.web.htmx.navigation.HtmxNavigationElement;
 import com.neo.util.framework.rest.web.rest.CacheResource;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -21,15 +19,14 @@ public class CacheHtmxResource {
     public static final String RESOURCE_LOCATION = "/admin/html/cache";
 
     public static final String P_RELOAD = "/reload";
-
     public static final String P_CLEAR = "/clear";
 
-    @Inject
-    @CacheName("Test")
-    protected Cache cache;
+    protected CacheResource cacheResource;
 
     @Inject
-    protected CacheResource cacheResource;
+    public CacheHtmxResource(CacheResource cacheResource) {
+        this.cacheResource = cacheResource;
+    }
 
     @GET
     public HtmlElement cacheName() {

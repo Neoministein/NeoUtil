@@ -17,8 +17,13 @@ public class CacheProducer {
 
     protected static final ExceptionDetails EX_NO_CACHE_FOUND = new ExceptionDetails(
             "cache/no-cache","The provided cache {0} name does not exist.", true);
-    @Inject
+
     protected CacheManager cacheManager;
+
+    @Inject
+    public CacheProducer(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
 
     @Produces
     @CacheName("") // The `value` attribute is @Nonbinding.

@@ -41,33 +41,26 @@ public class JobRunnerQueueService implements QueueService {
     public static final ExceptionDetails EX_MISSING_OUTGOING = new ExceptionDetails(
             "queue/missing-outgoing-annotation", "The JobRunner implementation also requires an outgoing annotation for [{0}]", true);
 
-    @Inject
-    protected ConfigService configService;
-
-    @Inject
-    protected RequestContextExecutor requestContextExecutor;
-
-    @Inject
-    protected InstanceIdentification instanceIdentification;
-
-    @Inject
-    protected Provider<RequestDetails> requestDetailsProvider;
+    protected final ConfigService configService;
+    protected final InstanceIdentification instanceIdentification;
+    protected final Provider<RequestDetails> requestDetailsProvider;
+    protected final RequestContextExecutor requestContextExecutor;
 
     protected Map<String, JobRunnerQueueConfig> queueListenerMap = new HashMap<>();
 
-    public void readyEvent(@Observes ApplicationReadyEvent applicationReadyEvent) {
-        LOGGER.debug("ApplicationReadyEvent processed");
-    }
-
     @Inject
-    public void init(Instance<QueueListener> queueListeners, ReflectionService reflectionService) {
+    public JobRunnerQueueService(ConfigService configService, RequestContextExecutor requestContextExecutor, InstanceIdentification instanceIdentification, Provider<RequestDetails> requestDetailsProvider, Instance<QueueListener> queueListeners, ReflectionService reflectionService) {
+        this.configService = configService;
+        this.requestContextExecutor = requestContextExecutor;
+        this.instanceIdentification = instanceIdentification;
+        this.requestDetailsProvider = requestDetailsProvider;
+
         Map<String, OutgoingQueue> queueConnectionMap = new HashMap<>();
         for (AnnotatedElement annotatedElement: reflectionService.getAnnotatedElement(OutgoingQueue.class)) {
             OutgoingQueue annotation = annotatedElement.getAnnotation(OutgoingQueue.class);
             queueConnectionMap.put(annotation.value(), annotation);
         }
 
-        Map<String, JobRunnerQueueConfig> newMap = new HashMap<>();
         Config queueConfig = configService.get("queue");
 
         for (QueueListener queueListener: queueListeners) {
@@ -75,8 +68,8 @@ public class JobRunnerQueueService implements QueueService {
 
             IncomingQueue incomingAnnotation = clazz.getAnnotation(IncomingQueue.class);
 
-            if (newMap.containsKey(incomingAnnotation.value())) {
-                throw new ConfigurationException(QueueService.EX_DUPLICATED_QUEUE, queueListener.getClass().getName(), newMap.get(incomingAnnotation.value()));
+            if (queueListenerMap.containsKey(incomingAnnotation.value())) {
+                throw new ConfigurationException(QueueService.EX_DUPLICATED_QUEUE, queueListener.getClass().getName(), queueListenerMap.get(incomingAnnotation.value()));
             }
 
             OutgoingQueue outgoingConnection = queueConnectionMap.get(incomingAnnotation.value());
@@ -85,10 +78,13 @@ public class JobRunnerQueueService implements QueueService {
             }
 
             LOGGER.debug("Registered Queue [{}], Listener [{}]", incomingAnnotation.value(), queueListener.getClass().getSimpleName());
-            newMap.put(incomingAnnotation.value(), new JobRunnerQueueConfig(queueConfig, outgoingConnection, queueListener));
+            queueListenerMap.put(incomingAnnotation.value(), new JobRunnerQueueConfig(queueConfig, outgoingConnection, queueListener));
         }
-        LOGGER.info("Registered [{}] Queues {}", newMap.size(), newMap.keySet());
-        queueListenerMap = newMap;
+        LOGGER.info("Registered [{}] Queues {}", queueListenerMap.size(), queueListenerMap.keySet());
+    }
+
+    public void readyEvent(@Observes ApplicationReadyEvent applicationReadyEvent) {
+        LOGGER.debug("ApplicationReadyEvent processed");
     }
 
     @Override
@@ -123,7 +119,6 @@ public class JobRunnerQueueService implements QueueService {
             LOGGER.error("Unexpected error occurred while processing a queue message. Action will be retried based on the retry policy.", ex);
             throw ex;
         }
-
     }
 
     protected JobBuilder createJob(JobRunnerQueueConfig config, QueueMessage message) {

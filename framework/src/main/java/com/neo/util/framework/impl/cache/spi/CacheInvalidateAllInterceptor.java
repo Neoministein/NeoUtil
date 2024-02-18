@@ -2,8 +2,10 @@ package com.neo.util.framework.impl.cache.spi;
 
 import com.neo.util.common.impl.FutureUtils;
 import com.neo.util.framework.api.cache.Cache;
+import com.neo.util.framework.api.cache.CacheManager;
 import com.neo.util.framework.api.cache.spi.CacheInvalidateAll;
 import jakarta.annotation.Priority;
+import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
 import jakarta.interceptor.InvocationContext;
@@ -31,6 +33,11 @@ public class CacheInvalidateAllInterceptor extends CacheInterceptor {
         }
         return Set.of();
     };
+
+    @Inject
+    protected CacheInvalidateAllInterceptor(CacheManager cacheManager, CacheKeyGeneratorManager cacheKeyGeneratorManager) {
+        super(cacheManager, cacheKeyGeneratorManager);
+    }
 
     @AroundInvoke
     public Object intercept(InvocationContext invocationContext) throws Throwable {

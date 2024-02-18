@@ -6,6 +6,10 @@ public class DummyIndexerNotificationService extends IndexingQueueService {
 
     protected QueueMessage queueMessage;
 
+    public DummyIndexerNotificationService() {
+        super(null);
+    }
+
     @Override
     public void addToIndexingQueue(QueueMessage queueMessage) {
         this.queueMessage = queueMessage;

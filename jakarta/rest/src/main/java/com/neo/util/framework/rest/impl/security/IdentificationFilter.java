@@ -29,11 +29,14 @@ public class IdentificationFilter implements ContainerRequestFilter {
 
     protected static final String INVALID_IP = "255.255.255.255";
 
-    @Inject
     protected InstanceIdentification identification;
+    protected RequestDetailsProducer requestDetailsProvider;
 
     @Inject
-    protected RequestDetailsProducer requestDetailsProvider;
+    public IdentificationFilter(InstanceIdentification identification, RequestDetailsProducer requestDetailsProvider) {
+        this.identification = identification;
+        this.requestDetailsProvider = requestDetailsProvider;
+    }
 
     @Override
     public void filter(ContainerRequestContext requestContext) {

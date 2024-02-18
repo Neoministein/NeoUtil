@@ -11,7 +11,7 @@ public class DummySchedulerService implements SchedulerService {
 
     @Override
     public SchedulerConfig getSchedulerConfig(String id) {
-        return new SchedulerConfig("TestScheduler", false);
+        return null;
     }
 
     @Override

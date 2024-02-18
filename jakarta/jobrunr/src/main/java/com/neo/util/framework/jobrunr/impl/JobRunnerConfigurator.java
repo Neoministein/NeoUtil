@@ -32,14 +32,16 @@ public class JobRunnerConfigurator {
     private static final int DEFAULT_WORKERS = 1;
     private static final int DEFAULT_POLL_INTERVAL = 5;
 
-    @Inject
-    protected ConfigService configService;
+    protected final ConfigService configService;
+    protected final JobRunrStorageProvider jobRunrStorageProvider;
+    protected final Instance<Object> instance;
 
     @Inject
-    protected JobRunrStorageProvider jobRunrStorageProvider;
-
-    @Inject
-    protected Instance<Object> instance;
+    public JobRunnerConfigurator(ConfigService configService, JobRunrStorageProvider jobRunrStorageProvider, Instance<Object> instance) {
+        this.configService = configService;
+        this.jobRunrStorageProvider = jobRunrStorageProvider;
+        this.instance = instance;
+    }
 
     @PostConstruct
     public void init() {

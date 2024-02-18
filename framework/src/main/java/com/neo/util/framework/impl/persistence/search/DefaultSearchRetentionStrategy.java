@@ -28,8 +28,12 @@ public class DefaultSearchRetentionStrategy implements SearchRetentionStrategy {
 
     public static final String CUSTOM_RETENTION_CONFIG = CONFIG_PREFIX + ".custom.";
 
+    protected final ConfigService configService;
+
     @Inject
-    protected ConfigService configService;
+    public DefaultSearchRetentionStrategy(ConfigService configService) {
+        this.configService = configService;
+    }
 
     @Override
     public boolean shouldIndexBeDeleted(LocalDate now, LocalDate creationDate, SearchableIndex searchableIndex) {

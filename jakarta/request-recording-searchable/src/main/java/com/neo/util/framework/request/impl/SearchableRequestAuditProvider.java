@@ -20,16 +20,17 @@ import java.util.Map;
 @ApplicationScoped
 public class SearchableRequestAuditProvider implements RequestAuditProvider {
 
-    @Inject
-    protected SearchProvider searchProvider;
+    protected final SearchProvider searchProvider;
 
-    protected Map<Class<? extends RequestDetails>, RequestSearchableParser<? extends RequestDetails>> requestRecorderMap;
+    protected final Map<Class<? extends RequestDetails>, RequestSearchableParser<? extends RequestDetails>> requestRecorderMap;
 
     /**
      * Stores all RequestRecorder. This is done only once at startup since it cannot be changed at runtime.
      */
     @Inject
-    protected void init(Instance<RequestSearchableParser<?>> requestRecorders) {
+    protected SearchableRequestAuditProvider(SearchProvider searchProvider, Instance<RequestSearchableParser<?>> requestRecorders) {
+        this.searchProvider = searchProvider;
+
         Map<Class<? extends RequestDetails>, RequestSearchableParser<?>> newMap = new HashMap<>();
         for (RequestSearchableParser<?> requestRecorder: requestRecorders) {
             newMap.put(requestRecorder.getRequestType(), requestRecorder);

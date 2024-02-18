@@ -55,13 +55,8 @@ public class JobRunnerSchedulerService implements SchedulerService {
 
     private boolean inStartupPhase;
 
-    @Inject
     protected ConfigService configService;
-
-    @Inject
     protected InstanceIdentification identification;
-
-    @Inject
     protected RequestContextExecutor requestContextExecutor;
 
     public void applicationReadyEvent(@Observes @Priority(PriorityConstants.LIBRARY_AFTER) ApplicationPostReadyEvent applicationPostReadyEvent) {
@@ -72,8 +67,11 @@ public class JobRunnerSchedulerService implements SchedulerService {
      * Initializes the mapping for the {@link JobRunnerSchedulerConfig}.
      */
     @Inject
-    public JobRunnerSchedulerService(Instance<Object> instance, Instance<ScheduleAnnotationParser<?>> parsers,
-                                     ReflectionService reflectionService) {
+    public JobRunnerSchedulerService(Instance<Object> instance, Instance<ScheduleAnnotationParser<?>> parsers, ReflectionService reflectionService, ConfigService configService, InstanceIdentification identification, RequestContextExecutor requestContextExecutor) {
+        this.configService = configService;
+        this.identification = identification;
+        this.requestContextExecutor = requestContextExecutor;
+
         LOGGER.info("Registering Schedulers...");
         this.inStartupPhase = true;
 

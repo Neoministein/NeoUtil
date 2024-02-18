@@ -14,8 +14,12 @@ public class IndexingQueueService {
 
     public static final String QUEUE_NAME = "indexingQueue";
 
-    @Inject
     protected QueueService queueService;
+
+    @Inject
+    public IndexingQueueService(QueueService queueService) {
+        this.queueService = queueService;
+    }
 
     /**
      * put message to indexer queue.

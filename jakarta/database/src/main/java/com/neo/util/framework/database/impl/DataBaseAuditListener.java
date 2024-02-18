@@ -16,14 +16,18 @@ import java.time.Instant;
 
 public class DataBaseAuditListener {
 
-    @Inject
-    protected Provider<RequestDetails> requestDetailsProvider;
+    private final Provider<RequestDetails> requestDetailsProvider;
+
+    private final EntityAuditTrailProvider auditTrailProvider;
+
+    private final TransactionSynchronizationRegistry registry;
 
     @Inject
-    protected EntityAuditTrailProvider auditTrailProvider;
-
-    @Inject
-    private TransactionSynchronizationRegistry registry;
+    public DataBaseAuditListener(Provider<RequestDetails> requestDetailsProvider, EntityAuditTrailProvider auditTrailProvider, TransactionSynchronizationRegistry registry) {
+        this.requestDetailsProvider = requestDetailsProvider;
+        this.auditTrailProvider = auditTrailProvider;
+        this.registry = registry;
+    }
 
     @PrePersist
     protected void prePersist(AuditableDataBaseEntity entity) {

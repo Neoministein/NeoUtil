@@ -26,14 +26,7 @@ public class IndexNamingServiceImplTest {
     public void before() {
         basicConfigService = new BasicConfigService(new HashMap<>());
 
-        subject = new IndexNamingServiceImpl() {
-            {
-                configService = basicConfigService;
-                searchableIndexCache = new HashMap<>();
-            }
-        };
-        subject.postConstruct();
-        subject.initIndexProperties(new ReflectionService(new IndexReflectionProvider(ThreadUtils.classLoader())));
+        subject = new IndexNamingServiceImpl(basicConfigService, new ReflectionService(new IndexReflectionProvider(ThreadUtils.classLoader())));
     }
 
     @Test

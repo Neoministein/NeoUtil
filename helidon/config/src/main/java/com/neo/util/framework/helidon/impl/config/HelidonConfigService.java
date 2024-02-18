@@ -12,10 +12,14 @@ import jakarta.inject.Inject;
 @Alternative
 @Priority(PriorityConstants.APPLICATION)
 @ApplicationScoped
-public class ConfigServiceImpl implements ConfigService {
+public class HelidonConfigService implements ConfigService {
+
+    protected final io.helidon.config.Config config;
 
     @Inject
-    protected io.helidon.config.Config config;
+    public HelidonConfigService(io.helidon.config.Config config) {
+        this.config = config;
+    }
 
     @Override
     public Config get(String key) {

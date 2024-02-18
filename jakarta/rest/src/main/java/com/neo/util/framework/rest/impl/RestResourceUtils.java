@@ -3,6 +3,7 @@ package com.neo.util.framework.rest.impl;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 
 import java.lang.annotation.Annotation;
 import java.util.Optional;
@@ -13,6 +14,9 @@ public class RestResourceUtils {
     @Context
     protected ResourceInfo resourceInfo;
 
+    @Context
+    protected HttpHeaders headers;
+
     public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
         A annotation = resourceInfo.getResourceMethod().getAnnotation(annotationClass);
         if (annotation == null) {
@@ -20,4 +24,6 @@ public class RestResourceUtils {
         }
         return Optional.ofNullable(annotation);
     }
+
+
 }

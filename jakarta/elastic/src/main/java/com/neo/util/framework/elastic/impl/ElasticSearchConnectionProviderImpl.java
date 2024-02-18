@@ -12,7 +12,6 @@ import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionProvider;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionStatusEvent;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Event;
@@ -51,15 +50,12 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
     protected static final String NODE_CONFIG = CONFIG_PREFIX + ".nodes";
     protected static final String CREDENTIALS_CONFIG = CONFIG_PREFIX + ".credentials";
 
+    protected final ConfigService configService;
+    protected final Event<ElasticSearchConnectionStatusEvent> connectionStatusEvent;
+
     protected boolean enabled = false;
 
     protected boolean initialized = false;
-
-    @Inject
-    protected ConfigService configService;
-
-    @Inject
-    protected Event<ElasticSearchConnectionStatusEvent> connectionStatusEvent;
 
     protected volatile ElasticsearchClient elasticsearchClient;
 
@@ -67,8 +63,10 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
 
     protected final AtomicBoolean connectorInitializationOngoing = new AtomicBoolean(false);
 
-    @PostConstruct
-    public void postConstruct() {
+    @Inject
+    public ElasticSearchConnectionProviderImpl(ConfigService configService,  Event<ElasticSearchConnectionStatusEvent> connectionStatusEvent) {
+        this.configService = configService;
+        this.connectionStatusEvent = connectionStatusEvent;
         reloadConfig();
         initialized = true;
     }

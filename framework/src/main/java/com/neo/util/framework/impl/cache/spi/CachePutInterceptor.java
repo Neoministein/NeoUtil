@@ -1,8 +1,10 @@
 package com.neo.util.framework.impl.cache.spi;
 
 import com.neo.util.framework.api.cache.Cache;
+import com.neo.util.framework.api.cache.CacheManager;
 import com.neo.util.framework.api.cache.spi.CachePut;
 import jakarta.annotation.Priority;
+import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
 import jakarta.interceptor.InvocationContext;
@@ -17,6 +19,11 @@ import java.util.Set;
 public class CachePutInterceptor extends CacheInterceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CachePutInterceptor.class);
+
+    @Inject
+    public CachePutInterceptor(CacheManager cacheManager, CacheKeyGeneratorManager cacheKeyGeneratorManager) {
+        super(cacheManager, cacheKeyGeneratorManager);
+    }
 
     @AroundInvoke
     public Object intercept(InvocationContext invocationContext) throws Throwable {

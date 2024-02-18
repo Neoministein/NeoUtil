@@ -20,12 +20,14 @@ public class AuditJanitorJob implements JanitorJob {
 
     public static final String CONFIG_AUDIT_RETENTION = "entity.audit.retention";
 
-    @Inject
-    protected PersistenceContextProvider pcp;
+    protected final PersistenceContextProvider pcp;
+    protected final ConfigService configService;
 
     @Inject
-    protected ConfigService configService;
-
+    public AuditJanitorJob(PersistenceContextProvider pcp, ConfigService configService) {
+        this.pcp = pcp;
+        this.configService = configService;
+    }
 
     @Override
     @Transactional

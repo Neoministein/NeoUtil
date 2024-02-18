@@ -11,12 +11,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
-public class DummyAuditTrailProvider implements EntityAuditTrailProvider {
+public class Slf4jEntityAuditTrailProvider implements EntityAuditTrailProvider {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DummyAuditTrailProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Slf4jEntityAuditTrailProvider.class);
+
+    protected Provider<RequestDetails> requestDetailsProvider;
 
     @Inject
-    protected Provider<RequestDetails> requestDetailsProvider;
+    public Slf4jEntityAuditTrailProvider(Provider<RequestDetails> requestDetailsProvider) {
+        this.requestDetailsProvider = requestDetailsProvider;
+    }
 
     @Override
     public void audit(PersistenceEntity entity, AuditParameter auditParameter) {

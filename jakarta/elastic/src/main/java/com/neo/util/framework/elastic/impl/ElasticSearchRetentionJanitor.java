@@ -11,21 +11,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
+import java.util.Optional;
 
 @ApplicationScoped
 public class ElasticSearchRetentionJanitor implements JanitorJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ElasticSearchRetentionJanitor.class);
 
-    @Inject
-    protected IndexNamingService indexNamingService;
+    protected final IndexNamingService indexNamingService;
+    protected final SearchRetentionStrategy searchRetentionStrategy;
+
+    protected final ElasticSearchProvider elasticSearchProvider;
 
     @Inject
-    protected SearchRetentionStrategy searchRetentionStrategy;
-
-    @Inject
-    protected ElasticSearchProvider elasticSearchProvider;
+    public ElasticSearchRetentionJanitor(IndexNamingService indexNamingService, SearchRetentionStrategy searchRetentionStrategy,
+                                         ElasticSearchProvider elasticSearchProvider) {
+        this.indexNamingService = indexNamingService;
+        this.searchRetentionStrategy = searchRetentionStrategy;
+        this.elasticSearchProvider = elasticSearchProvider;
+    }
 
     public void execute(LocalDate now) {
         LOGGER.info("Starting cleanup for elastic indices...");

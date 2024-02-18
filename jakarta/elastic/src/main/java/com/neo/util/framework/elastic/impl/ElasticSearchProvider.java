@@ -82,22 +82,25 @@ public class ElasticSearchProvider implements SearchProvider {
     protected static final ExceptionDetails EX_CONFIG_SEARCHING = new ExceptionDetails(
             "elk/io-searching", "Failed to fetch {0} entries for index {1} because of ElasticsearchException: {2}", true);
 
-    @Inject
-    protected ConfigService configService;
-
-    @Inject
-    protected Provider<RequestDetails> requestDetailsProvider;
-
-    @Inject
-    protected IndexingQueueService indexerQueueService;
-
-    @Inject
-    protected IndexNamingService indexNameService;
-
-    @Inject
-    protected ElasticSearchConnectionProvider connection;
+    protected final ConfigService configService;
+    protected final Provider<RequestDetails> requestDetailsProvider;
+    protected final IndexingQueueService indexerQueueService;
+    protected final IndexNamingService indexNameService;
+    protected final ElasticSearchConnectionProvider connection;
 
     protected volatile BulkIngester<Object> bulkIngester;
+
+    @Inject
+    public ElasticSearchProvider(ConfigService configService, Provider<RequestDetails> requestDetailsProvider, IndexingQueueService indexerQueueService,
+                                 IndexNamingService indexNameService, ElasticSearchConnectionProvider connection) {
+        this.configService = configService;
+        this.requestDetailsProvider = requestDetailsProvider;
+        this.indexerQueueService = indexerQueueService;
+        this.indexNameService = indexNameService;
+        this.connection = connection;
+
+        setupBulkIngester();
+    }
 
     protected synchronized void setupBulkIngester() {
         if (bulkIngester != null) {
@@ -150,7 +153,7 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
     public void onStartUp(@Observes @Priority(PriorityConstants.LIBRARY_BEFORE + 1) ApplicationPreReadyEvent preReadyEvent) {
-        setupBulkIngester();
+        LOGGER.debug("ApplicationPreReadyEvent processed");
     }
 
     public void connectionStatusListener(@Observes ElasticSearchConnectionStatusEvent event) {

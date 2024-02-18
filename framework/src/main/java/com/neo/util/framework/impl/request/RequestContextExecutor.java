@@ -19,14 +19,18 @@ public class RequestContextExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestContextExecutor.class);
 
-    @Inject
-    protected Provider<RequestContextController> requestContextControllerFactory;
+    protected final Provider<RequestContextController> requestContextControllerFactory;
+    protected final RequestDetailsProducer requestDetailsProducer;
+    protected final RequestAuditProvider requestAuditProvider;
+
 
     @Inject
-    protected RequestDetailsProducer requestDetailsProducer;
-
-    @Inject
-    protected RequestAuditProvider requestAuditProvider;
+    public RequestContextExecutor(Provider<RequestContextController> requestContextControllerFactory,
+                                  RequestDetailsProducer requestDetailsProducer, RequestAuditProvider requestAuditProvider) {
+        this.requestContextControllerFactory = requestContextControllerFactory;
+        this.requestDetailsProducer = requestDetailsProducer;
+        this.requestAuditProvider = requestAuditProvider;
+    }
 
     /**
      * Executes the runnable within a {@link RequestScoped} with the provided {@link RequestDetails} and logs the request

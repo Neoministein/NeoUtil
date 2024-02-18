@@ -6,7 +6,6 @@ import com.neo.util.framework.api.cache.spi.CacheInvalidateAll;
 import com.neo.util.framework.api.cache.spi.CacheName;
 import com.neo.util.framework.api.cache.spi.CacheResult;
 import com.neo.util.framework.impl.ReflectionService;
-import jakarta.inject.Inject;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.HashSet;
@@ -17,8 +16,12 @@ import java.util.Set;
  */
 public abstract class AbstractCacheBuilder implements CacheBuilder {
 
-    @Inject
-    protected ReflectionService reflectionService;
+
+    protected final ReflectionService reflectionService;
+
+    protected AbstractCacheBuilder(ReflectionService reflectionService) {
+        this.reflectionService = reflectionService;
+    }
 
     public Set<String> getCacheNames() {
         Set<String> cacheNames = new HashSet<>();
