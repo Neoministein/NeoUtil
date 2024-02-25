@@ -13,8 +13,7 @@ import com.neo.util.framework.api.persistence.entity.EntityProvider;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
 import com.neo.util.framework.api.request.UserRequest;
 import com.neo.util.framework.api.request.UserRequestDetails;
-import com.neo.util.framework.rest.api.response.ResponseGenerator;
-import jakarta.enterprise.inject.Alternative;
+import com.neo.util.framework.rest.api.response.ClientResponseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +53,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
     protected UserRequestDetails userRequestDetails;
 
     @Inject
-    protected ResponseGenerator responseGenerator;
+    protected ClientResponseService clientResponseService;
 
     protected abstract Object convertToPrimaryKey(String primaryKey);
 
@@ -81,10 +80,10 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
             LOGGER.info("Created new [{},{}]",getEntityClass().getSimpleName(), entity.getPrimaryKey());
         } catch (PersistenceException ex) {
             LOGGER.debug("Entity is missing mandatory fields");
-            return responseGenerator.error(400, EX_ENTITY_MISSING_FIELDS);
+            return clientResponseService.error(400, EX_ENTITY_MISSING_FIELDS);
         } catch (Exception ex) {
             LOGGER.debug("Provided value isn't unique");
-            return responseGenerator.error(400, EX_ENTITY_NONE_UNIQUE);
+            return clientResponseService.error(400, EX_ENTITY_NONE_UNIQUE);
         }
         return parseToResponse(entity,Views.Owner.class);
     }
@@ -98,7 +97,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
 
         if (entity.isEmpty()) {
             LOGGER.debug("Entity not found [{},{}]", getEntityClass().getSimpleName() ,primaryKey);
-            return responseGenerator.error(404, EX_ENTITY_NOT_FOUND, primaryKey);
+            return clientResponseService.error(404, EX_ENTITY_NOT_FOUND, primaryKey);
         }
 
         try {
@@ -106,7 +105,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
             LOGGER.info("Deleted entity [{},{}]",getEntityClass().getSimpleName(), entity.get().getPrimaryKey());
             return Response.ok().build();
         } catch (PersistenceException ex) {
-            return responseGenerator.error(400, EX_ENTITY_MISSING_FIELDS);
+            return clientResponseService.error(400, EX_ENTITY_MISSING_FIELDS);
         }
     }
 
@@ -123,7 +122,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
         EntityResult<T> entity = entityRepository.fetch(entityParameters);
         if (entity.getHitSize() == 0) {
             LOGGER.debug("Entity not found [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
-            return responseGenerator.error(404, EX_ENTITY_NOT_FOUND, value);
+            return clientResponseService.error(404, EX_ENTITY_NOT_FOUND, value);
         }
         LOGGER.trace("Entity lookup success [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
         return parseToResponse(entity.getHits().get(0), getSerializationScope());
@@ -135,10 +134,10 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
             LOGGER.info("Created new [{},{}]",getEntityClass().getSimpleName(), entity.getPrimaryKey());
         } catch (PersistenceException ex) {
             LOGGER.debug("Entity is missing mandatory fields");
-            return responseGenerator.error(400, EX_ENTITY_MISSING_FIELDS);
+            return clientResponseService.error(400, EX_ENTITY_MISSING_FIELDS);
         } catch (Exception ex) {
             LOGGER.debug("Provided value isn't unique");
-            return responseGenerator.error(400, EX_ENTITY_NONE_UNIQUE);
+            return clientResponseService.error(400, EX_ENTITY_NONE_UNIQUE);
         }
         return parseToResponse(entity, serializationScope);
     }

@@ -3,7 +3,7 @@ package com.neo.util.framework.rest.impl.security;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.request.UserRequest;
 import com.neo.util.framework.api.request.UserRequestDetails;
-import com.neo.util.framework.rest.api.response.ResponseGenerator;
+import com.neo.util.framework.rest.api.response.ClientResponseService;
 import com.neo.util.framework.rest.api.security.Secured;
 import jakarta.annotation.Priority;
 import jakarta.annotation.security.RolesAllowed;
@@ -32,7 +32,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     protected ResourceInfo resourceInfo;
 
     @Inject
-    protected ResponseGenerator responseGenerator;
+    protected ClientResponseService clientResponseService;
 
     @Inject
     @UserRequest
@@ -52,7 +52,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         Set<String> roles = Set.of(rolesAllowed.value());
         if (!userRequestDetails.hasOneOfTheRoles(roles)) {
             LOGGER.info("Aborting request with forbidden, one of the permissions is required {}", roles);
-            containerRequest.abortWith(responseGenerator.error(403, FrameworkConstants.EX_FORBIDDEN));
+            containerRequest.abortWith(clientResponseService.error(403, FrameworkConstants.EX_FORBIDDEN));
         }
     }
 }

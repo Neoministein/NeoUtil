@@ -2,7 +2,7 @@ package com.neo.util.framework.rest.impl.exception;
 
 import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.NoContentFoundException;
-import com.neo.util.framework.rest.api.response.ResponseGenerator;
+import com.neo.util.framework.rest.api.response.ClientResponseService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
@@ -18,24 +18,24 @@ public class CommonExceptionMapper implements ExceptionMapper<CommonRuntimeExcep
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonExceptionMapper.class);
 
     @Inject
-    protected ResponseGenerator responseGenerator;
+    protected ClientResponseService clientResponseService;
 
     @Override
     public Response toResponse(CommonRuntimeException ex) {
         if (ex.getInternal()) {
             LOGGER.error("A [{}] occurred with message [{}] setting status to [500]",
                     ex.getClass().getSimpleName(), ex.getMessage(), ex);
-            return responseGenerator.error(500, RuntimeExceptionMapper.EX_INTERNAL_RUNTIME_EXCEPTION);
+            return clientResponseService.error(500, RuntimeExceptionMapper.EX_INTERNAL_RUNTIME_EXCEPTION);
         }
 
         if (ex instanceof NoContentFoundException) {
             LOGGER.warn("A [{}] occurred with message [{}] setting status to [404]",
                     ex.getClass().getSimpleName(), ex.getMessage(), ex);
-            return responseGenerator.error(404, ex);
+            return clientResponseService.error(404, ex);
         }
 
         LOGGER.warn("A [{}] occurred with message [{}] setting status to [400]",
                 ex.getClass().getSimpleName(), ex.getMessage(), ex);
-        return responseGenerator.error(400, ex);
+        return clientResponseService.error(400, ex);
     }
 }

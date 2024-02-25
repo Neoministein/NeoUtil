@@ -2,12 +2,15 @@ package com.neo.util.framework.rest.api.response;
 
 import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
+import java.util.Optional;
 
 /**
  * This interface defines common response which can look different based on applications
  */
-public interface ResponseGenerator {
+public interface ClientResponseService {
 
     /**
      * A header that should be added to a valid error response object
@@ -49,5 +52,12 @@ public interface ResponseGenerator {
      * @param entity the response entity
      * @return the error code or {@link com.neo.util.common.impl.StringUtils#EMPTY}
      */
-    String responseToErrorCode(Object entity);
+    Optional<String> responseToErrorCode(Object entity);
+
+    /**
+     *
+     * @param mediaType
+     * @return
+     */
+    Optional<ClientResponseGenerator> getGenerator(MediaType mediaType);
 }

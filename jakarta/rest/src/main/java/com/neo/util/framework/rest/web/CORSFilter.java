@@ -1,6 +1,6 @@
 package com.neo.util.framework.rest.web;
 
-import com.neo.util.framework.rest.api.response.ResponseGenerator;
+import com.neo.util.framework.rest.api.response.ClientResponseService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
@@ -14,7 +14,7 @@ public class CORSFilter implements ContainerResponseFilter {
     @Override
     public void filter(final ContainerRequestContext requestContext,
             final ContainerResponseContext containerRequest) {
-        containerRequest.getHeaders().add("Access-Control-Expose-Headers", ResponseGenerator.VALID_BACKEND_ERROR);
+        containerRequest.getHeaders().add("Access-Control-Expose-Headers", ClientResponseService.VALID_BACKEND_ERROR);
         containerRequest.getHeaders().add("Access-Control-Allow-Origin", "*");
         containerRequest.getHeaders().add("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, hx-request, hx-current-url");
         containerRequest.getHeaders().add("Access-Control-Allow-Credentials", "true");

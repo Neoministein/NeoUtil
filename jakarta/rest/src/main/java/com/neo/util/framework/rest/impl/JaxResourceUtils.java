@@ -4,12 +4,13 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
 
 import java.lang.annotation.Annotation;
 import java.util.Optional;
 
 @ApplicationScoped
-public class RestResourceUtils {
+public class JaxResourceUtils {
 
     @Context
     protected ResourceInfo resourceInfo;
@@ -26,4 +27,7 @@ public class RestResourceUtils {
     }
 
 
+    public MediaType getCurrentMediaType() {
+        return headers.getMediaType();
+    }
 }

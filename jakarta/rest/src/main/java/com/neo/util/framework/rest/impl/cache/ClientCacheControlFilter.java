@@ -1,8 +1,8 @@
 package com.neo.util.framework.rest.impl.cache;
 
 import com.neo.util.framework.rest.api.cache.ClientCacheControl;
-import com.neo.util.framework.rest.api.response.ResponseGenerator;
-import com.neo.util.framework.rest.impl.RestResourceUtils;
+import com.neo.util.framework.rest.api.response.ClientResponseService;
+import com.neo.util.framework.rest.impl.JaxResourceUtils;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -21,13 +21,14 @@ import java.util.concurrent.TimeUnit;
 public class ClientCacheControlFilter implements ContainerResponseFilter {
 
     @Inject
-    protected RestResourceUtils restUtils;
+    protected JaxResourceUtils jaxResourceUtils;
 
     @Override
     public void filter(ContainerRequestContext requestContext,
                        ContainerResponseContext responseContext) {
-        if (responseContext.getStatus() < 500 && (responseContext.getStatus() == 200 || responseContext.getHeaders().containsKey(ResponseGenerator.VALID_BACKEND_ERROR))) {
-            ClientCacheControl cacheAnnotation = restUtils.getAnnotation(ClientCacheControl.class).orElseThrow();
+        if (responseContext.getStatus() < 500 && (responseContext.getStatus() == 200 || responseContext.getHeaders().containsKey(
+                ClientResponseService.VALID_BACKEND_ERROR))) {
+            ClientCacheControl cacheAnnotation = jaxResourceUtils.getAnnotation(ClientCacheControl.class).orElseThrow();
 
             CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(parseTimeUnit(cacheAnnotation.maxAge(), cacheAnnotation.timeUnit()));

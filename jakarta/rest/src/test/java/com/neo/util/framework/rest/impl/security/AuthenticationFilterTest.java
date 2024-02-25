@@ -5,7 +5,7 @@ import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.HttpCredentialsGenerator;
 import com.neo.util.framework.impl.security.HttpCredentialsGeneratorImpl;
 import com.neo.util.framework.rest.api.request.HttpRequestDetails;
-import com.neo.util.framework.rest.api.response.ResponseGenerator;
+import com.neo.util.framework.rest.api.response.ClientResponseService;
 import jakarta.security.enterprise.credential.Credential;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -22,7 +22,6 @@ class AuthenticationFilterTest {
     AuthenticationFilter subject;
 
     AuthenticationProvider authenticationProvider;
-    ResponseGenerator responseGenerator;
     HttpCredentialsGenerator credentialsGenerator;
     HttpRequestDetails requestDetails;
 
@@ -32,9 +31,6 @@ class AuthenticationFilterTest {
 
         authenticationProvider = Mockito.mock(AuthenticationProvider.class);
         subject.authenticationProvider = authenticationProvider;
-
-        responseGenerator = Mockito.mock(ResponseGenerator.class);
-        subject.responseGenerator = responseGenerator;
 
         credentialsGenerator = Mockito.mock(HttpCredentialsGenerator.class);
         subject.httpCredentialsGenerator = credentialsGenerator;

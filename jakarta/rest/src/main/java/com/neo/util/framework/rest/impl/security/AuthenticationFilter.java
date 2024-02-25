@@ -6,7 +6,6 @@ import com.neo.util.framework.api.request.UserRequest;
 import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.HttpCredentialsGenerator;
-import com.neo.util.framework.rest.api.response.ResponseGenerator;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -31,9 +30,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     @Inject
     protected AuthenticationProvider authenticationProvider;
-
-    @Inject
-    protected ResponseGenerator responseGenerator;
 
     @Inject
     protected HttpCredentialsGenerator httpCredentialsGenerator;

@@ -74,6 +74,10 @@ class CacheKeyGenerationTest {
 
     // This inner class changes the CacheInterceptor#getCacheKey method visibility to public.
     private static class TestCacheInterceptor extends CacheInterceptor {
+        protected TestCacheInterceptor() {
+            super(null, null);
+        }
+
         @Override
         public Object getCacheKey(Class<? extends CacheKeyGenerator> keyGeneratorClass,
                 List<Short> cacheKeyParameterPositions, Method method, Object[] methodParameterValues) {
