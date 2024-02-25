@@ -1,6 +1,7 @@
 package com.neo.util.framework.rest.api.response;
 
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.Optional;
 
@@ -13,7 +14,7 @@ public interface ClientResponseGenerator {
      * @param message the message
      * @return parsed response
      */
-    String parseToErrorEntity(String errorCode, String message);
+    Response generateErrorResponse(int code, String errorCode, String message);
 
     /**
      * Retries to retrieve the error code from the given response object.

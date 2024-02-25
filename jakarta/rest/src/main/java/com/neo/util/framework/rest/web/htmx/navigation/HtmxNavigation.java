@@ -3,7 +3,6 @@ package com.neo.util.framework.rest.web.htmx.navigation;
 import com.neo.util.common.impl.html.HtmlElement;
 import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.rest.api.security.Secured;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -16,7 +15,6 @@ import static com.neo.util.common.impl.html.HtmlStringTemplate.HTML;
 @ApplicationScoped
 @Path(HtmxNavigation.RESOURCE_LOCATION)
 @Produces(MediaType.TEXT_HTML + "; charset=UTF-8")
-@Secured
 public class HtmxNavigation {
 
     public static final String RESOURCE_LOCATION = "/admin/html/navigation";
@@ -29,16 +27,15 @@ public class HtmxNavigation {
     }
 
     @GET
+    @Secured
     public HtmlElement getNavigation() {
         return navigationElement;
     }
 
-    @Secured
-    @RolesAllowed("ADMIN")
     protected HtmlElement navigationElement(HtmxNavigationElement element) {
         return HTML."""
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" hx-get="\{element.route()}" hx-target="#main">
+                    <a class="nav-link" aria-current="page" hx-get="\{element.route()}" hx-target="#main" href="/\{element.name()}">
                         \{element.name()}
                     </a>
                 </li>

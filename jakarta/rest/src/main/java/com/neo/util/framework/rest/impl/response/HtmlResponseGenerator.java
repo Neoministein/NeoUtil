@@ -7,6 +7,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.Optional;
 
@@ -21,24 +22,31 @@ public class HtmlResponseGenerator implements ClientResponseGenerator {
     }
 
     @Override
-    public String parseToErrorEntity(String errorCode, String message) {
+    public Response generateErrorResponse(int code, String errorCode, String message) {
+        Response.ResponseBuilder response = Response.status(code);
+
         if (displayErrorAsToast()) {
-            return "null";
+            response.header("HX-Retarget", "");
+            response.header("HX-Reswap", "");
+            response.entity("null");
         }
-        return HtmlStringTemplate.HTML."""
+        response.entity(HtmlStringTemplate.HTML."""
                 <div>
                     <b>Error: </b>\{errorCode}
                 </div>
                 <div>
                     <b>Message: </b>\{message}
                 </div>
-                """.content();
+                """);
+
+        response.header("HX-Location", "/error");
+        return response.build();
     }
 
     @Override
     public Optional<String> responseToErrorCode(Object entity) {
         if (displayErrorAsToast()) {
-            return null;
+            return Optional.empty();
         }
         return Optional.empty();
     }

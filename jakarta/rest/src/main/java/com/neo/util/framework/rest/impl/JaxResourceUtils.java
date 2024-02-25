@@ -1,6 +1,7 @@
 package com.neo.util.framework.rest.impl;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -28,6 +29,7 @@ public class JaxResourceUtils {
 
 
     public MediaType getCurrentMediaType() {
-        return headers.getMediaType();
+        Optional<Produces> produces = getAnnotation(Produces.class);
+        return MediaType.valueOf(produces.get().value()[0]);
     }
 }

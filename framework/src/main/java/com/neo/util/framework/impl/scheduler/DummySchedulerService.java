@@ -36,6 +36,6 @@ public class DummySchedulerService implements SchedulerService {
 
     @Override
     public Set<String> getSchedulerIds() {
-        return Set.of("");
+        return Set.of();
     }
 }

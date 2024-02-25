@@ -34,12 +34,8 @@ public class ClientResponseServiceImpl implements ClientResponseService {
 
     @Override
     public Response error(int code, CommonRuntimeException exceptionDetails) {
-        ClientResponseGenerator generator = getGenerator(jaxResourceUtils.getCurrentMediaType()).orElse(DEFAULT_GENERATOR);
-        return Response
-                .status(code)
-                .entity(generator.parseToErrorEntity(exceptionDetails.getExceptionId(), exceptionDetails.getMessage()))
-                .header(VALID_BACKEND_ERROR, true)
-                .build();
+        return getGenerator(jaxResourceUtils.getCurrentMediaType()).orElse(DEFAULT_GENERATOR)
+                .generateErrorResponse(code, exceptionDetails.getExceptionId(), exceptionDetails.getMessage());
     }
 
     @Override
@@ -66,8 +62,11 @@ public class ClientResponseServiceImpl implements ClientResponseService {
     private static final class DefaultClientResponseGenerator implements ClientResponseGenerator {
 
         @Override
-        public String parseToErrorEntity(String errorCode, String message) {
-            return "Error: " + errorCode + "\nMessage: " + message;
+        public Response generateErrorResponse(int code, String errorCode, String message) {
+            return Response
+                    .status(code)
+                    .entity("Error: " + errorCode + "\nMessage: " + message)
+                    .build();
         }
 
         @Override
