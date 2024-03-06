@@ -17,7 +17,7 @@ public class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException>
     private static final Logger LOGGER = LoggerFactory.getLogger(RuntimeExceptionMapper.class);
 
     public static final ExceptionDetails EX_INTERNAL_RUNTIME_EXCEPTION = new ExceptionDetails(
-            "unknown", "Internal server error please try again later", true);
+            "unknown", "Internal server error please try again later");
 
     @Inject
     protected ClientResponseService clientResponseService;

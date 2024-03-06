@@ -1,5 +1,6 @@
 package com.neo.util.framework.rest.web.rest;
 
+import com.neo.util.framework.api.excpetion.ToExternalException;
 import com.neo.util.framework.api.janitor.JanitorConfig;
 import com.neo.util.framework.api.janitor.JanitorService;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -12,6 +13,7 @@ import java.util.List;
 @ApplicationScoped
 @Path(JanitorResource.RESOURCE_LOCATION)
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+@ToExternalException({JanitorService.E_NON_EXISTENT_JANITOR_JOB})
 public class JanitorResource {
 
     public static final String RESOURCE_LOCATION = "/admin/api/janitor";
@@ -26,12 +28,12 @@ public class JanitorResource {
     @GET
     @Path("{id}")
     public JanitorConfig getJanitorConfig(@PathParam("id") String janitorId) {
-        return janitorService.getJanitorConfig(janitorId);
+        return janitorService.requestJanitorConfig(janitorId);
     }
     @GET
     public List<JanitorConfig> getJanitorConfig() {
-        return janitorService.getJanitorIds().stream()
-                .map(janitorService::getJanitorConfig)
+        return janitorService.fetchJanitorIds().stream()
+                .map(janitorService::requestJanitorConfig)
                 .toList();
     }
 

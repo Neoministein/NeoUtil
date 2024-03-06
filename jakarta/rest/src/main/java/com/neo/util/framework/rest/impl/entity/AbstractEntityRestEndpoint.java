@@ -1,25 +1,24 @@
 package com.neo.util.framework.rest.impl.entity;
 
 import com.neo.util.common.api.json.Views;
-import com.neo.util.common.impl.exception.ExceptionUtils;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.NoContentFoundException;
 import com.neo.util.common.impl.exception.ValidationException;
-import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.persistence.criteria.ExplicitSearchCriteria;
-import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
-import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityProvider;
+import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
+import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.api.request.UserRequest;
 import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.rest.api.response.ClientResponseService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import jakarta.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -33,14 +32,11 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEntityRestEndpoint.class);
 
     public static final ExceptionDetails EX_ENTITY_NOT_FOUND = new ExceptionDetails(
-            "resource/not-found", "Cannot find resource {0}", false
-    );
+            "resource/not-found", "Cannot find resource {0}");
     public static final ExceptionDetails EX_ENTITY_NONE_UNIQUE = new ExceptionDetails(
-            "resource/none-unique", "", false
-    );
+            "resource/none-unique", "");
     public static final ExceptionDetails EX_ENTITY_MISSING_FIELDS = new ExceptionDetails(
-            "resource/already-exists", "", false
-    );
+            "resource/already-exists", "");
     public static final String ENTITY_PERM = "CRUD_";
 
     public static final String PERM_INTERNAL = "internal";
@@ -72,7 +68,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
         try {
             entity = JsonUtil.fromJson(x, getEntityClass(), getSerializationScope());
         } catch (ValidationException ex) {
-            throw ExceptionUtils.asExternal(ex);
+            throw ex.asExternal();
         }
 
         try {

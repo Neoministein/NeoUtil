@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.KeyUtils;
 import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.StringUtils;
-import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.InternalRuntimeException;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.json.JsonUtil;
 import io.helidon.common.config.Config;
@@ -29,8 +29,7 @@ public class CustomJWTAuthentication implements AuthenticationProvider {
     private static final Logger LOGGER =  LoggerFactory.getLogger(CustomJWTAuthentication.class);
 
     private static final ExceptionDetails EX_CANNOT_ACCESS_PRIVATE_KEY = new ExceptionDetails(
-            "auth/jwt/cannot-access-private-key", "Unable to retrieve private key from resources {0}", true
-    );
+            "auth/jwt/cannot-access-private-key", "Unable to retrieve private key from resources {0}");
 
     protected static final String KEY_ENDPOINT = "publicKeyEndpoint";
     protected static final String IS_SECURITY_SERVICE = "isSecurityService";
@@ -128,7 +127,7 @@ public class CustomJWTAuthentication implements AuthenticationProvider {
         } catch (SignatureException| UnsupportedJwtException ex)  {
             LOGGER.warn("Token signature {}", ex.getMessage());
             return AuthenticationResponse.failed("Token signature is invalid");
-        } catch (CommonRuntimeException ex) {
+        } catch (InternalRuntimeException ex) {
             LOGGER.error("An error has occurred {}", ex.getMessage());
             return AuthenticationResponse.failed("Internal authentication error");
         } catch (Exception ex) {

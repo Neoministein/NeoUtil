@@ -3,8 +3,6 @@ package com.neo.util.framework.rest.api.response;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.util.Optional;
-
 public interface ClientResponseGenerator {
 
     /**
@@ -15,14 +13,6 @@ public interface ClientResponseGenerator {
      * @return parsed response
      */
     Response generateErrorResponse(int code, String errorCode, String message);
-
-    /**
-     * Retries to retrieve the error code from the given response object.
-     *
-     * @param entity the response entity
-     * @return the error code
-     */
-    Optional<String> responseToErrorCode(Object entity);
 
     /**
      * Get the {@link MediaType} of this generator

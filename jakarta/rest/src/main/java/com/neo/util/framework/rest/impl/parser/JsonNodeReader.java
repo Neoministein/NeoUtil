@@ -3,15 +3,13 @@ package com.neo.util.framework.rest.impl.parser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.exception.ConfigurationException;
-import com.neo.util.common.impl.exception.ExceptionUtils;
-import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.impl.json.JsonSchemaLoader;
 import com.neo.util.framework.rest.api.parser.ValidateJsonSchema;
 import com.networknt.schema.JsonSchema;
-
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -24,6 +22,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.ext.Provider;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -39,8 +38,7 @@ import java.util.Optional;
 public class JsonNodeReader implements MessageBodyReader<JsonNode> {
 
     protected static final ExceptionDetails EX_UNKNOWN_JSON_SCHEMA = new ExceptionDetails(
-            "framework/json/unknown-schema", "Invalid json schema to check against {0}.", true
-    );
+            "framework/json/unknown-schema", "Invalid json schema to check against {0}.");
 
     protected final Map<String, JsonSchema> schemaMap;
 
@@ -66,7 +64,7 @@ public class JsonNodeReader implements MessageBodyReader<JsonNode> {
             checkForSchema(input);
             return input;
         } catch (ValidationException ex) {
-            throw ExceptionUtils.asExternal(ex);
+            throw ex.asExternal();
         }
     }
 

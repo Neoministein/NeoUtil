@@ -29,8 +29,7 @@ public class JsonUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtil.class);
 
     public static final ExceptionDetails EX_INTERNAL_JSON_EXCEPTION = new ExceptionDetails(
-            "common/json", "{0}", true
-    );
+            "common/json", "{0}");
 
     /**
      * https://stackoverflow.com/questions/3907929/should-i-declare-jacksons-objectmapper-as-a-static-field

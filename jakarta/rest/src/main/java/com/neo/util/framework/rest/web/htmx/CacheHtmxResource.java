@@ -1,8 +1,8 @@
 package com.neo.util.framework.rest.web.htmx;
 
 import com.neo.util.common.impl.html.HtmlElement;
-import com.neo.util.framework.rest.web.htmx.navigation.HtmxNavigationElement;
-import com.neo.util.framework.rest.web.rest.CacheResource;
+import com.neo.util.framework.api.cache.CacheManager;
+import com.neo.util.framework.api.excpetion.ToExternalException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -14,6 +14,7 @@ import static com.neo.util.common.impl.html.HtmlStringTemplate.HTML;
 @Path(CacheHtmxResource.RESOURCE_LOCATION)
 @Produces(MediaType.TEXT_HTML + "; charset=UTF-8")
 @HtmxNavigationElement(name = "Cache", route = CacheHtmxResource.RESOURCE_LOCATION)
+@ToExternalException({CacheManager.E_CACHE_DOES_NOT_EXIST})
 public class CacheHtmxResource {
 
     public static final String RESOURCE_LOCATION = "/admin/html/cache";
@@ -21,11 +22,11 @@ public class CacheHtmxResource {
     public static final String P_RELOAD = "/reload";
     public static final String P_CLEAR = "/clear";
 
-    protected CacheResource cacheResource;
+    protected CacheManager cacheManager;
 
     @Inject
-    public CacheHtmxResource(CacheResource cacheResource) {
-        this.cacheResource = cacheResource;
+    public CacheHtmxResource(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
     }
 
     @GET
@@ -43,7 +44,7 @@ public class CacheHtmxResource {
                 </h5>
                 <table class="table table-striped">
                     <tbody>
-                        \{cacheResource.getCacheNames().stream().map(this::getCacheRow)}
+                        \{cacheManager.fetchCacheNames().stream().map(this::getCacheRow)}
                     </tbody>
                 </table>
                 """;
@@ -69,12 +70,12 @@ public class CacheHtmxResource {
     @POST
     @Path(P_RELOAD)
     public void reload() {
-        cacheResource.reload();
+        cacheManager.reload();
     }
 
     @POST
     @Path("/{id}" + P_CLEAR)
     public void clearCache(@PathParam("id") String id) {
-        cacheResource.clearCache(id);
+        cacheManager.requestCache(id).invalidateAll();
     }
 }

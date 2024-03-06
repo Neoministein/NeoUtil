@@ -28,8 +28,6 @@ public class ReflectionUtils {
 
     public static final String DEPENDENCY_REFLECTION_PATTERN = "dependencyReflectionPattern";
 
-    public static final String JSON_FILE_ENDING = ".*\\.json";
-
     private ReflectionUtils() {}
 
     /**

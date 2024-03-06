@@ -1,7 +1,7 @@
 package com.neo.util.framework.rest.impl.security;
 
 import com.neo.util.common.impl.StringUtils;
-import com.neo.util.common.impl.exception.CommonRuntimeException;
+import com.neo.util.common.impl.exception.InternalRuntimeException;
 import com.neo.util.framework.api.request.UserRequest;
 import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.api.security.AuthenticationProvider;
@@ -50,7 +50,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         try {
             Credential credential = httpCredentialsGenerator.generate(authorizationHeader);
             authenticationProvider.authenticate(requestDetails, credential);
-        } catch (CommonRuntimeException ex) {
+        } catch (InternalRuntimeException ex) {
             LOGGER.debug("Invalid authorization header [{}]", ex.getExceptionId());
         }
     }

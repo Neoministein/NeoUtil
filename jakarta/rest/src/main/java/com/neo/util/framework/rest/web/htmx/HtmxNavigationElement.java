@@ -1,4 +1,4 @@
-package com.neo.util.framework.rest.web.htmx.navigation;
+package com.neo.util.framework.rest.web.htmx;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

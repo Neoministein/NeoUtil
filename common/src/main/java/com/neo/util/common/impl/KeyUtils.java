@@ -1,8 +1,8 @@
 package com.neo.util.common.impl;
 
-import com.neo.util.common.impl.exception.CommonRuntimeException;
-import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.InternalRuntimeException;
+import com.neo.util.common.impl.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,13 +15,12 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-public class KeyUtils {
+public final class KeyUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyUtils.class);
 
     private static final ExceptionDetails EX_RSA_KEY_PARSING = new ExceptionDetails(
-            "common/rsa", "Invalid RSA {0} key.",true
-    );
+            "common/rsa", "Invalid RSA {0} key.");
 
     private static final String PUBLIC_KEY = "public";
     private static final String PRIVATE_KEY = "private";
@@ -34,7 +33,7 @@ public class KeyUtils {
      * @param base64Key the base64 encoded key
      * @return a public key instance
      *
-     * @throws CommonRuntimeException if the key cannot be parsed
+     * @throws InternalRuntimeException if the key cannot be parsed
      */
     public static PublicKey parseRSAPublicKey(String base64Key) {
         try {

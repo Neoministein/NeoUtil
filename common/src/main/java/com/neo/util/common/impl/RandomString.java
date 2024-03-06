@@ -8,7 +8,7 @@ import java.util.Random;
 /**
  * This class provide a creation of a random string
  */
-public class RandomString {
+public final class RandomString {
 
     /**
      * Generate a random string.

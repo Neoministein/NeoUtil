@@ -1,5 +1,6 @@
 package com.neo.util.framework.impl.scheduler;
 
+import com.neo.util.common.impl.exception.NoContentFoundException;
 import com.neo.util.framework.api.scheduler.SchedulerConfig;
 import com.neo.util.framework.api.scheduler.SchedulerService;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -10,8 +11,8 @@ import java.util.Set;
 public class DummySchedulerService implements SchedulerService {
 
     @Override
-    public SchedulerConfig getSchedulerConfig(String id) {
-        return null;
+    public SchedulerConfig requestSchedulerConfig(String id) {
+        throw new NoContentFoundException(SchedulerService.EX_INVALID_SCHEDULER_ID, id);
     }
 
     @Override

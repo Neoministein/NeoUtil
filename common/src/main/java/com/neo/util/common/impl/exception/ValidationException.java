@@ -3,7 +3,7 @@ package com.neo.util.common.impl.exception;
 /**
  * This class handles all Exceptions associated with invalid input
  */
-public class ValidationException extends CommonRuntimeException {
+public class ValidationException extends InternalRuntimeException {
 
     public ValidationException(ExceptionDetails exceptionDetails, Object... arguments) {
         super(exceptionDetails, arguments);

@@ -7,7 +7,7 @@ import java.util.function.Function;
 /**
  * Utility class for Futures
  */
-public class FutureUtils {
+public final class FutureUtils {
 
 
     private FutureUtils() {}

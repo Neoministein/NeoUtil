@@ -1,21 +1,20 @@
 package com.neo.util.common.impl.retry;
 
-import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.InternalRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
-public class RetryExecutor {
+public final class RetryExecutor {
 
     private static final Logger LOGGER =  LoggerFactory.getLogger(RetryExecutor.class);
 
     private static final int DEFAULT_STARTING_TIME = 100;
 
-    protected static final ExceptionDetails EX_RETRY = new ExceptionDetails(
-            "common/retry", "Retry action cannot be fulfilled after {0} tries.", true
-    );
+    public static final ExceptionDetails EX_RETRY = new ExceptionDetails(
+            "common/retry", "Retry action cannot be fulfilled after {0} tries.");
 
     /**
      * Executes the given action for n amounts of times if the action fails
@@ -23,7 +22,7 @@ public class RetryExecutor {
      * @param action the action to Execute
      * @param retries the amount of retries available
      *
-     * @throws CommonRuntimeException if it fails and no more retries are available
+     * @throws InternalRuntimeException if it fails and no more retries are available
      */
     public <T> T execute(Supplier<T> action, int retries, int maxWaitTimeInMilli) {
         return execute(action, retries, 0, maxWaitTimeInMilli);
@@ -35,7 +34,7 @@ public class RetryExecutor {
      * @param actionToExecute the action to Execute
      * @param retries the amount of retries available
      *
-     * @throws CommonRuntimeException if it fails and no more retries are available
+     * @throws InternalRuntimeException if it fails and no more retries are available
      */
     public <T> T execute(Supplier<T> actionToExecute, int retries) {
         return execute(actionToExecute, retries, 0, DEFAULT_STARTING_TIME);
@@ -47,7 +46,7 @@ public class RetryExecutor {
         } catch (Exception ex) {
             LOGGER.warn("Failed to execute action {} -> retrying {} times", ex.getMessage(), count);
             if (retries <= count) {
-                throw new CommonRuntimeException(EX_RETRY, count);
+                throw new InternalRuntimeException(EX_RETRY, count);
             }
             wait(count, startingTime);
             execute(actionToExecute, retries, count + 1, startingTime);

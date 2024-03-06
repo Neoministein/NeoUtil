@@ -18,9 +18,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.enumeration.Association;
 import com.neo.util.common.impl.enumeration.Synchronization;
-import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.InternalRuntimeException;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.config.ConfigService;
@@ -74,13 +74,13 @@ public class ElasticSearchProvider implements SearchProvider {
     public static final String BULK_SIZE = CONFIG_PREFIX + ".BulkSize";
 
     protected static final ExceptionDetails EX_SYNCHRONOUS_INDEXING = new ExceptionDetails(
-            "elk/synchronous-indexing", "IOException while synchronous indexing", true);
+            "elk/synchronous-indexing", "IOException while synchronous indexing");
 
     protected static final ExceptionDetails EX_IO_SEARCHING = new ExceptionDetails(
-            "elk/io-searching", "Failed to fetch {0} entries for index {1} because of IOException: {2}", true);
+            "elk/io-searching", "Failed to fetch {0} entries for index {1} because of IOException: {2}");
 
     protected static final ExceptionDetails EX_CONFIG_SEARCHING = new ExceptionDetails(
-            "elk/io-searching", "Failed to fetch {0} entries for index {1} because of ElasticsearchException: {2}", true);
+            "elk/io-searching", "Failed to fetch {0} entries for index {1} because of ElasticsearchException: {2}");
 
     protected final ConfigService configService;
     protected final Provider<RequestDetails> requestDetailsProvider;
@@ -189,7 +189,7 @@ public class ElasticSearchProvider implements SearchProvider {
             try {
                 getApiClient().index(buildIndexRequest(searchable));
             } catch (IOException ex) {
-                throw new CommonRuntimeException(ex, EX_IO_SEARCHING);
+                throw new InternalRuntimeException(ex, EX_IO_SEARCHING);
             } catch (IllegalStateException ex) {
                 reconnectClientIfNeeded(ex);
                 throw ex;
@@ -214,7 +214,7 @@ public class ElasticSearchProvider implements SearchProvider {
             try {
                 handleBulkResponse(-1, bulkRequest, getApiClient().bulk(bulkRequest));
             } catch (IOException ex) {
-                throw new CommonRuntimeException(ex, EX_SYNCHRONOUS_INDEXING, ex);
+                throw new InternalRuntimeException(ex, EX_SYNCHRONOUS_INDEXING, ex);
             } catch (IllegalStateException ex) {
                 reconnectClientIfNeeded(ex);
                 throw ex;
@@ -235,7 +235,7 @@ public class ElasticSearchProvider implements SearchProvider {
             try {
                 getApiClient().update(buildUpdateRequest(searchable, upsert), String.class);
             } catch (IOException ex) {
-                throw new CommonRuntimeException(ex, EX_IO_SEARCHING);
+                throw new InternalRuntimeException(ex, EX_IO_SEARCHING);
             } catch (IllegalStateException ex) {
                 reconnectClientIfNeeded(ex);
                 throw ex;
@@ -265,7 +265,7 @@ public class ElasticSearchProvider implements SearchProvider {
             try {
                 handleBulkResponse(-1, bulkRequest, getApiClient().bulk(bulkRequest));
             } catch (IOException ex) {
-                throw new CommonRuntimeException(ex, EX_IO_SEARCHING, ex);
+                throw new InternalRuntimeException(ex, EX_IO_SEARCHING, ex);
             } catch (IllegalStateException ex) {
                 reconnectClientIfNeeded(ex);
                 throw ex;
@@ -348,12 +348,12 @@ public class ElasticSearchProvider implements SearchProvider {
         } catch (IOException ex) {
             LOGGER.warn("Executed bulk with complete failure, entire bulk will be retried, message: [{}]",
                     ex.getMessage());
-            throw new CommonRuntimeException(EX_SYNCHRONOUS_INDEXING);
+            throw new InternalRuntimeException(EX_SYNCHRONOUS_INDEXING);
         } catch (IllegalStateException ex) {
             LOGGER.warn("Executed bulk with complete failure, entire bulk will be retried, message: [{}]",
                     ex.getMessage());
             reconnectClientIfNeeded(ex);
-            throw new CommonRuntimeException(EX_SYNCHRONOUS_INDEXING);
+            throw new InternalRuntimeException(EX_SYNCHRONOUS_INDEXING);
         }
     }
 
@@ -493,7 +493,7 @@ public class ElasticSearchProvider implements SearchProvider {
         } catch (ElasticsearchException ex) {
             throw new ConfigurationException(ex, EX_CONFIG_SEARCHING, parameters.getMaxResults(), index, ex.getMessage());
         } catch (IOException ex) {
-            throw new CommonRuntimeException(ex, EX_IO_SEARCHING, parameters.getMaxResults(), index, ex.getMessage());
+            throw new InternalRuntimeException(ex, EX_IO_SEARCHING, parameters.getMaxResults(), index, ex.getMessage());
         }
     }
 

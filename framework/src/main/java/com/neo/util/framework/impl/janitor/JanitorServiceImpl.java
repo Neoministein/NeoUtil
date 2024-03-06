@@ -32,11 +32,7 @@ public class JanitorServiceImpl implements JanitorService {
     private static final String CONFIG_DISABLED_POSTFIX = ".disabled";
 
     public static final ExceptionDetails EX_DUPLICATED_JANITOR_JOB = new ExceptionDetails(
-            "janitor/duplicated-janitor-configured", "Duplicated Janitor configured [{0}], [{1}]", true);
-
-    protected static final ExceptionDetails EX_NON_EXISTENT_JANITOR_JOB = new ExceptionDetails(
-            "janitor/non-existent-janitor", "The Janitor [{0}] does not exist", true
-    );
+            "janitor/duplicated-janitor-configured", "Duplicated Janitor configured [{0}], [{1}]");
 
     protected final ConfigService configService;
 
@@ -73,13 +69,13 @@ public class JanitorServiceImpl implements JanitorService {
     }
 
     @Override
-    public JanitorConfig getJanitorConfig(String janitorId) throws NoContentFoundException {
+    public JanitorConfig requestJanitorConfig(String janitorId) throws NoContentFoundException {
         return Optional.ofNullable(janitorJobMap.get(janitorId)).orElseThrow(() -> new NoContentFoundException(EX_NON_EXISTENT_JANITOR_JOB, janitorId));
     }
 
     @Override
     public void execute(String janitorId) {
-        execute(getJanitorConfig(janitorId), LocalDate.now());
+        execute(requestJanitorConfig(janitorId), LocalDate.now());
     }
 
     protected void execute(JanitorConfig janitorConfig, LocalDate now) {
@@ -112,17 +108,17 @@ public class JanitorServiceImpl implements JanitorService {
     @Override
     public void enable(String janitorId) {
         LOGGER.info("Enabling Janitor Job [{}]", janitorId);
-        getJanitorConfig(janitorId).setEnabled(true);
+        requestJanitorConfig(janitorId).setEnabled(true);
     }
 
     @Override
     public void disable(String janitorId) {
         LOGGER.info("Disabling Janitor Job [{}]", janitorId);
-        getJanitorConfig(janitorId).setEnabled(false);
+        requestJanitorConfig(janitorId).setEnabled(false);
     }
 
     @Override
-    public Set<String> getJanitorIds() {
+    public Set<String> fetchJanitorIds() {
         return janitorJobMap.keySet();
     }
 }

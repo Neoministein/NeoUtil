@@ -1,5 +1,6 @@
 package com.neo.util.framework.api.janitor;
 
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.NoContentFoundException;
 import com.neo.util.framework.api.scheduler.CronSchedule;
 
@@ -9,6 +10,11 @@ import java.util.Set;
  * This is an interface for a Janitor System to manage {@link JanitorJob} and delete old data.
  */
 public interface JanitorService {
+
+    String E_NON_EXISTENT_JANITOR_JOB = "janitor/invalid-id";
+
+    ExceptionDetails EX_NON_EXISTENT_JANITOR_JOB = new ExceptionDetails(
+            E_NON_EXISTENT_JANITOR_JOB, "The Janitor [{0}] does not exist");
 
     /**
      * Executes all {@link JanitorJob}
@@ -40,12 +46,12 @@ public interface JanitorService {
     /**
      * Returns the config for the provided janitor id
      */
-    JanitorConfig getJanitorConfig(String janitorId) throws NoContentFoundException;
+    JanitorConfig requestJanitorConfig(String janitorId) throws NoContentFoundException;
 
     /**
      * Returns a collection of all janitor ids.
      *
      * @return ids of all janitors
      */
-    Set<String> getJanitorIds();
+    Set<String> fetchJanitorIds();
 }

@@ -1,7 +1,8 @@
 package com.neo.util.framework.rest.api.response;
 
-import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.ExternalRuntimeException;
+import com.neo.util.common.impl.exception.InternalRuntimeException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -24,7 +25,16 @@ public interface ClientResponseService {
      * @param runtimeException the exception to cause the error
      * @return the response
      */
-    Response error(int code, CommonRuntimeException runtimeException);
+    Response error(int code, ExternalRuntimeException runtimeException);
+
+    /**
+     * A response with the status code and data in the response body
+     *
+     * @param code the status code
+     * @param runtimeException the exception to cause the error
+     * @return the response
+     */
+    Response error(int code, InternalRuntimeException runtimeException);
 
     /**
      * A response with the status code and data in the response body
@@ -45,14 +55,6 @@ public interface ClientResponseService {
      * @return the response
      */
     Response error(int code, String errorCode, String message);
-
-    /**
-     * Retries to retrieve the error code from the given response object.
-     *
-     * @param entity the response entity
-     * @return the error code or {@link com.neo.util.common.impl.StringUtils#EMPTY}
-     */
-    Optional<String> responseToErrorCode(Object entity);
 
     /**
      *

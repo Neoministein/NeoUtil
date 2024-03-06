@@ -1,5 +1,6 @@
 package com.neo.util.framework.rest.web.rest;
 
+import com.neo.util.framework.api.excpetion.ToExternalException;
 import com.neo.util.framework.api.scheduler.SchedulerConfig;
 import com.neo.util.framework.api.scheduler.SchedulerService;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -12,23 +13,28 @@ import java.util.List;
 @ApplicationScoped
 @Path(SchedulerResource.RESOURCE_LOCATION)
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+@ToExternalException({SchedulerService.E_INVALID_SCHEDULER_ID})
 public class SchedulerResource {
 
     public static final String RESOURCE_LOCATION = "/admin/api/scheduler";
 
+    protected final SchedulerService schedulerService;
+
     @Inject
-    protected SchedulerService schedulerService;
+    public SchedulerResource(SchedulerService schedulerService) {
+        this.schedulerService = schedulerService;
+    }
 
     @GET
     @Path("{id}")
     public SchedulerConfig getSchedulerConfig(@PathParam("id") String id) {
-        return schedulerService.getSchedulerConfig(id);
+        return schedulerService.requestSchedulerConfig(id);
     }
 
     @GET
     public List<SchedulerConfig> getSchedulerConfig() {
         return schedulerService.getSchedulerIds().stream()
-                .map(ids -> schedulerService.getSchedulerConfig(ids))
+                .map(schedulerService::requestSchedulerConfig)
                 .toList();
     }
 
@@ -36,7 +42,7 @@ public class SchedulerResource {
     @Path("/active")
     public List<SchedulerConfig> getActiveSchedulerConfig() {
         return schedulerService.getSchedulerIds().stream()
-                .map(ids -> schedulerService.getSchedulerConfig(ids))
+                .map(schedulerService::requestSchedulerConfig)
                 .filter(SchedulerConfig::isEnabled)
                 .toList();
     }

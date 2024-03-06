@@ -11,7 +11,7 @@ import java.time.Instant;
 public class SchedulerConfig {
 
     public static final ExceptionDetails INVALID_SCHEDULER_ID = new ExceptionDetails(
-            "scheduler/invalid-id", "The scheduler id [{0}] may not have whitespaces.", true);
+            "scheduler/invalid-id", "The scheduler id [{0}] may not have whitespaces.");
 
     protected final String id;
     protected final RequestContext context;

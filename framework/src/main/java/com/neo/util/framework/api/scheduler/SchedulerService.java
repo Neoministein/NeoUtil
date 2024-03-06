@@ -12,16 +12,16 @@ import java.util.Set;
  */
 public interface SchedulerService {
 
-    ExceptionDetails EX_METHOD_NOT_ACCESSIBLE = new ExceptionDetails(
-            "scheduler/method-not-accessible", "Scheduler is not accessible [{0}.{1}].", true);
     ExceptionDetails EX_DUPLICATED_SCHEDULER = new ExceptionDetails(
-            "scheduler/duplicated-scheduler-configured","Duplicated scheduler present [{0}].",true);
+            "scheduler/duplicated-scheduler-configured","Duplicated scheduler present [{0}].");
+
+    String E_INVALID_SCHEDULER_ID = "scheduler/invalid-id";
 
     ExceptionDetails EX_INVALID_SCHEDULER_ID = new ExceptionDetails(
-            "scheduler/invalid-id", "The provided scheduler id [{0}] does not exist.", true);
+            E_INVALID_SCHEDULER_ID, "The provided scheduler id [{0}] does not exist.");
 
     ExceptionDetails EX_INVALID_CONFIG_EXPRESSION = new ExceptionDetails(
-            "scheduler/invalid-chron", "The configured expression is invalid because [{0}].", true);
+            "scheduler/invalid-chron", "The configured expression is invalid because [{0}].");
 
     /**
      * Manually executes the provided scheduler
@@ -47,7 +47,7 @@ public interface SchedulerService {
     /**
      * Returns the config for the provided scheduler name
      */
-    SchedulerConfig getSchedulerConfig(String schedulerId) throws NoContentFoundException;
+    SchedulerConfig requestSchedulerConfig(String schedulerId) throws NoContentFoundException;
 
     /**
      * Reload all schedulers from configuration.

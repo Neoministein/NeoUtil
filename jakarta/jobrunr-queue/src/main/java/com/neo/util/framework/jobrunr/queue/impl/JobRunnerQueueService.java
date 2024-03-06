@@ -39,7 +39,7 @@ public class JobRunnerQueueService implements QueueService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobRunnerQueueService.class);
 
     public static final ExceptionDetails EX_MISSING_OUTGOING = new ExceptionDetails(
-            "queue/missing-outgoing-annotation", "The JobRunner implementation also requires an outgoing annotation for [{0}]", true);
+            "queue/missing-outgoing-annotation", "The JobRunner implementation also requires an outgoing annotation for [{0}]");
 
     protected final ConfigService configService;
     protected final InstanceIdentification instanceIdentification;

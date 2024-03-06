@@ -1,8 +1,7 @@
 package com.neo.util.helidon.rest.exception;
 
-import com.neo.util.common.impl.exception.CommonRuntimeException;
-
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.InternalRuntimeException;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -23,10 +22,10 @@ public class ExceptionResource {
     public static final String P_CLIENT_ERROR = "/clientError";
 
     public static final ExceptionDetails EX_INTERNAL_COMMON_RUNTIME = new ExceptionDetails(
-            "test/internal-common-runtime", "CommonRuntimeException", true);
+            "test/internal-common-runtime", "CommonRuntimeException");
 
     public static final ExceptionDetails EX_EXTERNAL_COMMON_RUNTIME = new ExceptionDetails(
-            "test/external-common-runtime", "CommonRuntimeException", false);
+            "test/external-common-runtime", "CommonRuntimeException");
 
     @GET
     @Path(P_SUCCESS)
@@ -43,13 +42,13 @@ public class ExceptionResource {
     @GET
     @Path(P_INTERNAL_LOGIC)
     public Response internalException() {
-        throw new CommonRuntimeException(EX_INTERNAL_COMMON_RUNTIME);
+        throw new InternalRuntimeException(EX_INTERNAL_COMMON_RUNTIME);
     }
 
     @GET
     @Path(P_EXTERNAL_JSON)
     public Response externalException() {
-        throw new CommonRuntimeException(EX_EXTERNAL_COMMON_RUNTIME);
+        throw new InternalRuntimeException(EX_EXTERNAL_COMMON_RUNTIME);
     }
 
     @GET

@@ -1,8 +1,9 @@
 package com.neo.util.framework.rest.web.htmx;
 
 import com.neo.util.common.impl.html.HtmlElement;
-import com.neo.util.framework.rest.web.htmx.navigation.HtmxNavigationElement;
-import com.neo.util.framework.rest.web.rest.JsonSchemaResource;
+import com.neo.util.common.impl.json.JsonUtil;
+import com.neo.util.framework.api.excpetion.ToExternalException;
+import com.neo.util.framework.impl.json.JsonSchemaLoader;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -17,15 +18,16 @@ import static com.neo.util.common.impl.html.HtmlStringTemplate.HTML;
 @Path(JsonSchemaHtmxResource.RESOURCE_LOCATION)
 @Produces(MediaType.TEXT_HTML + "; charset=UTF-8")
 @HtmxNavigationElement(name = "Json Schema", route = JsonSchemaHtmxResource.RESOURCE_LOCATION)
+@ToExternalException({JsonSchemaLoader.E_SCHEMA_DOES_NOT_EXIST})
 public class JsonSchemaHtmxResource {
 
     public static final String RESOURCE_LOCATION = "/admin/html/json-schema";
 
-    protected JsonSchemaResource jsonSchemaResource;
+    protected JsonSchemaLoader jsonSchemaLoader;
 
     @Inject
-    public JsonSchemaHtmxResource(JsonSchemaResource jsonSchemaResource) {
-        this.jsonSchemaResource = jsonSchemaResource;
+    public JsonSchemaHtmxResource(JsonSchemaLoader jsonSchemaLoader) {
+        this.jsonSchemaLoader = jsonSchemaLoader;
     }
 
     @GET
@@ -37,7 +39,7 @@ public class JsonSchemaHtmxResource {
                     <div class="col-6" style="padding-top: 1.3rem!important;">
                         <table id="main" class="table table-striped">
                             <tbody>
-                                \{jsonSchemaResource.getSchemaNames().stream().map(this::getTableElement)}
+                                \{jsonSchemaLoader.getUnmodifiableMap().keySet().stream().sorted().map(this::getTableElement)}
                             </tbody>
                         </table>
                     </div>
@@ -66,7 +68,12 @@ public class JsonSchemaHtmxResource {
     @GET
     @Path("{path : .+}")//This param'{path : .+}' means that it also includes '/'
     public String getSchema(@PathParam("path") String path) {
-        return jsonSchemaResource.getSchema(path);
+        String rawJson = jsonSchemaLoader.requestJsonSchema(path)
+                //Substring +6 is done since default toString start with '"#" :' which isn't valid json
+                .toString().substring(6);
+
+
+        return JsonUtil.toPrettyJson(JsonUtil.fromJson(rawJson));
     }
 
     public HtmlElement getTableElement(String path) {

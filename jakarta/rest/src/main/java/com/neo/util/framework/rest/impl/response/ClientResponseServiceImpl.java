@@ -1,7 +1,8 @@
 package com.neo.util.framework.rest.impl.response;
 
-import com.neo.util.common.impl.exception.CommonRuntimeException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.ExternalRuntimeException;
+import com.neo.util.common.impl.exception.InternalRuntimeException;
 import com.neo.util.framework.rest.api.response.ClientResponseGenerator;
 import com.neo.util.framework.rest.api.response.ClientResponseService;
 import com.neo.util.framework.rest.impl.JaxResourceUtils;
@@ -33,25 +34,25 @@ public class ClientResponseServiceImpl implements ClientResponseService {
     }
 
     @Override
-    public Response error(int code, CommonRuntimeException exceptionDetails) {
+    public Response error(int code, ExternalRuntimeException runtimeException) {
+        return getGenerator(jaxResourceUtils.getCurrentMediaType()).orElse(DEFAULT_GENERATOR)
+                .generateErrorResponse(code, runtimeException.getExceptionId(), runtimeException.getMessage());
+    }
+
+    @Override
+    public Response error(int code, InternalRuntimeException exceptionDetails) {
         return getGenerator(jaxResourceUtils.getCurrentMediaType()).orElse(DEFAULT_GENERATOR)
                 .generateErrorResponse(code, exceptionDetails.getExceptionId(), exceptionDetails.getMessage());
     }
 
     @Override
     public Response error(int code, ExceptionDetails exceptionDetails, Object... arguments) {
-        return error(code, new CommonRuntimeException(exceptionDetails, arguments));
+        return error(code, new InternalRuntimeException(exceptionDetails, arguments));
     }
 
     @Override
     public Response error(int code, String errorCode, String message) {
-        return error(code, new CommonRuntimeException(new ExceptionDetails(errorCode, message, false)));
-    }
-
-    @Override
-    public Optional<String> responseToErrorCode(Object entity) {
-        return getGenerator(jaxResourceUtils.getCurrentMediaType()).orElse(DEFAULT_GENERATOR)
-                .responseToErrorCode(entity);
+        return error(code, new InternalRuntimeException(new ExceptionDetails(errorCode, message)));
     }
 
     @Override
@@ -67,16 +68,6 @@ public class ClientResponseServiceImpl implements ClientResponseService {
                     .status(code)
                     .entity("Error: " + errorCode + "\nMessage: " + message)
                     .build();
-        }
-
-        @Override
-        public Optional<String> responseToErrorCode(Object entity) {
-            if (entity instanceof String s) {
-                try {
-                    return Optional.of(s.substring(6, s.indexOf('\n')));
-                } catch (IndexOutOfBoundsException ignored) {}
-            }
-            return Optional.empty();
         }
 
         @Override

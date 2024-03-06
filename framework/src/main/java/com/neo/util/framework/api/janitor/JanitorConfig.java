@@ -9,7 +9,7 @@ import java.time.Instant;
 public class JanitorConfig {
 
     public static final ExceptionDetails INVALID_JANITOR_ID = new ExceptionDetails(
-            "janitor/invalid-id", "The janitor id [{0}] may not have whitespaces.", true);
+            "janitor/invalid-id", "The janitor id [{0}] may not have whitespaces.");
 
     protected final String id;
     protected final JanitorJob janitorJob;

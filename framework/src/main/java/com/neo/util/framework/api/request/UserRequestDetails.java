@@ -20,7 +20,7 @@ import java.util.Optional;
 public interface UserRequestDetails extends RequestDetails {
 
     ExceptionDetails EX_USER_ALREADY_DEFINED = new ExceptionDetails(
-            "auth/user-already-defined", "A user is already defined in this context", true);
+            "auth/user-already-defined", "A user is already defined in this context");
 
     /**
      * Returns the current user associated with the request

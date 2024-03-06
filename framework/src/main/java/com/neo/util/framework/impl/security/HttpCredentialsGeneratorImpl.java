@@ -2,7 +2,7 @@ package com.neo.util.framework.impl.security;
 
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.exception.ExceptionDetails;
-import com.neo.util.common.impl.exception.ValidationException;
+import com.neo.util.common.impl.exception.ExternalRuntimeException;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.AuthenticationScheme;
@@ -17,7 +17,7 @@ import jakarta.security.enterprise.credential.Credential;
 public class HttpCredentialsGeneratorImpl implements HttpCredentialsGenerator {
 
     public static final ExceptionDetails EX_BASIC_INVALID = new ExceptionDetails(
-            "auth/basic-invalid", "The provided basic token is invalid", false);
+            "auth/basic-invalid", "The provided basic token is invalid");
 
     protected final AuthenticationProvider authenticationProvider;
 
@@ -36,29 +36,29 @@ public class HttpCredentialsGeneratorImpl implements HttpCredentialsGenerator {
             return switch (httpScheme.toUpperCase()) {
                 case AuthenticationScheme.BASIC -> new BasicAuthenticationCredential(httpHeader);
                 case AuthenticationScheme.BEARER -> new BearerCredentials(httpHeader);
-                default -> throw new ValidationException(FrameworkConstants.EX_UNSUPPORTED_AUTH_TYPE);
+                default -> throw new ExternalRuntimeException(FrameworkConstants.EX_UNSUPPORTED_AUTH_TYPE);
             };
         }
-        throw new ValidationException(FrameworkConstants.EX_UNSUPPORTED_AUTH_TYPE);
+        throw new ExternalRuntimeException(FrameworkConstants.EX_UNSUPPORTED_AUTH_TYPE);
     }
 
     protected String getHttpScheme(String httpHeader) {
         if (StringUtils.isEmpty(httpHeader)) {
-            throw new ValidationException(FrameworkConstants.EX_UNSUPPORTED_AUTH_TYPE);
+            throw new ExternalRuntimeException(FrameworkConstants.EX_UNSUPPORTED_AUTH_TYPE);
         }
 
         int index = httpHeader.indexOf(' ');
         if (index >= 0) {
             return httpHeader.substring(0 ,index);
         }
-        throw new ValidationException(FrameworkConstants.EX_UNSUPPORTED_AUTH_TYPE);
+        throw new ExternalRuntimeException(FrameworkConstants.EX_UNSUPPORTED_AUTH_TYPE);
     }
 
     protected BasicAuthenticationCredential parseBasicCredenital(String httpHeader) {
         try {
             return new BasicAuthenticationCredential(httpHeader);
         } catch (RuntimeException ex) {
-            throw new ValidationException(EX_BASIC_INVALID);
+            throw new ExternalRuntimeException(EX_BASIC_INVALID);
         }
     }
 }

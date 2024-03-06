@@ -1,8 +1,9 @@
-package com.neo.util.framework.rest.web.htmx.navigation;
+package com.neo.util.framework.rest.web.htmx;
 
+import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.html.HtmlElement;
+import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.impl.ReflectionService;
-import com.neo.util.framework.rest.api.security.Secured;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -13,21 +14,29 @@ import jakarta.ws.rs.core.MediaType;
 import static com.neo.util.common.impl.html.HtmlStringTemplate.HTML;
 
 @ApplicationScoped
-@Path(HtmxNavigation.RESOURCE_LOCATION)
+@Path(HtmxDashboard.RESOURCE_LOCATION)
 @Produces(MediaType.TEXT_HTML + "; charset=UTF-8")
-public class HtmxNavigation {
+public class HtmxDashboard {
 
-    public static final String RESOURCE_LOCATION = "/admin/html/navigation";
+    public static final String RESOURCE_LOCATION = "/admin/";
 
     protected final HtmlElement navigationElement;
+    protected final String dashboard;
 
     @Inject
-    public HtmxNavigation(ReflectionService reflectionService) {
+    public HtmxDashboard(ReflectionService reflectionService, ConfigService configService) {
         this.navigationElement = HTML."\{reflectionService.getAnnotationInstance(HtmxNavigationElement.class).stream().map(this::navigationElement)}";
+        this.dashboard = ResourceUtil.getResourceFileAsString(configService.get("admin.dashboard").asString().orElse("static/dashboard.html"));
     }
 
     @GET
-    @Secured
+    @Path("/dashboard")
+    public String getDashboard() {
+        return dashboard;
+    }
+
+    @GET
+    @Path("/html/navigation")
     public HtmlElement getNavigation() {
         return navigationElement;
     }

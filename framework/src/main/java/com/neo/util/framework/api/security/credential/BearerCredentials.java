@@ -1,7 +1,7 @@
 package com.neo.util.framework.api.security.credential;
 
 import com.neo.util.common.impl.exception.ExceptionDetails;
-import com.neo.util.common.impl.exception.ValidationException;
+import com.neo.util.common.impl.exception.ExternalRuntimeException;
 import com.neo.util.framework.api.security.AuthenticationScheme;
 import jakarta.security.enterprise.credential.AbstractClearableCredential;
 
@@ -11,7 +11,7 @@ import jakarta.security.enterprise.credential.AbstractClearableCredential;
 public class BearerCredentials extends AbstractClearableCredential {
 
     public static final ExceptionDetails EX_BEARER_INVALID = new ExceptionDetails(
-            "auth/bearer-invalid", "The provided bearer token is invalid", false);
+            "auth/bearer-invalid", "The provided bearer token is invalid");
 
     protected String token;
 
@@ -20,7 +20,7 @@ public class BearerCredentials extends AbstractClearableCredential {
                 .startsWith(AuthenticationScheme.BEARER.toUpperCase() + " ")) {
             token = authorizationHeader.substring(AuthenticationScheme.BEARER.length()).trim();
         } else {
-            throw new ValidationException(EX_BEARER_INVALID);
+            throw new ExternalRuntimeException(EX_BEARER_INVALID);
         }
 
     }

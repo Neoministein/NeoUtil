@@ -2,8 +2,8 @@ package com.neo.util.common.impl.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.ResourceUtil;
-import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.ValidationException;
 import com.networknt.schema.*;
 
 import java.util.Optional;
@@ -18,10 +18,10 @@ public class JsonSchemaUtil {
 
 
     private static final ExceptionDetails EX_INVALID_JSON_SCHEMA = new ExceptionDetails(
-            "common/json/invalid-schema", "The provided json schema is invalid", true);
+            "common/json/invalid-schema", "The provided json schema is invalid");
 
     private static final ExceptionDetails EX_INVALID_JSON = new ExceptionDetails(
-            "common/json/invalid-json", "{0}", false);
+            "common/json/invalid-json", "{0}");
 
     private JsonSchemaUtil(){}
 

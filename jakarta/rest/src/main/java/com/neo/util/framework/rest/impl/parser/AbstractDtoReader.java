@@ -3,7 +3,6 @@ package com.neo.util.framework.rest.impl.parser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
-import com.neo.util.common.impl.exception.ExceptionUtils;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.common.impl.json.JsonUtil;
@@ -35,8 +34,7 @@ public abstract class AbstractDtoReader<T> implements MessageBodyReader<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDtoReader.class);
 
     protected static final ExceptionDetails EX_UNKNOWN_JSON_SCHEMA = new ExceptionDetails(
-            "framework/json/unknown-schema", "Invalid json schema to check against {0}.", true
-    );
+            "framework/json/unknown-schema", "Invalid json schema to check against {0}.");
 
     @Inject
     protected JsonSchemaLoader jsonSchemaLoader;
@@ -55,7 +53,7 @@ public abstract class AbstractDtoReader<T> implements MessageBodyReader<T> {
     @PostConstruct
     protected void init() {
         LOGGER.trace("Registering DTO reader for class [{}]", clazz.getSimpleName());
-        schema = jsonSchemaLoader.getJsonSchema(getSchemaLocation())
+        schema = jsonSchemaLoader.fetchJsonSchema(getSchemaLocation())
                 .orElseThrow(() -> new DeploymentException(new ConfigurationException(EX_UNKNOWN_JSON_SCHEMA, getSchemaLocation())));
     }
 
@@ -72,7 +70,7 @@ public abstract class AbstractDtoReader<T> implements MessageBodyReader<T> {
         try {
             input = JsonUtil.fromJson(entityStream);
         } catch (ValidationException ex) {
-            throw ExceptionUtils.asExternal(ex);
+            throw ex.asExternal();
         }
 
         try {
@@ -82,7 +80,7 @@ public abstract class AbstractDtoReader<T> implements MessageBodyReader<T> {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("The parsed json does not match the dto schema [{}]", JsonUtil.toJson(input));
             }
-            throw ExceptionUtils.asExternal(ex);
+            throw ex.asExternal();
         }
     }
 }

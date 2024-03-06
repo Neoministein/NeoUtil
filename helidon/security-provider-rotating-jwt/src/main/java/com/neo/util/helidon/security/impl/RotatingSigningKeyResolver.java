@@ -1,15 +1,15 @@
 package com.neo.util.helidon.security.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.neo.util.common.impl.KeyUtils;
 import com.neo.util.common.impl.exception.ConfigurationException;
-import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.InternalRuntimeException;
+import com.neo.util.common.impl.exception.ValidationException;
+import com.neo.util.common.impl.json.JsonUtil;
+import com.neo.util.common.impl.retry.RetryHttpExecutor;
 import com.neo.util.helidon.security.impl.key.JWTKey;
 import com.neo.util.helidon.security.impl.key.JWTPublicKey;
-import com.neo.util.common.impl.KeyUtils;
-import com.neo.util.common.impl.retry.RetryHttpExecutor;
-import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.common.impl.exception.CommonRuntimeException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.MalformedJwtException;
@@ -32,14 +32,11 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
     private static final Logger LOGGER =  LoggerFactory.getLogger(RotatingSigningKeyResolver.class);
 
     protected static final ExceptionDetails EX_INVALID_URL = new ExceptionDetails(
-            "auth/jwt/invalid-public-key-url", "Invalid public key url {0}", true
-    );
+            "auth/jwt/invalid-public-key-url", "Invalid public key url {0}");
     protected static final ExceptionDetails EX_CANNOT_REACH_PUBLIC_KEY = new ExceptionDetails(
-            "auth/jwt/cannot-reach-public-key-endpoint", "Cannot reach public key endpoint", true
-    );
+            "auth/jwt/cannot-reach-public-key-endpoint", "Cannot reach public key endpoint");
     protected static final ExceptionDetails EX_INVALID_PUBLIC_KEY = new ExceptionDetails(
-            "auth/jwt/invalid-public-key","Cannot parse json result from PublicKey Endpoint", true
-    );
+            "auth/jwt/invalid-public-key","Cannot parse json result from PublicKey Endpoint");
 
     protected static final int TEN_SECONDS = 10 * 1000;
     protected long lastUpdate = 0L;
@@ -120,8 +117,8 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
             }
 
             return hasChanged;
-        } catch (CommonRuntimeException e) {
-            throw new CommonRuntimeException(EX_CANNOT_REACH_PUBLIC_KEY);
+        } catch (InternalRuntimeException e) {
+            throw new InternalRuntimeException(EX_CANNOT_REACH_PUBLIC_KEY);
         }
     }
 
@@ -148,7 +145,7 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
             return newMap;
         } catch (ValidationException ex) {
             LOGGER.error("Cannot parse json result from PublicKey Endpoint");
-            throw new CommonRuntimeException(EX_INVALID_PUBLIC_KEY);
+            throw new InternalRuntimeException(EX_INVALID_PUBLIC_KEY);
         }
     }
 }

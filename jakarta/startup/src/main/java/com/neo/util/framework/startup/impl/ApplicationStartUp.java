@@ -73,37 +73,29 @@ public class ApplicationStartUp {
 
     protected void fireApplicationPreReadyEvent() {
         LOGGER.info("Fire Application pre ready event");
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+        StopWatch stopWatch = new StopWatch().start();
         applicationPreReadyEventEvent.fire(new ApplicationPreReadyEvent());
-        stopWatch.stop();
-        LOGGER.info("Application ready pre event took: [{}] ms ", stopWatch.getElapsedTimeMs());
+        LOGGER.info("Application ready pre event took: [{}] ms ", stopWatch.stop().getElapsedTimeMs());
     }
 
     protected void fireApplicationReadyEvent() {
         LOGGER.info("Fire Application ready event");
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+        StopWatch stopWatch = new StopWatch().start();
         applicationReadyEvent.fire(new ApplicationReadyEvent());
-        stopWatch.stop();
-        LOGGER.info("Application Init event took: [{}] ms ", stopWatch.getElapsedTimeMs());
+        LOGGER.info("Application Init event took: [{}] ms ", stopWatch.stop().getElapsedTimeMs());
     }
 
     protected void fireApplicationPostReadyEvent() {
         LOGGER.info("Fire Application post ready event");
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+        StopWatch stopWatch = new StopWatch().start();
         applicationPostReadyEvent.fire(new ApplicationPostReadyEvent());
-        stopWatch.stop();
-        LOGGER.info("Application ready post event took: [{}] ms ", stopWatch.getElapsedTimeMs());
+        LOGGER.info("Application ready post event took: [{}] ms ", stopWatch.stop().getElapsedTimeMs());
     }
 
     protected void fireApplicationShutDownEvent() {
         LOGGER.info("Fire Application shutdown event");
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+        StopWatch stopWatch = new StopWatch().start();
         applicationShutdownEventEvent.fire(new ApplicationShutdownEvent());
-        stopWatch.stop();
-        LOGGER.info("Application shutdown took: [{}] ms ", stopWatch.getElapsedTimeMs());
+        LOGGER.info("Application shutdown took: [{}] ms ", stopWatch.stop().getElapsedTimeMs());
     }
 }

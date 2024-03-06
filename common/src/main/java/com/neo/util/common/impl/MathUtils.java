@@ -4,7 +4,7 @@ package com.neo.util.common.impl;
  * This class is a provides basic math utilities
  *
  */
-public class MathUtils {
+public final class MathUtils {
 
     private MathUtils() {}
 

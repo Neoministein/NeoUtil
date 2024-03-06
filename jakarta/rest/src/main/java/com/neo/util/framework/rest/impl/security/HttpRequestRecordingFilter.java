@@ -1,6 +1,5 @@
 package com.neo.util.framework.rest.impl.security;
 
-import com.neo.util.common.impl.StringUtils;
 import com.neo.util.framework.api.request.RequestAuditProvider;
 import com.neo.util.framework.api.request.UserRequest;
 import com.neo.util.framework.api.request.UserRequestDetails;
@@ -26,10 +25,6 @@ public class HttpRequestRecordingFilter implements ContainerResponseFilter {
     @Inject
     protected RequestAuditProvider requestAuditProvider;
 
-    @Inject
-    protected ClientResponseService clientResponseService;
-
-
     @Override
     public void filter(ContainerRequestContext req,
             ContainerResponseContext resp) {
@@ -43,8 +38,9 @@ public class HttpRequestRecordingFilter implements ContainerResponseFilter {
 
     protected String parseErrorCodeIfPresent(ContainerResponseContext containerResponse) {
         if (containerResponse.getStatus() >= 400) {
-            if (containerResponse.getHeaders().containsKey(ClientResponseService.VALID_BACKEND_ERROR)) {
-                return clientResponseService.responseToErrorCode(containerResponse.getEntity()).orElse(StringUtils.EMPTY);
+            Object value = containerResponse.getHeaders().getFirst(ClientResponseService.VALID_BACKEND_ERROR);
+            if (value instanceof String stringValue) {
+                return stringValue;
             }
             return FRAMEWORK_PROVIDED_ERROR;
         }

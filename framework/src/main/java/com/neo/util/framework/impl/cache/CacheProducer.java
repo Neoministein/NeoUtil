@@ -16,7 +16,7 @@ import java.lang.annotation.Annotation;
 public class CacheProducer {
 
     protected static final ExceptionDetails EX_NO_CACHE_FOUND = new ExceptionDetails(
-            "cache/no-cache","The provided cache {0} name does not exist.", true);
+            "cache/no-cache","The provided cache {0} name does not exist.");
 
     protected CacheManager cacheManager;
 
@@ -30,7 +30,7 @@ public class CacheProducer {
     public Cache produce(InjectionPoint injectionPoint) {
         for (Annotation qualifier : injectionPoint.getQualifiers()) {
             if (qualifier instanceof CacheName cacheName) {
-                return cacheManager.getCache(cacheName.value()).orElseThrow(() ->
+                return cacheManager.fetchCache(cacheName.value()).orElseThrow(() ->
                         new ConfigurationException(EX_NO_CACHE_FOUND, cacheName.value())
                 );
             }

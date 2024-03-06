@@ -2,6 +2,7 @@ package com.neo.util.framework.jobrunr.scheduler.impl;
 
 import com.neo.util.common.api.func.CheckedRunnable;
 import com.neo.util.common.impl.exception.ConfigurationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.NoContentFoundException;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.framework.api.PriorityConstants;
@@ -50,6 +51,9 @@ import java.util.concurrent.TimeUnit;
 @ApplicationScoped
 public class JobRunnerSchedulerService implements SchedulerService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobRunnerSchedulerService.class);
+
+    public static final ExceptionDetails EX_METHOD_NOT_ACCESSIBLE = new ExceptionDetails(
+            "scheduler/method-not-accessible", "Scheduler is not accessible [{0}.{1}].");
 
     private final Map<String, JobRunnerSchedulerConfig> schedulers = new ConcurrentHashMap<>();
 
@@ -107,7 +111,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
     }
 
 
-    public JobRunnerSchedulerConfig getSchedulerConfig(String id) {
+    public JobRunnerSchedulerConfig requestSchedulerConfig(String id) {
         return Optional.ofNullable(schedulers.get(id)).
                 orElseThrow(() -> new NoContentFoundException(EX_INVALID_SCHEDULER_ID, id));
     }
@@ -129,7 +133,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
     @Override
     public void start(String id) {
         LOGGER.info("Starting scheduler [{}]", id);
-        startScheduler(getSchedulerConfig(id), true);
+        startScheduler(requestSchedulerConfig(id), true);
     }
 
     protected void startScheduler(JobRunnerSchedulerConfig schedulerConfig, boolean forceStart) {
@@ -172,7 +176,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
 
     @Override
     public void execute(String id) {
-        JobRunnerSchedulerConfig schedulerConfig = getSchedulerConfig(id);
+        JobRunnerSchedulerConfig schedulerConfig = requestSchedulerConfig(id);
 
         CheckedRunnable<?> action = () -> {
             LOGGER.info("Executing scheduler [{}]", id);
@@ -203,7 +207,7 @@ public class JobRunnerSchedulerService implements SchedulerService {
 
     @Override
     public void stop(String id) {
-        SchedulerConfig schedulerConfig = getSchedulerConfig(id);
+        SchedulerConfig schedulerConfig = requestSchedulerConfig(id);
         schedulerConfig.setEnabled(false);
 
         BackgroundJob.delete(id);

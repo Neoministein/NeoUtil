@@ -1,6 +1,6 @@
 package com.neo.util.common.impl.retry;
 
-import com.neo.util.common.impl.exception.CommonRuntimeException;
+import com.neo.util.common.impl.exception.InternalRuntimeException;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
@@ -30,7 +30,7 @@ public class RetryHttpExecutor {
      * @param request the request to send
      * @param retries the amount of retries available
      *
-     * @throws CommonRuntimeException if it fails and no more retries are available
+     * @throws InternalRuntimeException if it fails and no more retries are available
      *
      * @return the response message
      */

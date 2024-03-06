@@ -3,6 +3,7 @@ package com.neo.util.framework.impl.json;
 import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.NoContentFoundException;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.config.ConfigService;
@@ -32,7 +33,12 @@ public class JsonSchemaLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonSchemaLoader.class);
 
     public static final ExceptionDetails INVALID_SCHEDULER_ID = new ExceptionDetails(
-            "json-schema/invalid-id", "The json-schema path [{0}] may not have whitespaces.", true);
+            "json-schema/invalid-id", "The json-schema path [{0}] may not have whitespaces.");
+
+    public static final String E_SCHEMA_DOES_NOT_EXIST = "json-schema/invalid-path";
+
+    public static final ExceptionDetails EX_SCHEMA_DOES_NOT_EXIST = new ExceptionDetails(
+            "json-schema/invalid-path", "The provided json schema path [{0}] does not exist.");
 
     protected final Map<String, JsonSchema> jsonSchemaMap;
 
@@ -84,12 +90,16 @@ public class JsonSchemaLoader {
         return jsonSchemaMap;
     }
 
-    public Optional<JsonSchema> getJsonSchema(String path) {
+    public Optional<JsonSchema> fetchJsonSchema(String path) {
         JsonSchema schema = jsonSchemaMap.get(path);
         if (schema != null) {
             return Optional.of(schema);
         }
         LOGGER.warn("The json schema [{}] does not exist", path);
         return Optional.empty();
+    }
+
+    public JsonSchema requestJsonSchema(String path) {
+        return fetchJsonSchema(path).orElseThrow(() -> new NoContentFoundException(EX_SCHEMA_DOES_NOT_EXIST));
     }
 }

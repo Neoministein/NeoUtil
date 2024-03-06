@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * Utilities for {@link String}
  */
-public class StringUtils {
+public final class StringUtils {
 
     private static final Pattern ALPHANUMERIC = Pattern.compile("[^a-zA-Z0-9]");
 

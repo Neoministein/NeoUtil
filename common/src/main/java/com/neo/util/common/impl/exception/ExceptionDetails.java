@@ -1,15 +1,13 @@
 package com.neo.util.common.impl.exception;
 
-public class ExceptionDetails {
+public final class ExceptionDetails {
 
-    protected final String exceptionId;
-    protected final String format;
-    protected final boolean internal;
+    private final String exceptionId;
+    private final String format;
 
-    public ExceptionDetails(String exceptionId, String format, boolean internal) {
+    public ExceptionDetails(String exceptionId, String format) {
         this.exceptionId = exceptionId;
         this.format = format;
-        this.internal = internal;
     }
 
     public String getExceptionId() {
@@ -18,9 +16,5 @@ public class ExceptionDetails {
 
     public String getFormat() {
         return format;
-    }
-
-    public boolean isInternal() {
-        return internal;
     }
 }

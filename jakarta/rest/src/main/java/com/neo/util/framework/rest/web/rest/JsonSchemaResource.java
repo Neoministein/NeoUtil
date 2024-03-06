@@ -1,8 +1,7 @@
 package com.neo.util.framework.rest.web.rest;
 
-import com.neo.util.common.impl.exception.ExceptionDetails;
-import com.neo.util.common.impl.exception.NoContentFoundException;
 import com.neo.util.common.impl.json.JsonUtil;
+import com.neo.util.framework.api.excpetion.ToExternalException;
 import com.neo.util.framework.impl.json.JsonSchemaLoader;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -17,15 +16,17 @@ import java.util.List;
 @ApplicationScoped
 @Path(JsonSchemaResource.RESOURCE_LOCATION)
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+@ToExternalException({JsonSchemaLoader.E_SCHEMA_DOES_NOT_EXIST})
 public class JsonSchemaResource {
 
     public static final String RESOURCE_LOCATION = "admin/api/json-schema";
 
-    public static final ExceptionDetails EX_SCHEMA_DOES_NOT_EXIST = new ExceptionDetails("common/json/schema/i<<<nvalid-path",
-            "The provided json schema path [{0}] does not exist.", false);
+    protected final JsonSchemaLoader jsonSchemaLoader;
 
     @Inject
-    protected JsonSchemaLoader jsonSchemaLoader;
+    public JsonSchemaResource(JsonSchemaLoader jsonSchemaLoader) {
+        this.jsonSchemaLoader = jsonSchemaLoader;
+    }
 
     @GET
     public List<String> getSchemaNames() {
@@ -35,8 +36,7 @@ public class JsonSchemaResource {
     @GET
     @Path("{path : .+}")//This param'{path : .+}' means that it also includes '/'
     public String getSchema(@PathParam("path") String path) {
-        String rawJson = jsonSchemaLoader.getJsonSchema(path)
-                .orElseThrow(() -> new NoContentFoundException(EX_SCHEMA_DOES_NOT_EXIST, path))
+        String rawJson = jsonSchemaLoader.requestJsonSchema(path)
                 //Substring +6 is done since default toString start with '"#" :' which isn't valid json
                 .toString().substring(6);
 

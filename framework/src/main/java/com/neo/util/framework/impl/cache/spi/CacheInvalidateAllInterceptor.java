@@ -73,7 +73,7 @@ public class CacheInvalidateAllInterceptor extends CacheInterceptor {
     }
 
     protected CompletableFuture<Void> invalidateAll(CacheInvalidateAll binding) {
-        Cache cache = cacheManager.getCache(binding.cacheName()).orElseThrow();
+        Cache cache = cacheManager.fetchCache(binding.cacheName()).orElseThrow();
         LOGGER.debug("Invalidating all entries from cache [{}]", binding.cacheName());
         return cache.invalidateAllAsync();
     }

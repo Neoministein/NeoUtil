@@ -9,16 +9,19 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 
-public class ResourceUtil {
+public final class ResourceUtil {
 
     private static final ExceptionDetails EX_INVALID_URI = new ExceptionDetails(
-            "common/file/invalid-URI", "The URI {0} is invalid.", true);
+            "common/file/invalid-URI", "The URI {0} is invalid.");
     private static final ExceptionDetails EX_INVALID_FILE = new ExceptionDetails(
-            "common/file/invalid-file", "The file {0} is invalid.", true);
+            "common/file/invalid-file", "The file {0} is invalid.");
     private static final ExceptionDetails EX_CANNOT_READ_FILE_CONTENT = new ExceptionDetails(
-            "common/file/cannot-read", "Cannot read file content at {0}.", true);
+            "common/file/cannot-read", "Cannot read file content at {0}.");
 
     private ResourceUtil(){}
 

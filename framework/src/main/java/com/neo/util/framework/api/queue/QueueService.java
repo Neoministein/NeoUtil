@@ -13,10 +13,10 @@ public interface QueueService {
 
 
     ExceptionDetails EX_DUPLICATED_QUEUE = new ExceptionDetails(
-            "queue/duplicated-queue-configured","Duplicated queues present [{0}] [{1}]",true);
+            "queue/duplicated-queue-configured","Duplicated queues present [{0}] [{1}]");
 
     ExceptionDetails EX_NON_EXISTENT_QUEUE = new ExceptionDetails(
-            "queue/non-existent-queue", "The [{0}] [{1}] does not exist", true);
+            "queue/non-existent-queue", "The [{0}] [{1}] does not exist");
 
     /**
      * Returns a collection of all queue names.

@@ -1,7 +1,7 @@
 package com.neo.util.framework.jobrunr.scheduler.impl;
 
 import com.neo.util.common.impl.MathUtils;
-import com.neo.util.common.impl.exception.CommonRuntimeException;
+import com.neo.util.common.impl.exception.InternalRuntimeException;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.reflection.IndexReflectionProvider;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
@@ -72,8 +72,8 @@ class SchedulerServiceIT {
     void unknownSchedulers() {
         setupSchedulers();
 
-        Assertions.assertThrows(CommonRuntimeException.class, () -> schedulerService.execute(""));
-        Assertions.assertThrows(CommonRuntimeException.class, () -> schedulerService.start(""));
+        Assertions.assertThrows(InternalRuntimeException.class, () -> schedulerService.execute(""));
+        Assertions.assertThrows(InternalRuntimeException.class, () -> schedulerService.start(""));
     }
 
     @Test

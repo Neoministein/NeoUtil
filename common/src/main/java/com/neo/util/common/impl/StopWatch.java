@@ -11,11 +11,11 @@ public final class StopWatch {
     /**
      * Start date of when the stop watch was started.
      */
-    Instant start = null;
+    private Instant start = null;
     /**
      * Stop date of when the stop watch was started.
      */
-    Instant stop = null;
+    private Instant stop = null;
 
     /**
      * sets the start date and resets the stop date.
@@ -29,8 +29,9 @@ public final class StopWatch {
     /**
      * sets the stop date.
      */
-    public void stop() {
+    public StopWatch stop() {
         stop = Instant.now();
+        return this;
     }
 
     /**

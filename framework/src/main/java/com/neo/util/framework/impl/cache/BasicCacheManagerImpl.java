@@ -37,12 +37,12 @@ public class BasicCacheManagerImpl implements CacheManager {
     }
 
     @Override
-    public Set<String> getCacheNames() {
+    public Set<String> fetchCacheNames() {
         return keys;
     }
 
     @Override
-    public Optional<Cache> getCache(String name) {
+    public Optional<Cache> fetchCache(String name) {
         return Optional.ofNullable(cacheMap.get(name));
     }
 
