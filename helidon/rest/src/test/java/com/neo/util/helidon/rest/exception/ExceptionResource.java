@@ -1,6 +1,7 @@
 package com.neo.util.helidon.rest.exception;
 
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.ExternalRuntimeException;
 import com.neo.util.common.impl.exception.InternalRuntimeException;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.GET;
@@ -48,7 +49,7 @@ public class ExceptionResource {
     @GET
     @Path(P_EXTERNAL_JSON)
     public Response externalException() {
-        throw new InternalRuntimeException(EX_EXTERNAL_COMMON_RUNTIME);
+        throw new ExternalRuntimeException(EX_EXTERNAL_COMMON_RUNTIME);
     }
 
     @GET

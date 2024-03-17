@@ -1,6 +1,6 @@
 package com.neo.util.framework.websocket.impl;
 
-import com.neo.util.common.impl.exception.InternalRuntimeException;
+import com.neo.util.common.impl.exception.ExternalRuntimeException;
 import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.HttpCredentialsGenerator;
@@ -55,7 +55,7 @@ public class WebsocketAccessController {
             authenticationProvider.authenticate(requestDetails, credential);
 
             failed = !requestDetails.hasOneOfTheRoles(roles);
-        } catch (InternalRuntimeException ignored) {}
+        } catch (ExternalRuntimeException ignored) {}
 
         return failed;
     }
