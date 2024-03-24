@@ -2,7 +2,9 @@ package com.neo.util.framework.impl.excpetion;
 
 import com.neo.util.common.impl.exception.ExternalRuntimeException;
 import com.neo.util.common.impl.exception.InternalRuntimeException;
+import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.excpetion.ToExternalException;
+import jakarta.annotation.Priority;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
 import jakarta.interceptor.InvocationContext;
@@ -11,6 +13,7 @@ import java.util.Set;
 
 @ToExternalException(value = {}) // The `value` attribute is @Nonbinding.
 @Interceptor
+@Priority(PriorityConstants.LIBRARY_AFTER)
 public class ToExternalExceptionInterceptor {
 
     @AroundInvoke

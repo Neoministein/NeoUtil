@@ -6,8 +6,8 @@ import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.HttpCredentialsGenerator;
 import com.neo.util.framework.api.security.InstanceIdentification;
 import com.neo.util.framework.websocket.api.WebsocketRequestDetails;
+import com.neo.util.framework.websocket.api.scope.WebsocketScope;
 import com.networknt.org.apache.commons.validator.routines.InetAddressValidator;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.security.enterprise.credential.Credential;
 import jakarta.websocket.Session;
@@ -17,7 +17,7 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import java.util.Set;
 import java.util.UUID;
 
-@ApplicationScoped
+@WebsocketScope
 public class WebsocketAccessController {
 
     public static final String X_REAL_IP = "X-Real-IP";

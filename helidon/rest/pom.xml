@@ -22,6 +22,16 @@
             <artifactId>neoutil-rest</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-websocket</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.helidon.microprofile.websocket</groupId>
+            <artifactId>helidon-microprofile-websocket</artifactId>
+            <version>${helidon.version}</version>
+        </dependency>
 
         <!-- Helidon -->
         <dependency>

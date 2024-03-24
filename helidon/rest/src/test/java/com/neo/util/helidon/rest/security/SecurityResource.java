@@ -2,8 +2,7 @@ package com.neo.util.helidon.rest.security;
 
 import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.rest.api.request.HttpRequestDetails;
-import com.neo.util.framework.rest.api.security.Secured;
-
+import com.neo.util.framework.rest.api.security.SecuredResource;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -33,14 +32,14 @@ public class SecurityResource {
     }
 
     @GET
-    @Secured
+    @SecuredResource
     @Path(P_SECURED)
     public Response jsonParsing() {
         return Response.ok().entity(((HttpRequestDetails) requestDetails).getUser().get().getName()).build();
     }
 
     @GET
-    @Secured
+    @SecuredResource
     @RolesAllowed("ADMIN")
     @Path(P_ROLE)
     public Response jsonScheme() {

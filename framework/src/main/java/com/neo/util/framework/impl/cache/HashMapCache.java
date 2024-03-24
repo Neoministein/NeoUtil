@@ -31,7 +31,15 @@ public class HashMapCache implements Cache {
 
     @Override
     public <K, V> CompletableFuture<Object> getAsync(K key, Function<K, V> valueLoader) {
-        return CompletableFuture.supplyAsync(() -> cache.get(key));
+        return CompletableFuture.supplyAsync(() -> {
+            Object cachedValue = cache.get(key);
+            if (cachedValue != null) {
+                return cachedValue;
+            }
+            Object computedValue = valueLoader.apply(key);
+            cache.put(key, computedValue);
+            return computedValue;
+        });
     }
 
     @Override
@@ -68,6 +76,7 @@ public class HashMapCache implements Cache {
 
     @Override
     public CompletableFuture<Void> invalidateAllAsync() {
+        invalidateAll();
         return null;
     }
 

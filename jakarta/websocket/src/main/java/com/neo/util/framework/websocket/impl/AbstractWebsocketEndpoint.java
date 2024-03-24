@@ -65,7 +65,7 @@ public abstract class AbstractWebsocketEndpoint {
 
     @OnClose
     public void preCloseSetup(Session session) throws IOException {
-        WebsocketRequestDetails requestDetails = requestDetailsMap.get(session);
+        WebsocketRequestDetails requestDetails = requestDetailsMap.remove(session);
         requestDetails.updateMDC();
         executor.executeChecked(requestDetails, () -> onClose(session));
     }

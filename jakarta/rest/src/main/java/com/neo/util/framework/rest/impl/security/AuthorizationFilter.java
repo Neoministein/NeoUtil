@@ -4,7 +4,7 @@ import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.request.UserRequest;
 import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.rest.api.response.ClientResponseService;
-import com.neo.util.framework.rest.api.security.Secured;
+import com.neo.util.framework.rest.api.security.SecuredResource;
 import jakarta.annotation.Priority;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
-@Secured
+@SecuredResource
 @Provider
 @RequestScoped
 @Priority(Priorities.AUTHORIZATION)
