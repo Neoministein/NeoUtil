@@ -1,4 +1,4 @@
-package com.neo.util.framework.websocket.api.scope;
+package com.neo.util.framework.websocket.api;
 
 import jakarta.enterprise.context.NormalScope;
 

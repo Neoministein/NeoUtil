@@ -6,12 +6,11 @@ import com.neo.util.framework.websocket.impl.AbstractWebsocketIT;
 import io.helidon.microprofile.testing.junit5.HelidonTest;
 import jakarta.inject.Inject;
 import jakarta.websocket.Session;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Set;
 
 @HelidonTest
 class AuthenticationWebsocketIT extends AbstractWebsocketIT {
@@ -19,10 +18,12 @@ class AuthenticationWebsocketIT extends AbstractWebsocketIT {
     @Inject
     protected AuthenticatedWebsocket socketWithId;
 
-    @BeforeEach
+    @Inject
+    protected CustomWebsocketInterceptorLogicImpl customWebsocketInterceptorLogic;
+
+    @AfterEach
     void before() {
         socketWithId.getMessageMap().clear();
-        socketWithId.setRoles(Set.of());
     }
 
     @Test
@@ -58,7 +59,14 @@ class AuthenticationWebsocketIT extends AbstractWebsocketIT {
 
     @Test
     void authorizationTest() throws IOException {
-        socketWithId.setRoles(Set.of("ADMIN"));
+        //Creating and closing session to get the Beans Initialized
+        {
+            Session session = connectToWebsocket("/auth/id-1", BasicAuthorizationProvider.ADMIN_TOKEN, val -> {});
+            session.close();
+        }
+
+        //instances.forEach(instance -> instance.setRequiredRoles(Set.of("ADMIN")));
+        //customWebsocketOnOpenInterceptor.setRoles(Set.of("ADMIN"));
 
         Session session = connectToWebsocket("/auth/id-1", BasicAuthorizationProvider.ADMIN_TOKEN, val -> {});
         session.getBasicRemote().sendText("A message 1");
@@ -71,7 +79,15 @@ class AuthenticationWebsocketIT extends AbstractWebsocketIT {
 
     @Test
     void authorizationFailureTest() throws IOException {
-        socketWithId.setRoles(Set.of("SUPER_ADMIN"));
+        //Creating and closing session to get the Beans Initialized
+        {
+            Session session = connectToWebsocket("/auth/id-1", BasicAuthorizationProvider.ADMIN_TOKEN, val -> {});
+            ThreadUtils.simpleSleep(1000);
+            session.close();
+        }
+
+        //instances.forEach(instance -> instance.setRequiredRoles(Set.of("SUPER_ADMIN")));
+        //customWebsocketOnOpenInterceptor.setRoles(Set.of("SUPER_ADMIN"));
 
         Session session = connectToWebsocket("/auth/id-1", BasicAuthorizationProvider.ADMIN_TOKEN, val -> {});
         session.getBasicRemote().sendText("A message 1");

@@ -1,28 +1,39 @@
-package com.neo.util.framework.websocket.impl.scope;
+package com.neo.util.framework.websocket.impl;
 
+import com.neo.util.common.impl.exception.ConfigurationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.framework.websocket.api.NeoUtilWebsocket;
 import com.neo.util.framework.websocket.api.WebserverHttpHeaderForwarding;
-import com.neo.util.framework.websocket.api.scope.NeoUtilWebsocket;
-import com.neo.util.framework.websocket.api.scope.WebsocketScope;
-import com.neo.util.framework.websocket.api.scope.internal.NeoUtilWebsocketOnClose;
-import com.neo.util.framework.websocket.api.scope.internal.NeoUtilWebsocketOnMessage;
-import com.neo.util.framework.websocket.api.scope.internal.NeoUtilWebsocketOnOpen;
+import com.neo.util.framework.websocket.api.WebsocketScope;
+import com.neo.util.framework.websocket.impl.scope.ScopeContext;
+import com.neo.util.framework.websocket.impl.scope.internal.NeoUtilWebsocketOnClose;
+import com.neo.util.framework.websocket.impl.scope.internal.NeoUtilWebsocketOnMessage;
+import com.neo.util.framework.websocket.impl.scope.internal.NeoUtilWebsocketOnOpen;
 import jakarta.enterprise.event.Observes;
-import jakarta.enterprise.inject.spi.AfterBeanDiscovery;
-import jakarta.enterprise.inject.spi.BeforeBeanDiscovery;
 import jakarta.enterprise.inject.spi.Extension;
-import jakarta.enterprise.inject.spi.ProcessAnnotatedType;
+import jakarta.enterprise.inject.spi.*;
 import jakarta.enterprise.inject.spi.configurator.AnnotatedMethodConfigurator;
 import jakarta.enterprise.inject.spi.configurator.AnnotatedParameterConfigurator;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class WebsocketScopedExtension implements Extension {
+
+    private static final ExceptionDetails EX_MISSING_SERVER_ENDPOINT = new ExceptionDetails("websocket/missing/serverEndpoint",
+            "The Class [{0}] requires the ServerEndpoint annotation and configurator [{1}]");
+
+    private static final ExceptionDetails EX_MASSING_PARAMETER = new ExceptionDetails("websocket/missing/parameter",
+            "The method [{0}.{1}] requires the parameters {2}");
+
+    private static final ExceptionDetails EX_MASSING_METHOD = new ExceptionDetails("websocket/missing/method",
+            "The class [{0}] requires a method annotated with [{1}]");
 
     public void beforeBeanDiscovery(@Observes BeforeBeanDiscovery bbd) {
         bbd.addScope(WebsocketScope.class, true, false);
@@ -32,18 +43,13 @@ public class WebsocketScopedExtension implements Extension {
         abd.addContext(new ScopeContext<>(WebsocketScope.class));
     }
 
-    public void processAnnotatedType(@Observes ProcessAnnotatedType<?> pat) {
+    public void processAnnotatedType(@Observes @WithAnnotations(NeoUtilWebsocket.class) ProcessAnnotatedType<?> pat) {
         Class<?> clazz = pat.getAnnotatedType().getJavaClass();
         if (clazz.getAnnotation(NeoUtilWebsocket.class) != null) {
             ServerEndpoint serverEndpoint = clazz.getAnnotation(ServerEndpoint.class);
-            if (serverEndpoint == null) {
-                throw new IllegalStateException();
+            if (serverEndpoint == null || !serverEndpoint.configurator().isAssignableFrom(WebserverHttpHeaderForwarding.class)) {
+                throw new ConfigurationException(EX_MISSING_SERVER_ENDPOINT, clazz.getName(), WebserverHttpHeaderForwarding.class.getName());
             }
-
-            if (!serverEndpoint.configurator().isAssignableFrom(WebserverHttpHeaderForwarding.class))  {
-                throw new IllegalStateException();
-            }
-
 
             boolean onOpen = false;
             boolean onMessage = false;
@@ -69,11 +75,11 @@ public class WebsocketScopedExtension implements Extension {
             }
 
             if (!onClose) {
-                throw new IllegalStateException();
+                throw new ConfigurationException(EX_MASSING_METHOD, clazz.getName(), OnClose.class.getName());
             }
 
             if (!onOpen) {
-                throw new IllegalStateException();
+                throw new ConfigurationException(EX_MASSING_METHOD, clazz.getName(), OnOpen.class.getName());
             }
         }
     }
@@ -85,9 +91,8 @@ public class WebsocketScopedExtension implements Extension {
         }
 
         if (!requiresParameters2.isEmpty()) {
-            throw new IllegalStateException();
+            Method method = methodConfigurator.getAnnotated().getJavaMember();
+            throw new ConfigurationException(EX_MASSING_PARAMETER, method.getDeclaringClass().getName(), method.getName(), requiresParameters);
         }
-
-        //methodConfigurator.params().get(0).getClass()
     }
 }

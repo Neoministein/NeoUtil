@@ -1,51 +1,41 @@
 package com.neo.util.framework.websocket.impl.security;
 
+import com.neo.util.framework.websocket.api.NeoUtilWebsocket;
 import com.neo.util.framework.websocket.api.WebserverHttpHeaderForwarding;
-import com.neo.util.framework.websocket.impl.AbstractWebsocketEndpoint;
+import com.neo.util.framework.websocket.impl.BasicWebsocket;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
+import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
+@NeoUtilWebsocket(secured = true)
 @ApplicationScoped
 @ServerEndpoint(value = "/auth/{id}", configurator = WebserverHttpHeaderForwarding.class)
-public class AuthenticatedWebsocket extends AbstractWebsocketEndpoint {
+public class AuthenticatedWebsocket implements BasicWebsocket {
 
     protected Map<String, String> messageMap = new HashMap<>();
 
-    protected Set<String> roles = new HashSet<>();
-
-    @Override
-    protected boolean secured() {
-        return true;
+    public AuthenticatedWebsocket() {
+        System.out.println();
     }
 
-    @Override
-    protected Set<String> requiredRoles() {
-        return roles;
-    }
-
-    @Override
-    public void onOpen(Session session) throws IOException{
+    @OnOpen
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
         System.out.println(session);
     }
 
-    @Override
-    public void onMessage(Session session, String message) {
-        String id = getPathParameter(session, "id");
+    @OnMessage
+    public void onMessage(Session session, String message, @PathParam("id") String id) {
         messageMap.put(id, message);
     }
 
     public Map<String, String> getMessageMap() {
         return messageMap;
-    }
-
-    public void setRoles(Set<String> roles) {
-        this.roles = roles;
     }
 }

@@ -1,29 +1,31 @@
-package com.neo.util.framework.websocket.impl.monitoring;
+package com.neo.util.framework.websocket;
 
 import com.neo.util.framework.websocket.api.NeoUtilWebsocket;
 import com.neo.util.framework.websocket.api.WebserverHttpHeaderForwarding;
 import com.neo.util.framework.websocket.api.WebsocketStateHolder;
-import com.neo.util.framework.websocket.impl.BasicWebsocket;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 
 @NeoUtilWebsocket(monitored = true)
 @ApplicationScoped
-@ServerEndpoint(value = "/monitoring/{id}", configurator = WebserverHttpHeaderForwarding.class)
-public class MonitoringWebsocket implements BasicWebsocket {
+@ServerEndpoint(value = "/monitoring", configurator = WebserverHttpHeaderForwarding.class)
+public class MonitoringWebsocket {
 
 
     @Inject
-    protected WebsocketStateHolder websocketStateHolder;
+    protected Instance<WebsocketStateHolder> websocketStateHolder;
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig endpointConfig) {}
 
     @OnMessage
     public void onMessage(Session session, String message) {
-        websocketStateHolder.broadcast(message);
+        for (WebsocketStateHolder stateHolder: websocketStateHolder) {
+            stateHolder.broadcast(message);
+        }
     }
 
     @OnClose

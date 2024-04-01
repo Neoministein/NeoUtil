@@ -1,13 +1,9 @@
 package com.neo.util.framework.websocket.impl.interceptor;
 
 import com.neo.util.framework.api.PriorityConstants;
-import com.neo.util.framework.impl.request.RequestContextExecutor;
-import com.neo.util.framework.websocket.api.scope.WebsocketScope;
-import com.neo.util.framework.websocket.api.scope.internal.NeoUtilWebsocketOnClose;
-import com.neo.util.framework.websocket.impl.WebsocketStateHolder;
-import com.neo.util.framework.websocket.impl.scope.ScopeContext;
+import com.neo.util.framework.websocket.api.WebsocketInterceptorLogic;
+import com.neo.util.framework.websocket.impl.scope.internal.NeoUtilWebsocketOnClose;
 import jakarta.annotation.Priority;
-import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
@@ -19,15 +15,11 @@ import jakarta.websocket.Session;
 @Priority(PriorityConstants.PLATFORM_BEFORE)
 public class WebsocketOnCloseInterceptor {
 
-    protected final BeanManager beanManager;
-    protected final RequestContextExecutor executor;
-    protected final WebsocketStateHolder sessionHolder;
+    protected final WebsocketInterceptorLogic interceptorLogic;
 
     @Inject
-    public WebsocketOnCloseInterceptor(BeanManager beanManager, RequestContextExecutor executor, WebsocketStateHolder sessionHolder) {
-        this.beanManager = beanManager;
-        this.executor = executor;
-        this.sessionHolder = sessionHolder;
+    public WebsocketOnCloseInterceptor(WebsocketInterceptorLogic interceptorLogic) {
+        this.interceptorLogic = interceptorLogic;
     }
 
     @AroundInvoke
@@ -41,22 +33,7 @@ public class WebsocketOnCloseInterceptor {
             }
         }
 
-        if (session == null) {
-            throw new IllegalStateException();
-        }
-        logic(invocationContext, session);
+        interceptorLogic.onClose(invocationContext, session);
         return null;
-    }
-
-    public void logic(InvocationContext invocationContext, Session session) throws Exception {
-        ScopeContext<String> context = (ScopeContext<String>) beanManager.getContext(WebsocketScope.class);
-        context.enter(session.getId());
-
-        try {
-            executor.executeChecked(sessionHolder.getRequestDetails(), invocationContext::proceed);
-        } finally {
-            context.exit(session.getId());
-            context.destroy(session.getId());
-        }
     }
 }
