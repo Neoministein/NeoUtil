@@ -17,16 +17,16 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint(value = "/monitoring/{id}", configurator = WebserverHttpHeaderForwarding.class)
 public class MonitoringWebsocket implements BasicWebsocket {
 
-    private Map<String, WebsocketStateContext> websocketStateHolderMap = new ConcurrentHashMap<>();
+    private Map<String, WebsocketStateContext> websocketStateContextMap = new ConcurrentHashMap<>();
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig endpointConfig) {
-        websocketStateHolderMap.put(session.getId(), WebsocketUtil.getStateHoldet(endpointConfig));
+        websocketStateContextMap.put(session.getId(), WebsocketUtil.getWebsocketContext(session));
     }
 
     @OnMessage
     public void onMessage(Session session, String message) {
-        websocketStateHolderMap.get(session.getId()).broadcastAsync(message);
+        websocketStateContextMap.get(session.getId()).broadcastAsync(message);
     }
 
     @OnClose

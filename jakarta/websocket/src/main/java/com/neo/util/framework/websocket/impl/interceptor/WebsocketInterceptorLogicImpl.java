@@ -10,7 +10,7 @@ import com.neo.util.framework.websocket.api.NeoUtilWebsocket;
 import com.neo.util.framework.websocket.api.WebsocketInterceptorLogic;
 import com.neo.util.framework.websocket.api.WebsocketRequestDetails;
 import com.neo.util.framework.websocket.api.WebsocketStateContext;
-import com.neo.util.framework.websocket.impl.InterceptorWebsocketStateHolder;
+import com.neo.util.framework.websocket.impl.InterceptorWebsocketStateContext;
 import com.neo.util.framework.websocket.impl.WebsocketUtil;
 import com.networknt.org.apache.commons.validator.routines.InetAddressValidator;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -40,7 +40,7 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
     public static final String INVALID_IP = "255.255.255.255";
 
 
-    protected final Map<String, WebsocketStateContext> websocketStateHolderMap;
+    protected final Map<String, WebsocketStateContext> websocketStateContextMap;
 
     protected final RequestContextExecutor executor;
     protected final InstanceIdentification instanceIdentification;
@@ -50,7 +50,7 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
     @Inject
     public WebsocketInterceptorLogicImpl(RequestContextExecutor executor, InstanceIdentification instanceIdentification,
                                          HttpCredentialsGenerator credentialsGenerator, AuthenticationProvider authenticationProvider) {
-        this.websocketStateHolderMap = new ConcurrentHashMap<>();
+        this.websocketStateContextMap = new ConcurrentHashMap<>();
 
         this.executor = executor;
         this.instanceIdentification = instanceIdentification;
@@ -60,12 +60,12 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
 
     @Override
     public void onOpen(InvocationContext invocationContext, Session session, EndpointConfig config) throws Exception {
-        MultivaluedMap<String, String> headers = WebsocketUtil.getStoredObject(config, HttpHeaders.class.getSimpleName());
+        MultivaluedMap<String, String> headers = WebsocketUtil.getStoredObject(session, HttpHeaders.class.getSimpleName());
         WebsocketRequestDetails requestDetails = createUserRequestDetails(session, headers);
-        WebsocketStateContext stateHolder = new InterceptorWebsocketStateHolder(session, requestDetails, getMessageFromContext(invocationContext), isMonitored(invocationContext));
-        websocketStateHolderMap.put(session.getId(), stateHolder);
+        WebsocketStateContext stateContext = new InterceptorWebsocketStateContext(session, requestDetails, getMessageFromContext(invocationContext), isMonitored(invocationContext));
+        websocketStateContextMap.put(session.getId(), stateContext);
 
-        WebsocketUtil.storeStateHolder(config, stateHolder);
+        WebsocketUtil.storeWebsocketContext(session, stateContext);
 
         executor.executeChecked(requestDetails, () -> {
             boolean shouldDisconnect = authenticate(requestDetails, headers, getPermittedRoles(invocationContext));
@@ -80,20 +80,20 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
 
     @Override
     public void onMessage(InvocationContext invocationContext, Session session) throws Exception {
-        InterceptorWebsocketStateHolder stateHolder = (InterceptorWebsocketStateHolder) websocketStateHolderMap.get(session.getId());
-        stateHolder.addToIncomingSocketLog(invocationContext);
-        executor.executeChecked(stateHolder.newRequestDetailInstance(), invocationContext::proceed);
+        InterceptorWebsocketStateContext stateContext = (InterceptorWebsocketStateContext) websocketStateContextMap.get(session.getId());
+        stateContext.addToIncomingSocketLog(invocationContext);
+        executor.executeChecked(stateContext.newRequestDetailInstance(), invocationContext::proceed);
     }
 
     @Override
     public void onClose(InvocationContext invocationContext, Session session) throws Exception {
-        WebsocketStateContext stateHolder = websocketStateHolderMap.remove(session.getId());
-        executor.executeChecked(stateHolder.newRequestDetailInstance(), invocationContext::proceed);
+        WebsocketStateContext stateContext = websocketStateContextMap.remove(session.getId());
+        executor.executeChecked(stateContext.newRequestDetailInstance(), invocationContext::proceed);
     }
 
     @Override
     public Collection<WebsocketStateContext> getActiveWebsocketStates() {
-        return websocketStateHolderMap.values();
+        return websocketStateContextMap.values();
     }
 
     protected WebsocketRequestDetails createUserRequestDetails(Session session, MultivaluedMap<String, String> headers) {

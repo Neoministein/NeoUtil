@@ -23,9 +23,9 @@ public class MonitorableWebsocketScheduler {
 
     @FixedRateSchedule(value = "MonitorableWebsocketScheduler", delay = 1, timeUnit = TimeUnit.MINUTES)
     public void action() {
-        for (WebsocketStateContext websocketStateHolder: websocketInterceptorLogic.getActiveWebsocketStates()) {
-            if (websocketStateHolder.isMonitored()) {
-                searchProvider.index(websocketStateHolder.clearSocketLog());
+        for (WebsocketStateContext stateContext: websocketInterceptorLogic.getActiveWebsocketStates()) {
+            if (stateContext.isMonitored()) {
+                searchProvider.index(stateContext.clearSocketLog());
             }
         }
     }

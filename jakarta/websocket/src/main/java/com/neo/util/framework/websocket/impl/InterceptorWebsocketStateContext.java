@@ -8,7 +8,7 @@ import jakarta.websocket.Session;
 
 import java.util.function.Function;
 
-public class InterceptorWebsocketStateHolder implements WebsocketStateContext {
+public class InterceptorWebsocketStateContext implements WebsocketStateContext {
 
     protected boolean monitored;
     protected Session session;
@@ -16,7 +16,7 @@ public class InterceptorWebsocketStateHolder implements WebsocketStateContext {
     protected SocketLogSearchable socketLogSearchable;
     protected Function<InvocationContext, String> messageFunc;
 
-    public InterceptorWebsocketStateHolder(Session session, WebsocketRequestDetails requestDetails, Function<InvocationContext, String> messageFunc, boolean monitored) {
+    public InterceptorWebsocketStateContext(Session session, WebsocketRequestDetails requestDetails, Function<InvocationContext, String> messageFunc, boolean monitored) {
         this.monitored = monitored;
         this.session = session;
         this.requestDetails = requestDetails;
