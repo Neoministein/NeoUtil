@@ -34,7 +34,7 @@ class MonitoringWebsocketIT extends AbstractWebsocketIT {
         SocketLogSearchable searchable = dummySearchProvider.getSearchableToIndex();
         Assertions.assertNotNull(searchable);
         Assertions.assertEquals(message.length(), searchable.getIncoming());
-        Assertions.assertEquals(message.length() + 1, searchable.getOutgoing());
+        Assertions.assertEquals(message.length(), searchable.getOutgoing());
         Assertions.assertEquals("ws:/monitoring/id-1", searchable.getContext());
         session_1.close();
     }

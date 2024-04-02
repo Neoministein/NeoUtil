@@ -1,24 +1,28 @@
 package com.neo.util.framework.websocket.impl;
 
 import com.neo.util.framework.websocket.api.WebsocketRequestDetails;
-import com.neo.util.framework.websocket.api.WebsocketScope;
-import com.neo.util.framework.websocket.api.WebsocketStateHolder;
+import com.neo.util.framework.websocket.api.WebsocketStateContext;
 import com.neo.util.framework.websocket.persistence.SocketLogSearchable;
 import jakarta.interceptor.InvocationContext;
 import jakarta.websocket.Session;
 
 import java.util.function.Function;
 
-@WebsocketScope
-public class InterceptorWebsocketStateHolder implements WebsocketStateHolder {
+public class InterceptorWebsocketStateHolder implements WebsocketStateContext {
 
-    protected boolean initialized = false;
+    protected boolean monitored;
+    protected Session session;
+    protected WebsocketRequestDetails requestDetails;
+    protected SocketLogSearchable socketLogSearchable;
+    protected Function<InvocationContext, String> messageFunc;
 
-    protected boolean monitored = false;
-    protected Session session = null;
-    protected WebsocketRequestDetails requestDetails = null;
-    protected SocketLogSearchable socketLogSearchable = null;
-    protected Function<InvocationContext, String> messageFunc = null;
+    public InterceptorWebsocketStateHolder(Session session, WebsocketRequestDetails requestDetails, Function<InvocationContext, String> messageFunc, boolean monitored) {
+        this.monitored = monitored;
+        this.session = session;
+        this.requestDetails = requestDetails;
+        this.messageFunc = messageFunc;
+        this.socketLogSearchable = new SocketLogSearchable(requestDetails);
+    }
 
     @Override
     public boolean isMonitored() {
@@ -31,8 +35,8 @@ public class InterceptorWebsocketStateHolder implements WebsocketStateHolder {
     }
 
     @Override
-    public WebsocketRequestDetails getRequestDetails() {
-        return requestDetails;
+    public WebsocketRequestDetails newRequestDetailInstance() {
+        return requestDetails.newInstance();
     }
 
     @Override
@@ -49,16 +53,6 @@ public class InterceptorWebsocketStateHolder implements WebsocketStateHolder {
     public void addToIncomingSocketLog(InvocationContext context) {
         if (monitored) {
             socketLogSearchable.addToIncoming(messageFunc.apply(context).length());
-        }
-    }
-
-    public void setState(Session session, WebsocketRequestDetails requestDetails, Function<InvocationContext, String> messageFunc, boolean monitored) {
-        if (!initialized) {
-            this.monitored = monitored;
-            this.session = session;
-            this.requestDetails = requestDetails;
-            this.socketLogSearchable = new SocketLogSearchable(requestDetails);
-            this.messageFunc = messageFunc;
         }
     }
 }

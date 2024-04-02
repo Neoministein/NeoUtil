@@ -1,4 +1,4 @@
-package com.neo.util.framework.websocket.impl.scope.internal;
+package com.neo.util.framework.websocket.impl.interceptor.internal;
 
 import jakarta.interceptor.InterceptorBinding;
 

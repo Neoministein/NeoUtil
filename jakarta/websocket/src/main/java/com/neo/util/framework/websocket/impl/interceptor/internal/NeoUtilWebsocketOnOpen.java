@@ -1,4 +1,4 @@
-package com.neo.util.framework.websocket.impl.scope.internal;
+package com.neo.util.framework.websocket.impl.interceptor.internal;
 
 import jakarta.interceptor.InterceptorBinding;
 
@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 @InterceptorBinding
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface NeoUtilWebsocketOnMessage {
+public @interface NeoUtilWebsocketOnOpen {
 }

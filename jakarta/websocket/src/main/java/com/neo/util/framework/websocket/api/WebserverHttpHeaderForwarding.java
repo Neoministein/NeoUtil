@@ -7,6 +7,9 @@ import jakarta.ws.rs.core.AbstractMultivaluedMap;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MultivaluedMap;
 
+/**
+ * The configurator propagates the {@link HandshakeRequest#getHeaders()} to the {@link ServerEndpointConfig#getUserProperties()} with key {@link HttpHeaders}
+ */
 public class WebserverHttpHeaderForwarding extends ServerEndpointConfig.Configurator {
 
     @Override

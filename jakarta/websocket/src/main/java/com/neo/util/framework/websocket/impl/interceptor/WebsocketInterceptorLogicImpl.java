@@ -9,12 +9,11 @@ import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.websocket.api.NeoUtilWebsocket;
 import com.neo.util.framework.websocket.api.WebsocketInterceptorLogic;
 import com.neo.util.framework.websocket.api.WebsocketRequestDetails;
-import com.neo.util.framework.websocket.api.WebsocketScope;
+import com.neo.util.framework.websocket.api.WebsocketStateContext;
 import com.neo.util.framework.websocket.impl.InterceptorWebsocketStateHolder;
-import com.neo.util.framework.websocket.impl.scope.ScopeContext;
+import com.neo.util.framework.websocket.impl.WebsocketUtil;
 import com.networknt.org.apache.commons.validator.routines.InetAddressValidator;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.inject.Inject;
 import jakarta.interceptor.InvocationContext;
 import jakarta.security.enterprise.credential.Credential;
@@ -26,8 +25,11 @@ import jakarta.ws.rs.core.MultivaluedMap;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 @ApplicationScoped
@@ -37,21 +39,20 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
     public static final String X_FORWARDED_FOR = "X-Forwarded-For";
     public static final String INVALID_IP = "255.255.255.255";
 
-    protected final BeanManager beanManager;
-    protected final RequestContextExecutor executor;
-    protected final InterceptorWebsocketStateHolder sessionHolder;
 
+    protected final Map<String, WebsocketStateContext> websocketStateHolderMap;
+
+    protected final RequestContextExecutor executor;
     protected final InstanceIdentification instanceIdentification;
     protected final HttpCredentialsGenerator credentialsGenerator;
     protected final AuthenticationProvider authenticationProvider;
 
     @Inject
-    public WebsocketInterceptorLogicImpl(BeanManager beanManager, RequestContextExecutor executor, InterceptorWebsocketStateHolder sessionHolder,
-                                      InstanceIdentification instanceIdentification, HttpCredentialsGenerator credentialsGenerator,
-                                      AuthenticationProvider authenticationProvider) {
-        this.beanManager = beanManager;
+    public WebsocketInterceptorLogicImpl(RequestContextExecutor executor, InstanceIdentification instanceIdentification,
+                                         HttpCredentialsGenerator credentialsGenerator, AuthenticationProvider authenticationProvider) {
+        this.websocketStateHolderMap = new ConcurrentHashMap<>();
+
         this.executor = executor;
-        this.sessionHolder = sessionHolder;
         this.instanceIdentification = instanceIdentification;
         this.credentialsGenerator = credentialsGenerator;
         this.authenticationProvider = authenticationProvider;
@@ -59,53 +60,40 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
 
     @Override
     public void onOpen(InvocationContext invocationContext, Session session, EndpointConfig config) throws Exception {
-        ScopeContext<String> context = (ScopeContext<String>) beanManager.getContext(WebsocketScope.class);
-        context.enter(session.getId());
+        MultivaluedMap<String, String> headers = WebsocketUtil.getStoredObject(config, HttpHeaders.class.getSimpleName());
+        WebsocketRequestDetails requestDetails = createUserRequestDetails(session, headers);
+        WebsocketStateContext stateHolder = new InterceptorWebsocketStateHolder(session, requestDetails, getMessageFromContext(invocationContext), isMonitored(invocationContext));
+        websocketStateHolderMap.put(session.getId(), stateHolder);
 
-        try {
-            MultivaluedMap<String, String> headers = getStoredObject(config, HttpHeaders.class.getSimpleName());
-            WebsocketRequestDetails requestDetails = createUserRequestDetails(session, headers);
+        WebsocketUtil.storeStateHolder(config, stateHolder);
 
-            sessionHolder.setState(session, requestDetails, getMessageFromContext(invocationContext), isMonitored(invocationContext));
+        executor.executeChecked(requestDetails, () -> {
+            boolean shouldDisconnect = authenticate(requestDetails, headers, getPermittedRoles(invocationContext));
 
-            executor.executeChecked(requestDetails, () -> {
-                boolean shouldDisconnect = authenticate(requestDetails, headers, getRequiredRoles(invocationContext));
-
-                if (shouldDisconnect && isSecured(invocationContext)) {
-                    session.close();
-                } else {
-                    invocationContext.proceed();
-                }
-            });
-        } finally {
-            context.exit(session.getId());
-        }
+            if (shouldDisconnect && isSecured(invocationContext)) {
+                session.close();
+            } else {
+                invocationContext.proceed();
+            }
+        });
     }
 
     @Override
     public void onMessage(InvocationContext invocationContext, Session session) throws Exception {
-        ScopeContext<String> context = (ScopeContext<String>) beanManager.getContext(WebsocketScope.class);
-        context.enter(session.getId());
-
-        try {
-            sessionHolder.addToIncomingSocketLog(invocationContext);
-            executor.executeChecked(sessionHolder.getRequestDetails(), invocationContext::proceed);
-        } finally {
-            context.exit(session.getId());
-        }
+        InterceptorWebsocketStateHolder stateHolder = (InterceptorWebsocketStateHolder) websocketStateHolderMap.get(session.getId());
+        stateHolder.addToIncomingSocketLog(invocationContext);
+        executor.executeChecked(stateHolder.newRequestDetailInstance(), invocationContext::proceed);
     }
 
     @Override
     public void onClose(InvocationContext invocationContext, Session session) throws Exception {
-        ScopeContext<String> context = (ScopeContext<String>) beanManager.getContext(WebsocketScope.class);
-        context.enter(session.getId());
+        WebsocketStateContext stateHolder = websocketStateHolderMap.remove(session.getId());
+        executor.executeChecked(stateHolder.newRequestDetailInstance(), invocationContext::proceed);
+    }
 
-        try {
-            executor.executeChecked(sessionHolder.getRequestDetails(), invocationContext::proceed);
-        } finally {
-            context.exit(session.getId());
-            context.destroy(session.getId());
-        }
+    @Override
+    public Collection<WebsocketStateContext> getActiveWebsocketStates() {
+        return websocketStateHolderMap.values();
     }
 
     protected WebsocketRequestDetails createUserRequestDetails(Session session, MultivaluedMap<String, String> headers) {
@@ -116,7 +104,7 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
                 new WebsocketRequestDetails.Context(session.getRequestURI().toString()));
     }
 
-    protected boolean authenticate(UserRequestDetails requestDetails, MultivaluedMap<String, String> headers, Set<String> roles) {
+    protected boolean authenticate(UserRequestDetails requestDetails, MultivaluedMap<String, String> headers, Set<String> permitted) {
         boolean failed = true;
         try {
             String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
@@ -127,7 +115,7 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
             Credential credential = credentialsGenerator.generate(authHeader);
             authenticationProvider.authenticate(requestDetails, credential);
 
-            failed = !requestDetails.hasOneOfTheRoles(roles);
+            failed = !requestDetails.hasOneOfTheRoles(permitted);
         } catch (ExternalRuntimeException ignored) {}
 
         return failed;
@@ -141,7 +129,7 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
         return invocationContext.getMethod().getDeclaringClass().getAnnotation(NeoUtilWebsocket.class).secured();
     }
 
-    protected Set<String> getRequiredRoles(InvocationContext invocationContext) {
+    protected Set<String> getPermittedRoles(InvocationContext invocationContext) {
         return Set.of(invocationContext.getMethod().getDeclaringClass().getAnnotation(NeoUtilWebsocket.class).roles());
     }
 
@@ -165,11 +153,6 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
             return remoteAddress;
         }
         return INVALID_IP;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <T> T getStoredObject(EndpointConfig config, String key) {
-        return (T) config.getUserProperties().get(key);
     }
 
     protected Function<InvocationContext, String> getMessageFromContext(InvocationContext invocationContext) {

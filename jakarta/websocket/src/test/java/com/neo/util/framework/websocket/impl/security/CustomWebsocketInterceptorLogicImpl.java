@@ -4,11 +4,9 @@ import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.HttpCredentialsGenerator;
 import com.neo.util.framework.api.security.InstanceIdentification;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
-import com.neo.util.framework.websocket.impl.InterceptorWebsocketStateHolder;
 import com.neo.util.framework.websocket.impl.interceptor.WebsocketInterceptorLogicImpl;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Specializes;
-import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.inject.Inject;
 import jakarta.interceptor.InvocationContext;
 
@@ -21,12 +19,13 @@ public class CustomWebsocketInterceptorLogicImpl extends WebsocketInterceptorLog
     private Set<String> requiredRoles = Set.of();
 
     @Inject
-    public CustomWebsocketInterceptorLogicImpl(BeanManager beanManager, RequestContextExecutor executor, InterceptorWebsocketStateHolder sessionHolder, InstanceIdentification instanceIdentification, HttpCredentialsGenerator credentialsGenerator, AuthenticationProvider authenticationProvider) {
-        super(beanManager, executor, sessionHolder, instanceIdentification, credentialsGenerator, authenticationProvider);
+    public CustomWebsocketInterceptorLogicImpl(RequestContextExecutor executor, InstanceIdentification instanceIdentification, HttpCredentialsGenerator credentialsGenerator, AuthenticationProvider authenticationProvider) {
+        super(executor, instanceIdentification, credentialsGenerator, authenticationProvider);
     }
 
+
     @Override
-    protected Set<String> getRequiredRoles(InvocationContext invocationContext) {
+    protected Set<String> getPermittedRoles(InvocationContext invocationContext) {
         return requiredRoles;
     }
 

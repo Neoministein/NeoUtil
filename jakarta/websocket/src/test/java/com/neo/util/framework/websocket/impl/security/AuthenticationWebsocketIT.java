@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Set;
 
 @HelidonTest
 class AuthenticationWebsocketIT extends AbstractWebsocketIT {
@@ -24,6 +25,7 @@ class AuthenticationWebsocketIT extends AbstractWebsocketIT {
     @AfterEach
     void before() {
         socketWithId.getMessageMap().clear();
+        customWebsocketInterceptorLogic.setRequiredRoles(Set.of());
     }
 
     @Test
@@ -59,14 +61,7 @@ class AuthenticationWebsocketIT extends AbstractWebsocketIT {
 
     @Test
     void authorizationTest() throws IOException {
-        //Creating and closing session to get the Beans Initialized
-        {
-            Session session = connectToWebsocket("/auth/id-1", BasicAuthorizationProvider.ADMIN_TOKEN, val -> {});
-            session.close();
-        }
-
-        //instances.forEach(instance -> instance.setRequiredRoles(Set.of("ADMIN")));
-        //customWebsocketOnOpenInterceptor.setRoles(Set.of("ADMIN"));
+        customWebsocketInterceptorLogic.setRequiredRoles(Set.of("ADMIN"));
 
         Session session = connectToWebsocket("/auth/id-1", BasicAuthorizationProvider.ADMIN_TOKEN, val -> {});
         session.getBasicRemote().sendText("A message 1");
@@ -79,15 +74,7 @@ class AuthenticationWebsocketIT extends AbstractWebsocketIT {
 
     @Test
     void authorizationFailureTest() throws IOException {
-        //Creating and closing session to get the Beans Initialized
-        {
-            Session session = connectToWebsocket("/auth/id-1", BasicAuthorizationProvider.ADMIN_TOKEN, val -> {});
-            ThreadUtils.simpleSleep(1000);
-            session.close();
-        }
-
-        //instances.forEach(instance -> instance.setRequiredRoles(Set.of("SUPER_ADMIN")));
-        //customWebsocketOnOpenInterceptor.setRoles(Set.of("SUPER_ADMIN"));
+        customWebsocketInterceptorLogic.setRequiredRoles(Set.of("SUPER_ADMIN"));
 
         Session session = connectToWebsocket("/auth/id-1", BasicAuthorizationProvider.ADMIN_TOKEN, val -> {});
         session.getBasicRemote().sendText("A message 1");

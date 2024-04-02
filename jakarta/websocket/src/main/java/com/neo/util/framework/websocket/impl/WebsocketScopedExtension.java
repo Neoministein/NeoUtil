@@ -4,14 +4,13 @@ import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.framework.websocket.api.NeoUtilWebsocket;
 import com.neo.util.framework.websocket.api.WebserverHttpHeaderForwarding;
-import com.neo.util.framework.websocket.api.WebsocketScope;
-import com.neo.util.framework.websocket.impl.scope.ScopeContext;
-import com.neo.util.framework.websocket.impl.scope.internal.NeoUtilWebsocketOnClose;
-import com.neo.util.framework.websocket.impl.scope.internal.NeoUtilWebsocketOnMessage;
-import com.neo.util.framework.websocket.impl.scope.internal.NeoUtilWebsocketOnOpen;
+import com.neo.util.framework.websocket.impl.interceptor.internal.NeoUtilWebsocketOnClose;
+import com.neo.util.framework.websocket.impl.interceptor.internal.NeoUtilWebsocketOnMessage;
+import com.neo.util.framework.websocket.impl.interceptor.internal.NeoUtilWebsocketOnOpen;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.spi.Extension;
-import jakarta.enterprise.inject.spi.*;
+import jakarta.enterprise.inject.spi.ProcessAnnotatedType;
+import jakarta.enterprise.inject.spi.WithAnnotations;
 import jakarta.enterprise.inject.spi.configurator.AnnotatedMethodConfigurator;
 import jakarta.enterprise.inject.spi.configurator.AnnotatedParameterConfigurator;
 import jakarta.websocket.*;
@@ -34,14 +33,6 @@ public class WebsocketScopedExtension implements Extension {
 
     private static final ExceptionDetails EX_MASSING_METHOD = new ExceptionDetails("websocket/missing/method",
             "The class [{0}] requires a method annotated with [{1}]");
-
-    public void beforeBeanDiscovery(@Observes BeforeBeanDiscovery bbd) {
-        bbd.addScope(WebsocketScope.class, true, false);
-    }
-
-    public void afterBeanDiscovery(@Observes AfterBeanDiscovery abd) {
-        abd.addContext(new ScopeContext<>(WebsocketScope.class));
-    }
 
     public void processAnnotatedType(@Observes @WithAnnotations(NeoUtilWebsocket.class) ProcessAnnotatedType<?> pat) {
         Class<?> clazz = pat.getAnnotatedType().getJavaClass();

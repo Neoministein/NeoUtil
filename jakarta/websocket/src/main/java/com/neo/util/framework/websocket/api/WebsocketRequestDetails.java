@@ -15,9 +15,15 @@ public class WebsocketRequestDetails extends AbstractUserRequestDetails {
         this.remoteAddress = remoteAddress;
     }
 
-    @Override
-    public void updateMDC() {
-        super.updateMDC();
+    /**
+     * Create a new instance in order to get a new {@link #getRequestId()} for each request.
+     *
+     * @return a new instance
+     */
+    public WebsocketRequestDetails newInstance() {
+        WebsocketRequestDetails requestDetails = new WebsocketRequestDetails(this.getTraceId(), this.getInstanceId(), this.getRemoteAddress(), this.getRequestContext());
+        getUser().ifPresent(requestDetails::setUserIfPossible);
+        return requestDetails;
     }
 
     public String getRemoteAddress() {

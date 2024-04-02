@@ -2,7 +2,7 @@ package com.neo.util.framework.websocket.impl.interceptor;
 
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.websocket.api.WebsocketInterceptorLogic;
-import com.neo.util.framework.websocket.impl.scope.internal.NeoUtilWebsocketOnMessage;
+import com.neo.util.framework.websocket.impl.interceptor.internal.NeoUtilWebsocketOnMessage;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
