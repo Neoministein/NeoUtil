@@ -31,7 +31,7 @@ public @interface NeoUtilWebsocket {
     /**
      * If the endpoint throughput is monitored with a {@link SocketLogSearchable}
      * <p>
-     * Outgoing needs to go through the {@link WebsocketStateContext#broadcastAsync(String)}
+     * Outgoing needs to go through the {@link WebsocketStateContext#broadcastAsync(String)} or {@link WebsocketStateContext#broadcast(String)}
      */
     boolean monitored() default false;
 
