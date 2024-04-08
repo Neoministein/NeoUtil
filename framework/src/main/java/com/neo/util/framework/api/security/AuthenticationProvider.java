@@ -26,7 +26,9 @@ public interface AuthenticationProvider {
      * @param userRequestDetails the user to authenticate
      * @param credential to authenticate against
      */
-    void authenticate(UserRequestDetails userRequestDetails, Credential credential);
+    default void authenticate(UserRequestDetails userRequestDetails, Credential credential) {
+        authenticate(credential).ifPresent(userRequestDetails::setUserIfPossible);
+    }
 
     /**
      * Returns which authentication scheme the provider supports
