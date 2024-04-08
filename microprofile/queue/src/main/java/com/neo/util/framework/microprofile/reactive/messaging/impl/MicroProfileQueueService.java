@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.lang.reflect.AnnotatedElement;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -33,20 +34,19 @@ public class MicroProfileQueueService implements QueueService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicroProfileQueueService.class);
 
-    @Inject
-    protected ConfigService configService;
 
-    @Inject
-    protected Provider<RequestDetails> requestDetailsProvider;
-
-    protected Map<String, MicroProfileQueueConfig> queueProducerMap;
+    protected final Provider<RequestDetails> requestDetailsProvider;
+    protected final Map<String, MicroProfileQueueConfig> queueProducerMap;
 
     /**
      * Initializes the mapping to the {@link QueueProducer}.
      * This is done only once at startup as no new queues should be added at runtime.
      */
     @Inject
-    protected void init(Instance<QueueProducer> queueProducerInstances, ReflectionService reflectionService) {
+    public MicroProfileQueueService(Provider<RequestDetails> requestDetailsProvider, ConfigService configService,
+                                    Instance<QueueProducer> queueProducerInstances, ReflectionService reflectionService) {
+        this.requestDetailsProvider = requestDetailsProvider;
+
         Map<String, OutgoingQueue> queueConnectionMap = new HashMap<>();
         for (AnnotatedElement annotatedElement: reflectionService.getAnnotatedElement(OutgoingQueue.class)) {
             OutgoingQueue annotation = annotatedElement.getAnnotation(OutgoingQueue.class);
@@ -67,7 +67,7 @@ public class MicroProfileQueueService implements QueueService {
             LOGGER.debug("Registered Queue [{}], Producer [{}]", outgoingConnection.value(), queueProducer.getClass().getSimpleName());
         }
         LOGGER.info("Registered [{}] Queues {}", newMap.size(), newMap.keySet());
-        queueProducerMap = newMap;
+        this.queueProducerMap = Collections.unmodifiableMap(newMap);
     }
 
     protected void onStartUp(@Observes ApplicationPreReadyEvent preReadyEvent) {

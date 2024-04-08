@@ -14,16 +14,15 @@ import java.util.Optional;
 @ApplicationScoped
 public class ReactiveMessageTransformerServiceImpl implements ReactiveMessageTransformerService {
 
-    @Inject
-    protected ConfigService configService;
-
-    protected ReactiveMessageTransformer defaultTransformer;
-
-    protected Map<String, ReactiveMessageTransformer> transformerMap = new HashMap<>();
+    protected final ConfigService configService;
+    protected final ReactiveMessageTransformer defaultTransformer;
+    protected final Map<String, ReactiveMessageTransformer> transformerMap = new HashMap<>();
 
     @Inject
-    public void init(Instance<ReactiveMessageTransformer> instance, DummyTransformer dummyTransformer) {
+    public ReactiveMessageTransformerServiceImpl(ConfigService configService, Instance<ReactiveMessageTransformer> instance, DummyTransformer dummyTransformer) {
         Optional<String> optDefaultTransformer = configService.get("queue").get("defaultTransformer").asString().asOptional();
+
+        ReactiveMessageTransformer defaultTransformer = null;
 
         for (ReactiveMessageTransformer transformer: instance) {
             transformerMap.put(transformer.getTransformerId(), transformer);
@@ -33,14 +32,17 @@ public class ReactiveMessageTransformerServiceImpl implements ReactiveMessageTra
         }
 
         if (defaultTransformer == null) {
-            defaultTransformer = dummyTransformer;
+            this.defaultTransformer = dummyTransformer;
+        } else {
+            this.defaultTransformer = defaultTransformer;
         }
+        this.configService = configService;
     }
 
     @Override
     public ReactiveMessageTransformer getTransformer(String queueName) {
         return configService.get("queue").get(queueName).asString()
-                .map(s -> transformerMap.get(s))
+                .map(transformerMap::get)
                 .orElse(defaultTransformer);
     }
 }
