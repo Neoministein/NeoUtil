@@ -3,10 +3,7 @@ package com.neo.util.framework.rest.api.response;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ExternalRuntimeException;
 import com.neo.util.common.impl.exception.InternalRuntimeException;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import java.util.Optional;
 
 /**
  * This interface defines common response which can look different based on applications
@@ -55,11 +52,4 @@ public interface ClientResponseService {
      * @return the response
      */
     Response error(int code, String errorCode, String message);
-
-    /**
-     *
-     * @param mediaType
-     * @return
-     */
-    Optional<ClientResponseGenerator> getGenerator(MediaType mediaType);
 }

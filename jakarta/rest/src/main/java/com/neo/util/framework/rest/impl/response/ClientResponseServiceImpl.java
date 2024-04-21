@@ -55,7 +55,6 @@ public class ClientResponseServiceImpl implements ClientResponseService {
         return error(code, new InternalRuntimeException(new ExceptionDetails(errorCode, message)));
     }
 
-    @Override
     public Optional<ClientResponseGenerator> getGenerator(MediaType mediaType) {
         return Optional.ofNullable(responseGeneratorMap.get(mediaType.getSubtype()));
     }
