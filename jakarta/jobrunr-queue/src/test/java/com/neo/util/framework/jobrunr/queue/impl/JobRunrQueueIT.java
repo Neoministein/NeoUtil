@@ -73,7 +73,6 @@ class JobRunrQueueIT {
 
         IntegrationTestUtil.sleepUntil(200, 30, () -> {
             Assertions.assertNotNull(basicQueueListener.getLastMessage());
-            return true;
         });
 
         int basicDelay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
@@ -91,7 +90,6 @@ class JobRunrQueueIT {
 
         IntegrationTestUtil.sleepUntil(500, 30, () -> {
             Assertions.assertNotNull(delayedQueueListener.getLastMessage());
-            return true;
         });
 
         int delay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
@@ -106,7 +104,6 @@ class JobRunrQueueIT {
         IntegrationTestUtil.sleepUntil(500, 30, () -> {
             Assertions.assertFalse(retryQueueListener.isFirst());
             Assertions.assertNotNull(retryQueueListener.getLastMessage());
-            return true;
         });
     }
 

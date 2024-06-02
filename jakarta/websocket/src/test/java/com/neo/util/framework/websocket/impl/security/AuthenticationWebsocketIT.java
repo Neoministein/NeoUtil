@@ -45,7 +45,6 @@ class AuthenticationWebsocketIT extends AbstractWebsocketIT {
 
         IntegrationTestUtil.sleepUntil(100, 50, () -> {
             Assertions.assertFalse(socketWithId.getMessageMap().isEmpty());
-            return true;
         });
     }
 
@@ -68,7 +67,6 @@ class AuthenticationWebsocketIT extends AbstractWebsocketIT {
 
         IntegrationTestUtil.sleepUntil(100, 50, () -> {
             Assertions.assertFalse(socketWithId.getMessageMap().isEmpty());
-            return true;
         });
     }
 

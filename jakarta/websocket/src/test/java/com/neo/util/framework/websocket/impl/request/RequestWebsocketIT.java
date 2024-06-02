@@ -40,9 +40,8 @@ class RequestWebsocketIT extends AbstractWebsocketIT {
         session_2.close();
     }
 
-    protected boolean assertRequestDetails(RequestDetails requestDetails, String context) {
+    protected void assertRequestDetails(RequestDetails requestDetails, String context) {
         Assertions.assertNotNull(requestDetails);
         Assertions.assertEquals(requestDetails.getRequestContext().toString(), context);
-        return true;
     }
 }

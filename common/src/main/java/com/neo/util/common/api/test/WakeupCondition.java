@@ -10,5 +10,5 @@ public interface WakeupCondition {
     /**
      * Returns true if the caller should wake up.
      */
-    boolean shouldWakeUp();
+    boolean shouldWakeUp() throws Exception;
 }

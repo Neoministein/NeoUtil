@@ -1,7 +1,7 @@
 package com.neo.util.helidon.rest.entity;
 
-import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityProvider;
+import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.database.api.PersistenceContextProvider;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -17,7 +17,8 @@ public class JqplTransaction {
     @Inject
     PersistenceContextProvider contextService;
 
-    @Inject EntityProvider entityRepository;
+    @Inject
+    EntityProvider entityRepository;
 
 
     public void save(TestPersonEntity testPersonEntity) {

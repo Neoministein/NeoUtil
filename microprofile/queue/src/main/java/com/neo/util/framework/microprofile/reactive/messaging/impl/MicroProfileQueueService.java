@@ -86,9 +86,11 @@ public class MicroProfileQueueService implements QueueService {
 
     @Override
     public void addToQueue(String queueName, QueueMessage message) {
-        queueProducerMap.computeIfAbsent(queueName, s -> {
-            throw new ConfigurationException(QueueService.EX_NON_EXISTENT_QUEUE, QueueProducer.class.getSimpleName(), queueName); })
-                .getQueueProducer().addToQueue(JsonUtil.toJson(message));
+        MicroProfileQueueConfig config = queueProducerMap.get(queueName);
+        if (config == null) {
+            throw new ConfigurationException(QueueService.EX_NON_EXISTENT_QUEUE, QueueProducer.class.getSimpleName(), queueName);
+        }
+        config.getQueueProducer().addToQueue(JsonUtil.toJson(message));
     }
 
     @Override

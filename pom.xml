@@ -186,6 +186,7 @@
 		<module>jakarta/maven-plugin</module>
 		<module>jakarta/startup</module>
 		<module>jakarta/elastic</module>
+		<module>jakarta/elastic-embedded</module>
 		<module>jakarta/database</module>
 		<module>jakarta/database-audit</module>
 		<module>jakarta/rest</module>

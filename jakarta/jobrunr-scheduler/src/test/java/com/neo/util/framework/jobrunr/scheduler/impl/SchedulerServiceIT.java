@@ -92,7 +92,6 @@ class SchedulerServiceIT {
         IntegrationTestUtil.sleepUntil(500, 30, () -> {
             Assertions.assertEquals(1, testSchedulers.getIntervalExecutionCount());
             Assertions.assertEquals(2, testSchedulers.getCronExecutionCount());
-            return true;
         });
 
         int basicDelay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
@@ -108,7 +107,6 @@ class SchedulerServiceIT {
         IntegrationTestUtil.sleepUntil(500, 30, () -> {
             Assertions.assertEquals(1, testSchedulers.getIntervalExecutionCount());
             Assertions.assertEquals(0, testSchedulers.getCronExecutionCount());
-            return true;
         });
 
         int basicDelay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
@@ -126,7 +124,6 @@ class SchedulerServiceIT {
         IntegrationTestUtil.sleepUntil(500, 30, () -> {
             Assertions.assertEquals(1, testSchedulers.getIntervalExecutionCount());
             Assertions.assertEquals(0, testSchedulers.getCronExecutionCount());
-            return true;
         });
 
         int basicDelay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
@@ -168,7 +165,6 @@ class SchedulerServiceIT {
         Instant start = Instant.now();
         IntegrationTestUtil.sleepUntil(500, 30, () -> {
             Assertions.assertEquals(1, testSchedulers.getInterfaceExecutionCount());
-            return true;
         });
 
         int basicDelay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();

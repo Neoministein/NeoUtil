@@ -1,5 +1,6 @@
 package com.neo.util.common.impl;
 
+import com.neo.util.common.api.func.CheckedRunnable;
 import com.neo.util.common.api.test.WakeupCondition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +13,6 @@ import java.text.SimpleDateFormat;
 public final class ThreadUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadUtils.class);
-
-
 
     private ThreadUtils() {}
 
@@ -31,46 +30,42 @@ public final class ThreadUtils {
      * This method waits for the {@link WakeupCondition} to be true. <p>
      * If the max number of tries are exceeded, either false is returned or the conditions last exception is rethrown.
      */
-    public static boolean fluentWait(int millisToSleep, int maxTries, WakeupCondition wakeUpCondition) {
-        RuntimeException runtimeException = null;
+    public static void fluentWait(int millisToSleep, int maxTries, CheckedRunnable<Exception> wakeUpCondition) throws Exception {
+        Exception exception = null;
         AssertionError assertionError = null;
 
         for (int tryCount = 0; tryCount < maxTries; tryCount++) {
-            runtimeException = null;
+            exception = null;
             assertionError = null;
 
-            boolean conditionMet = false;
             try {
-                conditionMet = wakeUpCondition.shouldWakeUp();
-            } catch (RuntimeException e) {
-                runtimeException = e;
-                LOGGER.warn("FluentWait - Exception occurred during wake up condition. Current: try [{}] in WakeupCondition [{}]. Exception message was: [{}] [{}]",
-                        tryCount, wakeUpCondition, e.getClass().getSimpleName(), e.getMessage());
-            } catch (AssertionError e) {
-                assertionError = e;
-                LOGGER.warn("FluentWait - Exception occurred during wake up condition. Current: try [{}] in WakeupCondition [{}]. Exception message was: [{}] [{}]",
-                        tryCount, wakeUpCondition, e.getClass().getSimpleName(), e.getMessage());
-            }
-
-            if (conditionMet) {
+                wakeUpCondition.run();
                 String totalTime = new SimpleDateFormat("HH:mm:ss.SSS").format(millisToSleep * tryCount);
                 LOGGER.info("FluentWait - WakeupCondition [{}] met after [{}] tries, total time [{}]",
                         wakeUpCondition, tryCount, totalTime);
-                return true;
+                return;
+            } catch (AssertionError ex) {
+                assertionError = ex;
+                LOGGER.warn("FluentWait - Exception occurred during wake up condition. Current: try [{}] in WakeupCondition [{}]. Exception message was: [{}] [{}]",
+                        tryCount, wakeUpCondition, ex.getClass().getSimpleName(), ex.getMessage());
+            } catch (Exception ex) {
+                exception = ex;
+                LOGGER.warn("FluentWait - Exception occurred during wake up condition. Current: try [{}] in WakeupCondition [{}]. Exception message was: [{}] [{}]",
+                        tryCount, wakeUpCondition, ex.getClass().getSimpleName(), ex.getMessage());
             }
 
             ThreadUtils.simpleSleep(millisToSleep);
         }
 
-        if (runtimeException != null) {
-            throw runtimeException;
+        if (exception != null) {
+            throw exception;
         }
         if (assertionError != null) {
             throw assertionError;
         }
 
         LOGGER.warn("FluentWait - no more tries left");
-        return false;
+        throw new IllegalStateException();
     }
 
 

@@ -6,7 +6,10 @@ import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
 import com.neo.util.framework.api.persistence.aggregation.*;
 import com.neo.util.framework.api.persistence.criteria.*;
-import com.neo.util.framework.api.persistence.search.*;
+import com.neo.util.framework.api.persistence.search.IndexParameter;
+import com.neo.util.framework.api.persistence.search.SearchQuery;
+import com.neo.util.framework.api.persistence.search.SearchResult;
+import com.neo.util.framework.api.persistence.search.Searchable;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -55,7 +58,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 		IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
 			flushAndRefresh();
 			SearchResult<JsonNode> result = elasticSearchRepository.fetch(INDEX_NAME_FOR_QUERY, query);
-			return result.getHits().size() == 4;
+			Assert.assertTrue(result.getHits().size() == 4);
 		});
 	}
 
@@ -95,7 +98,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			Assert.assertEquals(2, betweenResult.getHitSize());
 			Assert.assertEquals(personTwo.getBusinessId(), betweenResult.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
 			Assert.assertEquals(personThree.getBusinessId(), betweenResult.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
-			return true;
 		});
 	}
 
@@ -138,7 +140,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 					betweenResult.getHits().get(0).get(BasicPersonSearchable.F_WEIGHT).asDouble(), 0.1);
 			Assert.assertEquals(personThree.getWeight(),
 					betweenResult.getHits().get(1).get(BasicPersonSearchable.F_WEIGHT).asDouble(), 0.1);
-			return true;
 		});
 	}
 
@@ -157,7 +158,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 			Assert.assertEquals(1, searchResult.getHitSize());
 			Assert.assertEquals(personFour.getBusinessId(), searchResult.getHits().get(0).get(Searchable.BUSINESS_ID).textValue());
-			return true;
 		});
 	}
 
@@ -176,7 +176,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 			Assert.assertEquals(1, searchResult.getHitSize());
 			Assert.assertEquals(personTwo.getBusinessId(), searchResult.getHits().get(0).get(Searchable.BUSINESS_ID).textValue());
-			return true;
 		});
 	}
 
@@ -202,7 +201,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 			Assert.assertEquals(1, questionResult.getHitSize());
 			Assert.assertEquals(personOne.getBusinessId() ,questionResult.getHits().get(0).get(Searchable.BUSINESS_ID).textValue());
-			return true;
 		});
 	}
 
@@ -221,8 +219,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			//Assert
 			Assert.assertEquals(1, result.getHitSize());
 			Assert.assertEquals(personTwo.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
-			return true;
-
 		});
 	}
 
@@ -243,7 +239,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			Assert.assertEquals(personTwo.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
 			Assert.assertEquals(personThree.getBusinessId(), result.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
 			Assert.assertEquals(personFour.getBusinessId(), result.getHits().get(2).get(Searchable.BUSINESS_ID).asText());
-			return true;
 		});
 	}
 
@@ -279,7 +274,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			Assert.assertEquals(2,betweenResult.getHitSize());
 			Assert.assertEquals(personTwo.getBusinessId(), betweenResult.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
 			Assert.assertEquals(personThree.getBusinessId(), betweenResult.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
-			return true;
 		});
 	}
 
@@ -298,7 +292,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			Assert.assertEquals(2, result.getHitSize());
 			Assert.assertEquals(personOne.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
 			Assert.assertEquals(personFour.getBusinessId(), result.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
-			return true;
 		});
 	}
 
@@ -318,7 +311,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			//Assert
 			Assert.assertEquals(1, result.getHitSize());
 			Assert.assertEquals(personOne.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
-			return true;
 		});
 	}
 
@@ -340,7 +332,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			Assert.assertEquals(personOne.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
 			Assert.assertEquals(personTwo.getBusinessId(), result.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
 			Assert.assertEquals(personFour.getBusinessId(), result.getHits().get(2).get(Searchable.BUSINESS_ID).asText());
-			return true;
 		});
 
 	}
@@ -363,7 +354,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			Assert.assertEquals(4, result.getHitSize());
 			Assert.assertEquals(personFour.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
 			Assert.assertEquals(personThree.getBusinessId(), result.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
-			return true;
 		});
 	}
 
@@ -400,8 +390,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			Assert.assertEquals(10.0, parseD.apply(result.getAggregations().get("MIN")),0.1);
 			Assert.assertEquals(40.0, parseD.apply(result.getAggregations().get("MAX")),0.1);
 			Assert.assertEquals(4L, (long) parseL.apply(result.getAggregations().get("CARDINALITY")));
-			//Assert
-			return true;
 		});
 	}
 
@@ -433,8 +421,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 			Assert.assertEquals(30.0, aggregationResult.getCriteriaResult().get("0"));
 			Assert.assertEquals(70.0, aggregationResult.getCriteriaResult().get("1"));
-			//Assert
-			return true;
 		});
 	}
 
@@ -459,9 +445,6 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			Assert.assertEquals("Davian Chang",buckets.get(1).key());
 			Assert.assertEquals("Catherine Leon",buckets.get(2).key());
 			Assert.assertEquals("Heaven Schneider",buckets.get(3).key());
-
-			//Assert
-			return true;
 		});
 
 	}

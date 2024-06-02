@@ -28,10 +28,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.test.ESIntegTestCase;
 import org.elasticsearch.transport.netty4.Netty4Plugin;
 import org.elasticsearch.transport.netty4.Netty4Transport;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -204,19 +201,16 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
             flushAndRefresh();
 
-            try {
-                SearchResponse<ObjectNode> searchResponse = connection.getApiClient().search(searchQuery, ObjectNode.class);
-                LOGGER.info("SearchResponse: [{}]", searchResponse.toString());
-                if (mustExist) {
-                    if (searchResponse.hits().total() == null || searchResponse.hits().total().value() != 1) {
-                        return false;
-                    }
-                    return uuid.equals(searchResponse.hits().hits().get(0).id());
-                } else {
-                    return searchResponse.hits().total() != null && searchResponse.hits().total().value() == 0;
+            SearchResponse<ObjectNode> searchResponse = connection.getApiClient().search(searchQuery, ObjectNode.class);
+            LOGGER.info("SearchResponse: [{}]", searchResponse.toString());
+            if (mustExist) {
+                if (searchResponse.hits().total() == null || searchResponse.hits().total().value() != 1) {
+                    Assert.fail();
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                Assert.assertEquals(uuid, searchResponse.hits().hits().get(0).id());
+            } else {
+                Assert.assertNotNull(searchResponse.hits().total());
+                Assert.assertEquals(0, searchResponse.hits().total().value());
             }
         });
 
@@ -232,21 +226,18 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
             flushAndRefresh();
 
-            try {
-                SearchResponse<ObjectNode> searchResponse = connection.getApiClient().search(searchQuery, ObjectNode.class);
-                LOGGER.info("SearchResponse: [{}]", searchResponse.toString());
-                if (searchResponse.hits().total() == null || searchResponse.hits().total().value() != 1) {
-                    return false;
-                }
-                ObjectNode source = searchResponse.hits().hits().get(0).source();
-                if (source == null) {
-                    return false;
-                }
-                JsonNode field = source.get(fieldName);
-                return field != null && fieldValue.equals(field.asText());
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
+            SearchResponse<ObjectNode> searchResponse = connection.getApiClient().search(searchQuery, ObjectNode.class);
+            LOGGER.info("SearchResponse: [{}]", searchResponse.toString());
+            if (searchResponse.hits().total() == null || searchResponse.hits().total().value() != 1) {
+                Assert.fail();
             }
+            ObjectNode source = searchResponse.hits().hits().get(0).source();
+            if (source == null) {
+                Assert.fail();
+            }
+            JsonNode field = source.get(fieldName);
+            Assert.assertNotNull(field);
+            Assert.assertEquals(fieldValue, field.asText());
 
         });
 
@@ -261,32 +252,25 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         LOGGER.info("SearchRequest: [{}]", searchQuery);
 
         IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
-
             flushAndRefresh();
 
-            try {
-                SearchResponse<ObjectNode> searchResponse = connection.getApiClient().search(searchQuery, ObjectNode.class);
-                LOGGER.info("SearchResponse: [{}]", searchResponse.toString());
-                if (searchResponse.hits().total() == null || searchResponse.hits().total().value() != 1) {
-                    return false;
-                }
-                ObjectNode source = searchResponse.hits().hits().get(0).source();
-                if (source == null) {
-                    return false;
-                }
-                JsonNode field = source.get(fieldName);
-                if (field == null && !fieldValue.equals(field.asText())) {
-                    return false;
-                }
-
-                if (fieldToCheckMustExist) {
-                    return source.get(fieldToCheck) != null;
-                }
-                return true;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            SearchResponse<ObjectNode> searchResponse = connection.getApiClient().search(searchQuery, ObjectNode.class);
+            LOGGER.info("SearchResponse: [{}]", searchResponse.toString());
+            if (searchResponse.hits().total() == null || searchResponse.hits().total().value() != 1) {
+                Assert.fail();
+            }
+            ObjectNode source = searchResponse.hits().hits().get(0).source();
+            if (source == null) {
+                Assert.fail();
+            }
+            JsonNode field = source.get(fieldName);
+            if (field == null && !fieldValue.equals(field.asText())) {
+                Assert.fail();
             }
 
+            if (fieldToCheckMustExist) {
+                Assert.assertNotNull(source.get(fieldToCheck));
+            }
         });
     }
 
