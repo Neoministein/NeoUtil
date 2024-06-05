@@ -63,7 +63,7 @@ public class HttpRequestDetails extends AbstractUserRequestDetails {
 
         @Override
         public String toString() {
-            return httpMethod + " " + uri;
+            return httpMethod + " /" + uri;
         }
     }
 }
