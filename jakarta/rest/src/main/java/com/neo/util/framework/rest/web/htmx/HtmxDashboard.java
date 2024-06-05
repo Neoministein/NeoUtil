@@ -3,13 +3,17 @@ package com.neo.util.framework.rest.web.htmx;
 import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.html.HtmlElement;
 import com.neo.util.framework.api.config.ConfigService;
+import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
 import com.neo.util.framework.impl.ReflectionService;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.neo.util.common.impl.html.HtmlStringTemplate.HTML;
 
@@ -17,6 +21,8 @@ import static com.neo.util.common.impl.html.HtmlStringTemplate.HTML;
 @Path(HtmxDashboard.RESOURCE_LOCATION)
 @Produces(MediaType.TEXT_HTML + "; charset=UTF-8")
 public class HtmxDashboard {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HtmxDashboard.class);
 
     public static final String RESOURCE_LOCATION = "/admin/";
 
@@ -49,5 +55,9 @@ public class HtmxDashboard {
                     </a>
                 </li>
                 """;
+    }
+
+    public void init(@Observes ApplicationPostReadyEvent event) {
+        LOGGER.debug("ApplicationPostReadyEvent processed");
     }
 }
