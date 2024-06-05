@@ -55,11 +55,11 @@ public class ClientErrorMapper implements ExceptionMapper<ClientErrorException> 
         }
 
         if (ex instanceof NotFoundException || ex instanceof NotAllowedException) {
-            LOGGER.warn("A [{}] occurred with message [{}] setting status to [{}]",
-                    ex.getClass().getSimpleName(),requestDetails.getRequestContext(), ex.getResponse().getStatus(), ex);
+            LOGGER.warn("A [{}] occurred at [{}] setting status to [{}]",
+                    ex.getClass().getSimpleName(),requestDetails.getRequestContext(), ex.getResponse().getStatus());
         } else {
             LOGGER.warn("A [{}] occurred with message [{}] setting status to [{}]",
-                    ex.getClass().getSimpleName(), ex.getMessage(), ex.getResponse().getStatus(), ex);
+                    ex.getClass().getSimpleName(), ex.getMessage(), ex.getResponse().getStatus());
         }
 
         return ex.getResponse();
