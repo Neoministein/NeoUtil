@@ -50,6 +50,6 @@ public class ReflectionService {
      * Reflection should no longer be needed after startup and the resource should be freed
      */
     public void init(@Observes @Priority(PriorityConstants.PLATFORM_AFTER + 1) ApplicationPostReadyEvent event) {
-        reflectionProvider = null;
+        reflectionProvider = null; //TODO Add better error handling since now it produces a null pointer
     }
 }
