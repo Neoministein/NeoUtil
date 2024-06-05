@@ -54,7 +54,7 @@ public class CaffeineCacheBuilder extends AbstractCacheBuilder implements CacheB
 
 
     public List<CaffeineCacheConfig> getConfigs() {
-        Set<String> reflectionConfig = getCacheNames();
+        Set<String> reflectionConfig = new HashSet<>(getCacheNames());
         Config config = configService.get(CONFIG_PREFIX);
         CaffeineCacheConfig defaultConfig = new CaffeineCacheConfig(config.get(DEFAULT_CONFIG));
         LOGGER.trace("Default CaffeineCacheConfig loaded Config: {}", defaultConfig);
