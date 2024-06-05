@@ -13,7 +13,7 @@ import java.net.http.HttpResponse;
 
 class ElasticEmbeddedIT {
 
-    ElasticEmbedded subject;
+    EmbeddedElasticNode subject;
 
     @Test
     void startupTest() {
@@ -21,7 +21,7 @@ class ElasticEmbeddedIT {
         ConfigService configService = new BasicConfigService();
         configService.save(configService.newConfig("elastic.embedded.dataPath", "./target/esdata"));
 
-        subject = new ElasticEmbedded(configService);
+        subject = new EmbeddedElasticNode(configService);
 
         //Act
         new Thread(() -> subject.startNode()).start();

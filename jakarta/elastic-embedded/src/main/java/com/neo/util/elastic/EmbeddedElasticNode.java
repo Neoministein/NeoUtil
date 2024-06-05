@@ -19,37 +19,39 @@ import org.elasticsearch.transport.netty4.Netty4Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 import java.util.function.Function;
 
 @ApplicationScoped
-public class ElasticEmbedded {
+public class EmbeddedElasticNode {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ElasticEmbedded.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedElasticNode.class);
 
     protected final ConfigService configService;
 
     protected Node elasticNode;
 
     @Inject
-    public ElasticEmbedded(ConfigService configService) {
+    public EmbeddedElasticNode(ConfigService configService) {
         this.configService = configService;
 
+        LOGGER.warn("EmbeddedElasticNode is added as a dependency of the Project. Replace with a standalone instance for best performance");
         if (configService.get("elastic.embedded.autostart").asBoolean().orElse(false)) {
             startNode();
         }
     }
 
     public void startNode() {
+        LOGGER.info("Starting EmbeddedElasticNode");
         if (elasticNode != null) {
-            LOGGER.warn("");
+            LOGGER.warn("The EmbeddedElasticNode is already running");
             return;
         }
 
         String dataPath = configService.get("elastic.embedded.dataPath").asString().orElse("./data");
+        LOGGER.debug("EmbeddedElasticNode DataPath [{}]", dataPath);
 
         LogConfigurator.registerErrorListener();
         LogConfigurator.configureESLogging();
@@ -70,22 +72,24 @@ public class ElasticEmbedded {
         try {
             this.elasticNode = NodeFactory.createNode(environment, pluginServiceCtor, true);
             this.elasticNode.start();
+            LOGGER.info("EmbeddedElasticNode started successfully");
         } catch (Exception ex) {
+            LOGGER.error("Failed to start EmbeddedElasticNode", ex);
             this.elasticNode = null;
         }
-
     }
 
     public void stopNode() {
         if (this.elasticNode == null) {
-            LOGGER.warn("");
+            LOGGER.warn("EmbeddedElasticNode isn't running");
             return;
         }
         try {
             this.elasticNode.close();
             this.elasticNode = null;
-        } catch (IOException ex) {
-            LOGGER.error("");
+            LOGGER.info("EmbeddedElasticNode stopped successfully");
+        } catch (Exception ex) {
+            LOGGER.error("Failed to stop EmbeddedElasticNode", ex);
         }
 
     }
