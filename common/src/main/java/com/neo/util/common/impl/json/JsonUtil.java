@@ -14,6 +14,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ValidationException;
+import com.networknt.schema.JsonSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,6 +127,20 @@ public class JsonUtil {
             LOGGER.error("Error while parsing JSON node from json string: [{}], exception: [{}]", json, ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
+    }
+
+    /**
+     * Is a helper function combining parsing and validating.
+     * Does not catch errors.
+     *
+     * @param json to convert
+     * @param schema to validate
+     * @return is converted to JsonNode
+     */
+    public static JsonNode fromJsonAndVeryfy(String json, JsonSchema schema) {
+        JsonNode node = fromJson(json);
+        JsonSchemaUtil.isValidOrThrow(node, schema);
+        return node;
     }
 
     /**
