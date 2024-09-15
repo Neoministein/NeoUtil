@@ -37,7 +37,7 @@ class RequestRecorderIT extends AbstractIntegrationTest {
         Assertions.assertNotNull(searchable.getRequestId());
         Assertions.assertNull(searchable.getInitiator());
         Assertions.assertEquals("127.0.0.1", searchable.getRemoteAddress());
-        Assertions.assertEquals("GET test/security", searchable.getContext());
+        Assertions.assertEquals("GET /test/security", searchable.getContext());
         Assertions.assertEquals("200", searchable.getStatus());
         Assertions.assertNull(searchable.getError());
         Assertions.assertTrue(searchable.getProcessTime() >= 0);
@@ -61,7 +61,7 @@ class RequestRecorderIT extends AbstractIntegrationTest {
         Assertions.assertNotNull(searchable.getRequestId());
         Assertions.assertEquals(BasicAuthorizationProvider.NORMAL_PRINCIPAL.getName(), searchable.getInitiator());
         Assertions.assertEquals("127.0.0.1", searchable.getRemoteAddress());
-        Assertions.assertEquals("GET test/security/secure", searchable.getContext());
+        Assertions.assertEquals("GET /test/security/secure", searchable.getContext());
         Assertions.assertEquals("200", searchable.getStatus());
         Assertions.assertNull(searchable.getError());
         Assertions.assertTrue(searchable.getProcessTime() >= 0);
@@ -85,7 +85,7 @@ class RequestRecorderIT extends AbstractIntegrationTest {
         Assertions.assertNotNull(searchable.getRequestId());
         Assertions.assertEquals(BasicAuthorizationProvider.NORMAL_PRINCIPAL.getName(), searchable.getInitiator());
         Assertions.assertEquals("127.0.0.1", searchable.getRemoteAddress());
-        Assertions.assertEquals("POST test/security/secure", searchable.getContext());
+        Assertions.assertEquals("POST /test/security/secure", searchable.getContext());
         Assertions.assertEquals("405", searchable.getStatus());
         Assertions.assertEquals(HttpRequestRecordingFilter.FRAMEWORK_PROVIDED_ERROR, searchable.getError());
         Assertions.assertTrue(searchable.getProcessTime() >= 0);
@@ -111,7 +111,7 @@ class RequestRecorderIT extends AbstractIntegrationTest {
         Assertions.assertNotNull(searchable.getRequestId());
         Assertions.assertEquals(BasicAuthorizationProvider.NORMAL_PRINCIPAL.getName(), searchable.getInitiator());
         Assertions.assertEquals("127.0.0.1", searchable.getRemoteAddress());
-        Assertions.assertEquals("GET test/security/unknown", searchable.getContext());
+        Assertions.assertEquals("GET /test/security/unknown", searchable.getContext());
         Assertions.assertEquals("404", searchable.getStatus());
         Assertions.assertEquals(HttpRequestRecordingFilter.FRAMEWORK_PROVIDED_ERROR, searchable.getError());
         Assertions.assertTrue(searchable.getProcessTime() >= 0);
@@ -136,7 +136,7 @@ class RequestRecorderIT extends AbstractIntegrationTest {
         Assertions.assertNotNull(searchable.getRequestId());
         Assertions.assertNull(searchable.getInitiator());
         Assertions.assertEquals("127.0.0.1", searchable.getRemoteAddress());
-        Assertions.assertEquals("GET test/security/unknown", searchable.getContext());
+        Assertions.assertEquals("GET /test/security/unknown", searchable.getContext());
         Assertions.assertEquals("404", searchable.getStatus());
         Assertions.assertEquals(HttpRequestRecordingFilter.FRAMEWORK_PROVIDED_ERROR, searchable.getError());
         Assertions.assertTrue(searchable.getProcessTime() >= 0);
