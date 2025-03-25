@@ -258,6 +258,13 @@ public class JsonUtil {
     }
 
     /**
+     * Creates a missing Node
+     */
+    public static JsonNode misingNode() {
+        return MAPPER.missingNode();
+    }
+
+    /**
      * Converts an object to a {@link ObjectNode}.
      *
      * @param pojo to object convert

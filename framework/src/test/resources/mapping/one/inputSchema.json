@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "ZEWM_E1LTORH": {
+      "type": "object",
+      "properties": {
+        "LGNUM": {
+          "type": "string"
+        },
+        "WHO": {
+          "type": "string"
+        },
+        "TART": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "LGNUM",
+        "WHO",
+        "TART"
+      ]
+    },
+    "ZEWM_E1LTORI": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "MATNR": {
+            "type": "string"
+          },
+          "VSOLM": {
+            "type": "string"
+          },
+          "MEINS": {
+            "type": "string"
+          },
+          "WDATU": {
+            "type": "string"
+          },
+          "WENUM": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "MATNR",
+          "VSOLM",
+          "MEINS",
+          "WDATU",
+          "WENUM"
+        ]
+      }
+    }
+  },
+  "required": [
+    "ZEWM_E1LTORH",
+    "ZEWM_E1LTORI"
+  ]
+}

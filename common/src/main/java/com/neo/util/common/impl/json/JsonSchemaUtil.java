@@ -1,11 +1,15 @@
 package com.neo.util.common.impl.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.neo.util.common.api.json.JsonDataType;
 import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.networknt.schema.*;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -60,6 +64,86 @@ public class JsonSchemaUtil {
         }
     }
 
+    public static ObjectNode generateSampleJson(JsonSchema jsonSchema) {
+        return (ObjectNode) generateSampleJson(jsonSchema.getSchemaNode());
+    }
+
+    public static JsonNode generateSampleJson(JsonNode schemaNode) {
+        if (!schemaNode.has("type")) {
+            return JsonUtil.emptyObjectNode();
+        }
+
+        return switch (JsonDataType.fromString(schemaNode.get("type").asText())) {
+            case OBJECT -> {
+                ObjectNode objectNode = JsonUtil.emptyObjectNode();
+                if (schemaNode.has("properties")) {
+                    JsonNode properties = schemaNode.get("properties");
+                    Iterator<Map.Entry<String, JsonNode>> fields = properties.fields();
+                    while (fields.hasNext()) {
+                        Map.Entry<String, JsonNode> field = fields.next();
+                        objectNode.set(field.getKey(), generateSampleJson(field.getValue()));
+                    }
+                }
+                yield objectNode;
+            }
+            case ARRAY -> {
+                if (schemaNode.has("items")) {
+                    yield JsonUtil.emptyArrayNode().add(generateSampleJson(schemaNode.get("items")));
+                }
+                yield JsonUtil.emptyObjectNode();
+            }
+            case STRING -> JsonUtil.fromPojo("sample");
+            case INTEGER -> JsonUtil.fromPojo(0);
+            case NUMBER -> JsonUtil.fromPojo(0.0);
+            case BOOLEAN -> JsonUtil.fromPojo(true);
+        };
+    }
+/*
+    public static Map<String, JsonDataType> extractAllFields(JsonSchema schema) {
+        Map<String, JsonDataType> map = new HashMap<>();
+        extractAllFields(map, schema.getSchemaNode(), "");
+        return map;
+    }
+
+    public static void extractAllFields(Map<String, JsonDataType> map, JsonNode schemaNode, String node) {
+        if (!schemaNode.has("type")) {
+            return;
+        }
+
+        switch (JsonDataType.fromString(schemaNode.get("type").asText())) {
+            case OBJECT:
+                ObjectNode objectNode = JsonUtil.emptyObjectNode();
+                if (schemaNode.has("properties")) {
+                    JsonNode properties = schemaNode.get("properties");
+                    Iterator<Map.Entry<String, JsonNode>> fields = properties.fields();
+                    while (fields.hasNext()) {
+                        Map.Entry<String, JsonNode> field = fields.next();
+                        extractAllFields(map, field.getValue(), node + "." + field.getKey());
+                    }
+                }
+                break;
+            case ARRAY:
+                if (schemaNode.has("items")) {
+                    extractAllFields(map, schemaNode.get("items"), node);
+                }
+                break;
+            case STRING:
+                map.put(node, JsonDataType.STRING);
+                break;
+            case INTEGER:
+                map.put(node, JsonDataType.INTEGER);
+                break;
+            case NUMBER:
+                map.put(node, JsonDataType.NUMBER);
+                break;
+            case BOOLEAN:
+                map.put(node, JsonDataType.BOOLEAN);
+                break;
+            default:
+                break;
+        }
+    }
+*/
     /**
      * Generate the json form a file which resides in the projects resource folder.
      * Path example:

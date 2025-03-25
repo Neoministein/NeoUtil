@@ -1,0 +1,23 @@
+<root>
+    <owner type="String" value="#{ZEWM_E1LTORH.LGNUM}"/>
+    <asnType type="String" value="Receipt"/>
+    <transportUnit type="object">
+        <tuId type="String" value="#{ZEWM_E1LTORH.WHO}"/>
+        <tuType type="String" value="PALLET"/>
+    </transportUnit>
+    <asnLine type="array" var="asnline" loop="#{ZEWM_E1LTORI}">
+        <lineNumber type="Integer" value="#{asnline._iteration}"/>
+        <productId type="String" value="#{asnline.MATNR}"/>
+        <productVersionId type="String" value="default"/>
+        <packagingUom type="String" value="#{asnline.MEINS}"/>
+        <quantityExpected type="String" value="#{asnline.VSOLM}"/>
+        <attributeValue type="array">
+            <name type="String" value="lotcode"/>
+            <value type="String" value="#{asnline.WENUM}"/>
+        </attributeValue>
+        <attributeValue type="array">
+            <name type="String" value="checkInDate"/>
+            <value type="String" value="#{asnline.WDATU}"/>
+        </attributeValue>
+    </asnLine>
+</root>
