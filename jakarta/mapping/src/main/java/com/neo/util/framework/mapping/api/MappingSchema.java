@@ -1,10 +1,12 @@
-package com.neo.util.framework.impl.mapping;
+package com.neo.util.framework.mapping.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.api.json.JsonDataType;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.common.impl.json.JsonUtil;
+import com.neo.util.framework.impl.mapping.ExpressExtractor;
+import com.neo.util.framework.mapping.api.node.*;
 import com.networknt.schema.JsonSchema;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -18,18 +20,20 @@ import java.util.*;
 
 public class MappingSchema {
 
+    private final TestName testName;
     private final JsonSchema inputSchema;
     private final JsonNode sampleJson;
     private final Map<String, JsonNode> loopValues = new HashMap<>();
     private final NestedObjectNode schemaNode;
 
-    public MappingSchema(String mappingXml, String inputSchema) {
-        this(parseXml(mappingXml), JsonSchemaUtil.generateNewSchema(inputSchema));
+    public MappingSchema(TestName testName, String mappingXml, String inputSchema) {
+        this(testName, parseXml(mappingXml), JsonSchemaUtil.generateNewSchema(inputSchema));
     }
 
-    public MappingSchema(Document mapping, JsonSchema inputSchema) {
+    public MappingSchema(TestName testName, Document mapping, JsonSchema inputSchema) {
         Element root = mapping.getDocumentElement();
 
+        this.testName = testName;
         this.inputSchema = inputSchema;
         this.sampleJson = JsonSchemaUtil.generateSampleJson(inputSchema);
         this.schemaNode = new NestedObjectNode("root", getChildren(root));
@@ -77,10 +81,10 @@ public class MappingSchema {
             } else if (defaultValue.getFirst().type() != ExpressExtractor.Type.STATIC) {
                 throw new RuntimeException(); //TODO
             }
-            return new ExpressionNode(dataType, tag, valueParts, parseDataType(defaultValue.getFirst().value(), dataType));
+            return new ExpressionNode(dataType, tag, null, parseDataType(defaultValue.getFirst().value(), dataType));
         }
 
-        return new ExpressionNode(dataType, tag, valueParts, null);
+        return new ExpressionNode(dataType, tag, null, null);
     }
 
 
@@ -96,7 +100,7 @@ public class MappingSchema {
         };
     }
 
-    protected JsonNode getNode(String path) {
+    public JsonNode getNode(String path) {
         String[] parts = path.split("\\.");
 
         if (parts.length == 0) {
@@ -195,115 +199,5 @@ public class MappingSchema {
 
     public NestedObjectNode getSchemaNode() {
         return schemaNode;
-    }
-
-    public abstract class Node  {
-        private final JsonDataType dataType;
-        private final String filedName;
-
-        protected Node(JsonDataType dataType, String filedName) {
-            this.dataType = dataType;
-            this.filedName = filedName;
-        }
-
-        public JsonDataType getDataType() {
-            return dataType;
-        }
-
-        public String getFiledName() {
-            return filedName;
-        }
-
-        @Override
-        public String toString() {
-            return filedName + "->" + dataType;
-        }
-    }
-
-    public class StaticNode extends Node {
-
-        private final Object value;
-
-        public StaticNode(JsonDataType dataType, String filedName, Object value) {
-            super(dataType, filedName);
-            this.value = value;
-        }
-
-        public Object getSchemaValue() {
-            return value;
-        }
-    }
-
-    public class ExpressionNode extends Node {
-
-        private final List<ExpressExtractor.Value> values;
-        private final Object defaultValue;
-
-        public ExpressionNode(JsonDataType dataType, String filedName, List<ExpressExtractor.Value> values, Object defaultValue) {
-            super(dataType, filedName);
-            this.values = values;
-            this.defaultValue = defaultValue;
-
-            if (values.isEmpty()) {
-                throw new RuntimeException(); //TODO
-            }
-        }
-
-
-        public List<ExpressExtractor.Value> getValues() {
-            return values;
-        }
-
-        public Object getDefaultValue() {
-            return defaultValue;
-        }
-    }
-
-    public abstract class NestedNode extends Node {
-
-        private final List<Node> children;
-
-        protected NestedNode(JsonDataType dataType, String filedName, List<Node> children) {
-            super(dataType, filedName);
-            this.children = children;
-        }
-
-        public List<Node> getChildren() {
-            return children;
-        }
-    }
-
-    public class NestedObjectNode extends NestedNode {
-
-        public NestedObjectNode(String filedName, List<Node> children) {
-            super(JsonDataType.OBJECT, filedName, children);
-        }
-    }
-
-    public class SingleArrayNode extends NestedNode {
-
-        public SingleArrayNode(String filedName, List<Node> children) {
-            super(JsonDataType.ARRAY, filedName, children);
-        }
-    }
-
-    public class LoopArrayNode extends NestedNode {
-
-        private final String varName;
-        private final String loopPath;
-
-        public LoopArrayNode(String filedName, String varName, String loopPath, List<Node> children) {
-            super(JsonDataType.ARRAY, filedName, children);
-            this.varName = varName;
-            this.loopPath = loopPath;
-        }
-
-        public String getVarName() {
-            return varName;
-        }
-
-        public String getLoopPath() {
-            return loopPath;
-        }
     }
 }

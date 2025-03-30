@@ -1,10 +1,12 @@
-package com.neo.util.framework.impl.mapping;
+package com.neo.util.framework.mapping.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.api.json.JsonDataType;
+import com.neo.util.framework.mapping.api.MappingSchema;
+import com.neo.util.framework.mapping.api.node.*;
 
 public class MappingObjectv2 {
 
@@ -20,13 +22,13 @@ public class MappingObjectv2 {
         return parseObject(mapping.getSchemaNode(), sourceJson);
     }
 
-    private void parseElement(MappingSchema.Node schemaNode, ObjectNode sourceJson, ObjectNode destinationNode) {
+    private void parseElement(Node schemaNode, ObjectNode sourceJson, ObjectNode destinationNode) {
          JsonNode resultNode = switch (schemaNode) {
-            case MappingSchema.StaticNode staticNode -> objectMapper.valueToTree(staticNode.getSchemaValue());
-            case MappingSchema.ExpressionNode expressionNode -> parseSingleValue(expressionNode, sourceJson);
-            case MappingSchema.NestedObjectNode nestedObjectNode -> parseObject(nestedObjectNode, sourceJson);
-            case MappingSchema.LoopArrayNode loopArrayNode -> parseArray(loopArrayNode, sourceJson);
-            case MappingSchema.SingleArrayNode singleArrayNode -> parseArray(singleArrayNode, sourceJson);
+            case StaticNode staticNode -> objectMapper.valueToTree(staticNode.getSchemaValue());
+            case ExpressionNode expressionNode -> parseSingleValue(expressionNode, sourceJson);
+            case NestedObjectNode nestedObjectNode -> parseObject(nestedObjectNode, sourceJson);
+            case LoopArrayNode loopArrayNode -> parseArray(loopArrayNode, sourceJson);
+            case SingleArrayNode singleArrayNode -> parseArray(singleArrayNode, sourceJson);
 
             default -> throw new IllegalStateException("Unexpected value: " + schemaNode);
         };
@@ -39,7 +41,8 @@ public class MappingObjectv2 {
         }
     }
 
-    private JsonNode parseSingleValue(MappingSchema.ExpressionNode nestedObjectNode, ObjectNode sourceJson) {
+    private JsonNode parseSingleValue(ExpressionNode nestedObjectNode, ObjectNode sourceJson) {
+        /*
         if (nestedObjectNode.getValues().size() == 1) {
             JsonNode node = extractJsonValue(nestedObjectNode.getValues().getFirst().value(), sourceJson);
             if (node.isEmpty()) {
@@ -48,11 +51,12 @@ public class MappingObjectv2 {
             return node;
 
         }
-
+*/
         return parseDataType(nestedObjectNode.getDataType(), evaluateExpress(nestedObjectNode, sourceJson));
     }
 
-    private String evaluateExpress(MappingSchema.ExpressionNode nestedObjectNode, ObjectNode sourceJson) {
+    private String evaluateExpress(ExpressionNode nestedObjectNode, ObjectNode sourceJson) {
+        /*
         StringBuilder sb = new StringBuilder();
         for (ExpressExtractor.Value a : nestedObjectNode.getValues()) {
             if (a.type() == ExpressExtractor.Type.EXPRESSION) {
@@ -61,8 +65,8 @@ public class MappingObjectv2 {
             } else if (a.type() == ExpressExtractor.Type.STATIC) {
                 sb.append(a.value());
             }
-        }
-        return sb.toString();
+        }*/
+        return "";
     }
 
     private JsonNode parseDataType(JsonDataType  dataType, String value) {
@@ -89,15 +93,15 @@ public class MappingObjectv2 {
         return node.isMissingNode() ? objectMapper.nullNode() : node;
     }
 
-    private JsonNode parseObject(MappingSchema.NestedNode nestedObjectNode, ObjectNode sourceJson) {
+    private JsonNode parseObject(NestedNode nestedObjectNode, ObjectNode sourceJson) {
         ObjectNode objectNode = objectMapper.createObjectNode();
-        for (MappingSchema.Node node: nestedObjectNode.getChildren()) {
+        for (Node node: nestedObjectNode.getChildren()) {
             parseElement(node, sourceJson, objectNode);
         }
         return objectNode;
     }
 
-    private ArrayNode parseArray(MappingSchema.LoopArrayNode loopArrayNode, ObjectNode sourceJson) {
+    private ArrayNode parseArray(LoopArrayNode loopArrayNode, ObjectNode sourceJson) {
         ArrayNode arrayNode = objectMapper.createArrayNode();
 
         JsonNode loopSource = extractJsonValue(loopArrayNode.getLoopPath().substring(2, loopArrayNode.getLoopPath().length() - 1), sourceJson);
@@ -115,11 +119,11 @@ public class MappingObjectv2 {
         return arrayNode;
     }
 
-    private ArrayNode parseArray(MappingSchema.SingleArrayNode loopArrayNode, ObjectNode sourceJson) {
+    private ArrayNode parseArray(SingleArrayNode loopArrayNode, ObjectNode sourceJson) {
         ArrayNode arrayNode = objectMapper.createArrayNode();
 
         ObjectNode itemNode = objectMapper.createObjectNode();
-        for (MappingSchema.Node node: loopArrayNode.getChildren()) {
+        for (Node node: loopArrayNode.getChildren()) {
             parseElement(node, sourceJson, itemNode);
         }
         arrayNode.add(itemNode);

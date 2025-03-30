@@ -29,6 +29,12 @@
 			<version>${jakarta.security.enterprise-api.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>jakarta.el</artifactId>
+			<version>5.0.0-M1</version>  <!-- Check latest version -->
+		</dependency>
+
 		<!-- Test Framework  -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>

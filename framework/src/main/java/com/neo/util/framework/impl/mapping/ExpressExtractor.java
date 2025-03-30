@@ -42,19 +42,7 @@ public class ExpressExtractor {
         return parts;
     }
 
-    private static void idk(String value) {
-        Matcher bracketMatch = BRACKET_MATCHER.matcher(value);
-
-        while (bracketMatch.find()) {
-            String valueInBrackets = bracketMatch.group(1);
-            idk(value);
-        }
-        if (bracketMatch.find()) {
-
-        }
-    }
-
-    enum Type {
+    public enum Type {
         STATIC,
         EXPRESSION
     }
