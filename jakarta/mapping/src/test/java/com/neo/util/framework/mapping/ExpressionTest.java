@@ -1,8 +1,12 @@
 package com.neo.util.framework.mapping;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.mapping.api.MappingSchema;
+import com.neo.util.framework.mapping.impl.ElExpressionHandler;
 import com.neo.util.framework.mapping.impl.MappingELResolver;
+import com.neo.util.framework.mapping.impl.MappingObjectv2;
 import com.neo.util.framework.mapping.impl.MappingStateHolder;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.StandardELContext;
@@ -25,7 +29,6 @@ public class ExpressionTest {
 
     @Test
     void applicationEventTest() {
-        MappingSchema mappingSchema = new MappingSchema(null, format, jsonSchema);
         BeanManager beanManager = weld.select(BeanManager.class).get();
         //MathBean mathBean = weld.select(MathBean.class).get();
         RequestContextController rcc = weld.select(RequestContextController.class).get();
@@ -36,13 +39,17 @@ public class ExpressionTest {
         context.addELResolver(new MappingELResolver(beanManager));
 
 
+        MappingSchema mappingSchema = new MappingSchema(new ElExpressionHandler(context), format, jsonSchema);
         ValueExpression expression = factory.createValueExpression(context, "#{mathBean.a.idk}", JsonNode.class);
         ValueExpression expression2 = factory.createValueExpression(context, "IDK", String.class);
 
         Object o = null;
         rcc.activate();
+
         weld.select(MappingStateHolder.class).get().setSchema(mappingSchema, null);
         o = expression.getValue(context);
+        MappingObjectv2 objectv2 = new MappingObjectv2(mappingSchema);
+        objectv2.transformJson((ObjectNode) JsonUtil.fromJson(json));
         System.out.println(o); // Output: 11
         rcc.deactivate();
 
@@ -138,4 +145,21 @@ public class ExpressionTest {
             "</attributeValue>\n" +
             "</asnLine>\n" +
             "</root>";
+
+    private static final String json = "{\n" +
+            "            \"ZEWM_E1LTORH\": {\n" +
+            "                \"LGNUM\": \"CustomerName\",\n" +
+            "                \"WHO\": \"T-10001\",\n" +
+            "                \"TART\": \"\"\n" +
+            "            },\n" +
+            "            \"ZEWM_E1LTORI\": [\n" +
+            "                {\n" +
+            "                    \"MATNR\": \"iPhone\",\n" +
+            "                    \"VSOLM\": \"10.0\",\n" +
+            "                    \"MEINS\": \"CASE\",\n" +
+            "                    \"WDATU\": \"2025-03-11\",\n" +
+            "                    \"WENUM\": \"LOT-120\"\n" +
+            "                }\n" +
+            "            ]\n" +
+            "        }";
 }

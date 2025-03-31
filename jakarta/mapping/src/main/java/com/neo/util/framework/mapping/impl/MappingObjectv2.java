@@ -52,7 +52,7 @@ public class MappingObjectv2 {
 
         }
 */
-        return parseDataType(nestedObjectNode.getDataType(), evaluateExpress(nestedObjectNode, sourceJson));
+        return parseDataType(nestedObjectNode.getDataType(), mapping.getExpressionHandler().evaluateWithContext(nestedObjectNode));
     }
 
     private String evaluateExpress(ExpressionNode nestedObjectNode, ObjectNode sourceJson) {
@@ -69,7 +69,7 @@ public class MappingObjectv2 {
         return "";
     }
 
-    private JsonNode parseDataType(JsonDataType  dataType, String value) {
+    private JsonNode parseDataType(JsonDataType  dataType, Object value) {
         if (value == null) {
             return objectMapper.nullNode();
         }
@@ -77,9 +77,9 @@ public class MappingObjectv2 {
         return objectMapper.valueToTree(
                 switch (dataType) {
                     case STRING -> value;
-                    case INTEGER -> Integer.parseInt(value);
-                    case NUMBER -> Float.parseFloat(value);
-                    case BOOLEAN -> Boolean.parseBoolean(value);
+                    case INTEGER -> Integer.parseInt(value.toString());
+                    case NUMBER -> Float.parseFloat(value.toString());
+                    case BOOLEAN -> Boolean.parseBoolean(value.toString());
                     default -> null;
                 });
     }

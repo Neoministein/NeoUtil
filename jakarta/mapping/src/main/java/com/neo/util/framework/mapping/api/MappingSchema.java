@@ -6,7 +6,10 @@ import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.impl.mapping.ExpressExtractor;
-import com.neo.util.framework.mapping.api.node.*;
+import com.neo.util.framework.mapping.api.node.LoopArrayNode;
+import com.neo.util.framework.mapping.api.node.NestedObjectNode;
+import com.neo.util.framework.mapping.api.node.Node;
+import com.neo.util.framework.mapping.api.node.SingleArrayNode;
 import com.networknt.schema.JsonSchema;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -20,20 +23,20 @@ import java.util.*;
 
 public class MappingSchema {
 
-    private final TestName testName;
+    private final ExpressionHandler expressionHandler;
     private final JsonSchema inputSchema;
     private final JsonNode sampleJson;
     private final Map<String, JsonNode> loopValues = new HashMap<>();
     private final NestedObjectNode schemaNode;
 
-    public MappingSchema(TestName testName, String mappingXml, String inputSchema) {
+    public MappingSchema(ExpressionHandler testName, String mappingXml, String inputSchema) {
         this(testName, parseXml(mappingXml), JsonSchemaUtil.generateNewSchema(inputSchema));
     }
 
-    public MappingSchema(TestName testName, Document mapping, JsonSchema inputSchema) {
+    public MappingSchema(ExpressionHandler testName, Document mapping, JsonSchema inputSchema) {
         Element root = mapping.getDocumentElement();
 
-        this.testName = testName;
+        this.expressionHandler = testName;
         this.inputSchema = inputSchema;
         this.sampleJson = JsonSchemaUtil.generateSampleJson(inputSchema);
         this.schemaNode = new NestedObjectNode("root", getChildren(root));
@@ -67,37 +70,8 @@ public class MappingSchema {
     private Node parseSingleValue(Element element, JsonDataType dataType) {
         String tag = element.getTagName();
         String value = getAndVerifyAttribute(element, "value");
-
-        List<ExpressExtractor.Value> valueParts = ExpressExtractor.extractParts(value);
-        if (valueParts.size() == 1 && valueParts.getFirst().type() == ExpressExtractor.Type.STATIC) {
-            return new StaticNode(dataType, tag, parseDataType(value, dataType));
-        }
-        validateExpression(valueParts);
-
-        if (element.hasAttribute("default")) {
-            List<ExpressExtractor.Value> defaultValue = ExpressExtractor.extractParts(element.getAttribute("default"));
-            if (defaultValue.size() > 1) {
-                throw new RuntimeException(); //TODO
-            } else if (defaultValue.getFirst().type() != ExpressExtractor.Type.STATIC) {
-                throw new RuntimeException(); //TODO
-            }
-            return new ExpressionNode(dataType, tag, null, parseDataType(defaultValue.getFirst().value(), dataType));
-        }
-
-        return new ExpressionNode(dataType, tag, null, null);
-    }
-
-
-    private Object parseDataType(String value, JsonDataType dataType) {
-        assert(value != null) : ""; //TODO
-        return switch (dataType) {
-            case STRING -> value;
-            case INTEGER -> Integer.parseInt(value);
-            case NUMBER -> Float.parseFloat(value);
-            case BOOLEAN -> Boolean.parseBoolean(value);
-            case ARRAY -> throw new RuntimeException(); //TODO
-            case OBJECT -> throw new RuntimeException(); //TODO
-        };
+        String defaultValue = element.hasAttribute("default") ? element.getAttribute("default") : null;
+        return expressionHandler.parseSingleValue(tag, value, defaultValue, dataType);
     }
 
     public JsonNode getNode(String path) {
@@ -199,5 +173,9 @@ public class MappingSchema {
 
     public NestedObjectNode getSchemaNode() {
         return schemaNode;
+    }
+
+    public ExpressionHandler getExpressionHandler() {
+        return expressionHandler;
     }
 }
