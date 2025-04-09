@@ -21,25 +21,56 @@ public class MappingELResolver extends ELResolver {
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
-        if (base instanceof JsonNode node) {
-            context.setPropertyResolved(true);
-            return node.path(property.toString());
-        }
+        if (property instanceof String path) {
+            MappingStateHolder stateHolder = lookupStateHolder();
+            if ("_iteration".equals(path)) {
+                Optional<Integer> iteration = stateHolder.getLoopIteration(base);
+                if (iteration.isPresent()) {
+                    context.setPropertyResolved(true);
+                    return iteration.get();
+                }
+            }
 
-        MappingStateHolder mappingStateHolder = lookup();
-        Optional<JsonNode> mappingNode = mappingStateHolder.getValueFromMapping(property.toString());
-        if (mappingNode.isPresent()) {
-            context.setPropertyResolved(true);
-            return mappingNode.get();
+            if (base instanceof JsonNode node) {
+                context.setPropertyResolved(true);
+                return node.path(path);
+            }
+
+            Optional<Object> mappingNode = stateHolder.getValueFromInput(path);
+            if (mappingNode.isPresent()) {
+                context.setPropertyResolved(true);
+                return mappingNode.get();
+            }
         }
 
         return wrappedResolver.getValue(context, base, property);
     }
 
-    private MappingStateHolder lookup() {
+    @Override
+    public <T> T convertToType(ELContext context, Object obj, Class<T> targetType) {
+        if (obj instanceof JsonNode node) {
+            if (targetType.equals(String.class)) {
+                context.setPropertyResolved(true);
+                return (T)node.textValue();
+            } else if (targetType.equals(Integer.class)) {
+                context.setPropertyResolved(true);
+                return (T) (Object) node.longValue();
+            } else if (targetType.equals(Float.class)) {
+                context.setPropertyResolved(true);
+                return (T) (Object) node.doubleValue();
+            } else if (targetType.equals(Boolean.class)) {
+                context.setPropertyResolved(true);
+                return (T) (Object) node.booleanValue();
+            }
+        }
+
+        return super.convertToType(context, obj, targetType);
+    }
+
+    private MappingStateHolder lookupStateHolder() {
         Bean<?> bean = beanManager.resolve(beanManager.getBeans(MappingStateHolder.class));
         if (bean == null) {
-            return null;
+            throw new RuntimeException();
         }
         return (MappingStateHolder) beanManager.getReference(bean, MappingStateHolder.class, beanManager.createCreationalContext(bean));
     }

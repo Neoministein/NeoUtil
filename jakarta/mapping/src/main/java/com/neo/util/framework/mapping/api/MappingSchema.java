@@ -1,15 +1,13 @@
 package com.neo.util.framework.mapping.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.api.json.JsonDataType;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.impl.mapping.ExpressExtractor;
-import com.neo.util.framework.mapping.api.node.LoopArrayNode;
-import com.neo.util.framework.mapping.api.node.NestedObjectNode;
-import com.neo.util.framework.mapping.api.node.Node;
-import com.neo.util.framework.mapping.api.node.SingleArrayNode;
+import com.neo.util.framework.mapping.api.node.*;
 import com.networknt.schema.JsonSchema;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -29,8 +27,8 @@ public class MappingSchema {
     private final Map<String, JsonNode> loopValues = new HashMap<>();
     private final NestedObjectNode schemaNode;
 
-    public MappingSchema(ExpressionHandler testName, String mappingXml, String inputSchema) {
-        this(testName, parseXml(mappingXml), JsonSchemaUtil.generateNewSchema(inputSchema));
+    public MappingSchema(ExpressionHandler expressionHAndler, String mappingXml, String inputSchema) {
+        this(expressionHAndler, parseXml(mappingXml), JsonSchemaUtil.generateNewSchema(inputSchema));
     }
 
     public MappingSchema(ExpressionHandler testName, Document mapping, JsonSchema inputSchema) {
@@ -39,7 +37,7 @@ public class MappingSchema {
         this.expressionHandler = testName;
         this.inputSchema = inputSchema;
         this.sampleJson = JsonSchemaUtil.generateSampleJson(inputSchema);
-        this.schemaNode = new NestedObjectNode("root", getChildren(root));
+        this.schemaNode = new NestedObjectNode("root", getChildren(root), null);
 
     }
 
@@ -55,7 +53,7 @@ public class MappingSchema {
     }
 
     private NestedObjectNode parseObject(Element element) {
-        return new NestedObjectNode(element.getTagName(), getChildren(element));
+        return new NestedObjectNode(element.getTagName(), getChildren(element), getSkipable(element));
     }
 
     private Node parseElement(Element element) {
@@ -70,8 +68,7 @@ public class MappingSchema {
     private Node parseSingleValue(Element element, JsonDataType dataType) {
         String tag = element.getTagName();
         String value = getAndVerifyAttribute(element, "value");
-        String defaultValue = element.hasAttribute("default") ? element.getAttribute("default") : null;
-        return expressionHandler.parseSingleValue(tag, value, defaultValue, dataType);
+        return new ExpressionNode(dataType, tag, expressionHandler.createExpression(value, dataType), getSkipable(element));
     }
 
     public JsonNode getNode(String path) {
@@ -108,23 +105,13 @@ public class MappingSchema {
         }
     }
 
-    private void validateExpression(List<ExpressExtractor.Value> valueList) {
-        for (ExpressExtractor.Value value: valueList) {
-            if (value.type() == ExpressExtractor.Type.EXPRESSION)  {
-                if (validatePath(value.value()).isEmpty()) {
-                    throw new RuntimeException(); //TODO
-                }
-            }
-        }
-    }
-
     private Node parseArray(Element element) {
         String tag = element.getTagName();
         String loopPath = element.getAttribute("loop");
         String varName = element.getAttribute("var");
 
         if (StringUtils.isEmpty(loopPath) && StringUtils.isEmpty(varName)) {
-            return new SingleArrayNode(tag, getChildren(element));
+            return new SingleArrayNode(tag, getChildren(element), getSkipable(element));
         }
 
         if (StringUtils.isPresent(loopPath) && StringUtils.isPresent(loopPath)) {
@@ -141,13 +128,13 @@ public class MappingSchema {
                 throw new RuntimeException(); //TODO
             }
 
-            com.fasterxml.jackson.databind.node.ObjectNode node = (com.fasterxml.jackson.databind.node.ObjectNode) getNode(expressionValue.getFirst().value()).get(0);
+            ObjectNode node = (ObjectNode) getNode(expressionValue.getFirst().value()).get(0);
             node.put("_iteration", 0);
             loopValues.put(varName, node);
             List<Node> children = getChildren(element);
             loopValues.remove(varName);
 
-            return new LoopArrayNode(tag, varName, loopPath, children);
+            return new LoopArrayNode(tag, varName, expressionHandler.createExpression(loopPath, JsonDataType.ARRAY), children, getSkipable(element));
         }
 
         throw new RuntimeException(); //TODO
@@ -159,6 +146,14 @@ public class MappingSchema {
         }
 
         throw new IllegalStateException(""); //TODO
+    }
+
+    private ExpressionValue getSkipable(Element element) {
+        if (element.hasAttribute("skip")) {
+            return expressionHandler.createExpression(element.getAttribute("skip"), JsonDataType.BOOLEAN);
+        }
+
+        return null;
     }
 
     private static Document parseXml(String xml) {

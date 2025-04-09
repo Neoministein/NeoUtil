@@ -6,7 +6,7 @@ import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.mapping.api.MappingSchema;
 import com.neo.util.framework.mapping.impl.ElExpressionHandler;
 import com.neo.util.framework.mapping.impl.MappingELResolver;
-import com.neo.util.framework.mapping.impl.MappingObjectv2;
+import com.neo.util.framework.mapping.impl.MappingServiceImpl;
 import com.neo.util.framework.mapping.impl.MappingStateHolder;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.StandardELContext;
@@ -33,32 +33,21 @@ public class ExpressionTest {
         //MathBean mathBean = weld.select(MathBean.class).get();
         RequestContextController rcc = weld.select(RequestContextController.class).get();
 
+        MappingServiceImpl mappingService = weld.select(MappingServiceImpl.class).get();
+
         ExpressionFactory factory = ExpressionFactory.newInstance();
         StandardELContext context = new StandardELContext(factory);
         context.putContext(BeanManager.class, beanManager);
         context.addELResolver(new MappingELResolver(beanManager));
 
 
-        MappingSchema mappingSchema = new MappingSchema(new ElExpressionHandler(context), format, jsonSchema);
+        MappingSchema mappingSchema = new MappingSchema(new ElExpressionHandler(beanManager), format, jsonSchema);
         ValueExpression expression = factory.createValueExpression(context, "#{mathBean.a.idk}", JsonNode.class);
         ValueExpression expression2 = factory.createValueExpression(context, "IDK", String.class);
 
-        Object o = null;
-        rcc.activate();
 
-        weld.select(MappingStateHolder.class).get().setSchema(mappingSchema, null);
-        o = expression.getValue(context);
-        MappingObjectv2 objectv2 = new MappingObjectv2(mappingSchema);
-        objectv2.transformJson((ObjectNode) JsonUtil.fromJson(json));
-        System.out.println(o); // Output: 11
-        rcc.deactivate();
-
-        rcc.activate();
-        weld.select(MappingStateHolder.class).get().setSchema(mappingSchema, null);
-        o = expression.getValue(context);
-        System.out.println(o); // Output: 11
-        rcc.deactivate();
-        System.out.println();
+        JsonNode result = mappingService.transformJson(mappingSchema, (ObjectNode) JsonUtil.fromJson(json));
+        System.out.println(result.toPrettyString());
     }
 
     private static final String jsonSchema = "{\n" +
@@ -130,7 +119,7 @@ public class ExpressionTest {
             "<tuType type=\"String\" value=\"PALLET\"/>\n" +
             "</transportUnit>\n" +
             "<asnLine type=\"array\" var=\"asnline\" loop=\"#{ZEWM_E1LTORI}\">\n" +
-            "<lineNumber type=\"Integer\" value=\"#{asnline._iteration}\"/>\n" +
+            "<lineNumber type=\"Integer\" value=\"#{asnline._iteration + 1}\"/>\n" +
             "<productId type=\"String\" value=\"#{asnline.MATNR}\"/>\n" +
             "<productVersionId type=\"String\" value=\"default\"/>\n" +
             "<packagingUom type=\"String\" value=\"#{asnline.MEINS}\"/>\n" +
