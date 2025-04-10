@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.api.json.JsonDataType;
+import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.framework.mapping.api.ExpressionHandler;
 import com.neo.util.framework.mapping.api.MappingSchema;
 import com.neo.util.framework.mapping.api.node.*;
@@ -14,6 +15,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @ApplicationScoped
 public class MappingServiceImpl {
@@ -35,6 +37,11 @@ public class MappingServiceImpl {
 
 
     public JsonNode transformJson(MappingSchema mapping, ObjectNode sourceJson) {
+        Optional<String> i = JsonSchemaUtil.isValid(sourceJson, mapping.getInputSchema());
+        if (i.isPresent()) {
+            throw new IllegalArgumentException("The source json doesn't addhear to the requred schema [" + i.get() +"]");
+        }
+
         RequestContextController rcc = requestContextControllerProvider.get();
         rcc.activate();
         try {
@@ -51,7 +58,6 @@ public class MappingServiceImpl {
             return;
         }
 
-
          JsonNode resultNode = switch (schemaNode) {
             case StaticNode staticNode -> objectMapper.valueToTree(staticNode.getSchemaValue());
             case ExpressionNode expressionNode -> parseSingleValue(expressionNode);
@@ -59,7 +65,7 @@ public class MappingServiceImpl {
             case LoopArrayNode loopArrayNode -> parseArray(loopArrayNode);
             case SingleArrayNode singleArrayNode -> parseArray(singleArrayNode);
 
-            default -> throw new IllegalStateException("Unexpected value: " + schemaNode);
+            default -> throw new IllegalArgumentException("The provided schemaNode isn't handledis n value: " + schemaNode);
         };
 
         if (schemaNode.getDataType().equals(JsonDataType.ARRAY)) {

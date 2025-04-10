@@ -85,7 +85,7 @@ public class MappingSchemaFactory {
             return new LoopArrayNode(tag, varName, expressionHandler.createExpression(loopPath, JsonDataType.ARRAY), getChildren(element), getSkipable(element));
         }
 
-        throw new RuntimeException(); //TODO
+        throw new IllegalArgumentException("The field [" + tag +"] either needs to have the attribute [loop] and [var] none of them");
     }
 
     private String getAndVerifyAttribute(Element element, String attribute) {
@@ -93,7 +93,7 @@ public class MappingSchemaFactory {
             return element.getAttribute(attribute);
         }
 
-        throw new IllegalStateException(""); //TODO
+        throw new IllegalArgumentException("The field [" + element.getTagName() + "] is missing the mandatory attribute ["+ attribute +"]");
     }
 
     private ExpressionValue getSkipable(Element element) {
@@ -110,7 +110,7 @@ public class MappingSchemaFactory {
             DocumentBuilder builder = factory.newDocumentBuilder();
             return builder.parse(new ByteArrayInputStream(xml.replace("\n", "").getBytes(StandardCharsets.UTF_8)));
         } catch (Exception ex) {
-            throw new IllegalArgumentException(ex);
+            throw new IllegalArgumentException("The provided mapping isn't valid XML Error: ["+ ex.getMessage() +"]");
         }
     }
 
