@@ -1,0 +1,48 @@
+{
+  "owner" : "CustomerName",
+  "asnType" : "Receipt",
+  "transportUnit" : {
+    "tuId" : "T-10001",
+    "tuType" : "PALLET"
+  },
+  "asnLine" : [ {
+    "lineNumber" : 1,
+    "productId" : "iPhone1",
+    "productVersionId" : "default",
+    "packagingUom" : "CASE",
+    "quantityExpected" : 11.0,
+    "attributeValue" : [ {
+      "name" : "lotcode",
+      "value" : "LOT-121"
+    }, {
+      "name" : "checkInDate",
+      "value" : "11.03.2025"
+    } ]
+  }, {
+    "lineNumber" : 2,
+    "productId" : "iPhone2",
+    "productVersionId" : "default",
+    "packagingUom" : "EACH",
+    "quantityExpected" : 12.0,
+    "attributeValue" : [ {
+      "name" : "lotcode",
+      "value" : "LOT-122"
+    }, {
+      "name" : "checkInDate",
+      "value" : "11.03.2025"
+    } ]
+  }, {
+    "lineNumber" : 3,
+    "productId" : "iPhone3",
+    "productVersionId" : "default",
+    "packagingUom" : "BIG-CASE",
+    "quantityExpected" : 13.0,
+    "attributeValue" : [ {
+      "name" : "lotcode",
+      "value" : "LOT-123"
+    }, {
+      "name" : "checkInDate",
+      "value" : "11.03.2025"
+    } ]
+  } ]
+}

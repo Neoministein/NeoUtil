@@ -11,49 +11,49 @@
         "Id": {
           "type": "string"
         },
-        "TART": {
+        "Empty": {
           "type": "string"
         }
       },
       "required": [
         "Customer",
         "Id",
-        "TART"
+        "Empty"
       ]
     },
-    "ZEWM_E1LTORI": {
+    "Line": {
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
-          "MATNR": {
+          "Product": {
             "type": "string"
           },
           "count": {
             "type": "string"
           },
-          "MEINS": {
+          "packaging": {
             "type": "string"
           },
-          "WDATU": {
+          "Date": {
             "type": "string"
           },
-          "WENUM": {
+          "Lot": {
             "type": "string"
           }
         },
         "required": [
-          "MATNR",
+          "Product",
           "count",
-          "MEINS",
-          "WDATU",
-          "WENUM"
+          "packaging",
+          "Date",
+          "Lot"
         ]
       }
     }
   },
   "required": [
     "OrderHeader",
-    "ZEWM_E1LTORI"
+    "Line"
   ]
 }

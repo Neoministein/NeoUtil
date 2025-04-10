@@ -5,19 +5,19 @@
         <tuId type="String" value="#{OrderHeader.Id}"/>
         <tuType type="String" value="PALLET"/>
     </transportUnit>
-    <asnLine type="array" var="asnline" loop="#{ZEWM_E1LTORI}">
-        <lineNumber type="Integer" value="#{asnline._iteration}"/>
-        <productId type="String" value="#{asnline.MATNR}"/>
+    <asnLine type="array" var="asnline" loop="#{Line}">
+        <lineNumber type="Integer" value="#{asnline._iteration + 1}"/>
+        <productId type="String" value="#{asnline.Product}"/>
         <productVersionId type="String" value="default"/>
-        <packagingUom type="String" value="#{asnline.MEINS}"/>
-        <quantityExpected type="String" value="#{asnline.count}"/>
+        <packagingUom type="String" value="#{asnline.packaging}"/>
+        <quantityExpected type="Number" value="#{asnline.count}"/>
         <attributeValue type="array">
             <name type="String" value="lotcode"/>
-            <value type="String" value="#{asnline.WENUM}"/>
+            <value type="String" value="#{asnline.Lot}"/>
         </attributeValue>
         <attributeValue type="array">
             <name type="String" value="checkInDate"/>
-            <value type="String" value="#{asnline.WDATU}"/>
+            <value type="String" value="#{utilBean.reformatDate(asnline.Date, 'yyyy-MM-dd', 'dd.MM.yyyy')}"/>
         </attributeValue>
     </asnLine>
 </root>

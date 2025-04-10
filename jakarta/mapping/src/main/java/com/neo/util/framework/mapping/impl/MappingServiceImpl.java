@@ -14,21 +14,24 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
 import java.util.Collection;
-import java.util.Map;
 
 @ApplicationScoped
 public class MappingServiceImpl {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Inject
-    protected ExpressionHandler expressionHandler;
+    protected final ExpressionHandler expressionHandler;
+
+    protected final Provider<RequestContextController> requestContextControllerProvider;
+
+    protected final  Provider<MappingStateHolder> mappingStateHolderProvider;
 
     @Inject
-    protected Provider<RequestContextController> requestContextControllerProvider;
-
-    @Inject
-    protected Provider<MappingStateHolder> mappingStateHolderProvider;
+    public MappingServiceImpl(ExpressionHandler expressionHandler, Provider<RequestContextController> requestContextControllerProvider, Provider<MappingStateHolder> mappingStateHolderProvider) {
+        this.expressionHandler = expressionHandler;
+        this.requestContextControllerProvider = requestContextControllerProvider;
+        this.mappingStateHolderProvider = mappingStateHolderProvider;
+    }
 
 
     public JsonNode transformJson(MappingSchema mapping, ObjectNode sourceJson) {
@@ -36,7 +39,7 @@ public class MappingServiceImpl {
         rcc.activate();
         try {
             mappingStateHolderProvider.get().init(sourceJson);
-            return parseObject(mapping.getSchemaNode());
+            return parseObject(mapping.getMappingSchema());
         } finally {
             rcc.deactivate();
         }
@@ -68,23 +71,8 @@ public class MappingServiceImpl {
     }
 
     private JsonNode parseSingleValue(ExpressionNode nestedObjectNode) {
-        Object expression = expressionHandler.evaluateWithContext(nestedObjectNode.getExpression());
-        return parseDataType(nestedObjectNode.getDataType(), expression);
-    }
-
-    private JsonNode parseDataType(JsonDataType  dataType, Object value) {
-        if (value == null) {
-            return objectMapper.nullNode();
-        }
-
-        return objectMapper.valueToTree(
-                switch (dataType) {
-                    case STRING -> value;
-                    case INTEGER -> Integer.parseInt(value.toString());
-                    case NUMBER -> Float.parseFloat(value.toString());
-                    case BOOLEAN -> Boolean.parseBoolean(value.toString());
-                    default -> null;
-                });
+        Object evaluatedExpression = expressionHandler.evaluateWithContext(nestedObjectNode.getExpression());
+        return objectMapper.valueToTree(evaluatedExpression);
     }
 
     private JsonNode parseObject(NestedNode nestedObjectNode) {

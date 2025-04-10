@@ -33,13 +33,14 @@ public class MappingELResolver extends ELResolver {
 
             if (base instanceof JsonNode node) {
                 context.setPropertyResolved(true);
-                return node.path(path);
+                JsonNode desiredProperty = node.path(path);
+                return tryHandleLeaf(desiredProperty);
             }
 
             Optional<Object> mappingNode = stateHolder.getValueFromInput(path);
             if (mappingNode.isPresent()) {
                 context.setPropertyResolved(true);
-                return mappingNode.get();
+                return tryHandleLeaf(mappingNode.get());
             }
         }
 
@@ -48,23 +49,51 @@ public class MappingELResolver extends ELResolver {
 
     @Override
     public <T> T convertToType(ELContext context, Object obj, Class<T> targetType) {
+        /*
         if (obj instanceof JsonNode node) {
             if (targetType.equals(String.class)) {
                 context.setPropertyResolved(true);
-                return (T)node.textValue();
+                if (node.isTextual()) {
+                    return (T) node.textValue();
+                }
+                return (T) node.toString();
             } else if (targetType.equals(Integer.class)) {
                 context.setPropertyResolved(true);
+                context.setPropertyResolved(true);
+                if (node.isTextual()) {
+                    return (T) (Object) Integer.parseInt(node.textValue());
+                }
                 return (T) (Object) node.longValue();
             } else if (targetType.equals(Float.class)) {
                 context.setPropertyResolved(true);
+                if (node.isTextual()) {
+                    return (T) (Object) Float.parseFloat(node.textValue());
+                }
                 return (T) (Object) node.doubleValue();
             } else if (targetType.equals(Boolean.class)) {
                 context.setPropertyResolved(true);
                 return (T) (Object) node.booleanValue();
             }
         }
-
+*/
         return super.convertToType(context, obj, targetType);
+    }
+
+    private Object tryHandleLeaf(Object value) {
+        if (value instanceof JsonNode node) {
+            if (node.isTextual()) {
+                return node.textValue();
+            } else if (node.isInt()) {
+                return node.intValue();
+            } else if (node.isLong()) {
+                return node.longValue();
+            } else if (node.isDouble()) {
+                return node.doubleValue();
+            } else if (node.isBoolean()) {
+                return node.booleanValue();
+            }
+        }
+        return value;
     }
 
     private MappingStateHolder lookupStateHolder() {
@@ -93,5 +122,10 @@ public class MappingELResolver extends ELResolver {
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
         return wrappedResolver.getCommonPropertyType(context, base);
+    }
+
+    @Override
+    public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
+        return super.invoke(context, base, method, paramTypes, params);
     }
 }

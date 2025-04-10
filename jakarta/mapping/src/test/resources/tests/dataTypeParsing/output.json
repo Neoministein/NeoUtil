@@ -1,0 +1,14 @@
+{
+  "stringToString" : "Name",
+  "stringToBoolean" : true,
+  "stringToInt" : 1,
+  "stringToNumber" : 2.0,
+  "intToString" : "3",
+  "intToInt" : 3,
+  "intToNumber" : 3.0,
+  "numberToString" : "4.0",
+  "numberToInt" : 4,
+  "numberToNUmber" : 4.0,
+  "booleanToString" : "true",
+  "booleanToBoolean" : true
+}

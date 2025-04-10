@@ -1,0 +1,14 @@
+<root>
+    <stringToString     type="String"   value="#{stringValue}"/>
+    <stringToBoolean    type="Boolean"  value="#{stringBoolean}"/>
+    <stringToInt        type="Integer"  value="#{stringInt}"/>
+    <stringToNumber     type="Number"   value="#{stringNumber}"/>
+    <intToString        type="String"   value="#{intValue}"/>
+    <intToInt           type="Integer"  value="#{intValue}"/>
+    <intToNumber        type="Number"   value="#{intValue}"/>
+    <numberToString     type="String"   value="#{numberValue}"/>
+    <numberToInt        type="Integer"  value="#{numberValue}"/>
+    <numberToNUmber     type="Number"   value="#{numberValue}"/>
+    <booleanToString    type="String"   value="#{booleanValue}"/>
+    <booleanToBoolean   type="Boolean"  value="#{booleanValue}"/>
+</root>

@@ -1,0 +1,30 @@
+{
+  "OrderHeader": {
+    "Customer": "CustomerName",
+    "Id": "T-10001",
+    "Empty": ""
+  },
+  "Line": [
+    {
+      "Product": "iPhone1",
+      "count": "11.0",
+      "packaging": "CASE",
+      "Date": "2025-03-11",
+      "Lot": "LOT-121"
+    },
+    {
+      "Product": "iPhone2",
+      "count": "12.0",
+      "packaging": "EACH",
+      "Date": "2025-03-11",
+      "Lot": "LOT-122"
+    },
+    {
+      "Product": "iPhone3",
+      "count": "13.0",
+      "packaging": "BIG-CASE",
+      "Date": "2025-03-11",
+      "Lot": "LOT-123"
+    }
+  ]
+}
