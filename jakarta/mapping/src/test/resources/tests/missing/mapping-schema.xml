@@ -1,0 +1,3 @@
+<root>
+    <expression1 type="String"   value="#{jsonObject.missing}"/>
+</root>

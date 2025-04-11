@@ -3,10 +3,7 @@ package com.neo.util.framework.mapping.impl;
 import com.neo.util.common.api.json.JsonDataType;
 import com.neo.util.framework.mapping.api.ExpressionHandler;
 import com.neo.util.framework.mapping.api.ExpressionValue;
-import jakarta.el.ExpressionFactory;
-import jakarta.el.PropertyNotFoundException;
-import jakarta.el.StandardELContext;
-import jakarta.el.ValueExpression;
+import jakarta.el.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.inject.Inject;
@@ -30,14 +27,15 @@ public class ElExpressionHandler implements ExpressionHandler {
         this.mappingContext.addELResolver(new MappingELResolver(beanManager));
     }
 
-    public ExpressionValue createExpression(String expression, JsonDataType dataType) {
+    @Override
+    public ExpressionValue createExpression(String name, String expression, JsonDataType dataType) {
         Class<?> singleValueClass = classFromDataType(dataType);
-        ValueExpression elExpression = createExpressionInternal(expression, singleValueClass);
-        Optional<Object> evaluatedElExpression = staticEvaluateExpression(elExpression);
+        ElExpressionWrapper elExpressionWrapper = new ElExpressionWrapper(name, createExpressionInternal(expression, singleValueClass));
+        Optional<Object> evaluatedElExpression = staticEvaluateExpression(elExpressionWrapper);
         if (evaluatedElExpression.isPresent()) {
             return new StaticExpressionValue(evaluatedElExpression.get());
         }
-        return new ElExpressionWrapper(elExpression);
+        return elExpressionWrapper;
     }
 
     private Class<?> classFromDataType(JsonDataType dataType) {
@@ -55,21 +53,28 @@ public class ElExpressionHandler implements ExpressionHandler {
     }
 
     @Override
-    public Optional<Object> staticEvaluateExpression(ValueExpression expression) {
+    public Optional<Object> staticEvaluateExpression(ExpressionValue expression) {
         try {
-            return Optional.ofNullable(expression.getValue(staticContext));
-        }  catch (PropertyNotFoundException ex) {
-            return Optional.empty();
+            return Optional.ofNullable(evaluate(expression, staticContext));
+        } catch (IllegalArgumentException ex) {
+            if (ex.getCause() instanceof PropertyNotFoundException) {
+                return Optional.empty();
+            }
+            throw ex;
         }
     }
 
     @Override
     public Object evaluateWithContext(ExpressionValue expressionNode) {
+        return evaluate(expressionNode, mappingContext);
+    }
+
+    protected Object evaluate(ExpressionValue expressionNode, ELContext context) {
         if (expressionNode instanceof ElExpressionWrapper elWrapper) {
             try {
-                return elWrapper.expression().getValue(mappingContext);
+                return elWrapper.expression().getValue(context);
             } catch (Exception ex) {
-
+                throw new IllegalArgumentException("Unable to evaludate field: [" + elWrapper.getName() + "], error: [" + ex.getMessage() + "]", ex);
             }
 
         } else if (expressionNode instanceof StaticExpressionValue staticExpressionValue) {

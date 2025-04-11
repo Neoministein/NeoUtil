@@ -69,20 +69,20 @@ public class MappingSchemaFactory {
     private Node parseSingleValue(Element element, JsonDataType dataType) {
         String tag = element.getTagName();
         String value = getAndVerifyAttribute(element, "value");
-        return new ExpressionNode(dataType, tag, expressionHandler.createExpression(value, dataType), getSkipable(element));
+        return new ExpressionNode(dataType, tag, expressionHandler.createExpression(tag, value, dataType), getSkipable(element));
     }
 
     private Node parseArray(Element element) {
         String tag = element.getTagName();
-        String loopPath = element.getAttribute("loop");
+        String loopExpression = element.getAttribute("loop");
         String varName = element.getAttribute("var");
 
-        if (StringUtils.isEmpty(loopPath) && StringUtils.isEmpty(varName)) {
+        if (StringUtils.isEmpty(loopExpression) && StringUtils.isEmpty(varName)) {
             return new SingleArrayNode(tag, getChildren(element), getSkipable(element));
         }
 
-        if (StringUtils.isPresent(loopPath) && StringUtils.isPresent(loopPath)) {
-            return new LoopArrayNode(tag, varName, expressionHandler.createExpression(loopPath, JsonDataType.ARRAY), getChildren(element), getSkipable(element));
+        if (StringUtils.isPresent(loopExpression) && StringUtils.isPresent(loopExpression)) {
+            return new LoopArrayNode(tag, varName, expressionHandler.createExpression(tag, loopExpression, JsonDataType.ARRAY), getChildren(element), getSkipable(element));
         }
 
         throw new IllegalArgumentException("The field [" + tag +"] either needs to have the attribute [loop] and [var] none of them");
@@ -98,7 +98,7 @@ public class MappingSchemaFactory {
 
     private ExpressionValue getSkipable(Element element) {
         if (element.hasAttribute("skip")) {
-            return expressionHandler.createExpression(element.getAttribute("skip"), JsonDataType.BOOLEAN);
+            return expressionHandler.createExpression(element.getTagName() + ".skip" , element.getAttribute("skip"), JsonDataType.BOOLEAN);
         }
 
         return null;

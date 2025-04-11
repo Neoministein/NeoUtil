@@ -6,7 +6,8 @@ import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.mapping.api.ExpressionHandler;
 import com.neo.util.framework.mapping.api.MappingSchema;
-import com.neo.util.framework.mapping.impl.*;
+import com.neo.util.framework.mapping.impl.MappingSchemaFactory;
+import com.neo.util.framework.mapping.impl.MappingServiceImpl;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.junit5.WeldInitiator;
 import org.jboss.weld.junit5.WeldJunit5Extension;
@@ -56,7 +57,7 @@ class ExpressionTest {
 
     @Test
     void singleSchemaTest() throws IOException {
-        File testLocation = ResourceUtil.getFolderContent("./tests/basicExpression")[0].getParentFile();
+        File testLocation = ResourceUtil.getFolderContent("./tests/missing")[0].getParentFile();
 
         String input = Files.readString(Path.of(testLocation.getPath() + "\\input.json"));
         String jsonSchema = Files.readString(Path.of(testLocation.getPath() + "\\json-schema.json"));

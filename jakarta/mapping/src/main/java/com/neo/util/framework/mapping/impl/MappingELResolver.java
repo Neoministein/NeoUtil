@@ -49,33 +49,11 @@ public class MappingELResolver extends ELResolver {
 
     @Override
     public <T> T convertToType(ELContext context, Object obj, Class<T> targetType) {
-        /*
-        if (obj instanceof JsonNode node) {
-            if (targetType.equals(String.class)) {
-                context.setPropertyResolved(true);
-                if (node.isTextual()) {
-                    return (T) node.textValue();
-                }
-                return (T) node.toString();
-            } else if (targetType.equals(Integer.class)) {
-                context.setPropertyResolved(true);
-                context.setPropertyResolved(true);
-                if (node.isTextual()) {
-                    return (T) (Object) Integer.parseInt(node.textValue());
-                }
-                return (T) (Object) node.longValue();
-            } else if (targetType.equals(Float.class)) {
-                context.setPropertyResolved(true);
-                if (node.isTextual()) {
-                    return (T) (Object) Float.parseFloat(node.textValue());
-                }
-                return (T) (Object) node.doubleValue();
-            } else if (targetType.equals(Boolean.class)) {
-                context.setPropertyResolved(true);
-                return (T) (Object) node.booleanValue();
-            }
+        if (obj == null) {
+            context.setPropertyResolved(true);
+            return null;
         }
-*/
+
         return super.convertToType(context, obj, targetType);
     }
 
@@ -91,6 +69,8 @@ public class MappingELResolver extends ELResolver {
                 return node.doubleValue();
             } else if (node.isBoolean()) {
                 return node.booleanValue();
+            } else if (node.isMissingNode()) {
+                return null;
             }
         }
         return value;
