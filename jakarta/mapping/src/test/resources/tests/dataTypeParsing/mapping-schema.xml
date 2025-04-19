@@ -1,14 +1,14 @@
 <root>
-    <stringToString     type="String"   value="#{stringValue}"/>
-    <stringToBoolean    type="Boolean"  value="#{stringBoolean}"/>
-    <stringToInt        type="Integer"  value="#{stringInt}"/>
-    <stringToNumber     type="Number"   value="#{stringNumber}"/>
-    <intToString        type="String"   value="#{intValue}"/>
-    <intToInt           type="Integer"  value="#{intValue}"/>
-    <intToNumber        type="Number"   value="#{intValue}"/>
-    <numberToString     type="String"   value="#{numberValue}"/>
-    <numberToInt        type="Integer"  value="#{numberValue}"/>
-    <numberToNUmber     type="Number"   value="#{numberValue}"/>
-    <booleanToString    type="String"   value="#{booleanValue}"/>
-    <booleanToBoolean   type="Boolean"  value="#{booleanValue}"/>
+    <stringToString     type="String"   value="#{_in.stringValue}"/>
+    <stringToBoolean    type="Boolean"  value="#{_in.stringBoolean}"/>
+    <stringToInt        type="Integer"  value="#{_in.stringInt}"/>
+    <stringToNumber     type="Number"   value="#{_in.stringNumber}"/>
+    <intToString        type="String"   value="#{_in.intValue}"/>
+    <intToInt           type="Integer"  value="#{_in.intValue}"/>
+    <intToNumber        type="Number"   value="#{_in.intValue}"/>
+    <numberToString     type="String"   value="#{_in.numberValue}"/>
+    <numberToInt        type="Integer"  value="#{_in.numberValue}"/>
+    <numberToNUmber     type="Number"   value="#{_in.numberValue}"/>
+    <booleanToString    type="String"   value="#{_in.booleanValue}"/>
+    <booleanToBoolean   type="Boolean"  value="#{_in.booleanValue}"/>
 </root>

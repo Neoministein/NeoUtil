@@ -1,6 +1,5 @@
 {
-  "expression1" : "VALUE",
-  "expression2" : "NAME",
-  "expression3" : "A",
-  "expression5" : "A"
+  "expression1" : null,
+  "expression2" : null,
+  "expression3" : [ ]
 }

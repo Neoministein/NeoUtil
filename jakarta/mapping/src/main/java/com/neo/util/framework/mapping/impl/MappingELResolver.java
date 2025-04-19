@@ -22,9 +22,14 @@ public class MappingELResolver extends ELResolver {
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         if (property instanceof String path) {
-            MappingStateHolder stateHolder = lookupStateHolder();
+
+            if ("_in".equals(path)) {
+                context.setPropertyResolved(true);
+                return lookupStateHolder();
+            }
+
             if ("_iteration".equals(path)) {
-                Optional<Integer> iteration = stateHolder.getLoopIteration(base);
+                Optional<Integer> iteration = lookupStateHolder().getLoopIteration(base);
                 if (iteration.isPresent()) {
                     context.setPropertyResolved(true);
                     return iteration.get();
@@ -37,10 +42,9 @@ public class MappingELResolver extends ELResolver {
                 return tryHandleLeaf(desiredProperty);
             }
 
-            Optional<Object> mappingNode = stateHolder.getValueFromInput(path);
-            if (mappingNode.isPresent()) {
+            if (base instanceof MappingStateHolder stateHolder) {
                 context.setPropertyResolved(true);
-                return tryHandleLeaf(mappingNode.get());
+                return tryHandleLeaf(stateHolder.getValueFromInput(path));
             }
         }
 

@@ -33,16 +33,12 @@ public class MappingStateHolder {
         }
     }
 
-    public Optional<Object> getValueFromInput(String path) {
+    public Object getValueFromInput(String path) {
         Object loopValue = loopValues.get(path);
         if (loopValue != null) {
-            return Optional.ofNullable(loopValue);
+            return loopValue;
         }
-        JsonNode node = sourceJson.path(path);
-        if (node.isMissingNode()) {
-            return Optional.empty();
-        }
-        return Optional.of(node);
+        return sourceJson.path(path);
     }
 
     public Optional<Integer> getLoopIteration(Object value) {

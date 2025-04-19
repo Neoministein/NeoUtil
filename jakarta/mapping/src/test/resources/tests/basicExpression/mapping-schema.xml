@@ -1,7 +1,7 @@
 <root>
     <expression1 type="String"   value="#{'value'.toUpperCase()}"/>
-    <expression2 type="String"   value="#{stringValue.toUpperCase()}"/>
-    <expression3 type="String"   value="#{intValue == 3 ? 'A' : 'B'}"/>
-    <expression4 type="String"   value="static" skip="#{booleanValue}"/>
-    <expression5 type="String"   value="#{stringInt == '1' ? 'A' : 'B'}" skip="#{!booleanValue}"/>
+    <expression2 type="String"   value="#{_in.stringValue.toUpperCase()}"/>
+    <expression3 type="String"   value="#{_in.intValue == 3 ? 'A' : 'B'}"/>
+    <expression4 type="String"   value="static" skip="#{_in.booleanValue}"/>
+    <expression5 type="String"   value="#{_in.stringInt == '1' ? 'A' : 'B'}" skip="#{!_in.booleanValue}"/>
 </root>

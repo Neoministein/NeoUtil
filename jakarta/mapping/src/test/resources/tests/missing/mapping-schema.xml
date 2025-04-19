@@ -1,3 +1,7 @@
 <root>
-    <expression1 type="String"   value="#{jsonObject.missing}"/>
+    <expression1 type="String"   value="#{_in.missing}"/>
+    <expression2 type="String"   value="#{_in.jsonObject.missing}"/>
+    <expression3 type="Array"    var="entry" loop="#{_in.missingArray}">
+        <subExpression1 type="String" value="#{entry.missing}"/>
+    </expression3>
 </root>

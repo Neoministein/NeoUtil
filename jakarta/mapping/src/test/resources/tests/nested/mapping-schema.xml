@@ -1,23 +1,23 @@
 <root>
-    <owner type="String" value="#{OrderHeader.Customer}"/>
+    <owner type="String" value="#{_in.OrderHeader.Customer}"/>
     <asnType type="String" value="Receipt"/>
     <transportUnit type="object">
-        <tuId type="String" value="#{OrderHeader.Id}"/>
+        <tuId type="String" value="#{_in.OrderHeader.Id}"/>
         <tuType type="String" value="PALLET"/>
     </transportUnit>
-    <asnLine type="array" var="asnline" loop="#{Line}">
-        <lineNumber type="Integer" value="#{asnline._iteration + 1}"/>
-        <productId type="String" value="#{asnline.Product}"/>
+    <asnLine type="array" var="asnline" loop="#{_in.Line}">
+        <lineNumber type="Integer" value="#{_in.asnline._iteration + 1}"/>
+        <productId type="String" value="#{_in.asnline.Product}"/>
         <productVersionId type="String" value="default"/>
-        <packagingUom type="String" value="#{asnline.packaging}"/>
-        <quantityExpected type="Number" value="#{asnline.count}"/>
+        <packagingUom type="String" value="#{_in.asnline.packaging}"/>
+        <quantityExpected type="Number" value="#{_in.asnline.count}"/>
         <attributeValue type="array">
             <name type="String" value="lotcode"/>
-            <value type="String" value="#{asnline.Lot}"/>
+            <value type="String" value="#{_in.asnline.Lot}"/>
         </attributeValue>
         <attributeValue type="array">
             <name type="String" value="checkInDate"/>
-            <value type="String" value="#{utilBean.reformatDate(asnline.Date, 'yyyy-MM-dd', 'dd.MM.yyyy')}"/>
+            <value type="String" value="#{utilBean.reformatDate(_in.asnline.Date, 'yyyy-MM-dd', 'dd.MM.yyyy')}"/>
         </attributeValue>
     </asnLine>
 </root>
