@@ -81,7 +81,7 @@ public class MappingSchemaFactory {
             return new SingleArrayNode(tag, getChildren(element), getSkipable(element));
         }
 
-        if (StringUtils.isPresent(loopExpression) && StringUtils.isPresent(loopExpression)) {
+        if (StringUtils.isPresent(loopExpression) && StringUtils.isPresent(varName)) {
             return new LoopArrayNode(tag, varName, expressionHandler.createExpression(tag, loopExpression, JsonDataType.ARRAY), getChildren(element), getSkipable(element));
         }
 
@@ -113,5 +113,4 @@ public class MappingSchemaFactory {
             throw new IllegalArgumentException("The provided mapping isn't valid XML Error: ["+ ex.getMessage() +"]");
         }
     }
-
 }
