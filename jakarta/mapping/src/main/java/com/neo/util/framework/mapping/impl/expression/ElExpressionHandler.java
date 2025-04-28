@@ -1,4 +1,4 @@
-package com.neo.util.framework.mapping.impl;
+package com.neo.util.framework.mapping.impl.expression;
 
 import com.neo.util.common.api.json.JsonDataType;
 import com.neo.util.framework.mapping.api.ExpressionHandler;
@@ -7,11 +7,15 @@ import jakarta.el.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
 @ApplicationScoped
 public class ElExpressionHandler implements ExpressionHandler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ElExpressionHandler.class);
 
     private final ExpressionFactory factory;
     private final StandardELContext staticContext;
@@ -29,6 +33,7 @@ public class ElExpressionHandler implements ExpressionHandler {
 
     @Override
     public ExpressionValue createExpression(String name, String expression, JsonDataType dataType) {
+        LOGGER.debug("Creating ELExpression [{}], From [{}], DataType [{}]", name, expression, dataType);
         Class<?> singleValueClass = classFromDataType(dataType);
         ElExpressionWrapper elExpressionWrapper = new ElExpressionWrapper(name, createExpressionInternal(expression, singleValueClass));
         Optional<Object> evaluatedElExpression = staticEvaluateExpression(elExpressionWrapper);
@@ -65,8 +70,8 @@ public class ElExpressionHandler implements ExpressionHandler {
     }
 
     @Override
-    public Object evaluateWithContext(ExpressionValue expressionNode) {
-        return evaluate(expressionNode, mappingContext);
+    public Object evaluateWithContext(ExpressionValue expression) {
+        return evaluate(expression, mappingContext);
     }
 
     protected Object evaluate(ExpressionValue expressionNode, ELContext context) {

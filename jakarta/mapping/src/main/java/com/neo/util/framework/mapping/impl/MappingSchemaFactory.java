@@ -10,6 +10,8 @@ import com.neo.util.framework.mapping.api.node.*;
 import com.networknt.schema.JsonSchema;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -21,8 +23,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Responsible for Building a valid {@link MappingSchema}
+ */
 @ApplicationScoped
 public class MappingSchemaFactory {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MappingSchemaFactory.class);
 
     protected final ExpressionHandler expressionHandler;
 

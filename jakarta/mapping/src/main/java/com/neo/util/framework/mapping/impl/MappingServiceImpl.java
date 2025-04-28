@@ -1,11 +1,11 @@
 package com.neo.util.framework.mapping.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.api.json.JsonDataType;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
+import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.mapping.api.ExpressionHandler;
 import com.neo.util.framework.mapping.api.MappingSchema;
 import com.neo.util.framework.mapping.api.node.*;
@@ -13,6 +13,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.RequestContextController;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -20,12 +22,10 @@ import java.util.Optional;
 @ApplicationScoped
 public class MappingServiceImpl {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Logger LOGGER = LoggerFactory.getLogger(MappingServiceImpl.class);
 
     protected final ExpressionHandler expressionHandler;
-
     protected final Provider<RequestContextController> requestContextControllerProvider;
-
     protected final  Provider<MappingStateHolder> mappingStateHolderProvider;
 
     @Inject
@@ -59,7 +59,7 @@ public class MappingServiceImpl {
         }
 
          JsonNode resultNode = switch (schemaNode) {
-            case StaticNode staticNode -> objectMapper.valueToTree(staticNode.getSchemaValue());
+            case StaticNode staticNode -> JsonUtil.fromPojo(staticNode.getSchemaValue());
             case ExpressionNode expressionNode -> parseSingleValue(expressionNode);
             case NestedObjectNode nestedObjectNode -> parseObject(nestedObjectNode);
             case LoopArrayNode loopArrayNode -> parseArray(loopArrayNode);
@@ -78,11 +78,11 @@ public class MappingServiceImpl {
 
     private JsonNode parseSingleValue(ExpressionNode nestedObjectNode) {
         Object evaluatedExpression = expressionHandler.evaluateWithContext(nestedObjectNode.getExpression());
-        return objectMapper.valueToTree(evaluatedExpression);
+        return JsonUtil.fromPojo(evaluatedExpression);
     }
 
     private JsonNode parseObject(NestedNode nestedObjectNode) {
-        ObjectNode objectNode = objectMapper.createObjectNode();
+        ObjectNode objectNode = JsonUtil.emptyObjectNode();
         for (Node node: nestedObjectNode.getChildren()) {
             parseElement(node, objectNode);
         }
@@ -90,7 +90,7 @@ public class MappingServiceImpl {
     }
 
     private ArrayNode parseArray(LoopArrayNode loopArrayNode) {
-        ArrayNode arrayNode = objectMapper.createArrayNode();
+        ArrayNode arrayNode = JsonUtil.emptyArrayNode();
         MappingStateHolder mappingStateHolder = mappingStateHolderProvider.get();
         Object loopSource = expressionHandler.evaluateWithContext(loopArrayNode.getLoopExpression());
         if (loopSource instanceof ArrayNode source) {
@@ -112,9 +112,9 @@ public class MappingServiceImpl {
     }
 
     private ArrayNode parseArray(SingleArrayNode loopArrayNode) {
-        ArrayNode arrayNode = objectMapper.createArrayNode();
+        ArrayNode arrayNode = JsonUtil.emptyArrayNode();
 
-        ObjectNode itemNode = objectMapper.createObjectNode();
+        ObjectNode itemNode = JsonUtil.emptyObjectNode();
         for (Node node: loopArrayNode.getChildren()) {
             parseElement(node, itemNode);
         }

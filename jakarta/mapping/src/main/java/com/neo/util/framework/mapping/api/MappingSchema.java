@@ -3,8 +3,10 @@ package com.neo.util.framework.mapping.api;
 import com.neo.util.framework.mapping.api.node.*;
 import com.networknt.schema.JsonSchema;
 
+/**
+ * Constant state holder for the SchemaMapping
+ */
 public class MappingSchema {
-
 
     private final NestedObjectNode schemaNode;
     private final JsonSchema inputSchema;

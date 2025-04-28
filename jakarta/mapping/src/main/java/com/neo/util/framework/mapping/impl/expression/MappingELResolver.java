@@ -1,11 +1,14 @@
-package com.neo.util.framework.mapping.impl;
+package com.neo.util.framework.mapping.impl.expression;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.neo.util.framework.mapping.impl.MappingStateHolder;
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 import jakarta.enterprise.inject.spi.Bean;
 import jakarta.enterprise.inject.spi.BeanManager;
 
+import java.beans.FeatureDescriptor;
+import java.util.Iterator;
 import java.util.Optional;
 
 
@@ -110,6 +113,11 @@ public class MappingELResolver extends ELResolver {
 
     @Override
     public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
-        return super.invoke(context, base, method, paramTypes, params);
+        return wrappedResolver.invoke(context, base, method, paramTypes, params);
+    }
+
+    @Override
+    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
+        return wrappedResolver.getFeatureDescriptors(context, base);
     }
 }
