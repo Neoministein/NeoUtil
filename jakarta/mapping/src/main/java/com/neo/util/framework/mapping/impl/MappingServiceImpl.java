@@ -99,7 +99,8 @@ public class MappingServiceImpl {
         ArrayNode arrayNode = JsonUtil.emptyArrayNode();
         MappingStateHolder mappingStateHolder = mappingStateHolderProvider.get();
         Object loopSource = expressionHandler.evaluateWithContext(loopArrayNode.getLoopExpression());
-        LOGGER.debug("LoopSourceExpression [{}] evaluated with class [{}]", loopArrayNode.getFiledName(), loopSource.getClass().getName());
+        String loopSourceClass = loopSource == null ? null : loopSource.getClass().getName();
+        LOGGER.debug("LoopSourceExpression [{}] evaluated with class [{}]", loopArrayNode.getFiledName(), loopSourceClass);
         if (loopSource instanceof ArrayNode source) {
             for (int i = 0; i < source.size(); i++) {
                 mappingStateHolder.setLoopIteration(i, loopArrayNode.getVarName(), source.get(i));
@@ -112,7 +113,7 @@ public class MappingServiceImpl {
                 mappingStateHolder.setLoopIteration(i, loopArrayNode.getVarName(), entry);
                 arrayNode.add(parseObject(loopArrayNode));
             }
-        } else {
+        } else if (loopSource != null) {
             throw new IllegalArgumentException("Unsupported LoopSource Type [" + loopSource.getClass().getName() + "]");
         }
         mappingStateHolder.removeLoopIteration(loopArrayNode.getVarName());
