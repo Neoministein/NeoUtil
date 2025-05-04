@@ -38,14 +38,15 @@ public class MappingSchemaFactory {
         this.expressionHandler = expressionHandler;
     }
 
-    public MappingSchema createSchema(String mappingXML, String inputJsonSchema) {
-        return createSchema(parseXml(mappingXML), JsonSchemaUtil.generateNewSchema(inputJsonSchema));
+    public MappingSchema createSchema(String name, String mappingXML, String inputJsonSchema) {
+        return createSchema(name, parseXml(mappingXML), JsonSchemaUtil.generateNewSchema(inputJsonSchema));
     }
 
-    public MappingSchema createSchema(Document mapping, JsonSchema inputSchema) {
+    public MappingSchema createSchema(String name, Document mapping, JsonSchema inputSchema) {
+        LOGGER.info("Creating MappingSchema [{}]", name);
         Element root = mapping.getDocumentElement();
         List<Node> nodes = getChildren(root);
-        return new MappingSchema(new NestedObjectNode("root", nodes, null), inputSchema);
+        return new MappingSchema(name, new NestedObjectNode("root", nodes, null), inputSchema);
     }
 
     private List<Node> getChildren(Element element) {
@@ -65,6 +66,7 @@ public class MappingSchemaFactory {
     }
 
     private Node parseElement(Element element) {
+        LOGGER.debug("Parsing SchemaNode [{}]", element.getTagName());
         JsonDataType dataType = JsonDataType.fromString(getAndVerifyAttribute(element, "type"));
         return switch (dataType) {
             case STRING, NUMBER, INTEGER, BOOLEAN -> parseSingleValue(element, dataType);

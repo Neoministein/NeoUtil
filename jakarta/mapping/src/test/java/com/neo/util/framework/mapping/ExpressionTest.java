@@ -68,7 +68,7 @@ class ExpressionTest {
     }
 
     void validateSchemaTest(String name, String input, String schema, String mappingSchemaXml, String output) {
-        MappingSchema mappingSchema = mappingSchemaFactory.createSchema(mappingSchemaXml, schema);
+        MappingSchema mappingSchema = mappingSchemaFactory.createSchema(name, mappingSchemaXml, schema);
 
         JsonNode result = mappingService.transformJson(mappingSchema, (ObjectNode) JsonUtil.fromJson(input));
 

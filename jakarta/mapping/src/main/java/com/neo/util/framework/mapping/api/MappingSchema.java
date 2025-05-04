@@ -8,12 +8,18 @@ import com.networknt.schema.JsonSchema;
  */
 public class MappingSchema {
 
+    private final String name;
     private final NestedObjectNode schemaNode;
     private final JsonSchema inputSchema;
 
-    public MappingSchema(NestedObjectNode schemaNode, JsonSchema inputSchema) {
+    public MappingSchema(String name, NestedObjectNode schemaNode, JsonSchema inputSchema) {
+        this.name = name;
         this.schemaNode = schemaNode;
         this.inputSchema = inputSchema;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public NestedObjectNode getMappingSchema() {

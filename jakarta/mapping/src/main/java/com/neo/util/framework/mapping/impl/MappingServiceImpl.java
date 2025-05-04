@@ -37,9 +37,12 @@ public class MappingServiceImpl {
 
 
     public JsonNode transformJson(MappingSchema mapping, ObjectNode sourceJson) {
-        Optional<String> i = JsonSchemaUtil.isValid(sourceJson, mapping.getInputSchema());
-        if (i.isPresent()) {
-            throw new IllegalArgumentException("The source json doesn't addhear to the requred schema [" + i.get() +"]");
+        LOGGER.info("Transforming Json for mapping [{}]", mapping.getName());
+        LOGGER.debug("Input Json: {}", sourceJson);
+        Optional<String> error = JsonSchemaUtil.isValid(sourceJson, mapping.getInputSchema());
+        if (error.isPresent()) {
+            LOGGER.error("The source json doesn't add hear to the required schema error: [{}]", error.get());
+            throw new IllegalArgumentException("The source json doesn't add hear to the required schema error: [" + error.get() +"]");
         }
 
         RequestContextController rcc = requestContextControllerProvider.get();
@@ -53,8 +56,10 @@ public class MappingServiceImpl {
     }
 
     private void parseElement(Node schemaNode, ObjectNode destinationNode) {
+        LOGGER.debug("Parsing [{}], schemaType [{}]", schemaNode.getFiledName(), schemaNode.getDataType());
         if (schemaNode.getSkipExpression().isPresent()
                 && (boolean) expressionHandler.evaluateWithContext(schemaNode.getSkipExpression().get())) {
+            LOGGER.debug("Skipping [{}], skip expression evaluated to true", schemaNode.getFiledName());
             return;
         }
 
@@ -65,7 +70,7 @@ public class MappingServiceImpl {
             case LoopArrayNode loopArrayNode -> parseArray(loopArrayNode);
             case SingleArrayNode singleArrayNode -> parseArray(singleArrayNode);
 
-            default -> throw new IllegalArgumentException("The provided schemaNode isn't handledis n value: " + schemaNode);
+            default -> throw new IllegalArgumentException("The provided schemaNode Class isn't implemented. Class: [" + schemaNode.getClass().getName() + "]");
         };
 
         if (schemaNode.getDataType().equals(JsonDataType.ARRAY)) {
@@ -78,6 +83,7 @@ public class MappingServiceImpl {
 
     private JsonNode parseSingleValue(ExpressionNode nestedObjectNode) {
         Object evaluatedExpression = expressionHandler.evaluateWithContext(nestedObjectNode.getExpression());
+        LOGGER.debug("SingleValueExpression [{}] evaluated to [{}]", nestedObjectNode.getFiledName(), evaluatedExpression);
         return JsonUtil.fromPojo(evaluatedExpression);
     }
 
@@ -93,6 +99,7 @@ public class MappingServiceImpl {
         ArrayNode arrayNode = JsonUtil.emptyArrayNode();
         MappingStateHolder mappingStateHolder = mappingStateHolderProvider.get();
         Object loopSource = expressionHandler.evaluateWithContext(loopArrayNode.getLoopExpression());
+        LOGGER.debug("LoopSourceExpression [{}] evaluated with class [{}]", loopArrayNode.getFiledName(), loopSource.getClass().getName());
         if (loopSource instanceof ArrayNode source) {
             for (int i = 0; i < source.size(); i++) {
                 mappingStateHolder.setLoopIteration(i, loopArrayNode.getVarName(), source.get(i));
@@ -105,6 +112,8 @@ public class MappingServiceImpl {
                 mappingStateHolder.setLoopIteration(i, loopArrayNode.getVarName(), entry);
                 arrayNode.add(parseObject(loopArrayNode));
             }
+        } else {
+            throw new IllegalArgumentException("Unsupported LoopSource Type [" + loopSource.getClass().getName() + "]");
         }
         mappingStateHolder.removeLoopIteration(loopArrayNode.getVarName());
 

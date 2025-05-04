@@ -42,11 +42,12 @@ public class MappingSchemaHolderImpl implements MappingSchemaHolder {
         File mappingLocation = new File(configService.get("mapping-schema.location").asString().get() + "/configuration/cfg/workflow");
         LOGGER.info("Mapping File Location: [{}]", mappingLocation.getAbsolutePath());
         for (File location: mappingLocation.listFiles()) {
-            LOGGER.info("Loading Mapping [{}]", location.getName());
+            String name = location.getName();
+            LOGGER.info("Loading Mapping [{}]", name);
             try {
                 String jsonSchema = Files.readString(Path.of(location.getPath() + "\\json-schema.json"));
                 String mappingSchema = Files.readString(Path.of(location.getPath() + "\\mapping-schema.xml"));
-                newSchemaMap.put(location.getName(), factory.createSchema(jsonSchema, mappingSchema));
+                newSchemaMap.put(name, factory.createSchema(name ,jsonSchema, mappingSchema));
 
             } catch (IOException ex) {
                 throw new IllegalArgumentException("", ex);
