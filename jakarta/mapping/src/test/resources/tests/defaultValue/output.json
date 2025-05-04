@@ -1,0 +1,23 @@
+{
+  "expression1" : {
+    "string" : "differentString",
+    "number" : 1.0,
+    "boolean" : true
+  },
+  "expression2" : [ {
+    "string" : "differentString",
+    "number" : 1.0,
+    "boolean" : true
+  } ],
+  "expression3" : [ {
+    "string" : "differentString",
+    "number" : 1.0,
+    "boolean" : true,
+    "newValue" : "Value1"
+  }, {
+    "string" : "differentString",
+    "number" : 1.0,
+    "boolean" : true,
+    "newValue" : "Value2"
+  } ]
+}

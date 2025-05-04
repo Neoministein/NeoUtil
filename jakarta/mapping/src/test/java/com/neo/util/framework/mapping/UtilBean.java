@@ -1,5 +1,7 @@
 package com.neo.util.framework.mapping;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.neo.util.common.impl.json.JsonUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 
@@ -11,7 +13,7 @@ import java.time.format.DateTimeParseException;
 @ApplicationScoped
 public class UtilBean {
 
-    public static String reformatDate(String date, String dateFormatIn, String dateFormatOut) {
+    public String reformatDate(String date, String dateFormatIn, String dateFormatOut) {
         try {
             DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern(dateFormatIn);
             DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern(dateFormatOut);
@@ -21,6 +23,16 @@ public class UtilBean {
         } catch (DateTimeParseException e) {
             return null;
         }
+    }
+
+    public ObjectNode defaultNode() {
+        ObjectNode node = JsonUtil.emptyObjectNode();
+        node.put("string", "stringValue");
+        node.put("number", 1.0);
+        node.put("boolean", true);
+
+
+        return node;
     }
 
 }

@@ -89,6 +89,14 @@ public class MappingServiceImpl {
 
     private JsonNode parseObject(NestedNode nestedObjectNode) {
         ObjectNode objectNode = JsonUtil.emptyObjectNode();
+
+        if (nestedObjectNode.getDefaultValue().isPresent()) {
+            Object result = expressionHandler.evaluateWithContext(nestedObjectNode.getDefaultValue().get());
+            if (result instanceof ObjectNode node) {
+                objectNode = node;
+            }
+        }
+
         for (Node node: nestedObjectNode.getChildren()) {
             parseElement(node, objectNode);
         }
@@ -124,11 +132,7 @@ public class MappingServiceImpl {
     private ArrayNode parseArray(SingleArrayNode loopArrayNode) {
         ArrayNode arrayNode = JsonUtil.emptyArrayNode();
 
-        ObjectNode itemNode = JsonUtil.emptyObjectNode();
-        for (Node node: loopArrayNode.getChildren()) {
-            parseElement(node, itemNode);
-        }
-        arrayNode.add(itemNode);
+        arrayNode.add(parseObject(loopArrayNode));
 
         return arrayNode;
     }

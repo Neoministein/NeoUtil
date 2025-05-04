@@ -7,7 +7,7 @@ import java.util.List;
 
 public final class NestedObjectNode extends NestedNode {
 
-    public NestedObjectNode(String filedName, List<Node> children, ExpressionValue skipExpression) {
-        super(JsonDataType.OBJECT, filedName, children, skipExpression);
+    public NestedObjectNode(String filedName, List<Node> children, ExpressionValue defaultValue, ExpressionValue skipExpression) {
+        super(JsonDataType.OBJECT, filedName, children, defaultValue, skipExpression);
     }
 }

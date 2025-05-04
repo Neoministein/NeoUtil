@@ -7,7 +7,7 @@ import java.util.List;
 
 public final class SingleArrayNode extends NestedNode {
 
-    public SingleArrayNode(String filedName, List<Node> children, ExpressionValue skipExpression) {
-        super(JsonDataType.ARRAY, filedName, children, skipExpression);
+    public SingleArrayNode(String filedName, List<Node> children, ExpressionValue defaultValue, ExpressionValue skipExpression) {
+        super(JsonDataType.ARRAY, filedName, children, defaultValue, skipExpression);
     }
 }

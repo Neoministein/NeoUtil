@@ -1,0 +1,12 @@
+<root>
+    <expression1 type="Object"   value="#{utilBean.defaultNode()}">
+        <string type="String"   value="differentString"/>
+    </expression1>
+    <expression2 type="Array"    value="#{utilBean.defaultNode()}">
+        <string type="String"   value="differentString"/>
+    </expression2>
+    <expression3 type="Array"    value="#{utilBean.defaultNode()}" var="val" loop="#{_in.arrayValue}">
+        <string type="String"   value="differentString"/>
+        <newValue type="String" value="#{_in.val}"/>
+    </expression3>
+</root>

@@ -10,8 +10,8 @@ public final class LoopArrayNode extends NestedNode {
     private final String varName;
     private final ExpressionValue loopExpression;
 
-    public LoopArrayNode(String filedName, String varName, ExpressionValue loopExpression, List<Node> children, ExpressionValue skipExpression) {
-        super(JsonDataType.ARRAY, filedName, children, skipExpression);
+    public LoopArrayNode(String filedName, String varName, ExpressionValue loopExpression, List<Node> children, ExpressionValue defaultValue, ExpressionValue skipExpression) {
+        super(JsonDataType.ARRAY, filedName, children, defaultValue, skipExpression);
         this.varName = varName;
         this.loopExpression = loopExpression;
     }

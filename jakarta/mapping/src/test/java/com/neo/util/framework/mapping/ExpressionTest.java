@@ -57,7 +57,7 @@ class ExpressionTest {
 
     @Test
     void singleSchemaTest() throws IOException {
-        File testLocation = ResourceUtil.getFolderContent("./tests/missing")[0].getParentFile();
+        File testLocation = ResourceUtil.getFolderContent("./tests/defaultValue")[0].getParentFile();
 
         String input = Files.readString(Path.of(testLocation.getPath() + "\\input.json"));
         String jsonSchema = Files.readString(Path.of(testLocation.getPath() + "\\json-schema.json"));

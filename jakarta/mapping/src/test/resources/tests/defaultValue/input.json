@@ -1,0 +1,10 @@
+{
+  "stringValue": "Name",
+  "stringBoolean": "true",
+  "stringInt": "1",
+  "stringNumber" : "2.0",
+  "intValue" : 3,
+  "numberValue" : 4.0,
+  "booleanValue" : true,
+  "arrayValue": ["Value1", "Value2"]
+}

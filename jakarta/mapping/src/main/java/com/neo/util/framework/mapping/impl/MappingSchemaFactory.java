@@ -46,7 +46,7 @@ public class MappingSchemaFactory {
         LOGGER.info("Creating MappingSchema [{}]", name);
         Element root = mapping.getDocumentElement();
         List<Node> nodes = getChildren(root);
-        return new MappingSchema(name, new NestedObjectNode("root", nodes, null), inputSchema);
+        return new MappingSchema(name, new NestedObjectNode("root", nodes, null, null), inputSchema);
     }
 
     private List<Node> getChildren(Element element) {
@@ -62,7 +62,7 @@ public class MappingSchemaFactory {
     }
 
     private NestedObjectNode parseObject(Element element) {
-        return new NestedObjectNode(element.getTagName(), getChildren(element), getSkipable(element));
+        return new NestedObjectNode(element.getTagName(), getChildren(element), getValue(element), getSkipable(element));
     }
 
     private Node parseElement(Element element) {
@@ -85,13 +85,14 @@ public class MappingSchemaFactory {
         String tag = element.getTagName();
         String loopExpression = element.getAttribute("loop");
         String varName = element.getAttribute("var");
+        ExpressionValue defaultValue = getValue(element);
 
         if (StringUtils.isEmpty(loopExpression) && StringUtils.isEmpty(varName)) {
-            return new SingleArrayNode(tag, getChildren(element), getSkipable(element));
+            return new SingleArrayNode(tag, getChildren(element), defaultValue, getSkipable(element));
         }
 
         if (StringUtils.isPresent(loopExpression) && StringUtils.isPresent(varName)) {
-            return new LoopArrayNode(tag, varName, expressionHandler.createExpression(tag, loopExpression, JsonDataType.ARRAY), getChildren(element), getSkipable(element));
+            return new LoopArrayNode(tag, varName, expressionHandler.createExpression(tag, loopExpression, JsonDataType.ARRAY), getChildren(element), defaultValue, getSkipable(element));
         }
 
         throw new IllegalArgumentException("The field [" + tag +"] either needs to have the attribute [loop] and [var] none of them");
@@ -108,6 +109,14 @@ public class MappingSchemaFactory {
     private ExpressionValue getSkipable(Element element) {
         if (element.hasAttribute("skip")) {
             return expressionHandler.createExpression(element.getTagName() + ".skip" , element.getAttribute("skip"), JsonDataType.BOOLEAN);
+        }
+
+        return null;
+    }
+
+    private ExpressionValue getValue(Element element) {
+        if (element.hasAttribute("value")) {
+            return expressionHandler.createExpression(element.getTagName() + ".value" , element.getAttribute("value"), JsonDataType.OBJECT);
         }
 
         return null;
