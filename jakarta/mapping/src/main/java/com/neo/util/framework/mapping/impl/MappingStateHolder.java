@@ -1,23 +1,47 @@
 package com.neo.util.framework.mapping.impl;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.enterprise.context.RequestScoped;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@RequestScoped  // Ensures it's a singleton in the app
+@RequestScoped
 public class MappingStateHolder {
 
-    private ObjectNode sourceJson;
+    private JsonNode sourceJson;
     private Map<String, Object> loopValues;
     private Map<Object, Integer> loopIteration;
+    private MappingStateHolder parent;
 
-    public void init(ObjectNode sourceJson) {
+    protected MappingStateHolder(MappingStateHolder parent) {
+        this.sourceJson = parent.sourceJson;
+        this.loopValues = parent.loopValues;
+        this.loopIteration = parent.loopIteration;
+        this.parent = null;
+    }
+
+    protected MappingStateHolder() {}
+
+    public void init(JsonNode sourceJson) {
+        //To Allow nested mapping we save the current information into a different object and load it back when we say that the mapping is done.
+        //This will break if mapping processing will become multithreaded
+        if (sourceJson != null) {
+            this.parent = new MappingStateHolder(this);
+        }
+
         this.sourceJson = sourceJson;
         this.loopValues = new HashMap<>();
         this.loopIteration = new HashMap<>();
+    }
+
+    public void clear() {
+        if (parent != null) {
+            this.sourceJson = parent.sourceJson;
+            this.loopValues = parent.loopValues;
+            this.loopIteration = parent.loopIteration;
+        }
     }
 
     public void setLoopIteration(Integer iteration, String varName, Object value) {

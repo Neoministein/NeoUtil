@@ -26,7 +26,7 @@ public class MappingServiceImpl {
 
     protected final ExpressionHandler expressionHandler;
     protected final Provider<RequestContextController> requestContextControllerProvider;
-    protected final  Provider<MappingStateHolder> mappingStateHolderProvider;
+    protected final Provider<MappingStateHolder> mappingStateHolderProvider;
 
     @Inject
     public MappingServiceImpl(ExpressionHandler expressionHandler, Provider<RequestContextController> requestContextControllerProvider, Provider<MappingStateHolder> mappingStateHolderProvider) {
@@ -51,6 +51,7 @@ public class MappingServiceImpl {
             mappingStateHolderProvider.get().init(sourceJson);
             return parseObject(mapping.getMappingSchema());
         } finally {
+            mappingStateHolderProvider.get().clear();
             rcc.deactivate();
         }
     }
@@ -124,6 +125,7 @@ public class MappingServiceImpl {
         } else if (loopSource instanceof JsonNode) {
             mappingStateHolder.setLoopIteration(0, loopArrayNode.getVarName(), loopArrayNode);
             arrayNode.add(parseObject(loopArrayNode));
+
         } else if (loopSource != null) {
             throw new IllegalArgumentException("Unsupported LoopSource Type [" + loopSource.getClass().getName() + "]");
         }
@@ -136,7 +138,6 @@ public class MappingServiceImpl {
         ArrayNode arrayNode = JsonUtil.emptyArrayNode();
 
         arrayNode.add(parseObject(loopArrayNode));
-
         return arrayNode;
     }
 }
