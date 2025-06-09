@@ -121,6 +121,9 @@ public class MappingServiceImpl {
                 mappingStateHolder.setLoopIteration(i, loopArrayNode.getVarName(), entry);
                 arrayNode.add(parseObject(loopArrayNode));
             }
+        } else if (loopSource instanceof JsonNode) {
+            mappingStateHolder.setLoopIteration(0, loopArrayNode.getVarName(), loopArrayNode);
+            arrayNode.add(parseObject(loopArrayNode));
         } else if (loopSource != null) {
             throw new IllegalArgumentException("Unsupported LoopSource Type [" + loopSource.getClass().getName() + "]");
         }
