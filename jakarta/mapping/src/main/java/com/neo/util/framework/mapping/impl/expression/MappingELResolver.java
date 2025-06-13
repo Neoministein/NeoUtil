@@ -1,6 +1,7 @@
 package com.neo.util.framework.mapping.impl.expression;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.neo.util.framework.mapping.impl.MappingStateHolder;
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
@@ -36,6 +37,15 @@ public class MappingELResolver extends ELResolver {
                 if (iteration.isPresent()) {
                     context.setPropertyResolved(true);
                     return iteration.get();
+                }
+            }
+
+            if (base instanceof ArrayNode node) {
+
+                JsonNode desiredProperty = node.path(0).path(path);
+                if (!desiredProperty.isMissingNode()) {
+                    context.setPropertyResolved(true);
+                    return tryHandleLeaf(desiredProperty);
                 }
             }
 
