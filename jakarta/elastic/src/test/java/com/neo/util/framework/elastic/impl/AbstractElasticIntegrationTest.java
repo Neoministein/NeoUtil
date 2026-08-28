@@ -11,11 +11,12 @@ import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.ThreadUtils;
 import com.neo.util.common.impl.reflection.IndexReflectionProvider;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
+import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 import com.neo.util.framework.impl.ReflectionService;
-import com.neo.util.framework.impl.config.BasicConfigService;
-import com.neo.util.framework.impl.config.BasicConfigValue;
+import com.neo.util.framework.impl.config.ConfigServiceImpl;
+import com.neo.util.framework.impl.config.store.InMemoryConfigStore;
 import com.neo.util.framework.impl.request.DummyRequestDetails;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.event.NotificationOptions;
@@ -36,7 +37,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletionStage;
 
 @ESIntegTestCase.ClusterScope(scope = ESIntegTestCase.Scope.TEST, numDataNodes = 0)
@@ -53,10 +53,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
 
     protected static RestClient restClient;
 
-    protected BasicConfigService configService = new BasicConfigService(Map.of(
-            ElasticSearchConnectionProviderImpl.ENABLED_CONFIG, true,
-            ElasticSearchProvider.FLUSH_INTERVAL_CONFIG, 1
-    ));
+    protected ConfigService configService = new ConfigServiceImpl(List.of(new InMemoryConfigStore()));
 
     protected static ElasticSearchConnectionProviderImpl connection;
     protected RequestDetails requestDetails = new DummyRequestDetails();
@@ -115,8 +112,10 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         ensureStableCluster(1);
         restClient = getRestClient();
         LOGGER.info("Elasticsearch node started at [{}]", restClient.getNodes().get(0).getHost().toString());
-        configService.save(new BasicConfigValue<>(
-                ElasticSearchConnectionProviderImpl.NODE_CONFIG, List.of(restClient.getNodes().get(0).getHost().toString())));
+
+        configService.save(true, ElasticSearchConnectionProviderImpl.ENABLED_CONFIG);
+        configService.save(1, ElasticSearchProvider.FLUSH_INTERVAL_CONFIG);
+        configService.save(restClient.getNodes().get(0).getHost().toString(), ElasticSearchConnectionProviderImpl.NODE_CONFIG, "0");
 
 
         initialiseElasticSearchProvider();

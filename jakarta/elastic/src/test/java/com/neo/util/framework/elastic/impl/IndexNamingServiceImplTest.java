@@ -2,29 +2,31 @@ package com.neo.util.framework.elastic.impl;
 
 import com.neo.util.common.impl.ThreadUtils;
 import com.neo.util.common.impl.reflection.IndexReflectionProvider;
+import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.Searchable;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;
 import com.neo.util.framework.impl.ReflectionService;
-import com.neo.util.framework.impl.config.BasicConfigService;
+import com.neo.util.framework.impl.config.ConfigServiceImpl;
+import com.neo.util.framework.impl.config.store.InMemoryConfigStore;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 public class IndexNamingServiceImplTest {
 
     IndexNamingServiceImpl subject;
 
-    BasicConfigService basicConfigService;
+    ConfigService basicConfigService;
 
     @Before
     public void before() {
-        basicConfigService = new BasicConfigService(new HashMap<>());
+        basicConfigService = new ConfigServiceImpl(List.of(new InMemoryConfigStore()));
 
         subject = new IndexNamingServiceImpl(basicConfigService, new ReflectionService(new IndexReflectionProvider(ThreadUtils.classLoader())));
     }

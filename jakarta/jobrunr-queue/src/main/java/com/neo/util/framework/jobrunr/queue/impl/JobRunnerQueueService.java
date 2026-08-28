@@ -2,8 +2,8 @@ package com.neo.util.framework.jobrunr.queue.impl;
 
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.NoContentFoundException;
 import com.neo.util.framework.api.PriorityConstants;
-import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.api.queue.*;
@@ -61,24 +61,23 @@ public class JobRunnerQueueService implements QueueService {
             queueConnectionMap.put(annotation.value(), annotation);
         }
 
-        Config queueConfig = configService.get("queue");
-
         for (QueueListener queueListener: queueListeners) {
             Class<?> clazz = queueListener.getClass().getSuperclass();
 
             IncomingQueue incomingAnnotation = clazz.getAnnotation(IncomingQueue.class);
-
-            if (queueListenerMap.containsKey(incomingAnnotation.value())) {
-                throw new ConfigurationException(QueueService.EX_DUPLICATED_QUEUE, queueListener.getClass().getName(), queueListenerMap.get(incomingAnnotation.value()));
+            String queueName = incomingAnnotation.value();
+            if (queueListenerMap.containsKey(queueName)) {
+                throw new ConfigurationException(QueueService.EX_DUPLICATED_QUEUE, queueListener.getClass().getName(), queueListenerMap.get(queueName).toString());
             }
 
-            OutgoingQueue outgoingConnection = queueConnectionMap.get(incomingAnnotation.value());
+            OutgoingQueue outgoingConnection = queueConnectionMap.get(queueName);
             if (outgoingConnection == null) {
-                throw new ConfigurationException(EX_MISSING_OUTGOING, incomingAnnotation.value());
+                throw new ConfigurationException(EX_MISSING_OUTGOING, queueName);
             }
 
             LOGGER.debug("Registered Queue [{}], Listener [{}]", incomingAnnotation.value(), queueListener.getClass().getSimpleName());
-            queueListenerMap.put(incomingAnnotation.value(), new JobRunnerQueueConfig(queueConfig, outgoingConnection, queueListener));
+            QueueConfig queueConfig = new QueueConfig(configService, outgoingConnection);
+            queueListenerMap.put(incomingAnnotation.value(), new JobRunnerQueueConfig(queueConfig, queueListener));
         }
         LOGGER.info("Registered [{}] Queues {}", queueListenerMap.size(), queueListenerMap.keySet());
     }
@@ -99,15 +98,16 @@ public class JobRunnerQueueService implements QueueService {
 
     @Override
     public void addToQueue(String queueName, QueueMessage message) {
-        JobRunnerQueueConfig config = queueListenerMap.computeIfAbsent(queueName, s -> {
-                    throw new ConfigurationException(QueueService.EX_NON_EXISTENT_QUEUE, QueueListener.class.getSimpleName(), queueName); });
-
-        BackgroundJob.create(createJob(config, message));
+        BackgroundJob.create(createJob(requestQueueConfig(queueName), message));
     }
 
     @Override
-    public QueueConfig getQueueConfig(String queueName) {
-        return queueListenerMap.get(queueName);
+    public QueueConfig requestQueueConfig(String queueName) {
+        JobRunnerQueueConfig queueConfig = queueListenerMap.get(queueName);
+        if (queueConfig == null) {
+            throw new NoContentFoundException(QueueService.EX_UNKNOWN_QUEUE, queueName);
+        }
+        return queueConfig.getConfig();
     }
 
     public void queueAction(String queueName, QueueMessage message) {
@@ -121,9 +121,9 @@ public class JobRunnerQueueService implements QueueService {
         }
     }
 
-    protected JobBuilder createJob(JobRunnerQueueConfig config, QueueMessage message) {
+    protected JobBuilder createJob(QueueConfig config, QueueMessage message) {
         JobBuilder jobBuilder = JobBuilder.aJob();
-        jobBuilder.withDetails(() -> queueAction(config.getQueueName(), message));
+        jobBuilder.withJobLambda(() -> queueAction(config.getQueueName(), message));
         jobBuilder.scheduleAt(Instant.now().plus(config.getDuration()));
         jobBuilder.withAmountOfRetries(config.getRetry());
         return jobBuilder;

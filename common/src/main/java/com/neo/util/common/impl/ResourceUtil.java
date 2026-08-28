@@ -35,7 +35,7 @@ public final class ResourceUtil {
      */
     public static String getResourceFileAsString(String fileName) {
         if (fileName == null) {
-            throw new ConfigurationException(EX_INVALID_URI, (Object) null);
+            throw new ConfigurationException(EX_INVALID_URI, "null");
         }
 
         try (InputStream is = ThreadUtils.classLoader().getResourceAsStream(fileName)) {
@@ -99,7 +99,7 @@ public final class ResourceUtil {
         try {
             return new File(url.toURI()).listFiles();
         } catch (URISyntaxException ex) {
-            throw new ConfigurationException(ex, EX_CANNOT_READ_FILE_CONTENT, url);
+            throw new ConfigurationException(ex, EX_CANNOT_READ_FILE_CONTENT, url.toString());
         } catch (IllegalArgumentException ex) {
             return new File[0];
         }

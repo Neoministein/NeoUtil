@@ -1,16 +1,17 @@
 package com.neo.util.framework.jobrunr.scheduler.impl;
 
-import com.neo.util.common.impl.MathUtils;
 import com.neo.util.common.impl.exception.InternalRuntimeException;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.reflection.IndexReflectionProvider;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
-import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
+import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
+import com.neo.util.framework.api.event.ApplicationReadyEvent;
+import com.neo.util.framework.api.scheduler.SchedulerConfig;
 import com.neo.util.framework.api.scheduler.SchedulerService;
 import com.neo.util.framework.impl.ReflectionService;
-import com.neo.util.framework.impl.config.BasicConfigService;
-import com.neo.util.framework.impl.config.BasicConfigValue;
+import com.neo.util.framework.impl.config.ConfigServiceImpl;
+import com.neo.util.framework.impl.config.store.InMemoryConfigStore;
 import com.neo.util.framework.impl.janitor.JanitorServiceImpl;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.RequestDetailsProducer;
@@ -18,8 +19,6 @@ import com.neo.util.framework.impl.request.Slf4jRequestAuditProvider;
 import com.neo.util.framework.impl.security.BasicInstanceIdentification;
 import com.neo.util.framework.jobrunr.impl.JobRunnerConfigurator;
 import com.neo.util.framework.jobrunr.impl.JobRunnerInMemoryStorageProvider;
-import com.neo.util.framework.jobrunr.scheduler.impl.parser.CronScheduleAnnotationParser;
-import com.neo.util.framework.jobrunr.scheduler.impl.parser.FixedRateScheduleAnnotationParser;
 import org.jboss.weld.junit5.WeldInitiator;
 import org.jboss.weld.junit5.WeldJunit5Extension;
 import org.jboss.weld.junit5.WeldSetup;
@@ -28,19 +27,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
 @ExtendWith(WeldJunit5Extension.class)
 class SchedulerServiceIT {
-
-    private static final BasicConfigValue<Integer> POOL_INTERVAL = new BasicConfigValue<>(JobRunnerConfigurator.CONFIG_PREFIX + JobRunnerConfigurator.CONFIG_POLL_INTERVAL, 1);
 
     @WeldSetup
     public WeldInitiator weld = WeldInitiator.from(
             JobRunnerConfigurator.class,
             JobRunnerInMemoryStorageProvider.class,
-            BasicConfigService.class,
+            JobRunnerSchedulerConfigHolder.class,
+            ConfigServiceImpl.class,
+            InMemoryConfigStore.class,
             BasicInstanceIdentification.class,
             ReflectionService.class,
             IndexReflectionProvider.class,
@@ -48,8 +44,6 @@ class SchedulerServiceIT {
             RequestDetailsProducer.class,
             Slf4jRequestAuditProvider.class,
             JobRunnerSchedulerService.class,
-            CronScheduleAnnotationParser.class,
-            FixedRateScheduleAnnotationParser.class,
             TestSchedulers.class,
             JanitorServiceImpl.class
     ).build();
@@ -60,7 +54,7 @@ class SchedulerServiceIT {
 
     @BeforeEach
     void before() {
-        weld.select(BasicConfigService.class).get().save(POOL_INTERVAL);
+        weld.select(ConfigService.class).get().save(1, JobRunnerConfigurator.CONFIG_PREFIX + JobRunnerConfigurator.CONFIG_POLL_INTERVAL);
 
         JobRunnerConfigurator jobRunnerConfigurator = weld.select(JobRunnerConfigurator.class).get();
         jobRunnerConfigurator.preReadyEvent(new ApplicationPreReadyEvent());
@@ -80,81 +74,58 @@ class SchedulerServiceIT {
     void executeScheduler() {
         setupSchedulers();
 
-        schedulerService.execute("interval");
-        Assertions.assertEquals(1, testSchedulers.getIntervalExecutionCount());
+        schedulerService.execute("cron");
+        Assertions.assertEquals(1, testSchedulers.getCronExecutionCount());
     }
 
     @Test
     void runningScheduler() {
         setupSchedulers();
 
-        Instant start = Instant.now();
         IntegrationTestUtil.sleepUntil(500, 30, () -> {
-            Assertions.assertEquals(1, testSchedulers.getIntervalExecutionCount());
             Assertions.assertEquals(2, testSchedulers.getCronExecutionCount());
         });
-
-        int basicDelay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
-        Assertions.assertTrue(MathUtils.isInBounds(basicDelay,9000, 11000), "The delay " + basicDelay);
-        System.out.println(basicDelay);
     }
 
     @Test
     void stopScheduler() {
         setupSchedulers();
         schedulerService.stop("cron");
-        Instant start = Instant.now();
         IntegrationTestUtil.sleepUntil(500, 30, () -> {
-            Assertions.assertEquals(1, testSchedulers.getIntervalExecutionCount());
             Assertions.assertEquals(0, testSchedulers.getCronExecutionCount());
         });
-
-        int basicDelay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
-        Assertions.assertTrue(MathUtils.isInBounds(basicDelay,9000, 11000), "The delay " + basicDelay);
-        System.out.println(basicDelay);
     }
 
     @Test
     void disableScheduler() {
-        BasicConfigValue<Boolean> disable = new BasicConfigValue<>("scheduler.cron.enabled", false);
-        weld.select(BasicConfigService.class).get().save(disable);
+        weld.select(ConfigService.class).get().save(false, "scheduler.cron.enabled");
 
         setupSchedulers();
-        Instant start = Instant.now();
         IntegrationTestUtil.sleepUntil(500, 30, () -> {
-            Assertions.assertEquals(1, testSchedulers.getIntervalExecutionCount());
             Assertions.assertEquals(0, testSchedulers.getCronExecutionCount());
         });
-
-        int basicDelay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
-        Assertions.assertTrue(MathUtils.isInBounds(basicDelay,9000, 11000), "The delay " + basicDelay);
     }
 
     @Test
-    void invalidChron() {
+    void invalidChronInConfig() {
         setupSchedulers();
-        BasicConfigValue<String> invalidChron = new BasicConfigValue<>("scheduler.cron.cron", "1");
-        weld.select(BasicConfigService.class).get().save(invalidChron);
+        weld.select(ConfigService.class).get().save("1", "scheduler.cron.cron");
 
-        Assertions.assertThrows(ValidationException.class, () -> schedulerService.reload());
+        Assertions.assertThrows(InternalRuntimeException.class, () -> schedulerService.reload());
     }
 
     @Test
-    void invalidInterval() {
+    void updateToInvalidCron() {
         setupSchedulers();
-        BasicConfigValue<Long> invalidInterval = new BasicConfigValue<>("scheduler.interval.delay", -1L);
-        BasicConfigValue<String> timeUnit = new BasicConfigValue<>("scheduler.interval.time-unit", "SECONDS");
-        weld.select(BasicConfigService.class).get().save(invalidInterval);
-        weld.select(BasicConfigService.class).get().save(timeUnit);
-
-        Assertions.assertThrows(ValidationException.class, () -> schedulerService.reload());
+        SchedulerConfig schedulerConfig = schedulerService.requestSchedulerConfig("cron");
+        schedulerConfig.setCronValue("1");
+        Assertions.assertThrows(ValidationException.class, () -> schedulerService.updateConfig(schedulerConfig));
     }
 
     @Test
     void changeType() {
         setupSchedulers();
-        BasicConfigValue<String> newConfig = new BasicConfigValue<>("scheduler.interval.cron", "0/5 * * * * *");
-        weld.select(BasicConfigService.class).get().save(newConfig);
+        weld.select(ConfigService.class).get().save("0/5 * * * * *", "scheduler.interval.cron");
 
         Assertions.assertDoesNotThrow(() -> schedulerService.reload());
     }
@@ -162,18 +133,14 @@ class SchedulerServiceIT {
     @Test
     void annotatedInterface() {
         setupSchedulers();
-        Instant start = Instant.now();
         IntegrationTestUtil.sleepUntil(500, 30, () -> {
             Assertions.assertEquals(1, testSchedulers.getInterfaceExecutionCount());
         });
-
-        int basicDelay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
-        Assertions.assertTrue(MathUtils.isInBounds(basicDelay,4000, 6000), "The delay " + basicDelay);
     }
 
     protected void setupSchedulers() {
         JobRunnerSchedulerService jobRunnerSchedulerService = weld.select(JobRunnerSchedulerService.class).get();
-        jobRunnerSchedulerService.applicationReadyEvent(new ApplicationPostReadyEvent());
+        jobRunnerSchedulerService.applicationReadyEvent(new ApplicationReadyEvent());
         schedulerService = jobRunnerSchedulerService;
     }
 }

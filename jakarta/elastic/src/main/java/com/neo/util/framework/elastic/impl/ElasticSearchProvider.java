@@ -214,7 +214,7 @@ public class ElasticSearchProvider implements SearchProvider {
             try {
                 handleBulkResponse(-1, bulkRequest, getApiClient().bulk(bulkRequest));
             } catch (IOException ex) {
-                throw new InternalRuntimeException(ex, EX_SYNCHRONOUS_INDEXING, ex);
+                throw new InternalRuntimeException(ex, EX_SYNCHRONOUS_INDEXING, ex.getMessage());
             } catch (IllegalStateException ex) {
                 reconnectClientIfNeeded(ex);
                 throw ex;
@@ -265,7 +265,7 @@ public class ElasticSearchProvider implements SearchProvider {
             try {
                 handleBulkResponse(-1, bulkRequest, getApiClient().bulk(bulkRequest));
             } catch (IOException ex) {
-                throw new InternalRuntimeException(ex, EX_IO_SEARCHING, ex);
+                throw new InternalRuntimeException(ex, EX_IO_SEARCHING, ex.getMessage());
             } catch (IllegalStateException ex) {
                 reconnectClientIfNeeded(ex);
                 throw ex;
@@ -491,9 +491,9 @@ public class ElasticSearchProvider implements SearchProvider {
             SearchResponse<T> response = getApiClient().search(searchRequest, hitsClass);
             return parseSearchResponse(parameters, response);
         } catch (ElasticsearchException ex) {
-            throw new ConfigurationException(ex, EX_CONFIG_SEARCHING, parameters.getMaxResults(), index, ex.getMessage());
+            throw new ConfigurationException(ex, EX_CONFIG_SEARCHING, String.valueOf(parameters.getMaxResults()), index, ex.getMessage());
         } catch (IOException ex) {
-            throw new InternalRuntimeException(ex, EX_IO_SEARCHING, parameters.getMaxResults(), index, ex.getMessage());
+            throw new InternalRuntimeException(ex, EX_IO_SEARCHING, String.valueOf(parameters.getMaxResults()), index, ex.getMessage());
         }
     }
 
@@ -925,16 +925,16 @@ public class ElasticSearchProvider implements SearchProvider {
                 .listener(listener);
 
 
-        long flushInterval = configService.get(FLUSH_INTERVAL_CONFIG).asInt().orElse(10);
+        long flushInterval = configService.getAsInt(FLUSH_INTERVAL_CONFIG).orElse(10);
         builder.flushInterval(flushInterval, TimeUnit.SECONDS);
 
-        int bulkAction = configService.get(BULK_ACTION_CONFIG).asInt().orElse(2500);
+        int bulkAction = configService.getAsInt(BULK_ACTION_CONFIG).orElse(2500);
         builder.maxOperations(bulkAction);
 
-        int concurrentRequests = configService.get(CONCURRENT_REQUEST_CONFIG).asInt().orElse(3);
+        int concurrentRequests = configService.getAsInt(CONCURRENT_REQUEST_CONFIG).orElse(3);
         builder.maxConcurrentRequests(concurrentRequests);
 
-        int bulkSize = configService.get(BULK_SIZE).asInt().orElse(10);
+        int bulkSize = configService.getAsInt(BULK_SIZE).orElse(10);
         builder.maxSize(bulkSize * BYTES_IN_MB);
         LOGGER.info("BulkIngester.Builder, FlushInterval: [{}], BulkActions: [{}], ConcurrentRequests: [{}], BulkSize: [{}] MB",
                 flushInterval, bulkAction, concurrentRequests, bulkSize);

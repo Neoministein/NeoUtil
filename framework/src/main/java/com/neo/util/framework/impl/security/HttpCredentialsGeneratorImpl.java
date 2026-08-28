@@ -3,11 +3,14 @@ package com.neo.util.framework.impl.security;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ExternalRuntimeException;
+import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.AuthenticationScheme;
 import com.neo.util.framework.api.security.HttpCredentialsGenerator;
+import com.neo.util.framework.api.security.credential.BasicCredentials;
 import com.neo.util.framework.api.security.credential.BearerCredentials;
+import com.neo.util.framework.api.security.credential.TokenCredentials;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.security.enterprise.credential.BasicAuthenticationCredential;
@@ -31,10 +34,15 @@ public class HttpCredentialsGeneratorImpl implements HttpCredentialsGenerator {
         return generate(getHttpScheme(httpHeader), httpHeader);
     }
 
+    @Override
+    public Credential generateFromCookie(String cookie) throws ValidationException {
+        return new TokenCredentials(cookie);
+    }
+
     protected Credential generate(String httpScheme, String httpHeader) {
         if (authenticationProvider.getSupportedAuthenticationSchemes().contains(httpScheme.toUpperCase())) {
             return switch (httpScheme.toUpperCase()) {
-                case AuthenticationScheme.BASIC -> new BasicAuthenticationCredential(httpHeader);
+                case AuthenticationScheme.BASIC -> new BasicCredentials(httpHeader);
                 case AuthenticationScheme.BEARER -> new BearerCredentials(httpHeader);
                 default -> throw new ExternalRuntimeException(FrameworkConstants.EX_UNSUPPORTED_AUTH_TYPE);
             };

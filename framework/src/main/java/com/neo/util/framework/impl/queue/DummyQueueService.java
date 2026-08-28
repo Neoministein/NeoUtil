@@ -1,5 +1,6 @@
 package com.neo.util.framework.impl.queue;
 
+import com.neo.util.common.impl.exception.NoContentFoundException;
 import com.neo.util.framework.api.queue.QueueConfig;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.api.queue.QueueService;
@@ -28,7 +29,7 @@ public class DummyQueueService implements QueueService {
     }
 
     @Override
-    public QueueConfig getQueueConfig(String queueName) {
-        return null;
+    public QueueConfig requestQueueConfig(String queueName) {
+        throw new NoContentFoundException(QueueService.EX_UNKNOWN_QUEUE, queueName);
     }
 }

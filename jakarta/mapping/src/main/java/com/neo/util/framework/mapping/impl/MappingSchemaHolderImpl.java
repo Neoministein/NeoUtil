@@ -39,7 +39,7 @@ public class MappingSchemaHolderImpl implements MappingSchemaHolder {
         LOGGER.info("Loading MappingSchemas");
         Map<String, MappingSchema> newSchemaMap = new HashMap<>();
 
-        File mappingLocation = new File(configService.get("mapping-schema.location").asString().get() + "/configuration/cfg/workflow");
+        File mappingLocation = new File(configService.getAsString("mapping-schema.location").asOptional().orElseThrow() + "/configuration/cfg/workflow");
         LOGGER.info("Mapping File Location: [{}]", mappingLocation.getAbsolutePath());
         for (File location: mappingLocation.listFiles()) {
             String name = location.getName();

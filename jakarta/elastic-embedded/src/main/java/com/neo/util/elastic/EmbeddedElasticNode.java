@@ -38,7 +38,7 @@ public class EmbeddedElasticNode {
         this.configService = configService;
 
         LOGGER.warn("EmbeddedElasticNode is added as a dependency of the Project. Replace with a standalone instance for best performance");
-        if (configService.get("elastic.embedded.autostart").asBoolean().orElse(false)) {
+        if (configService.getAsBoolean("elastic.embedded.autostart").orElse(false)) {
             startNode();
         }
     }
@@ -50,7 +50,7 @@ public class EmbeddedElasticNode {
             return;
         }
 
-        String dataPath = configService.get("elastic.embedded.dataPath").asString().orElse("./data");
+        String dataPath = configService.getAsString("elastic.embedded.dataPath").orElse("./data");
         LOGGER.debug("EmbeddedElasticNode DataPath [{}]", dataPath);
 
         LogConfigurator.registerErrorListener();

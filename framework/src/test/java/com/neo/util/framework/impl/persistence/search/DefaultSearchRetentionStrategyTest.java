@@ -1,17 +1,18 @@
 package com.neo.util.framework.impl.persistence.search;
 
+import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.RetentionPeriod;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;
-import com.neo.util.framework.impl.config.BasicConfigService;
-import com.neo.util.framework.impl.config.BasicConfigValue;
+import com.neo.util.framework.impl.config.ConfigServiceImpl;
+import com.neo.util.framework.impl.config.store.InMemoryConfigStore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.Annotation;
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.List;
 
 class DefaultSearchRetentionStrategyTest {
 
@@ -20,11 +21,11 @@ class DefaultSearchRetentionStrategyTest {
 
     DefaultSearchRetentionStrategy subject;
 
-    BasicConfigService basicConfigService;
+    ConfigService basicConfigService;
 
     @BeforeEach
     void before() {
-        basicConfigService = new BasicConfigService(new HashMap<>());
+        basicConfigService = new ConfigServiceImpl(List.of(new InMemoryConfigStore()));
 
         subject = new DefaultSearchRetentionStrategy(basicConfigService);
     }
@@ -99,7 +100,7 @@ class DefaultSearchRetentionStrategyTest {
 
     @Test
     void dailyConfigIndexTest() {
-        basicConfigService.save(new BasicConfigValue<>(DefaultSearchRetentionStrategy.DAILY_CONFIG, 10));
+        basicConfigService.save(10, DefaultSearchRetentionStrategy.DAILY_CONFIG);
 
         SearchableIndex searchableIndex = getSearchableIndex(IndexPeriod.DAILY);
         LocalDate indexCreateDate = LocalDate.of(2023, 1, 1);
@@ -115,7 +116,7 @@ class DefaultSearchRetentionStrategyTest {
 
     @Test
     void dailyIndexConfigTest() {
-        basicConfigService.save(new BasicConfigValue<>(DefaultSearchRetentionStrategy.CUSTOM_RETENTION_CONFIG + INDEX_NAME, 15));
+        basicConfigService.save( 15, DefaultSearchRetentionStrategy.CUSTOM_RETENTION_CONFIG + INDEX_NAME);
 
         SearchableIndex searchableIndex = getSearchableIndex(IndexPeriod.DAILY);
         LocalDate indexCreateDate = LocalDate.of(2023, 1, 1);
@@ -131,7 +132,7 @@ class DefaultSearchRetentionStrategyTest {
 
     @Test
     void negativeRetentionConfigTest() {
-        basicConfigService.save(new BasicConfigValue<>(DefaultSearchRetentionStrategy.CUSTOM_RETENTION_CONFIG + INDEX_NAME, -1));
+        basicConfigService.save(-1, DefaultSearchRetentionStrategy.CUSTOM_RETENTION_CONFIG + INDEX_NAME);
 
         SearchableIndex searchableIndex = getSearchableIndex(IndexPeriod.DAILY);
         LocalDate indexCreateDate = LocalDate.of(2023, 1, 1);

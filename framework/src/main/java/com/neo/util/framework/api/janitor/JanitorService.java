@@ -7,19 +7,20 @@ import com.neo.util.framework.api.scheduler.CronSchedule;
 import java.util.Set;
 
 /**
- * This is an interface for a Janitor System to manage {@link JanitorJob} and delete old data.
+ * This is an interface for a Janitor System to manage {@link JanitorJob} and
+ * delete old data.
  */
 public interface JanitorService {
 
-    String E_NON_EXISTENT_JANITOR_JOB = "janitor/invalid-id";
+    String E_NON_EXISTENT_JANITOR_JOB = "janitor/unknown-key";
 
-    ExceptionDetails EX_NON_EXISTENT_JANITOR_JOB = new ExceptionDetails(
-            E_NON_EXISTENT_JANITOR_JOB, "The Janitor [{0}] does not exist");
+    ExceptionDetails EX_UNKNOWN_JANITOR_JOB = new ExceptionDetails(E_NON_EXISTENT_JANITOR_JOB,
+            "The Janitor [{0}] does not exist");
 
     /**
      * Executes all {@link JanitorJob}
      */
-    @CronSchedule(value = "JanitorService", cron = "0 0 * * *")
+    @CronSchedule(value = "JanitorService", cron = "0 0 * * *") // Midnight
     void executeAll();
 
     /**
@@ -44,7 +45,7 @@ public interface JanitorService {
     void disable(String janitorId) throws NoContentFoundException;
 
     /**
-     * Returns the config for the provided janitor id
+     * Returns the config for the provided janitor key
      */
     JanitorConfig requestJanitorConfig(String janitorId) throws NoContentFoundException;
 
@@ -54,4 +55,9 @@ public interface JanitorService {
      * @return ids of all janitors
      */
     Set<String> fetchJanitorIds();
+
+    /**
+     * Reload all configuration.
+     */
+    void reload();
 }

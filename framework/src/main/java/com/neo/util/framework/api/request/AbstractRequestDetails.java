@@ -19,7 +19,7 @@ public abstract class AbstractRequestDetails implements RequestDetails {
         this.requestContext = requestContext;
         this.requestId = REQUEST_ID.addAndGet(1);
 
-        updateMDC();
+        applyLogContext();
     }
 
     @Override
@@ -47,7 +47,8 @@ public abstract class AbstractRequestDetails implements RequestDetails {
         return requestStartDate;
     }
 
-    protected void updateMDC() {
+    @Override
+    public void applyLogContext() {
         MDC.put(MDC_TRACE_ID, getTraceId());
         MDC.put(MDC_REQUEST_ID, getRequestId() + "");
         MDC.put(MDC_REQUEST_CONTEXT_TYPE, getRequestContext().type());

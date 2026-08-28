@@ -13,7 +13,7 @@ import java.util.List;
 @ApplicationScoped
 @Path(SchedulerResource.RESOURCE_LOCATION)
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-@ToExternalException({SchedulerService.E_INVALID_SCHEDULER_ID})
+@ToExternalException({SchedulerService.E_UNKNOWN_SCHEDULER_ID})
 public class SchedulerResource {
 
     public static final String RESOURCE_LOCATION = "/admin/api/scheduler";

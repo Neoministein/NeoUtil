@@ -6,11 +6,11 @@ import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.AuthenticationScheme;
 import com.neo.util.framework.api.security.RolePrincipal;
 import com.neo.util.framework.api.security.credential.BearerCredentials;
-
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.security.enterprise.credential.Credential;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -45,6 +45,11 @@ public class BasicAuthorizationProvider implements AuthenticationProvider {
             return "ADMIN_USER";
         }
     };
+
+    @Override
+    public boolean isSecurityEnabled() {
+        return true;
+    }
 
     @Override
     public Optional<RolePrincipal> authenticate(Credential credential) {

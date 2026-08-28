@@ -64,15 +64,15 @@ public class IndexNamingServiceImpl implements IndexNamingService {
             searchableIndexCache.put(searchableClass, searchableClass.getAnnotation(SearchableIndex.class));
         }
 
-        mappingVersion = configService.get(MAPPING_VERSION_CONFIG).asString().orElse(DEFAULT_MAPPING_VERSION);
+        mappingVersion = configService.getAsString(MAPPING_VERSION_CONFIG).orElse(DEFAULT_MAPPING_VERSION);
 
-        String prefix = configService.get(PROJECT_PREFIX_CONFIG).asString().orElse(StringUtils.EMPTY);
+        String prefix = configService.getAsString(PROJECT_PREFIX_CONFIG).orElse(StringUtils.EMPTY);
 
         if (!StringUtils.isEmpty(prefix)) {
             prefix = prefix.toLowerCase() + INDEX_SEPARATOR;
         }
         this.indexPrefix = prefix;
-        String postfix = configService.get(PROJECT_POSTFIX_CONFIG).asString().orElse(StringUtils.EMPTY);
+        String postfix = configService.getAsString(PROJECT_POSTFIX_CONFIG).orElse(StringUtils.EMPTY);
 
         if (!StringUtils.isEmpty(postfix)) {
             postfix = INDEX_SEPARATOR + postfix.toLowerCase();

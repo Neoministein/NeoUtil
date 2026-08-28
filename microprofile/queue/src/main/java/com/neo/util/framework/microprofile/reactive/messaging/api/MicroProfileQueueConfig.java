@@ -1,17 +1,20 @@
 package com.neo.util.framework.microprofile.reactive.messaging.api;
 
-import com.neo.util.framework.api.config.Config;
-import com.neo.util.framework.api.queue.OutgoingQueue;
 import com.neo.util.framework.api.queue.QueueConfig;
 import com.neo.util.framework.api.queue.QueueProducer;
 
-public class MicroProfileQueueConfig extends QueueConfig {
+public class MicroProfileQueueConfig {
 
+    protected final QueueConfig queueConfig;
     protected final QueueProducer queueProducer;
 
-    public MicroProfileQueueConfig(Config config, OutgoingQueue outgoingConnection, QueueProducer queueProducer) {
-        super(config, outgoingConnection);
+    public MicroProfileQueueConfig(QueueConfig queueConfig, QueueProducer queueProducer) {
+        this.queueConfig = queueConfig;
         this.queueProducer = queueProducer;
+    }
+
+    public QueueConfig getQueueConfig() {
+        return queueConfig;
     }
 
     public QueueProducer getQueueProducer() {

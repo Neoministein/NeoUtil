@@ -41,7 +41,7 @@ public interface ClientResponseService {
      * @param arguments the arguments of the exception details
      * @return the response
      */
-    Response error(int code, ExceptionDetails exceptionDetails, Object... arguments);
+    Response error(int code, ExceptionDetails exceptionDetails, String... arguments);
 
     /**
      * A response with the status code and data in the response body

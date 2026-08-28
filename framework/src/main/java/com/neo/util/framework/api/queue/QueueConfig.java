@@ -1,6 +1,6 @@
 package com.neo.util.framework.api.queue;
 
-import com.neo.util.framework.api.config.Config;
+import com.neo.util.framework.api.config.ConfigService;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -15,12 +15,11 @@ public class QueueConfig {
     protected final int delay;
     protected final TimeUnit timeUnit;
 
-    public QueueConfig(Config config, OutgoingQueue outgoingConnection) {
-        Config queueConfig = config.get(outgoingConnection.value());
+    public QueueConfig(ConfigService config, OutgoingQueue outgoingConnection) {
         this.queueName  = outgoingConnection.value();
-        this.retry      = queueConfig.get("retry").asInt().orElse(outgoingConnection.retry());
-        this.delay      = queueConfig.get("delay").asInt().orElse(outgoingConnection.delay());
-        this.timeUnit   = queueConfig.get("time-unit").asString().map(TimeUnit::valueOf).orElse(outgoingConnection.timeUnit());
+        this.retry      = config.getAsInt("queue",queueName, "retry").orElse(outgoingConnection.retry());
+        this.delay      = config.getAsInt("queue", queueName, "delay").orElse(outgoingConnection.delay());
+        this.timeUnit   = config.getAsString("queue", queueName,"time-unit").map(TimeUnit::valueOf).orElse(outgoingConnection.timeUnit());
     }
 
     public QueueConfig(String queueName, int retry, int delay, TimeUnit timeUnit) {

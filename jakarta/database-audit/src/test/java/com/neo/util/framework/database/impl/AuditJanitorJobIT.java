@@ -2,8 +2,6 @@ package com.neo.util.framework.database.impl;
 
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.database.persistence.EntityAuditTrail;
-import com.neo.util.framework.impl.config.BasicConfigService;
-import com.neo.util.framework.impl.config.BasicConfigValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,10 +17,10 @@ class AuditJanitorJobIT extends AbstractIntegrationTest<AuditJanitorJob> {
 
     @Test
     void auditCreationTest() {
-        ConfigService configService = getInstance(BasicConfigService.class);
+        ConfigService configService = getInstance(ConfigService.class);
         AuditTrailRepository auditTrailRepository = getInstance(AuditTrailRepository.class);
 
-        configService.save(new BasicConfigValue<>(AuditJanitorJob.CONFIG_AUDIT_RETENTION, 7));
+        configService.save(7, AuditJanitorJob.CONFIG_AUDIT_RETENTION);
 
         auditTrailRepository.create(new EntityAuditTrail("", "", ""));
         auditTrailRepository.create(new EntityAuditTrail("", "", ""));

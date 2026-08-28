@@ -3,6 +3,7 @@ package com.neo.util.framework.rest.impl.security;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.request.UserRequest;
 import com.neo.util.framework.api.request.UserRequestDetails;
+import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.rest.api.response.ClientResponseService;
 import com.neo.util.framework.rest.api.security.SecuredResource;
 import jakarta.annotation.Priority;
@@ -35,11 +36,19 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     protected ClientResponseService clientResponseService;
 
     @Inject
+    protected AuthenticationProvider authenticationProvider;
+
+    @Inject
     @UserRequest
     protected UserRequestDetails userRequestDetails;
 
     @Override
     public void filter(ContainerRequestContext containerRequest) {
+        if (!authenticationProvider.isSecurityEnabled()) {
+            LOGGER.warn("Security is disabled, this should only be active in development");
+            return;
+        }
+
         LOGGER.trace("Accessing secured endpoint");
         RolesAllowed rolesAllowed = resourceInfo.getResourceMethod().getAnnotation(RolesAllowed.class);
         if (rolesAllowed == null) {

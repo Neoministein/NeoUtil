@@ -1,21 +1,22 @@
 package com.neo.util.framework.api.janitor;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
-import jakarta.annotation.Nullable;
 
 import java.time.Instant;
 
 public class JanitorConfig {
 
-    public static final ExceptionDetails INVALID_JANITOR_ID = new ExceptionDetails(
-            "janitor/invalid-id", "The janitor id [{0}] may not have whitespaces.");
+    public static final ExceptionDetails INVALID_JANITOR_ID = new ExceptionDetails("janitor/invalid-key",
+            "The janitor key [{0}] may not have whitespaces.");
 
     protected final String id;
+    @JsonIgnore
     protected final JanitorJob janitorJob;
 
     protected boolean enabled;
-    protected Instant lastExecution = null;
+    protected Instant lastExecution = Instant.EPOCH;
     protected boolean lastExecutionFailed = false;
 
     public JanitorConfig(String id, boolean enabled, JanitorJob janitorJob) {
@@ -44,7 +45,6 @@ public class JanitorConfig {
         this.enabled = enabled;
     }
 
-    @Nullable
     public Instant getLastExecution() {
         return lastExecution;
     }

@@ -1,41 +1,38 @@
 package com.neo.util.framework.jobrunr.scheduler.api;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.neo.util.common.impl.exception.ConfigurationException;
+import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.framework.api.scheduler.SchedulerConfig;
-import org.jobrunr.scheduling.Schedule;
 
 import java.lang.reflect.Method;
-import java.util.function.Supplier;
+import java.lang.reflect.Modifier;
 
-public class JobRunnerSchedulerConfig extends SchedulerConfig {
+public class JobRunnerSchedulerConfig {
 
-    @JsonIgnore
+    public static final ExceptionDetails EX_METHOD_NOT_ACCESSIBLE = new ExceptionDetails(
+            "scheduler/method-not-accessible", "Scheduler is not accessible [{0}.{1}].");
+
+    protected final SchedulerConfig config;
     protected final Method method;
-    //This is done since the creation time of the object is important to how the calculation works
-    @JsonIgnore
-    protected final Supplier<Schedule> schedule;
+    protected final Object beanInstance;;
 
-    @JsonIgnore
-    protected Object beanInstance;
-
-
-    public JobRunnerSchedulerConfig(String id, Method method, Supplier<Schedule> schedule) {
-        super(id, false);
+    public JobRunnerSchedulerConfig(SchedulerConfig config, Method method, Object beanInstance) {
+        this.config = config;
         this.method = method;
-        this.schedule = schedule;
+        this.beanInstance = beanInstance;
+
+        if (Modifier.isPrivate(method.getModifiers()) || !method.trySetAccessible()) {
+            throw new ConfigurationException(EX_METHOD_NOT_ACCESSIBLE, method.getDeclaringClass().getName(),
+                    method.getName());
+        }
+    }
+
+    public SchedulerConfig getConfig() {
+        return config;
     }
 
     public Method getMethod() {
         return method;
-    }
-
-    public Supplier<Schedule> getSchedule() {
-        return schedule;
-    }
-
-
-    public void setBeanInstance(Object beanInstance) {
-        this.beanInstance = beanInstance;
     }
 
     public Object getBeanInstance() {

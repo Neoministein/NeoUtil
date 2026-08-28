@@ -2,12 +2,11 @@ package com.neo.util.framework.jobrunr.queue.impl;
 
 import com.neo.util.common.impl.MathUtils;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
+import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.api.request.RequestDetails;
-import com.neo.util.framework.impl.config.BasicConfigService;
-import com.neo.util.framework.impl.config.BasicConfigValue;
 import com.neo.util.framework.impl.request.QueueRequestDetails;
 import com.neo.util.framework.jobrunr.impl.JobRunnerConfigurator;
 import jakarta.enterprise.context.RequestScoped;
@@ -28,11 +27,6 @@ import java.time.temporal.ChronoUnit;
 @ExtendWith(WeldJunit5Extension.class)
 class JobRunrQueueIT {
 
-    private static final BasicConfigValue<Integer> POOL_INTERVAL = new BasicConfigValue<>(JobRunnerConfigurator.CONFIG_PREFIX + JobRunnerConfigurator.CONFIG_POLL_INTERVAL, 1);
-
-    private static final BasicConfigValue<Integer> DELAY_5_SEC = new BasicConfigValue<>("queue." + DelayedQueueListener.QUEUE_NAME + ".delay", 5);
-    private static final BasicConfigValue<Integer> RETRY = new BasicConfigValue<>("queue." + RetryQueueListener.QUEUE_NAME + ".retry", 5);
-
     @WeldSetup
     protected WeldInitiator weld = WeldInitiator.from(new Weld()).activate(RequestScoped.class).build();
 
@@ -44,9 +38,9 @@ class JobRunrQueueIT {
 
     @BeforeEach
     void init() {
-        weld.select(BasicConfigService.class).get().save(POOL_INTERVAL);
-        weld.select(BasicConfigService.class).get().save(DELAY_5_SEC);
-        weld.select(BasicConfigService.class).get().save(RETRY);
+        weld.select(ConfigService.class).get().save(1, JobRunnerConfigurator.CONFIG_PREFIX + JobRunnerConfigurator.CONFIG_POLL_INTERVAL);
+        weld.select(ConfigService.class).get().save(5, "queue." + DelayedQueueListener.QUEUE_NAME + ".delay");
+        weld.select(ConfigService.class).get().save(5, "queue." + RetryQueueListener.QUEUE_NAME + ".retry");
 
         weld.select(JobRunnerConfigurator.class).get().preReadyEvent(new ApplicationPreReadyEvent());
 

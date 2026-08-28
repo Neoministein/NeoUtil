@@ -20,7 +20,7 @@ public class ReactiveMessageTransformerServiceImpl implements ReactiveMessageTra
 
     @Inject
     public ReactiveMessageTransformerServiceImpl(ConfigService configService, Instance<ReactiveMessageTransformer> instance, DummyTransformer dummyTransformer) {
-        Optional<String> optDefaultTransformer = configService.get("queue").get("defaultTransformer").asString().asOptional();
+        Optional<String> optDefaultTransformer = configService.getAsString("queue.defaultTransformer").asOptional();
 
         ReactiveMessageTransformer defaultTransformer = null;
 
@@ -41,7 +41,7 @@ public class ReactiveMessageTransformerServiceImpl implements ReactiveMessageTra
 
     @Override
     public ReactiveMessageTransformer getTransformer(String queueName) {
-        return configService.get("queue").get(queueName).asString()
+        return configService.getAsString("queue", queueName)
                 .map(transformerMap::get)
                 .orElse(defaultTransformer);
     }

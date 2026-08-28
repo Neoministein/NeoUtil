@@ -46,7 +46,7 @@ public class ClientResponseServiceImpl implements ClientResponseService {
     }
 
     @Override
-    public Response error(int code, ExceptionDetails exceptionDetails, Object... arguments) {
+    public Response error(int code, ExceptionDetails exceptionDetails, String... arguments) {
         return error(code, new InternalRuntimeException(exceptionDetails, arguments));
     }
 

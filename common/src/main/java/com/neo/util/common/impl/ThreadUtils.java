@@ -6,6 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 
 /**
  * Utilities for {@link Thread}
@@ -66,6 +70,36 @@ public final class ThreadUtils {
 
         LOGGER.warn("FluentWait - no more tries left");
         throw new IllegalStateException();
+    }
+
+    /**
+     * Convenience method for rethrow interrupt
+     */
+    public static void rethrowInterrupt(CheckedRunnable<InterruptedException> runnable) {
+        try {
+            runnable.run();
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Task interrupted", ex);
+        }
+    }
+
+    /**
+     * A fail fast approach for a list of {@link CompletableFuture} futures. <br>
+     * If one fails cancel them all
+     */
+    public static void asyncFailFast(List<CompletableFuture<Void>> futures) {
+        AtomicBoolean cancelled = new AtomicBoolean();
+
+        BiConsumer<Void, Throwable> cancelFunc = (_, t) -> {
+            if (t != null && cancelled.compareAndSet(false, true)) {
+                futures.forEach(f -> f.cancel(true));
+            }
+        };
+
+        futures.forEach(f -> f.whenComplete(cancelFunc));
+
+        CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
     }
 
 

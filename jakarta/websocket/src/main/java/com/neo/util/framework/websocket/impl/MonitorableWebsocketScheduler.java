@@ -1,13 +1,11 @@
 package com.neo.util.framework.websocket.impl;
 
 import com.neo.util.framework.api.persistence.search.SearchProvider;
-import com.neo.util.framework.api.scheduler.FixedRateSchedule;
+import com.neo.util.framework.api.scheduler.CronSchedule;
 import com.neo.util.framework.websocket.api.WebsocketInterceptorLogic;
 import com.neo.util.framework.websocket.api.WebsocketStateContext;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
-import java.util.concurrent.TimeUnit;
 
 @ApplicationScoped
 public class MonitorableWebsocketScheduler {
@@ -21,7 +19,7 @@ public class MonitorableWebsocketScheduler {
         this.websocketInterceptorLogic = websocketInterceptorLogic;
     }
 
-    @FixedRateSchedule(value = "MonitorableWebsocketScheduler", delay = 1, timeUnit = TimeUnit.MINUTES)
+    @CronSchedule(value = "MonitorableWebsocketScheduler", cron = "0 0/1 * * * *") // Every Minute
     public void action() {
         for (WebsocketStateContext stateContext: websocketInterceptorLogic.getActiveWebsocketStates()) {
             if (stateContext.isMonitored()) {

@@ -14,7 +14,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ValidationException;
-import com.networknt.schema.JsonSchema;
+import com.networknt.schema.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,7 +137,7 @@ public class JsonUtil {
      * @param schema to validate
      * @return is converted to JsonNode
      */
-    public static JsonNode fromJsonAndVeryfy(String json, JsonSchema schema) {
+    public static JsonNode fromJsonAndVeryfy(String json, Schema schema) {
         JsonNode node = fromJson(json);
         JsonSchemaUtil.isValidOrThrow(node, schema);
         return node;

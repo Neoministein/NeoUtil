@@ -81,7 +81,7 @@ public class WebsocketAnnoationBuildStep implements BuildStep {
         }
 
         if (!requiresParameters2.isEmpty()) {
-            throw new ConfigurationException(EX_MASSING_PARAMETER, method.getDeclaringClass().getName(), method.getName(), requiresParameters);
+            throw new ConfigurationException(EX_MASSING_PARAMETER, method.getDeclaringClass().getName(), method.getName(), Arrays.toString(requiresParameters));
         }
     }
 

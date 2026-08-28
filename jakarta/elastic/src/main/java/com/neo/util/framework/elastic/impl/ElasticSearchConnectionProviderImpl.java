@@ -7,7 +7,6 @@ import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
-import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.elastic.api.ElasticSearchConnectionProvider;
@@ -73,11 +72,12 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
 
     public void reloadConfig() {
         LOGGER.debug("Loading elastic search configuration");
-        List<String> nodes = configService.get(NODE_CONFIG).asList(String.class).orElse(List.of(DEFAULT_URL));
+
+        List<String> nodes = configService.getAsList(String.class, x -> x, NODE_CONFIG).orElse(List.of(DEFAULT_URL));
 
         nodeList = nodes;
         LOGGER.info("Elasticsearch nodes {}", nodes);
-        this.enabled = configService.get(ENABLED_CONFIG).asBoolean().orElse(false);
+        this.enabled = configService.getAsBoolean(ENABLED_CONFIG).orElse(false);
         if (enabled) {
             connect();
         } else {
@@ -196,11 +196,8 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
      * @return credentialsProvider
      */
     protected CredentialsProvider getCredentialsProvider() {
-        Config config = configService.get(CREDENTIALS_CONFIG);
-
-
-        String username = config.get("username").asString().orElse(null);
-        String password = config.get("password").asString().orElse(null);
+        String username = configService.getAsString(CREDENTIALS_CONFIG,"username").orElse(null);
+        String password = configService.getAsString(CREDENTIALS_CONFIG,"password").orElse(null);
 
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
             return null;

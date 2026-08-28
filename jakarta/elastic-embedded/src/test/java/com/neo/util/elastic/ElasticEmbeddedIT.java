@@ -2,7 +2,8 @@ package com.neo.util.elastic;
 
 import com.neo.util.common.impl.test.IntegrationTestUtil;
 import com.neo.util.framework.api.config.ConfigService;
-import com.neo.util.framework.impl.config.BasicConfigService;
+import com.neo.util.framework.impl.config.ConfigServiceImpl;
+import com.neo.util.framework.impl.config.store.InMemoryConfigStore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +11,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 class ElasticEmbeddedIT {
 
@@ -18,8 +20,8 @@ class ElasticEmbeddedIT {
     @Test
     void startupTest() {
         //Arrange
-        ConfigService configService = new BasicConfigService();
-        configService.save(configService.newConfig("elastic.embedded.dataPath", "./target/esdata"));
+        ConfigService configService = new ConfigServiceImpl(List.of(new InMemoryConfigStore()));
+        configService.save("./target/esdata", "elastic.embedded.dataPath");
 
         subject = new EmbeddedElasticNode(configService);
 

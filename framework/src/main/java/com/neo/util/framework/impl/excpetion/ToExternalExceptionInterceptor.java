@@ -36,7 +36,8 @@ public class ToExternalExceptionInterceptor {
             return Set.of(methodAnnotation.value());
         }
 
-        ToExternalException classAnnotation = invocationContext.getMethod().getAnnotation(ToExternalException.class);
+        ToExternalException classAnnotation = invocationContext.getTarget().getClass()
+                .getAnnotation(ToExternalException.class);
         if (classAnnotation != null) {
             return Set.of(classAnnotation.value());
         }

@@ -83,7 +83,7 @@ public class WebsocketScopedExtension implements Extension {
 
         if (!requiresParameters2.isEmpty()) {
             Method method = methodConfigurator.getAnnotated().getJavaMember();
-            throw new ConfigurationException(EX_MASSING_PARAMETER, method.getDeclaringClass().getName(), method.getName(), requiresParameters);
+            throw new ConfigurationException(EX_MASSING_PARAMETER, method.getDeclaringClass().getName(), method.getName(), Arrays.toString(requiresParameters));
         }
     }
 }

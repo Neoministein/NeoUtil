@@ -50,6 +50,6 @@ public class AuditJanitorJob implements JanitorJob {
     }
 
     public Period getConfiguredRetention() {
-        return configService.get(CONFIG_AUDIT_RETENTION).asInt().map(Period::ofDays).orElse(Period.ofMonths(1));
+        return configService.getAsInt(CONFIG_AUDIT_RETENTION).map(Period::ofDays).orElse(Period.ofMonths(1));
     }
 }

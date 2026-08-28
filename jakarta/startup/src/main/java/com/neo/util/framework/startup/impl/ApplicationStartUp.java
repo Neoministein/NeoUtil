@@ -67,7 +67,7 @@ public class ApplicationStartUp {
      */
     public void destroy( @Observes @Priority( PriorityConstants.LIBRARY_BEFORE ) @Destroyed( ApplicationScoped.class ) Object init ) {
         requestContextExecutor.execute(new StartupRequestDetails(
-                identification.getInstanceId(), ApplicationShutdownEvent.EVENT_NAME), this::fireApplicationShutDownEvent);
+                identification.getInstanceId(), ApplicationShutdownEvent.EVENT_NAME), this::fireApplicationShutDownEvent, true);
     }
 
 

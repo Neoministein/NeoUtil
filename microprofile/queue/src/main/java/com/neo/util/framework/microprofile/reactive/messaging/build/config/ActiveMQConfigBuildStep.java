@@ -28,13 +28,12 @@ public class ActiveMQConfigBuildStep implements BuildStep {
     }
 
     protected String createAddressSettings(String queueName, int retry, int delay, TimeUnit timeUnit) {
-        return STR.
-                """
-                    <address-setting match="\{queueName}">
-                       <max-delivery-attempts>\{retry}</max-delivery-attempts>
-                       <redelivery-delay>\{timeUnit.toMillis(delay)}</redelivery-delay>
+        return """
+                    <address-setting match="%s">
+                       <max-delivery-attempts>%s</max-delivery-attempts>
+                       <redelivery-delay>%s</redelivery-delay>
                     </address-setting>
-                """;
+                """.formatted(queueName, retry, timeUnit.toMillis(delay));
     }
 
         @Override

@@ -118,7 +118,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
         EntityResult<T> entity = entityRepository.fetch(entityParameters);
         if (entity.getHitSize() == 0) {
             LOGGER.debug("Entity not found [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
-            return clientResponseService.error(404, EX_ENTITY_NOT_FOUND, value);
+            return clientResponseService.error(404, EX_ENTITY_NOT_FOUND, value.toString());
         }
         LOGGER.trace("Entity lookup success [{},{}:{}]", getEntityClass().getSimpleName(), field, value);
         return parseToResponse(entity.getHits().get(0), getSerializationScope());
@@ -155,7 +155,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
 
         Optional<T> entity = entityRepository.fetch(primaryKey, getEntityClass());
         if (entity.isEmpty()) {
-            throw new NoContentFoundException(EX_ENTITY_NOT_FOUND, primaryKey);
+            throw new NoContentFoundException(EX_ENTITY_NOT_FOUND, primaryKey.toString());
         }
         return JsonUtil.updateExistingEntity(entity.get(), x, getEntityClass(), serializationScope);
     }

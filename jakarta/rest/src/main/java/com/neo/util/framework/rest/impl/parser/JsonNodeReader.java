@@ -9,7 +9,7 @@ import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.impl.json.JsonSchemaLoader;
 import com.neo.util.framework.rest.api.parser.ValidateJsonSchema;
-import com.networknt.schema.JsonSchema;
+import com.networknt.schema.Schema;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -40,7 +40,7 @@ public class JsonNodeReader implements MessageBodyReader<JsonNode> {
     protected static final ExceptionDetails EX_UNKNOWN_JSON_SCHEMA = new ExceptionDetails(
             "framework/json/unknown-schema", "Invalid json schema to check against {0}.");
 
-    protected final Map<String, JsonSchema> schemaMap;
+    protected final Map<String, Schema> schemaMap;
 
     @Inject
     public JsonNodeReader(JsonSchemaLoader jsonSchemaLoader) {
@@ -75,7 +75,7 @@ public class JsonNodeReader implements MessageBodyReader<JsonNode> {
         }
     }
 
-    protected JsonSchema retrieveSchemaFromString(String schemaLocation) {
+    protected Schema retrieveSchemaFromString(String schemaLocation) {
         return Optional.ofNullable(schemaMap.get(schemaLocation))
                 .orElseThrow(() -> new ConfigurationException(EX_UNKNOWN_JSON_SCHEMA, schemaLocation));
     }

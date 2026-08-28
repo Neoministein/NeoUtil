@@ -69,7 +69,7 @@ public class DefaultSearchRetentionStrategy implements SearchRetentionStrategy {
     }
 
     protected Optional<Period> getRetention(SearchableIndex searchableIndex) {
-        Optional<Period> customRetention = configService.get(CUSTOM_RETENTION_CONFIG + searchableIndex.indexName()).asInt().map(Period::ofDays);
+        Optional<Period> customRetention = configService.getAsInt(CUSTOM_RETENTION_CONFIG + searchableIndex.indexName()).map(Period::ofDays);
         if (customRetention.isPresent()) {
             return customRetention;
         }
@@ -78,10 +78,10 @@ public class DefaultSearchRetentionStrategy implements SearchRetentionStrategy {
 
     protected Optional<Period> getRetentionFromConfig(IndexPeriod indexPeriod) {
         Period retention = switch (indexPeriod) {
-            case DAILY -> configService.get(DAILY_CONFIG).asInt().map(Period::ofDays).orElse(Period.ofDays(7));
-            case WEEKLY ->  configService.get(WEEKLY_CONFIG).asInt().map(Period::ofDays).orElse(Period.ofMonths(2));
-            case MONTHLY ->  configService.get(MONTHLY_CONFIG).asInt().map(Period::ofDays).orElse(Period.ofYears(1));
-            case YEARLY ->  configService.get(YEARLY_CONFIG).asInt().map(Period::ofDays).orElse(Period.ofYears(10));
+            case DAILY -> configService.getAsInt(DAILY_CONFIG).map(Period::ofDays).orElse(Period.ofDays(7));
+            case WEEKLY ->  configService.getAsInt(WEEKLY_CONFIG).map(Period::ofDays).orElse(Period.ofMonths(2));
+            case MONTHLY ->  configService.getAsInt(MONTHLY_CONFIG).map(Period::ofDays).orElse(Period.ofYears(1));
+            case YEARLY ->  configService.getAsInt(YEARLY_CONFIG).map(Period::ofDays).orElse(Period.ofYears(10));
             case EXTERNAL, ALL ->  null;
         };
         LOGGER.trace("The IndexPeriod [{}] retention is configured as [{}]", indexPeriod, retention);

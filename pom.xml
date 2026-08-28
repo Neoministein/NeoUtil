@@ -10,8 +10,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<maven.compiler.source>21</maven.compiler.source>
-		<maven.compiler.target>21</maven.compiler.target>
+		<maven.compiler.source>25</maven.compiler.source>
+		<maven.compiler.target>25</maven.compiler.target>
 		<!-- Jakarta -->
 		<jakarta.persistence-api.version>3.1.0</jakarta.persistence-api.version>
 		<jakarta.enterprise.cdi-api.version>4.0.1</jakarta.enterprise.cdi-api.version>
@@ -37,9 +37,9 @@
 		<!-- Jackson -->
 		<jackson.version>2.15.2</jackson.version>
 		<json-schema-generator.version>4.31.1</json-schema-generator.version>
-		<json-schema-validator.version>1.5.6</json-schema-validator.version>
+		<json-schema-validator.version>2.0.7</json-schema-validator.version>
 
-		<jobrunr.version>6.2.2-neoutil</jobrunr.version>
+		<jobrunr.version>8.6.1</jobrunr.version>
 		<!-- Caching -->
 		<caffeine.version>3.1.5</caffeine.version>
 
@@ -47,7 +47,7 @@
 		<helidon.version>4.1.1</helidon.version>
 		<!-- Testing -->
 		<junit.version>5.9.3</junit.version>
-		<mockito.version>5.3.1</mockito.version>
+		<mockito.version>5.23.0</mockito.version>
 		<h2.version>2.2.224</h2.version>
 		<weld.version>5.1.0.Final</weld.version>
 		<weld-junit.version>4.0.0.Final</weld-junit.version>
@@ -55,8 +55,8 @@
 
 		<!-- Maven -->
 		<maven.core.version>3.9.4</maven.core.version>
-		<maven.tools.version>3.9.0</maven.tools.version>
-		<maven.plugin.plugin.version>3.9.0</maven.plugin.plugin.version>
+		<maven.tools.version>3.15.2</maven.tools.version>
+		<maven.plugin.plugin.version>3.15.2</maven.plugin.plugin.version>
 		<surefire.version>3.2.5</surefire.version>
 		<build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
 		<compiler.plugin.version>3.11.0</compiler.plugin.version>
@@ -70,8 +70,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.10.1</version>
 				<configuration>
-					<source>21</source>
-					<target>21</target>
+					<source>25</source>
+					<target>25</target>
 					<compilerArgs>--enable-preview</compilerArgs>
 				</configuration>
 			</plugin>
@@ -180,7 +180,6 @@
 
 	<modules>
 		<module>tools</module>
-		<module>unfork/jobrunr</module>
 		<module>common</module>
 		<module>framework</module>
 		<module>jakarta/maven-plugin</module>
@@ -196,7 +195,6 @@
 		<module>jakarta/jobrunr</module>
 		<module>jakarta/jobrunr-queue</module>
 		<module>jakarta/jobrunr-scheduler</module>
-		<module>jakarta/cache-caffeine</module>
 		<module>microprofile</module>
 		<module>helidon</module>
 	</modules>

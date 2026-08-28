@@ -12,16 +12,16 @@ import java.util.Set;
  */
 public interface SchedulerService {
 
-    ExceptionDetails EX_DUPLICATED_SCHEDULER = new ExceptionDetails(
-            "scheduler/duplicated-scheduler-configured","Duplicated scheduler present [{0}].");
+    ExceptionDetails EX_DUPLICATED_SCHEDULER = new ExceptionDetails("scheduler/duplicated-scheduler-configured",
+            "Duplicated scheduler present [{0}].");
 
-    String E_INVALID_SCHEDULER_ID = "scheduler/invalid-id";
+    String E_UNKNOWN_SCHEDULER_ID = "scheduler/unknown-key";
 
-    ExceptionDetails EX_INVALID_SCHEDULER_ID = new ExceptionDetails(
-            E_INVALID_SCHEDULER_ID, "The provided scheduler id [{0}] does not exist.");
+    ExceptionDetails EX_UNKNOWN_SCHEDULER_ID = new ExceptionDetails(E_UNKNOWN_SCHEDULER_ID,
+            "The provided scheduler key [{0}] does not exist.");
 
-    ExceptionDetails EX_INVALID_CONFIG_EXPRESSION = new ExceptionDetails(
-            "scheduler/invalid-chron", "The configured expression is invalid because [{0}].");
+    ExceptionDetails EX_INVALID_CONFIG_EXPRESSION = new ExceptionDetails("scheduler/invalid-chron",
+            "The configured expression is invalid because [{0}].");
 
     /**
      * Manually executes the provided scheduler
@@ -58,4 +58,9 @@ public interface SchedulerService {
      * Returns a collection of all scheduler ids.
      */
     Set<String> getSchedulerIds();
+
+    /**
+     * Updates the scheduler config. Stops / restarts
+     */
+    void updateConfig(SchedulerConfig config);
 }

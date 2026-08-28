@@ -7,7 +7,7 @@ import com.neo.util.framework.mapping.api.ExpressionHandler;
 import com.neo.util.framework.mapping.api.ExpressionValue;
 import com.neo.util.framework.mapping.api.MappingSchema;
 import com.neo.util.framework.mapping.api.node.*;
-import com.networknt.schema.JsonSchema;
+import com.networknt.schema.Schema;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class MappingSchemaFactory {
         return createSchema(name, parseXml(mappingXML), JsonSchemaUtil.generateNewSchema(inputJsonSchema));
     }
 
-    public MappingSchema createSchema(String name, Document mapping, JsonSchema inputSchema) {
+    public MappingSchema createSchema(String name, Document mapping, Schema inputSchema) {
         LOGGER.info("Creating MappingSchema [{}]", name);
         Element root = mapping.getDocumentElement();
         List<Node> nodes = getChildren(root);

@@ -55,23 +55,21 @@ public class HelidonConfigBuildStep implements BuildStep {
     }
 
     protected String createIncoming(String queueName, QueueType type) {
-        return STR.
-                """
-                      from-\{queueName}:
+        return """
+                      from-%s:
                         connector: helidon-jms
-                        destination: \{queueName}
-                        type: \{type.name().toLowerCase()}
-                """;
+                        destination: %s
+                        type: %s
+                """.formatted(queueName, queueName, type.name().toLowerCase());
     }
 
     protected String createOutgoing(String queueName, QueueType type) {
-        return STR.
-               """
-                      to-\{queueName}:
+        return """
+                      to-%s:
                         connector: helidon-jms
-                        destination: \{queueName}
-                        type: \{type.name().toLowerCase()}
-                """;
+                        destination: %s
+                        type: %s
+                """.formatted(queueName, queueName, type.name().toLowerCase());
     }
 
     @Override

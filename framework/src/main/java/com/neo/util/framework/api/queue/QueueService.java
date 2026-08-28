@@ -1,6 +1,7 @@
 package com.neo.util.framework.api.queue;
 
 import com.neo.util.common.impl.exception.ExceptionDetails;
+import com.neo.util.common.impl.exception.NoContentFoundException;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -15,8 +16,8 @@ public interface QueueService {
     ExceptionDetails EX_DUPLICATED_QUEUE = new ExceptionDetails(
             "queue/duplicated-queue-configured","Duplicated queues present [{0}] [{1}]");
 
-    ExceptionDetails EX_NON_EXISTENT_QUEUE = new ExceptionDetails(
-            "queue/non-existent-queue", "The [{0}] [{1}] does not exist");
+    ExceptionDetails EX_UNKNOWN_QUEUE = new ExceptionDetails("queue/unknown-key",
+            "The Janitor [{0}] does not exist");
 
     /**
      * Returns a collection of all queue names.
@@ -37,5 +38,5 @@ public interface QueueService {
     /**
      * Returns the config for the provided queue name
      */
-    QueueConfig getQueueConfig(String queueName);
+    QueueConfig requestQueueConfig(String queueName) throws NoContentFoundException;
 }

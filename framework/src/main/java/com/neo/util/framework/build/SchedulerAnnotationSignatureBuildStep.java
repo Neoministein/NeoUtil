@@ -6,17 +6,14 @@ import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.build.BuildContext;
 import com.neo.util.framework.api.build.BuildStep;
 import com.neo.util.framework.api.scheduler.CronSchedule;
-import com.neo.util.framework.api.scheduler.FixedRateSchedule;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
- * Validates the method signature of {@link CronSchedule} and {@link FixedRateSchedule}
+ * Validates the method signature of {@link CronSchedule}
  */
 public class SchedulerAnnotationSignatureBuildStep implements BuildStep {
 
@@ -37,18 +34,13 @@ public class SchedulerAnnotationSignatureBuildStep implements BuildStep {
 
     @Override
     public void execute(BuildContext context) {
-        validateAnnotation(context, CronSchedule.class, CronSchedule::value);
-        validateAnnotation(context, FixedRateSchedule.class, FixedRateSchedule::value);
-    }
-
-    protected <T extends Annotation> void validateAnnotation(BuildContext context, Class<T> annotation, Function<T, String> funcGetSchedulerId) {
-        for (AnnotatedElement element: context.fullReflection().getAnnotatedElement(annotation)) {
+        for (AnnotatedElement element: context.fullReflection().getAnnotatedElement(CronSchedule.class)) {
             if (element instanceof Method method) {
                 if (method.getParameters().length != 0) {
-                    throw new ConfigurationException(EX_INVALID_METHOD_SIGNATURE, method.getDeclaringClass().getName(), method.getName(), annotation);
+                    throw new ConfigurationException(EX_INVALID_METHOD_SIGNATURE, method.getDeclaringClass().getName(), method.getName(), CronSchedule.class.toString());
                 }
 
-                String schedulerName = funcGetSchedulerId.apply(element.getAnnotation(annotation));
+                String schedulerName = element.getAnnotation(CronSchedule.class).value();
                 if (schedulerName.contains(" ")) {
                     throw new ConfigurationException(INVALID_SCHEDULER_ID, schedulerName, method.getDeclaringClass().getName(), method.getName());
                 }

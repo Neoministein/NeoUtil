@@ -29,8 +29,8 @@ public class IdentificationFilter implements ContainerRequestFilter {
 
     protected static final String INVALID_IP = "255.255.255.255";
 
-    protected InstanceIdentification identification;
-    protected RequestDetailsProducer requestDetailsProvider;
+    protected final InstanceIdentification identification;
+    protected final RequestDetailsProducer requestDetailsProvider;
 
     @Inject
     public IdentificationFilter(InstanceIdentification identification, RequestDetailsProducer requestDetailsProvider) {

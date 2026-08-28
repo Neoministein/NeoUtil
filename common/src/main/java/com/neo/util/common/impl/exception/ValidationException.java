@@ -5,11 +5,11 @@ package com.neo.util.common.impl.exception;
  */
 public class ValidationException extends InternalRuntimeException {
 
-    public ValidationException(ExceptionDetails exceptionDetails, Object... arguments) {
+    public ValidationException(ExceptionDetails exceptionDetails, String... arguments) {
         super(exceptionDetails, arguments);
     }
 
-    public ValidationException(Exception cause, ExceptionDetails exceptionDetails, Object... arguments) {
+    public ValidationException(Exception cause, ExceptionDetails exceptionDetails, String... arguments) {
         super(cause, exceptionDetails, arguments);
     }
 }

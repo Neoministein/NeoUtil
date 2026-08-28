@@ -45,6 +45,11 @@ public class DummyRequestDetails implements RequestDetails {
         return receiveDate;
     }
 
+    @Override
+    public void applyLogContext() {
+
+    }
+
     public void setCaller(String caller) {
         this.caller = caller;
     }

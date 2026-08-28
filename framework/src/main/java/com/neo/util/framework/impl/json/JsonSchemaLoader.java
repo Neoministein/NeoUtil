@@ -9,7 +9,7 @@ import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.impl.ReflectionService;
-import com.networknt.schema.JsonSchema;
+import com.networknt.schema.Schema;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * This class loads all {@link JsonSchema} on startup and provided an UnmodifiableMap {@link Map} for all classes which require them.
+ * This class loads all {@link Schema} on startup and provided an UnmodifiableMap {@link Map} for all classes which require them.
  * <br>
  * This increases startup time however decreases the response time of the first request which requires a particular schema.
  */
@@ -40,26 +40,26 @@ public class JsonSchemaLoader {
     public static final ExceptionDetails EX_SCHEMA_DOES_NOT_EXIST = new ExceptionDetails(
             "json-schema/invalid-path", "The provided json schema path [{0}] does not exist.");
 
-    protected final Map<String, JsonSchema> jsonSchemaMap;
+    protected final Map<String, Schema> jsonSchemaMap;
 
     @Inject
     public JsonSchemaLoader(ConfigService configService, ReflectionService reflectionService) {
         LOGGER.info("Pre-loading json schemas");
-        Map<String, JsonSchema> mapToFill = new HashMap<>();
+        Map<String, Schema> mapToFill = new HashMap<>();
 
         for (String filePath: reflectionService.getResources("^configuration/schema.*\\.json$")) {
             addSchema(mapToFill, FrameworkConstants.JSON_SCHEMA_LOCATION,
                     filePath.substring(FrameworkConstants.JSON_SCHEMA_LOCATION.length()));
         }
 
-        configService.get("json.schema.externalFolder").asString().asOptional().ifPresent(config ->
+        configService.getAsString("json.schema.externalFolder").asOptional().ifPresent(config ->
                 addSchemas(mapToFill, ResourceUtil.getFolderContent(config),
                         config.concat("/"), ""));
 
         jsonSchemaMap = Collections.unmodifiableMap(mapToFill);
     }
 
-    protected void addSchemas(Map<String, JsonSchema> mapToFill ,File[] files, String jsonSchemaFolder, String currentPath) {
+    protected void addSchemas(Map<String, Schema> mapToFill ,File[] files, String jsonSchemaFolder, String currentPath) {
         for (File file: files) {
             if (file.isDirectory()) {
                 addSchemas(mapToFill, file.listFiles(), jsonSchemaFolder ,currentPath + file.getName() + "/");
@@ -69,12 +69,12 @@ public class JsonSchemaLoader {
         }
     }
 
-    protected void addSchema(Map<String, JsonSchema> mapToFill, String basePath, String relativePath) {
+    protected void addSchema(Map<String, Schema> mapToFill, String basePath, String relativePath) {
         LOGGER.debug("Loading schema at: [{}{}]", basePath, relativePath);
         if (relativePath.contains(" ")) {
             throw new ConfigurationException(INVALID_SCHEDULER_ID, relativePath);
         }
-        JsonSchema schema = JsonSchemaUtil.generateSchemaFromResource(basePath.concat(relativePath));
+        Schema schema = JsonSchemaUtil.generateSchemaFromResource(basePath.concat(relativePath));
         mapToFill.put(relativePath, schema);
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Schema loaded: [{}]", schema.getSchemaNode().textValue());
@@ -86,12 +86,12 @@ public class JsonSchemaLoader {
         LOGGER.debug("ApplicationPreReadyEvent processed");
     }
 
-    public Map<String, JsonSchema> getUnmodifiableMap() {
+    public Map<String, Schema> getUnmodifiableMap() {
         return jsonSchemaMap;
     }
 
-    public Optional<JsonSchema> fetchJsonSchema(String path) {
-        JsonSchema schema = jsonSchemaMap.get(path);
+    public Optional<Schema> fetchJsonSchema(String path) {
+        Schema schema = jsonSchemaMap.get(path);
         if (schema != null) {
             return Optional.of(schema);
         }
@@ -99,7 +99,7 @@ public class JsonSchemaLoader {
         return Optional.empty();
     }
 
-    public JsonSchema requestJsonSchema(String path) {
+    public Schema requestJsonSchema(String path) {
         return fetchJsonSchema(path).orElseThrow(() -> new NoContentFoundException(EX_SCHEMA_DOES_NOT_EXIST));
     }
 }

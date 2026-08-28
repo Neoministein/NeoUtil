@@ -4,7 +4,8 @@ import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
 import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.api.event.ApplicationShutdownEvent;
-import com.neo.util.framework.impl.config.BasicConfigService;
+import com.neo.util.framework.impl.config.ConfigServiceImpl;
+import com.neo.util.framework.impl.config.store.InMemoryConfigStore;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.RequestDetailsProducer;
 import com.neo.util.framework.impl.request.Slf4jRequestAuditProvider;
@@ -42,7 +43,8 @@ class ApplicationStartUpIT {
             RequestContextExecutor.class,
             BasicInstanceIdentification.class,
             Slf4jRequestAuditProvider.class,
-            BasicConfigService.class
+            ConfigServiceImpl.class,
+            InMemoryConfigStore.class
     ).activate(RequestScoped.class).build();
 
     protected ListenerSequenceRecorder recorder;

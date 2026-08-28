@@ -1,7 +1,5 @@
 package com.neo.util.framework.api.config;
 
-import com.neo.util.common.impl.exception.ConfigurationException;
-
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -11,6 +9,7 @@ import java.util.stream.Stream;
 
 /**
  * A wrapper for a Key-Value set with additional features.
+ *
  * @param <T> the type of value
  */
 public interface ConfigValue<T> {
@@ -24,16 +23,6 @@ public interface ConfigValue<T> {
      * The value as an {@link Optional<T>}
      */
     Optional<T> asOptional();
-
-    /**
-     * The value but throws a {@link ConfigurationException} if not found
-     */
-    T get() throws ConfigurationException;
-
-    /**
-     * Set the value of the current config
-     */
-    void set(T value);
 
     /**
      * True if the value is present

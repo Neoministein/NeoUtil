@@ -8,7 +8,7 @@ import jakarta.inject.Inject;
 
 public abstract class AbstractRequestRecorder<T extends RequestDetails> implements RequestSearchableParser<T> {
 
-    private static final String REQUEST_RECORDING_PREFIX = "request.recorder.";
+    private static final String REQUEST_RECORDING_PREFIX = "request.recorder";
 
     @Inject
     protected ConfigService configService;
@@ -17,7 +17,7 @@ public abstract class AbstractRequestRecorder<T extends RequestDetails> implemen
 
     @PostConstruct
     protected void postConstruct() {
-        this.enabled = configService.get(REQUEST_RECORDING_PREFIX + getRequestType().getSimpleName() + ".enabled").asBoolean().orElse(false);
+        this.enabled = configService.getAsBoolean(REQUEST_RECORDING_PREFIX, getRequestType().getSimpleName(), "enabled").orElse(false);
     }
 
     @Override

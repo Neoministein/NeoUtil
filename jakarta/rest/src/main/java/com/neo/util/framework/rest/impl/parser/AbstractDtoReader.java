@@ -7,7 +7,7 @@ import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.json.JsonSchemaUtil;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.impl.json.JsonSchemaLoader;
-import com.networknt.schema.JsonSchema;
+import com.networknt.schema.Schema;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.inject.spi.DeploymentException;
 import jakarta.inject.Inject;
@@ -39,7 +39,7 @@ public abstract class AbstractDtoReader<T> implements MessageBodyReader<T> {
     @Inject
     protected JsonSchemaLoader jsonSchemaLoader;
 
-    protected JsonSchema schema;
+    protected Schema schema;
 
     protected final Class<T> clazz;
 

@@ -12,6 +12,11 @@ import java.util.Optional;
 public interface AuthenticationProvider {
 
     /**
+     * Returns true if security is enabled
+     */
+    boolean isSecurityEnabled();
+
+    /**
      * Authenticated and returns an {@link Optional<RolePrincipal>} based if it succeeds
      *
      * @param credential to authenticate against

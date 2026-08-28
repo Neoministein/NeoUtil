@@ -43,4 +43,9 @@ public interface RequestDetails {
      * Returns the date the request has been started
      */
     Instant getRequestStartDate();
+
+    /**
+     * Apply the log context to the current thread
+     */
+    void applyLogContext();
 }

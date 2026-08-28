@@ -47,6 +47,11 @@ public class BasicAuthorizationProvider implements AuthenticationProvider {
     };
 
     @Override
+    public boolean isSecurityEnabled() {
+        return true;
+    }
+
+    @Override
     public Optional<RolePrincipal> authenticate(Credential credential) {
         if (credential instanceof BearerCredentials) {
             if (NORMAL_TOKEN.equals(((BearerCredentials) credential).getToken())) {

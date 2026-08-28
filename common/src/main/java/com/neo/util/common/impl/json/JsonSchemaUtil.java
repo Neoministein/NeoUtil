@@ -7,8 +7,10 @@ import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.networknt.schema.*;
+import com.networknt.schema.Error;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,7 +32,7 @@ public class JsonSchemaUtil {
     private JsonSchemaUtil(){}
 
     /**
-     *  Make sure when calling this method, that the provided {@link JsonSchema} has the fail fast {@link SchemaValidatorsConfig}
+     *  Make sure when calling this method, that the provided {@link Schema} has the fail fast {@link SchemaRegistryConfig}
      *  is set to true otherwise the validation doesn't throw an exception if one is found.
      *
      * @param jsonNode the node to check for validity
@@ -38,16 +40,15 @@ public class JsonSchemaUtil {
      *
      * @throws ValidationException is thrown if it isn't valid
      */
-    public static void isValidOrThrow(JsonNode jsonNode, JsonSchema jsonSchema) {
-        try {
-            jsonSchema.validate(jsonNode);
-        } catch (JsonSchemaException ex) {
-            throw new ValidationException(EX_INVALID_JSON, ex.getMessage());
+    public static void isValidOrThrow(JsonNode jsonNode, Schema jsonSchema) {
+        List<Error> errors = jsonSchema.validate(jsonNode);
+        if (!errors.isEmpty()) {
+            throw new ValidationException(EX_INVALID_JSON, errors.getFirst().getMessage());
         }
     }
 
     /**
-     *  Make sure when calling this method, that the provided {@link JsonSchema} has the fail fast {@link SchemaValidatorsConfig}
+     *  Make sure when calling this method, that the provided {@link Schema} has the fail fast {@link SchemaRegistryConfig}
      *  is set to true otherwise the validation doesn't throw an exception if one is found.
      *
      * @param jsonNode the node to check for validity
@@ -55,16 +56,16 @@ public class JsonSchemaUtil {
      *
      * @return an optional that contains the error message if the validation failed
      */
-    public static Optional<String> isValid(JsonNode jsonNode, JsonSchema jsonSchema) {
-        try {
-            jsonSchema.validate(jsonNode);
+    public static Optional<String> isValid(JsonNode jsonNode, Schema jsonSchema) {
+        List<Error> errors = jsonSchema.validate(jsonNode);
+        if (!errors.isEmpty()) {
+            return Optional.of(errors.getFirst().getMessage());
+        } else {
             return Optional.empty();
-        } catch (JsonSchemaException ex) {
-            return Optional.of(ex.getMessage());
         }
     }
 
-    public static ObjectNode generateSampleJson(JsonSchema jsonSchema) {
+    public static ObjectNode generateSampleJson(Schema jsonSchema) {
         return (ObjectNode) generateSampleJson(jsonSchema.getSchemaNode());
     }
 
@@ -153,59 +154,59 @@ public class JsonSchemaUtil {
      *
      * @return the generated JsonSchema
      */
-    public static JsonSchema generateSchemaFromResource(String fileLocation) {
-        return generateNewSchema(ResourceUtil.getResourceFileAsString(fileLocation), SpecVersion.VersionFlag.V201909);
+    public static Schema generateSchemaFromResource(String fileLocation) {
+        return generateNewSchema(ResourceUtil.getResourceFileAsString(fileLocation), SpecificationVersion.DRAFT_2019_09);
     }
 
     /**
-     * Generates a {@link JsonSchema} from a json string with default schema version and config
+     * Generates a {@link Schema} from a json string with default schema version and config
      *
      * @param schema the schema as a json string
      *
-     * @return the schema as an {@link JsonSchema}
+     * @return the schema as an {@link Schema}
      */
-    public static JsonSchema generateNewSchema(String schema) {
-        return generateNewSchema(schema, SpecVersion.VersionFlag.V201909);
+    public static Schema generateNewSchema(String schema) {
+        return generateNewSchema(schema, SpecificationVersion.DRAFT_2019_09);
     }
 
     /**
-     * Generates a {@link JsonSchema} from a json string with default config
+     * Generates a {@link Schema} from a json string with default config
      *
      * @param schema the schema as a json string
      * @param specVersion the Global json schema version
      *
-     * @return the schema as an {@link JsonSchema}
+     * @return the schema as an {@link Schema}
      *
      */
-    public static JsonSchema generateNewSchema(String schema, SpecVersion.VersionFlag specVersion) {
+    public static Schema generateNewSchema(String schema, SpecificationVersion specVersion) {
         return generateNewSchema(schema,specVersion, getDefaultConfig());
     }
 
     /**
-     * Generates a {@link JsonSchema} from a json string
+     * Generates a {@link Schema} from a json string
      *
      * @param schema the schema as a json string
      * @param specVersion the Global json schema version
      * @param config the schema config
      *
-     * @return the schema as an {@link JsonSchema}
+     * @return the schema as an {@link Schema}
      */
-    public static JsonSchema generateNewSchema(String schema, SpecVersion.VersionFlag specVersion, SchemaValidatorsConfig config) {
+    public static Schema generateNewSchema(String schema, SpecificationVersion specVersion, SchemaRegistryConfig config) {
         try {
-            return JsonSchemaFactory.getInstance(specVersion).getSchema(schema, config);
-        } catch (JsonSchemaException ex) {
+            Schema schemaObject = SchemaRegistry.withDefaultDialect(specVersion, builder -> builder.schemaRegistryConfig(config)).getSchema(schema);
+            schemaObject.initializeValidators();
+            return schemaObject;
+        } catch (SchemaException ex) {
             throw new ValidationException(EX_INVALID_JSON_SCHEMA);
         }
     }
 
     /**
-     * Returns the default configuration for a {@link JsonSchema}
+     * Returns the default configuration for a {@link Schema}
      *
      * @return the default configuration
      */
-    public static SchemaValidatorsConfig getDefaultConfig() {
-        SchemaValidatorsConfig config = new SchemaValidatorsConfig();
-        config.setFailFast(true);
-        return config;
+    public static SchemaRegistryConfig getDefaultConfig() {
+        return SchemaRegistryConfig.builder().failFast(true).build();
     }
 }

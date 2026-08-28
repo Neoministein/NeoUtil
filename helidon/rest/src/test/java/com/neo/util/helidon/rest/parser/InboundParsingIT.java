@@ -57,7 +57,7 @@ class InboundParsingIT extends AbstractIntegrationTest {
         //Assert
 
         JsonNode body = validateResponse(response, 400);
-        Assertions.assertEquals("$.aString", body.get("message").asText().substring(0,9));
+        Assertions.assertEquals("required property 'aString' not found", body.get("message").asText());
     }
 
     @Test
@@ -95,6 +95,6 @@ class InboundParsingIT extends AbstractIntegrationTest {
         //Assert
 
         JsonNode body = validateResponse(response, 400);
-        Assertions.assertEquals("$.a_different_name", body.get("message").asText().substring(0,18));
+        Assertions.assertEquals("required property 'a_different_name' not found", body.get("message").asText());
     }
 }

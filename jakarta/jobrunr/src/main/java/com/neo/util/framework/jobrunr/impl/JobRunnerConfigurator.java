@@ -47,13 +47,13 @@ public class JobRunnerConfigurator {
     public void init() {
         LOGGER.info("Loading JobRunr configuration");
 
-        boolean backGroundWorkerEnabled = configService.get(CONFIG_PREFIX + CONFIG_BACKGROUND_WORKER + CONFIG_ENABLED).asBoolean().orElse(true);
-        int backGroundWorkers = configService.get(CONFIG_PREFIX + CONFIG_BACKGROUND_WORKER).asInt().orElse(DEFAULT_WORKERS);
-        int pollInterval = configService.get(CONFIG_PREFIX + CONFIG_POLL_INTERVAL).asInt().orElse(DEFAULT_POLL_INTERVAL);
+        boolean backGroundWorkerEnabled = configService.getAsBoolean(CONFIG_PREFIX + CONFIG_BACKGROUND_WORKER + CONFIG_ENABLED).orElse(true);
+        int backGroundWorkers = configService.getAsInt(CONFIG_PREFIX + CONFIG_BACKGROUND_WORKER).orElse(DEFAULT_WORKERS);
+        int pollInterval = configService.getAsInt(CONFIG_PREFIX + CONFIG_POLL_INTERVAL).orElse(DEFAULT_POLL_INTERVAL);
         LOGGER.info("JobRunrConfiguration, BackgroundJobServer: [{}], workers: [{}] pollIntervalInSeconds: [{}]", backGroundWorkerEnabled, backGroundWorkers, pollInterval);
 
-        boolean dashboardEnabled = configService.get(CONFIG_PREFIX + CONFIG_DASHBOARD + CONFIG_ENABLED).asBoolean().orElse(false);
-        int dashboardPort = configService.get(CONFIG_PREFIX + CONFIG_DASHBOARD).asInt().orElse(DEFAULT_DASHBOARD_PORT);
+        boolean dashboardEnabled = configService.getAsBoolean(CONFIG_PREFIX + CONFIG_DASHBOARD + CONFIG_ENABLED).orElse(false);
+        int dashboardPort = configService.getAsInt(CONFIG_PREFIX + CONFIG_DASHBOARD).orElse(DEFAULT_DASHBOARD_PORT);
         LOGGER.info("JobRunrConfiguration, Dashboard: [{}], ports: [{}]", dashboardEnabled, dashboardPort);
 
         JobActivator jobActivator = new JobActivator() {

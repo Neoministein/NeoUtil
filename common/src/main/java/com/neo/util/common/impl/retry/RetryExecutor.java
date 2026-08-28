@@ -46,7 +46,7 @@ public final class RetryExecutor {
         } catch (Exception ex) {
             LOGGER.warn("Failed to execute action {} -> retrying {} times", ex.getMessage(), count);
             if (retries <= count) {
-                throw new InternalRuntimeException(EX_RETRY, count);
+                throw new InternalRuntimeException(EX_RETRY, String.valueOf(count));
             }
             wait(count, startingTime);
             execute(actionToExecute, retries, count + 1, startingTime);

@@ -12,7 +12,7 @@ public class DummySchedulerService implements SchedulerService {
 
     @Override
     public SchedulerConfig requestSchedulerConfig(String id) {
-        throw new NoContentFoundException(SchedulerService.EX_INVALID_SCHEDULER_ID, id);
+        throw new NoContentFoundException(SchedulerService.EX_UNKNOWN_SCHEDULER_ID, id);
     }
 
     @Override
@@ -38,5 +38,10 @@ public class DummySchedulerService implements SchedulerService {
     @Override
     public Set<String> getSchedulerIds() {
         return Set.of();
+    }
+
+    @Override
+    public void updateConfig(SchedulerConfig config) {
+        
     }
 }

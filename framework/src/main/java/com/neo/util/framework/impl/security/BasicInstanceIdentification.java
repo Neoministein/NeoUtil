@@ -13,10 +13,13 @@ import java.util.UUID;
 @ApplicationScoped
 public class BasicInstanceIdentification implements InstanceIdentification {
 
-    private String id;
+    private final String id;
+
+    public BasicInstanceIdentification() {
+        this.id = UUID.randomUUID().toString();
+    }
 
     public void init(@Observes @Priority( PriorityConstants.PLATFORM_BEFORE ) @Initialized( ApplicationScoped.class ) Object init ) {
-        this.id = UUID.randomUUID().toString();
         MDC.put(MDC_INSTANCE, id);
     }
 
