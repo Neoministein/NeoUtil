@@ -1,6 +1,6 @@
 package com.neo.util.helidon.security.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.neo.util.common.impl.KeyUtils;
 import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.StringUtils;
@@ -185,7 +185,7 @@ public class CustomJWTAuthentication implements AuthenticationProvider {
     protected Key retrievePrivateKeyFromFile() {
         try {
             JsonNode node = JsonUtil.fromJson(ResourceUtil.getResourceFileAsString("jwt-keys.json"));
-            return KeyUtils.parseRSAPrivateKey(node.get("private").asText());
+            return KeyUtils.parseRSAPrivateKey(node.get("private").asString());
         } catch (ValidationException | ConfigurationException ex) {
             throw new ConfigurationException(ex, EX_CANNOT_ACCESS_PRIVATE_KEY, ex.getMessage());
         }

@@ -1,7 +1,5 @@
 package com.neo.util.framework.mapping;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.mapping.api.ExpressionHandler;
@@ -16,6 +14,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.io.File;
 import java.io.IOException;

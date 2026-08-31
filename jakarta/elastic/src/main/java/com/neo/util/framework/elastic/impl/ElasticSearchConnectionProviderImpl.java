@@ -1,9 +1,10 @@
 package com.neo.util.framework.elastic.impl;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.json.jackson.Jackson3JsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
+import co.elastic.clients.transport.rest5_client.Rest5ClientTransport;
+import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
@@ -16,12 +17,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.client.RestClient;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.core5.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,26 +157,26 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
      *            list of nodes
      */
     protected synchronized void initializeClient(List<HttpHost> nodes) {
-        CredentialsProvider credentialsProvider = getCredentialsProvider();
+        CredentialsProvider credentialsProvider = getCredentialsProvider(nodes);
 
         for (HttpHost node : nodes) {
             LOGGER.debug("Elasticsearch configuration. Protocol: [{}] Host: [{}] Port: [{}]",
                     node.getSchemeName(), node.getHostName(), node.getPort());
         }
 
-        RestClient restClient;
+        Rest5Client restClient;
 
         if (credentialsProvider != null) {
-            restClient = RestClient.builder(nodes.toArray(new HttpHost[0]))
+            restClient = Rest5Client.builder(nodes.toArray(new HttpHost[0]))
                     .setHttpClientConfigCallback(
                             httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
                     .build();
         } else {
-            restClient = RestClient.builder(nodes.toArray(new HttpHost[0]))
+            restClient = Rest5Client.builder(nodes.toArray(new HttpHost[0]))
                     .build();
         }
 
-        ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper(JsonUtil.createMapper()));
+        ElasticsearchTransport transport = new Rest5ClientTransport(restClient, new Jackson3JsonpMapper(JsonUtil.createMapper()));
 
         elasticsearchClient = new ElasticsearchClient(transport);
 
@@ -195,15 +195,18 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
      *
      * @return credentialsProvider
      */
-    protected CredentialsProvider getCredentialsProvider() {
+    protected CredentialsProvider getCredentialsProvider(List<HttpHost> nodes) {
         String username = configService.getAsString(CREDENTIALS_CONFIG,"username").orElse(null);
         String password = configService.getAsString(CREDENTIALS_CONFIG,"password").orElse(null);
 
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
             return null;
         }
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+        BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        for (HttpHost node: nodes) {
+            credentialsProvider.setCredentials(new AuthScope(node), new UsernamePasswordCredentials(username, password.toCharArray()));
+        }
+
         return credentialsProvider;
     }
 
@@ -218,7 +221,7 @@ public class ElasticSearchConnectionProviderImpl implements ElasticSearchConnect
             return nodes;
         } catch (Exception ex) {
             LOGGER.error("Failed load ElasticSearch nodes {} with exception: {}", nodeList, ex);
-            throw ex;
+            throw new IllegalStateException(ex);
         }
     }
 }

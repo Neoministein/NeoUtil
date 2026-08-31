@@ -1,7 +1,7 @@
 package com.neo.util.framework.api.persistence.search;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.framework.api.persistence.criteria.SearchCriteria;
+import tools.jackson.databind.JsonNode;
 
 import java.util.Collection;
 

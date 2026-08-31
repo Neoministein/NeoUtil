@@ -139,9 +139,10 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
                     .addField(instanceIdentification)
                     .build();
 
-            LOGGER.debug("Generating src file {}Caller", queueConsumerClass.getSimpleName());
+            LOGGER.info("Generating src file {}Caller", queueConsumerClass.getSimpleName());
             JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();
             javaFile.writeTo(new File(context.sourceOutPutDirectory()));
+            LOGGER.info("Generating src file {}: {}Caller",context.sourceOutPutDirectory(), queueConsumerClass.getSimpleName());
         } catch (Exception ex) {
             throw new IllegalArgumentException("Unable to generate src file for " + queueConsumerClass.getSimpleName(), ex);
         }

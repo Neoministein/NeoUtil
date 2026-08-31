@@ -64,6 +64,7 @@ class ApplicationStartUpIT {
         WeldContainer.current().shutdown();
 
         //List gets updated since it's the same instance as in the recorder
+        Assertions.assertEquals(4, callSequence.size());
         Assertions.assertEquals(List.of(
                 PREFIX + ApplicationPreReadyEvent.EVENT_NAME,
                 PREFIX + ApplicationReadyEvent.EVENT_NAME,

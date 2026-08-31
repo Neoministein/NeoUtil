@@ -1,6 +1,5 @@
 package com.neo.util.framework.elastic.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.enumeration.Association;
 import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
@@ -16,6 +15,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 import java.util.List;
 import java.util.Map;
@@ -86,18 +86,18 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			//Assert
 
 			Assert.assertEquals(3, fromResult.getHitSize());
-			Assert.assertEquals(personTwo.getBusinessId(), fromResult.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personThree.getBusinessId(), fromResult.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personFour.getBusinessId(), fromResult.getHits().get(2).get(Searchable.BUSINESS_ID).asText());
+			Assert.assertEquals(personTwo.getBusinessId(), fromResult.getHits().get(0).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personThree.getBusinessId(), fromResult.getHits().get(1).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personFour.getBusinessId(), fromResult.getHits().get(2).get(Searchable.BUSINESS_ID).asString());
 
 			Assert.assertEquals(3, toResult.getHitSize());
-			Assert.assertEquals(personOne.getBusinessId(), toResult.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personTwo.getBusinessId(), toResult.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personThree.getBusinessId(), toResult.getHits().get(2).get(Searchable.BUSINESS_ID).asText());
+			Assert.assertEquals(personOne.getBusinessId(), toResult.getHits().get(0).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personTwo.getBusinessId(), toResult.getHits().get(1).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personThree.getBusinessId(), toResult.getHits().get(2).get(Searchable.BUSINESS_ID).asString());
 
 			Assert.assertEquals(2, betweenResult.getHitSize());
-			Assert.assertEquals(personTwo.getBusinessId(), betweenResult.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personThree.getBusinessId(), betweenResult.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
+			Assert.assertEquals(personTwo.getBusinessId(), betweenResult.getHits().get(0).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personThree.getBusinessId(), betweenResult.getHits().get(1).get(Searchable.BUSINESS_ID).asString());
 		});
 	}
 
@@ -218,7 +218,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 			//Assert
 			Assert.assertEquals(1, result.getHitSize());
-			Assert.assertEquals(personTwo.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
+			Assert.assertEquals(personTwo.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asString());
 		});
 	}
 
@@ -236,9 +236,9 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 			//Assert
 			Assert.assertEquals(3, result.getHitSize());
-			Assert.assertEquals(personTwo.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personThree.getBusinessId(), result.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personFour.getBusinessId(), result.getHits().get(2).get(Searchable.BUSINESS_ID).asText());
+			Assert.assertEquals(personTwo.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personThree.getBusinessId(), result.getHits().get(1).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personFour.getBusinessId(), result.getHits().get(2).get(Searchable.BUSINESS_ID).asString());
 		});
 	}
 
@@ -263,17 +263,17 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			//Assert
 
 			Assert.assertEquals(3,fromResult.getHitSize());
-			Assert.assertEquals(personTwo.getBusinessId(), fromResult.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personThree.getBusinessId(), fromResult.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personFour.getBusinessId(), fromResult.getHits().get(2).get(Searchable.BUSINESS_ID).asText());
+			Assert.assertEquals(personTwo.getBusinessId(), fromResult.getHits().get(0).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personThree.getBusinessId(), fromResult.getHits().get(1).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personFour.getBusinessId(), fromResult.getHits().get(2).get(Searchable.BUSINESS_ID).asString());
 
 			Assert.assertEquals(2, toResult.getHitSize());
-			Assert.assertEquals(personOne.getBusinessId(), toResult.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personTwo.getBusinessId(), toResult.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
+			Assert.assertEquals(personOne.getBusinessId(), toResult.getHits().get(0).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personTwo.getBusinessId(), toResult.getHits().get(1).get(Searchable.BUSINESS_ID).asString());
 
 			Assert.assertEquals(2,betweenResult.getHitSize());
-			Assert.assertEquals(personTwo.getBusinessId(), betweenResult.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personThree.getBusinessId(), betweenResult.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
+			Assert.assertEquals(personTwo.getBusinessId(), betweenResult.getHits().get(0).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personThree.getBusinessId(), betweenResult.getHits().get(1).get(Searchable.BUSINESS_ID).asString());
 		});
 	}
 
@@ -290,8 +290,8 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 			//Assert
 			Assert.assertEquals(2, result.getHitSize());
-			Assert.assertEquals(personOne.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personFour.getBusinessId(), result.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
+			Assert.assertEquals(personOne.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personFour.getBusinessId(), result.getHits().get(1).get(Searchable.BUSINESS_ID).asString());
 		});
 	}
 
@@ -310,7 +310,7 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 			//Assert
 			Assert.assertEquals(1, result.getHitSize());
-			Assert.assertEquals(personOne.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
+			Assert.assertEquals(personOne.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asString());
 		});
 	}
 
@@ -329,9 +329,9 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 
 			//Assert
 			Assert.assertEquals(3, result.getHitSize());
-			Assert.assertEquals(personOne.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personTwo.getBusinessId(), result.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personFour.getBusinessId(), result.getHits().get(2).get(Searchable.BUSINESS_ID).asText());
+			Assert.assertEquals(personOne.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personTwo.getBusinessId(), result.getHits().get(1).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personFour.getBusinessId(), result.getHits().get(2).get(Searchable.BUSINESS_ID).asString());
 		});
 
 	}
@@ -352,8 +352,8 @@ public class ElasticSearchRepositoryFetchIT extends AbstractElasticIntegrationTe
 			//Assert
 			Assert.assertEquals(maxResult, result.getHits().size());
 			Assert.assertEquals(4, result.getHitSize());
-			Assert.assertEquals(personFour.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asText());
-			Assert.assertEquals(personThree.getBusinessId(), result.getHits().get(1).get(Searchable.BUSINESS_ID).asText());
+			Assert.assertEquals(personFour.getBusinessId(), result.getHits().get(0).get(Searchable.BUSINESS_ID).asString());
+			Assert.assertEquals(personThree.getBusinessId(), result.getHits().get(1).get(Searchable.BUSINESS_ID).asString());
 		});
 	}
 

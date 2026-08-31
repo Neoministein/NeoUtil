@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <elastic.version>8.9.0</elastic.version>
+        <elastic.version>9.5.1</elastic.version>
     </properties>
 
     <dependencies>
@@ -28,6 +28,11 @@
         <dependency>
             <groupId>co.elastic.clients</groupId>
             <artifactId>elasticsearch-java</artifactId>
+            <version>${elastic.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-rest5-client</artifactId>
             <version>${elastic.version}</version>
         </dependency>
 

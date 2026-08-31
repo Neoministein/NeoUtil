@@ -28,7 +28,6 @@ class BasicInterceptorUsageIT extends AbstractCacheIT {
 
     @BeforeEach
     void before() {
-        super.setupConfig();
         subject = weld.select(CachedService.class).get();
     }
 

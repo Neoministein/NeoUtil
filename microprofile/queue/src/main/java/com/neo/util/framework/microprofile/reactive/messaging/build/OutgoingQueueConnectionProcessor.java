@@ -135,7 +135,7 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
 
             JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();
             javaFile.writeTo(new File(context.sourceOutPutDirectory()));
-            LOGGER.debug("Generating src file {}", className);
+            LOGGER.info("Generating src file {}: {}",context.sourceOutPutDirectory(), className);
 
         } catch (Exception ex) {
             throw new IllegalArgumentException("Unable to generate src file for " + executionMethod.getName(), ex);

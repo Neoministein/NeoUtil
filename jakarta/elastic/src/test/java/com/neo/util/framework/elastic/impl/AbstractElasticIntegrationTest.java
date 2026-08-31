@@ -5,8 +5,6 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.indices.*;
 import com.carrotsearch.randomizedtesting.annotations.ThreadLeakScope;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.ThreadUtils;
 import com.neo.util.common.impl.reflection.IndexReflectionProvider;
@@ -28,10 +26,11 @@ import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.test.ESIntegTestCase;
 import org.elasticsearch.transport.netty4.Netty4Plugin;
-import org.elasticsearch.transport.netty4.Netty4Transport;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -60,11 +59,6 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
     protected IndexNamingService indexNamingService = new IndexNamingServiceImpl(configService, new ReflectionService(new IndexReflectionProvider(ThreadUtils.classLoader())));
 
     @Override
-    protected boolean ignoreExternalCluster() {
-        return true;
-    }
-
-    @Override
     protected boolean addMockTransportService() {
         return false;
     }
@@ -82,10 +76,6 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
     @Override
     protected Settings nodeSettings(int nodeOrdinal, Settings settings) {
         Settings.Builder builder = Settings.builder().put(super.nodeSettings(nodeOrdinal, settings));
-        // randomize netty settings
-        if (randomBoolean()) {
-            builder.put(Netty4Transport.WORKER_COUNT.getKey(), random().nextInt(3) + 1);
-        }
         builder.put(NetworkModule.TRANSPORT_TYPE_KEY, Netty4Plugin.NETTY_TRANSPORT_NAME);
         builder.put(NetworkModule.HTTP_TYPE_KEY, Netty4Plugin.NETTY_HTTP_TRANSPORT_NAME);
         return builder.build();
@@ -104,10 +94,8 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
         //System.setProperty("es.set.netty.runtime.available.processors", "false");
     }
 
-    @Override
     @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    public void beforeTest() {
         internalCluster().startNodes(1);
         ensureStableCluster(1);
         restClient = getRestClient();
@@ -236,7 +224,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
             }
             JsonNode field = source.get(fieldName);
             Assert.assertNotNull(field);
-            Assert.assertEquals(fieldValue, field.asText());
+            Assert.assertEquals(fieldValue, field.asString());
 
         });
 
@@ -263,7 +251,7 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
                 Assert.fail();
             }
             JsonNode field = source.get(fieldName);
-            if (field == null && !fieldValue.equals(field.asText())) {
+            if (field == null && !fieldValue.equals(field.asString())) {
                 Assert.fail();
             }
 

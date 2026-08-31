@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(WeldJunit5Extension.class)
 @AddEnabledInterceptors({CacheResultInterceptor.class, CacheInvalidateInterceptor.class, CacheInvalidateAllInterceptor.class})
-class CacheKeyGeneratorIT extends AbstractCacheIT{
+class CacheKeyGeneratorIT extends AbstractCacheIT {
 
     private static final String ASPARAGUS = "asparagus";
     private static final String CAULIFLOWER = "cauliflower";
@@ -39,7 +39,6 @@ class CacheKeyGeneratorIT extends AbstractCacheIT{
 
     @BeforeEach
     void before() {
-        super.setupConfig();
         subject = weld.select(CachedService.class).get();
     }
 

@@ -46,7 +46,7 @@ public class JobRunnerQueueService implements QueueService {
     protected final Provider<RequestDetails> requestDetailsProvider;
     protected final RequestContextExecutor requestContextExecutor;
 
-    protected Map<String, JobRunnerQueueConfig> queueListenerMap = new HashMap<>();
+    protected final Map<String, JobRunnerQueueConfig> queueListenerMap = new HashMap<>();
 
     @Inject
     public JobRunnerQueueService(ConfigService configService, RequestContextExecutor requestContextExecutor, InstanceIdentification instanceIdentification, Provider<RequestDetails> requestDetailsProvider, Instance<QueueListener> queueListeners, ReflectionService reflectionService) {

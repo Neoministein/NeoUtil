@@ -1,6 +1,5 @@
 package com.neo.util.helidon.rest.entity;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.rest.impl.entity.AbstractEntityRestEndpoint;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
@@ -10,6 +9,7 @@ import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.*;
+import tools.jackson.databind.JsonNode;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @HelidonTest(resetPerTest = true)
@@ -47,7 +47,7 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
 
         //Assert
         JsonNode responseBody = validateResponse(response,400);
-        Assertions.assertEquals(AbstractEntityRestEndpoint.EX_ENTITY_NONE_UNIQUE.getExceptionId(), responseBody.get("code").asText());
+        Assertions.assertEquals(AbstractEntityRestEndpoint.EX_ENTITY_NONE_UNIQUE.getExceptionId(), responseBody.get("code").asString());
     }
 
     @Test
@@ -104,7 +104,7 @@ abstract class AbstractEntityRestEndpointIT extends AbstractIntegrationTest {
 
         //Assert
         JsonNode responseBody = validateResponse(response,400);
-        Assertions.assertEquals(AbstractEntityRestEndpoint.EX_ENTITY_MISSING_FIELDS.getExceptionId(), responseBody.get("code").asText());
+        Assertions.assertEquals(AbstractEntityRestEndpoint.EX_ENTITY_MISSING_FIELDS.getExceptionId(), responseBody.get("code").asString());
     }
 
     @Test

@@ -1,12 +1,12 @@
 package com.neo.util.framework.mapping.impl.expression;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.neo.util.framework.mapping.impl.MappingStateHolder;
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 import jakarta.enterprise.inject.spi.Bean;
 import jakarta.enterprise.inject.spi.BeanManager;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;

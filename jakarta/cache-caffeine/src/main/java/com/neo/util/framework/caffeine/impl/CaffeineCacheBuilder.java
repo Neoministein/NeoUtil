@@ -3,11 +3,8 @@ package com.neo.util.framework.caffeine.impl;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.cache.Cache;
 import com.neo.util.framework.api.cache.CacheBuilder;
-import com.neo.util.framework.api.config.Config;
 import com.neo.util.framework.api.config.ConfigService;
-import com.neo.util.framework.api.config.ConfigValue;
-import com.neo.util.framework.impl.ReflectionService;
-import com.neo.util.framework.impl.cache.AbstractCacheBuilder;
+import com.neo.util.framework.impl.cache.CacheInstanceSearcher;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Alternative;
@@ -16,25 +13,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Alternative
 @Priority(PriorityConstants.APPLICATION)
 @ApplicationScoped
-public class CaffeineCacheBuilder extends AbstractCacheBuilder implements CacheBuilder {
+public class CaffeineCacheBuilder implements CacheBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CaffeineCacheBuilder.class);
 
-    protected static final String CONFIG_PREFIX = "caffeine";
-    protected static final String DEFAULT_CONFIG = "default";
-    protected static final String INSTANCES_CONFIG = "instances";
-
     protected final ConfigService configService;
+    protected final Set<String> cacheInstances;
 
     @Inject
-    public CaffeineCacheBuilder(ConfigService configService, ReflectionService reflectionService) {
-        super(reflectionService);
+    public CaffeineCacheBuilder(ConfigService configService, CacheInstanceSearcher cacheInstanceSearcher) {
         this.configService = configService;
+        this.cacheInstances = cacheInstanceSearcher.getCacheNames();
     }
 
     @Override
@@ -54,20 +47,29 @@ public class CaffeineCacheBuilder extends AbstractCacheBuilder implements CacheB
 
 
     public List<CaffeineCacheConfig> getConfigs() {
-        Set<String> reflectionConfig = new HashSet<>(getCacheNames());
-        Config config = configService.get(CONFIG_PREFIX);
-        CaffeineCacheConfig defaultConfig = new CaffeineCacheConfig(config.get(DEFAULT_CONFIG));
+        CaffeineCacheConfig defaultConfig = createDefault();
         LOGGER.trace("Default CaffeineCacheConfig loaded Config: {}", defaultConfig);
+        List<CaffeineCacheConfig> configs = new ArrayList<>();
+        for (String configName: cacheInstances) {
+            LOGGER.trace("Creating CaffeineCacheConfig from Config: {}", configName);
+            configs.add(createConfig(configName, defaultConfig));
+        }
+        return configs;
+    }
 
-        ConfigValue<List<CaffeineCacheConfig>> caffeineCacheConfigs = config.get(INSTANCES_CONFIG).asList(node -> {
-            reflectionConfig.remove(node.key());
-            LOGGER.trace("Creating CaffeineCacheConfig from Config: {}", node.key());
-            return new CaffeineCacheConfig(node, defaultConfig);
-        });
+    public CaffeineCacheConfig createConfig(String cacheName, CaffeineCacheConfig defaultConfig) {
+        return new CaffeineCacheConfig(
+                cacheName,
+                configService.getAsLong("caffeine", cacheName ,"expireAfterSeconds").asOptional().or(defaultConfig::expireAfterSeconds),
+                configService.getAsInt("caffeine", cacheName ,"initialCapacity").asOptional().or(defaultConfig::initialCapacity),
+                configService.getAsInt("caffeine", cacheName ,"maxSize").asOptional().or(defaultConfig::maxCapacity));
+    }
 
-        LOGGER.trace("Creating rest of the CaffeineCacheConfig from reflections {}", reflectionConfig);
-        //Do not use async stream you will get an index out of bound exception
-        return reflectionConfig.stream().map(cacheName -> new CaffeineCacheConfig(cacheName, defaultConfig))
-                .collect(Collectors.toCollection(() -> caffeineCacheConfigs.orElse(new ArrayList<>())));
+    private CaffeineCacheConfig createDefault() {
+        return new CaffeineCacheConfig(
+                "default",
+                configService.getAsLong("caffeine.default.expireAfterSeconds").asOptional(),
+                configService.getAsInt("caffeine.default.initialCapacity").asOptional(),
+                configService.getAsInt("caffeine.default.maxSize").asOptional());
     }
 }

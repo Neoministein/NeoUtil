@@ -1,7 +1,5 @@
 package com.neo.util.helidon.rest.parser;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
 import io.helidon.microprofile.testing.junit5.AddBean;
@@ -13,6 +11,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 @HelidonTest
 @AddBean(InboundParserResource.class)
@@ -57,7 +57,7 @@ class InboundParsingIT extends AbstractIntegrationTest {
         //Assert
 
         JsonNode body = validateResponse(response, 400);
-        Assertions.assertEquals("required property 'aString' not found", body.get("message").asText());
+        Assertions.assertEquals("required property 'aString' not found", body.get("message").asString());
     }
 
     @Test
@@ -95,6 +95,6 @@ class InboundParsingIT extends AbstractIntegrationTest {
         //Assert
 
         JsonNode body = validateResponse(response, 400);
-        Assertions.assertEquals("required property 'a_different_name' not found", body.get("message").asText());
+        Assertions.assertEquals("required property 'a_different_name' not found", body.get("message").asString());
     }
 }

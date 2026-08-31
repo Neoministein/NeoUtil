@@ -1,15 +1,14 @@
 package com.neo.util.common.impl.json;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.api.json.JsonDataType;
 import com.neo.util.common.impl.ResourceUtil;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.networknt.schema.*;
 import com.networknt.schema.Error;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -74,14 +73,13 @@ public class JsonSchemaUtil {
             return JsonUtil.emptyObjectNode();
         }
 
-        return switch (JsonDataType.fromString(schemaNode.get("type").asText())) {
+        return switch (JsonDataType.fromString(schemaNode.get("type").asString())) {
             case OBJECT -> {
                 ObjectNode objectNode = JsonUtil.emptyObjectNode();
                 if (schemaNode.has("properties")) {
                     JsonNode properties = schemaNode.get("properties");
-                    Iterator<Map.Entry<String, JsonNode>> fields = properties.fields();
-                    while (fields.hasNext()) {
-                        Map.Entry<String, JsonNode> field = fields.next();
+
+                    for (Map.Entry<String, JsonNode> field: properties.properties()) {
                         objectNode.set(field.getKey(), generateSampleJson(field.getValue()));
                     }
                 }
@@ -111,7 +109,7 @@ public class JsonSchemaUtil {
             return;
         }
 
-        switch (JsonDataType.fromString(schemaNode.get("type").asText())) {
+        switch (JsonDataType.fromString(schemaNode.get("type").asString())) {
             case OBJECT:
                 ObjectNode objectNode = JsonUtil.emptyObjectNode();
                 if (schemaNode.has("properties")) {

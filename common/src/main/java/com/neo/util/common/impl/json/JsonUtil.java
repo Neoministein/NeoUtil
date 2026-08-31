@@ -2,25 +2,21 @@ package com.neo.util.common.impl.json;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.networknt.schema.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.MissingNode;
+import tools.jackson.databind.node.ObjectNode;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.TimeZone;
 import java.util.function.Consumer;
 
@@ -41,36 +37,33 @@ public class JsonUtil {
      * but you are not changing configuration so that is fine. If you did need to change configuration,
      * you would do that from the static block, and it would be fine as well.
      */
-    private static final ObjectMapper MAPPER = createMapper();
+    private static final JsonMapper MAPPER = createMapper();
 
     private JsonUtil() {}
 
 
-    public static ObjectMapper createMapper() {
-        ObjectMapper mapper = new ObjectMapper();
+    public static JsonMapper createMapper() {
+        JsonMapper.Builder builder = JsonMapper.builder();
 
         // ignore null fields
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_ABSENT);
+        builder.changeDefaultPropertyInclusion(inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_ABSENT));
 
         // use fields only
-        mapper.setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE);
-        mapper.setVisibility(PropertyAccessor.SETTER, JsonAutoDetect.Visibility.NONE);
-        mapper.setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
-        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        builder.changeDefaultVisibility(visibility -> visibility
+                .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
+                .withFieldVisibility(JsonAutoDetect.Visibility.ANY));
 
-        mapper.setTimeZone(TimeZone.getDefault());
-
-        //Adds support for Optional
-        mapper.registerModule(new Jdk8Module());
-        mapper.registerModule(new JavaTimeModule());
+        builder.defaultTimeZone(TimeZone.getDefault());
 
         //Configure proper serialization of instant and LocalTime
-        mapper.configure( SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false );
-        mapper.configure( SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true );
+        builder.disable(DateTimeFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS);
+        builder.enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         // Don't throw error when empty bean is being serialized
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        return mapper;
+        builder.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        return builder.build();
     }
 
     /**
@@ -86,7 +79,7 @@ public class JsonUtil {
 
         try {
             jsonString = MAPPER.writeValueAsString(pojo);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             LOGGER.error("Error while creating json string from pojo: [{}], exception: [{}]", pojo, ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
@@ -106,7 +99,7 @@ public class JsonUtil {
 
         try {
             jsonString = MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(pojo);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             LOGGER.error("Error while creating json string from pojo: [{}], exception: [{}]", pojo, ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
@@ -123,7 +116,7 @@ public class JsonUtil {
     public static JsonNode fromJson(String json) {
         try {
             return MAPPER.readTree(json);
-        } catch (IOException ex) {
+        } catch (JacksonException ex) {
             LOGGER.error("Error while parsing JSON node from json string: [{}], exception: [{}]", json, ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
@@ -159,7 +152,7 @@ public class JsonUtil {
             }
 
             return node;
-        } catch (IOException ex) {
+        } catch (JacksonException ex) {
             LOGGER.error("Error while parsing JSON node from input stream, exception: [{}]", ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
@@ -177,7 +170,7 @@ public class JsonUtil {
     public static String toJson(Object pojo, Class<?> serializationScope) {
         try {
             return MAPPER.writerWithView(serializationScope).writeValueAsString(pojo);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             LOGGER.error("Error while creating json string from pojo: [{}], exception: [{}]", pojo.getClass().getSimpleName(), ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
@@ -196,7 +189,7 @@ public class JsonUtil {
     public static <T> T fromJson(JsonNode json, Class<T> clazz) {
         try {
             return MAPPER.treeToValue(json, clazz);
-        } catch (IOException ex) {
+        } catch (JacksonException ex) {
             LOGGER.error("Error while creating Pojo: [{}] from JsonNode: [{}], exception: [{}]", clazz.getSimpleName(), json, ex.getMessage());
 
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
@@ -216,7 +209,7 @@ public class JsonUtil {
     public static <T> T fromJson(String json, Class<T> clazz) {
         try {
             return MAPPER.readValue(json, clazz);
-        } catch (IOException ex) {
+        } catch (JacksonException ex) {
             LOGGER.error("Error while creating pojo from Json-String [{}], Exception [{}]", json, ex.getMessage());
 
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
@@ -236,8 +229,8 @@ public class JsonUtil {
      */
     public static <T> T fromJson(String json, Class<T> clazz, Class<?> serializationScope) {
         try {
-            return MAPPER.readerWithView(serializationScope).readValue(json, clazz);
-        } catch (IOException ex) {
+            return MAPPER.readerFor(clazz).withView(serializationScope).readValue(json);
+        } catch (JacksonException ex) {
             LOGGER.error("Error while creating pojo from Json-String [{}], Exception [{}]", json, ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
@@ -298,15 +291,14 @@ public class JsonUtil {
      *
      * @param pojo the object to add to
      * @param json the json to add to the object
-     * @param clazz the class of the object
      * @param serializationScope the jack son serialization scope
      * @param <T> the object type
      * @return
      */
-    public static <T> T updateExistingEntity(T pojo, String json, Class<T> clazz, Class<?> serializationScope) {
+    public static <T> T updateExistingEntity(T pojo, String json, Class<?> serializationScope) {
         try {
-            return MAPPER.readerForUpdating(pojo).withView(serializationScope).readValue(json, clazz);
-        } catch (IOException ex) {
+            return MAPPER.readerForUpdating(pojo).withView(serializationScope).readValue(json);
+        } catch (JacksonException ex) {
             LOGGER.error("Error while updating existing pojo from Json-String [{}], Exception [{}]", json, ex.getMessage());
             throw new ValidationException(ex, EX_INTERNAL_JSON_EXCEPTION, ex.getMessage());
         }
@@ -320,10 +312,7 @@ public class JsonUtil {
      * @return the merged Node
      */
     public static JsonNode merge(JsonNode mainNode, JsonNode updateNode) {
-        Iterator<String> fieldNames = updateNode.fieldNames();
-
-        while (fieldNames.hasNext()) {
-            String updatedFieldName = fieldNames.next();
+        for (String  updatedFieldName : updateNode.propertyNames()) {
             JsonNode valueToBeUpdated = mainNode.get(updatedFieldName);
             JsonNode updatedValue = updateNode.get(updatedFieldName);
 

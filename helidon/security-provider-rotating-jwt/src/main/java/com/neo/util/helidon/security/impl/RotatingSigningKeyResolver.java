@@ -1,6 +1,6 @@
 package com.neo.util.helidon.security.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.neo.util.common.impl.KeyUtils;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
@@ -133,8 +133,8 @@ public class RotatingSigningKeyResolver extends SigningKeyResolverAdapter {
 
 
                     JWTKey jwtPublicKey = new JWTPublicKey(
-                            jwtPublicKeyObject.get("kid").asText(),
-                            KeyUtils.parseRSAPublicKey(jwtPublicKeyObject.get("key").asText()),
+                            jwtPublicKeyObject.get("kid").asString(),
+                            KeyUtils.parseRSAPublicKey(jwtPublicKeyObject.get("key").asString()),
                             new Date(jwtPublicKeyObject.get("exp").asLong())
                     );
 

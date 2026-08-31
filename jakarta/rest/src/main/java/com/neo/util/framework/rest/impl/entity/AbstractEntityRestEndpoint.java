@@ -157,7 +157,7 @@ public abstract class AbstractEntityRestEndpoint<T extends PersistenceEntity> {
         if (entity.isEmpty()) {
             throw new NoContentFoundException(EX_ENTITY_NOT_FOUND, primaryKey.toString());
         }
-        return JsonUtil.updateExistingEntity(entity.get(), x, getEntityClass(), serializationScope);
+        return JsonUtil.updateExistingEntity(entity.get(), x, serializationScope);
     }
 
     protected Class<?> getSerializationScope() {

@@ -1,7 +1,5 @@
 package com.neo.util.helidon.rest.parser;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
 import io.helidon.microprofile.testing.junit5.AddBean;
@@ -15,6 +13,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 @HelidonTest
 @AddBean(JsonReaderEndpointResource.class)
@@ -70,7 +70,7 @@ class JsonReaderIT extends AbstractIntegrationTest {
 
         Assertions.assertEquals(400, response.getStatus());
         JsonNode responseBoy = JsonUtil.fromJson(response.readEntity(String.class));
-        String errorBody = responseBoy.get("message").asText();
+        String errorBody = responseBoy.get("message").asString();
 
         LOGGER.info("Error body: [{}]", errorBody);
         Assertions.assertTrue(errorBody.contains("boolean"), errorBody);

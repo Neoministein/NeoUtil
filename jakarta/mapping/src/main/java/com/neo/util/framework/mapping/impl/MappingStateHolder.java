@@ -1,7 +1,7 @@
 package com.neo.util.framework.mapping.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.enterprise.context.RequestScoped;
+import tools.jackson.databind.JsonNode;
 
 import java.util.HashMap;
 import java.util.Map;

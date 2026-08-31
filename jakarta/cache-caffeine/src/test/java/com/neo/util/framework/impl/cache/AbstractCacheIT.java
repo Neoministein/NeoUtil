@@ -5,6 +5,7 @@ import com.neo.util.framework.api.cache.spi.CacheName;
 import com.neo.util.framework.caffeine.impl.CaffeineCacheBuilder;
 import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.impl.cache.spi.CacheKeyGeneratorManager;
+import com.neo.util.framework.impl.config.ConfigServiceImpl;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
 import org.jboss.weld.junit5.WeldInitiator;
@@ -26,18 +27,15 @@ public abstract class AbstractCacheIT {
             basicCDIClasses().toArray(new Class[0])
     ).activate(ApplicationScoped.class, RequestScoped.class).build();
 
-    protected void setupConfig() {
-        weld.select(ConfigServiceProducer.class).get().setConfigMap(getConfig());
-    }
-
     protected List<Class<?>> basicCDIClasses() {
         List<Class<?>> classes = new ArrayList<>();
         classes.add(BasicCacheManagerImpl.class);
         classes.add(CacheKeyGeneratorManager.class);
         classes.add(CaffeineCacheBuilder.class);
-        classes.add(ConfigServiceProducer.class);
+        classes.add(ConfigServiceImpl.class);
         classes.add(IndexReflectionProvider.class);
         classes.add(ReflectionService.class);
+        classes.add(CacheInstanceSearcher.class);
         return classes;
     }
 

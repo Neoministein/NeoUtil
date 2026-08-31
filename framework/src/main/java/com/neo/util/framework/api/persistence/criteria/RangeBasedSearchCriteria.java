@@ -1,7 +1,5 @@
 package com.neo.util.framework.api.persistence.criteria;
 
-import java.io.Serializable;
-
 /**
  * If this Criteria is applied to a field, the field must be between one or both values based on which ones are provided.
  */
@@ -11,9 +9,9 @@ public abstract class RangeBasedSearchCriteria extends FieldSearchCriteria {
         super(fieldName, not);
     }
 
-    public abstract Serializable getFrom();
+    public abstract Number getFrom();
 
-    public abstract Serializable getTo();
+    public abstract Number getTo();
 
     public boolean isIncludeFrom() {
         return getFrom() != null;

@@ -10,11 +10,11 @@ import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.*;
 import co.elastic.clients.elasticsearch.core.search.*;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
+import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
 import co.elastic.clients.elasticsearch.indices.GetIndexRequest;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.JsonpMapper;
 import co.elastic.clients.util.BinaryData;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.enumeration.Association;
 import com.neo.util.common.impl.enumeration.Synchronization;
@@ -44,12 +44,14 @@ import jakarta.inject.Provider;
 import jakarta.json.spi.JsonProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -510,7 +512,6 @@ public class ElasticSearchProvider implements SearchProvider {
 
     protected Query buildInnerQuery(SearchCriteria filter) {
         return switch (filter) {
-            case DateSearchCriteria criteria -> buildDateQuery(criteria);
             case RangeBasedSearchCriteria criteria -> buildRangeRangeBasedQuery(criteria);
             case ExplicitSearchCriteria criteria -> buildExplicitSearchQuery(criteria);
             case ContainsSearchCriteria criteria -> buildContainsSearchQuery(criteria);
@@ -520,30 +521,41 @@ public class ElasticSearchProvider implements SearchProvider {
         };
     }
 
-    protected Query buildDateQuery(DateSearchCriteria criteria) {
-        RangeQuery.Builder rangeQuery = buildBasicRangeQuery(criteria);
-        if (criteria.getTimeZone() != null) {
-            rangeQuery.timeZone(criteria.getTimeZone().getId());
-        }
-        return searchQueryNot(criteria, rangeQuery.build()._toQuery());
-    }
-
     protected Query buildRangeRangeBasedQuery(RangeBasedSearchCriteria criteria) {
-        return searchQueryNot(criteria, buildBasicRangeQuery(criteria).build()._toQuery());
+        return searchQueryNot(criteria, buildBasicRangeQuery(criteria));
     }
 
-    protected RangeQuery.Builder buildBasicRangeQuery(RangeBasedSearchCriteria criteria) {
-        RangeQuery.Builder rangeQuery = co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders.range();
-        rangeQuery.field(criteria.getFieldName());
+    protected Query buildBasicRangeQuery(RangeBasedSearchCriteria criteria) {
+        if (criteria instanceof DoubleRangeSearchCriteria) {
+            NumberRangeQuery.Builder rangeQuery = new NumberRangeQuery.Builder().field(criteria.getFieldName());
+            setRangeValues(rangeQuery, criteria, Number::doubleValue);
+            return rangeQuery.build()._toRangeQuery()._toQuery();
+
+        } else if (criteria instanceof DateSearchCriteria dateSearchCriteria){
+            DateRangeQuery.Builder rangeQuery = new DateRangeQuery.Builder().field(criteria.getFieldName());
+            setRangeValues(rangeQuery, criteria, String::valueOf);
+            if (dateSearchCriteria.getTimeZone() != null) {
+                rangeQuery.timeZone(dateSearchCriteria.getTimeZone().getId());
+            }
+            return rangeQuery.build()._toRangeQuery()._toQuery();
+        } else if (criteria instanceof LongRangeSearchCriteria) {
+            LongNumberRangeQuery.Builder rangeQuery = new LongNumberRangeQuery.Builder().field(criteria.getFieldName());
+            setRangeValues(rangeQuery, criteria, Number::longValue);
+
+            return rangeQuery.build()._toRangeQuery()._toQuery();
+        }
+        throw new IllegalStateException("Criteria not supported " + criteria.getClass().getName());
+    }
+
+    protected <T> void setRangeValues(RangeQueryBase.AbstractBuilder<T, ?> builder, RangeBasedSearchCriteria criteria,
+                                    Function<Number, T> convert) {
         if (criteria.getFrom() != null) {
-            rangeQuery.from(criteria.getFrom().toString());
+            builder.gte(convert.apply(criteria.getFrom()));
         }
 
         if (criteria.getTo() != null) {
-            rangeQuery.to(criteria.getTo().toString());
+            builder.lte(convert.apply(criteria.getTo()));
         }
-
-        return rangeQuery;
     }
 
     protected Query buildExplicitSearchQuery(ExplicitSearchCriteria criteria) {
@@ -649,9 +661,14 @@ public class ElasticSearchProvider implements SearchProvider {
     }
 
     protected Aggregation buildAggregation(BucketScriptAggregation agg) {
-        return new Aggregation.Builder().bucketScript(
-                val -> val.script(script -> script.inline(inline -> inline.source(agg.getScript())))
-                        .bucketsPath(path -> path.dict(agg.getPath()))).build();
+        return new Aggregation.Builder()
+                .bucketScript(bucketScript -> bucketScript
+                        .script(script -> script
+                                .source(source ->
+                                        source.scriptString(agg.getScript())))
+                        .bucketsPath(path ->
+                                path.dict(agg.getPath())))
+                .build();
     }
 
     protected Aggregation buildAggregation(CriteriaAggregation agg) {
@@ -1025,8 +1042,8 @@ public class ElasticSearchProvider implements SearchProvider {
     protected Set<String> getAllIndices() {
         GetIndexRequest request = new GetIndexRequest.Builder().index("*").build();
 
-        try {
-            return getApiClient().indices().get(request).result().keySet();
+        try (ElasticsearchIndicesClient client = getApiClient().indices()) {
+            return client.get(request).indices().keySet();
         } catch (IOException ex) {
             LOGGER.error("Unable to retrieve all indices", ex);
         }

@@ -16,7 +16,7 @@ class CacheNameIT extends AbstractCacheIT {
 
     @BeforeEach
     public void before() {
-        super.setupConfig();
+
     }
 
     @Test

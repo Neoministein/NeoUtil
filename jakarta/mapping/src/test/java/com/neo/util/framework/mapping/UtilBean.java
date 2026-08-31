@@ -1,9 +1,9 @@
 package com.neo.util.framework.mapping;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.json.JsonUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

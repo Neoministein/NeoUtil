@@ -2,13 +2,13 @@ package com.neo.util.framework.elastic.impl;
 
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.framework.api.persistence.search.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,11 +1,11 @@
 package com.neo.util.framework.rest.impl.response;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.rest.api.response.ClientResponseGenerator;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import tools.jackson.databind.node.ObjectNode;
 
 import static com.neo.util.framework.rest.api.response.ClientResponseService.VALID_BACKEND_ERROR;
 

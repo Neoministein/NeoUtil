@@ -1,6 +1,5 @@
 package com.neo.util.framework.rest.impl.parser;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.rest.api.parser.OutboundJsonView;
 import jakarta.annotation.Priority;
@@ -13,6 +12,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyWriter;
 import jakarta.ws.rs.ext.Provider;
+import tools.jackson.databind.JsonNode;
 
 import java.io.IOException;
 import java.io.OutputStream;

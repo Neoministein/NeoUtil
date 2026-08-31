@@ -1,9 +1,9 @@
 package com.neo.util.framework.impl.persistence.search;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.framework.api.persistence.criteria.SearchCriteria;
 import com.neo.util.framework.api.persistence.search.*;
 import jakarta.enterprise.context.ApplicationScoped;
+import tools.jackson.databind.JsonNode;
 
 import java.util.Collection;
 

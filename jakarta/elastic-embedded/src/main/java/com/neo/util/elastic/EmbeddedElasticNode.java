@@ -13,8 +13,6 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeFactory;
-import org.elasticsearch.plugins.EmbeddedPluginsService;
-import org.elasticsearch.plugins.PluginsService;
 import org.elasticsearch.transport.netty4.Netty4Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
-import java.util.function.Function;
 
 @ApplicationScoped
 public class EmbeddedElasticNode {
@@ -66,11 +63,10 @@ public class EmbeddedElasticNode {
         // Create environment
         Path pathHome = Paths.get(dataPath);
         Environment environment = new Environment(settings, pathHome);
-
         // Create the embedded node
-        Function<Settings, PluginsService> pluginServiceCtor = settings1 -> new EmbeddedPluginsService(settings1, environment, Set.of(Netty4Plugin.class));
+
         try {
-            this.elasticNode = NodeFactory.createNode(environment, pluginServiceCtor, true);
+            this.elasticNode = NodeFactory.createNode(environment, Set.of(Netty4Plugin.class));
             this.elasticNode.start();
             LOGGER.info("EmbeddedElasticNode started successfully");
         } catch (Exception ex) {

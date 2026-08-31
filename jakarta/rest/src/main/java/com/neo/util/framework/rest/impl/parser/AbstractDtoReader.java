@@ -1,6 +1,5 @@
 package com.neo.util.framework.rest.impl.parser;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ValidationException;
@@ -18,6 +17,7 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;

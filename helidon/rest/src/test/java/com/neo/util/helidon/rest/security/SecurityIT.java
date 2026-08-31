@@ -1,6 +1,5 @@
 package com.neo.util.helidon.rest.security;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.FrameworkConstants;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
@@ -10,6 +9,7 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
 
 @HelidonTest(resetPerTest = true)
 class SecurityIT extends AbstractIntegrationTest {
@@ -46,8 +46,8 @@ class SecurityIT extends AbstractIntegrationTest {
         //Assert
         Assertions.assertEquals(401, response.getStatus());
         JsonNode responseBody = JsonUtil.fromJson(response.readEntity(String.class));
-        Assertions.assertEquals(FrameworkConstants.EX_UNAUTHORIZED.getExceptionId(), responseBody.get("code").asText());
-        Assertions.assertEquals(FrameworkConstants.EX_UNAUTHORIZED.getFormat(), responseBody.get("message").asText());
+        Assertions.assertEquals(FrameworkConstants.EX_UNAUTHORIZED.getExceptionId(), responseBody.get("code").asString());
+        Assertions.assertEquals(FrameworkConstants.EX_UNAUTHORIZED.getFormat(), responseBody.get("message").asString());
     }
 
     @Test
@@ -72,7 +72,7 @@ class SecurityIT extends AbstractIntegrationTest {
         //Assert
         Assertions.assertEquals(403, response.getStatus());
         JsonNode responseBody = JsonUtil.fromJson(response.readEntity(String.class));
-        Assertions.assertEquals(FrameworkConstants.EX_FORBIDDEN.getExceptionId(), responseBody.get("code").asText());
-        Assertions.assertEquals(FrameworkConstants.EX_FORBIDDEN.getFormat(), responseBody.get("message").asText());
+        Assertions.assertEquals(FrameworkConstants.EX_FORBIDDEN.getExceptionId(), responseBody.get("code").asString());
+        Assertions.assertEquals(FrameworkConstants.EX_FORBIDDEN.getFormat(), responseBody.get("message").asString());
     }
 }
