@@ -1,16 +1,11 @@
 package com.neo.util.framework.microprofile.reactive.messaging.build;
 
-import com.neo.util.common.impl.exception.ValidationException;
-import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.build.BuildContext;
 import com.neo.util.framework.api.build.BuildStep;
 import com.neo.util.framework.api.queue.IncomingQueue;
 import com.neo.util.framework.api.queue.QueueListener;
-import com.neo.util.framework.api.queue.QueueMessage;
-import com.neo.util.framework.api.security.InstanceIdentification;
-import com.neo.util.framework.impl.request.QueueRequestDetails;
-import com.neo.util.framework.impl.request.RequestContextExecutor;
+import com.neo.util.framework.microprofile.reactive.messaging.impl.AbstractMpQueueListener;
 import com.squareup.javapoet.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -88,22 +83,23 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
 
     protected void createConsumeClass(String queueName, Class<?> queueConsumerClass, BuildContext context) {
         try {
-            FieldSpec logger = FieldSpec.builder(Logger.class, "LOGGER")
-                    .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-                    .initializer("$T.getLogger(" + queueConsumerClass.getSimpleName() + "Caller.class)",LoggerFactory.class)
-                    .build();
             FieldSpec queueConsumer = FieldSpec.builder(TypeName.get(queueConsumerClass), "queueConsumer")
-                    .addModifiers(Modifier.PROTECTED)
+                    .addModifiers(Modifier.PRIVATE)
                     .addAnnotation(Inject.class)
                     .build();
-            FieldSpec requestContextExecutor = FieldSpec.builder(RequestContextExecutor.class, "requestContextExecutor")
+            MethodSpec getListener = MethodSpec.methodBuilder("getListener")
                     .addModifiers(Modifier.PROTECTED)
-                    .addAnnotation(Inject.class)
+                    .addAnnotation(Override.class)
+                    .returns(QueueListener.class)
+                    .addStatement("return queueConsumer")
                     .build();
-            FieldSpec instanceIdentification = FieldSpec.builder(InstanceIdentification.class, "instanceIdentification")
+            MethodSpec getQueueName = MethodSpec.methodBuilder("getQueueName")
                     .addModifiers(Modifier.PROTECTED)
-                    .addAnnotation(Inject.class)
+                    .addAnnotation(Override.class)
+                    .returns(String.class)
+                    .addStatement("return $S",queueName)
                     .build();
+
             MethodSpec consumeMethodBuilder = MethodSpec.methodBuilder("consumeQueue")
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(AnnotationSpec.get(getAcknowledgment()))
@@ -111,32 +107,17 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
                     .addAnnotation(AnnotationSpec.builder(Incoming.class)
                             .addMember(BASIC_ANNOTATION_FIELD_NAME,"$S" , QUEUE_PREFIX + queueName).build())
                     .addParameter(ParameterizedTypeName.get(Message.class, String.class),"msg")
-                    .addStatement("$T $N", QueueMessage.class, "queueMessage")
-                    .beginControlFlow("try")
-                    .addStatement("$N = $T.fromJson($N.getPayload(), $T.class)", "queueMessage", JsonUtil.class, "msg", QueueMessage.class)
-                    .nextControlFlow("catch($T ex)", ValidationException.class)
-                    .addStatement("LOGGER.error($S, ex)","Unable to parse incoming queue message. Action won't be retried.")
-                    .addStatement("return msg.ack()")
-                    .endControlFlow()
-
-                    .beginControlFlow("try")
-                    .addStatement("requestContextExecutor.execute(new $T(instanceIdentification.getInstanceId(), queueMessage, new $T($S)), () -> queueConsumer.onMessage(queueMessage))",
-                            QueueRequestDetails.class, QueueRequestDetails.Context.class, queueName)
-                    .addStatement("return msg.ack()")
-                    .nextControlFlow("catch($T ex)", Exception.class)
-                    .addStatement("LOGGER.error($S, ex)","Unexpected error occurred while processing a queue message. Action will be retried based on the retry policy.")
-                    .addStatement("return msg.nack(ex)")
-                    .endControlFlow()
+                    .addStatement("return super.handleMessage(msg)")
                     .build();
 
             TypeSpec callerClass = TypeSpec.classBuilder(queueConsumerClass.getSimpleName() + "Caller")
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(ApplicationScoped.class)
+                    .superclass(AbstractMpQueueListener.class)
                     .addMethod(consumeMethodBuilder)
+                    .addMethod(getListener)
+                    .addMethod(getQueueName)
                     .addField(queueConsumer)
-                    .addField(logger)
-                    .addField(requestContextExecutor)
-                    .addField(instanceIdentification)
                     .build();
 
             LOGGER.info("Generating src file {}Caller", queueConsumerClass.getSimpleName());

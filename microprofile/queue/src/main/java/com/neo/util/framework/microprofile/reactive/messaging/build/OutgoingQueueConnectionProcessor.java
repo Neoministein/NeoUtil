@@ -4,16 +4,13 @@ import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.build.BuildContext;
 import com.neo.util.framework.api.build.BuildStep;
 import com.neo.util.framework.api.queue.OutgoingQueue;
-import com.neo.util.framework.api.queue.QueueProducer;
-import com.neo.util.framework.microprofile.reactive.messaging.api.ReactiveMessageTransformer;
 import com.neo.util.framework.microprofile.reactive.messaging.api.ReactiveMessageTransformerService;
+import com.neo.util.framework.microprofile.reactive.messaging.impl.AbstractMpQueueProducer;
 import com.squareup.javapoet.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
-import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
-import org.reactivestreams.FlowAdapters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +21,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.SubmissionPublisher;
 
 /**
  * Generates a microprofile specific impl for a {@link OutgoingQueue}
@@ -86,51 +82,27 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
     protected void createConsumeClass(String queueName, Class<?> executionMethod, BuildContext context) {
         try {
             String className = parseToClassName(queueName);
-            FieldSpec queueEmitter = FieldSpec.builder(ParameterizedTypeName.get(SubmissionPublisher.class, String.class), "emitter")
-                    .addModifiers(Modifier.PROTECTED, Modifier.FINAL)
-                    .initializer("new $T<>()", SubmissionPublisher.class)
-                    .build();
-            FieldSpec messageTransformer = FieldSpec.builder(TypeName.get(ReactiveMessageTransformer.class), "reactiveMessageTransformer")
-                    .addModifiers(Modifier.PROTECTED, Modifier.FINAL)
-                    .build();
             MethodSpec constructor = MethodSpec.constructorBuilder()
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(Inject.class)
                     .addParameter(ReactiveMessageTransformerService.class, "messageTransformerService")
-                    .addStatement("this.$N = $N.getTransformer($S)", "reactiveMessageTransformer", "messageTransformerService", queueName)
+                    .addStatement("super($S, $N.getTransformer($S))", queueName, "messageTransformerService", queueName)
                     .build();
 
-            MethodSpec addToQueue = MethodSpec.methodBuilder("addToQueue")
-                    .addModifiers(Modifier.PUBLIC)
-                    .returns(void.class)
-                    .addAnnotation(Override.class)
-                    .addParameter(String.class, "msg")
-                    .addStatement("emitter.submit(msg)")
-                    .build();
             MethodSpec produceToQueue = MethodSpec.methodBuilder("addToQueue")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(ParameterizedTypeName.get(PublisherBuilder.class, Object.class))
                     .addAnnotation(AnnotationSpec.builder(Outgoing.class)
                             .addMember(BASIC_ANNOTATION_FIELD_NAME, "$S", QUEUE_PREFIX + queueName).build())
-                    .addStatement("return $T.fromPublisher($T.toPublisher(emitter)).map(reactiveMessageTransformer.getMessageTransformer($S))", ReactiveStreams.class, FlowAdapters.class, queueName)
-                    .build();
-            MethodSpec getQueueName = MethodSpec.methodBuilder("getQueueName")
-                    .addModifiers(Modifier.PUBLIC)
-                    .returns(String.class)
-                    .addAnnotation(Override.class)
-                    .addStatement("return $S", queueName)
+                    .addStatement("return createPublisher()")
                     .build();
 
             TypeSpec callerClass = TypeSpec.classBuilder(className)
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(ApplicationScoped.class)
-                    .addSuperinterface(QueueProducer.class)
+                    .superclass(AbstractMpQueueProducer.class)
                     .addMethod(constructor)
-                    .addMethod(addToQueue)
                     .addMethod(produceToQueue)
-                    .addMethod(getQueueName)
-                    .addField(queueEmitter)
-                    .addField(messageTransformer)
                     .build();
 
             JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();
