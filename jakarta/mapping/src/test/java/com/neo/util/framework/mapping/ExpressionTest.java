@@ -46,10 +46,10 @@ class ExpressionTest {
         File[] tests = ResourceUtil.getFolderContent("./tests");
 
         for (File testLocation: tests) {
-            String input = Files.readString(Path.of(testLocation.getPath() + "\\input.json"));
-            String jsonSchema = Files.readString(Path.of(testLocation.getPath() + "\\json-schema.json"));
-            String mappingSchema = Files.readString(Path.of(testLocation.getPath() + "\\mapping-schema.xml"));
-            String output = Files.readString(Path.of(testLocation.getPath() + "\\output.json"));
+            String input = Files.readString(Path.of(testLocation.getPath() + "/input.json"));
+            String jsonSchema = Files.readString(Path.of(testLocation.getPath() + "/json-schema.json"));
+            String mappingSchema = Files.readString(Path.of(testLocation.getPath() + "/mapping-schema.xml"));
+            String output = Files.readString(Path.of(testLocation.getPath() + "/output.json"));
 
             validateSchemaTest(testLocation.getName(), input, jsonSchema, mappingSchema, output);
         }
@@ -59,10 +59,10 @@ class ExpressionTest {
     void singleSchemaTest() throws IOException {
         File testLocation = ResourceUtil.getFolderContent("./tests/defaultValue")[0].getParentFile();
 
-        String input = Files.readString(Path.of(testLocation.getPath() + "\\input.json"));
-        String jsonSchema = Files.readString(Path.of(testLocation.getPath() + "\\json-schema.json"));
-        String mappingSchema = Files.readString(Path.of(testLocation.getPath() + "\\mapping-schema.xml"));
-        String output = Files.readString(Path.of(testLocation.getPath() + "\\output.json"));
+        String input = Files.readString(Path.of(testLocation.getPath() + "/input.json"));
+        String jsonSchema = Files.readString(Path.of(testLocation.getPath() + "/json-schema.json"));
+        String mappingSchema = Files.readString(Path.of(testLocation.getPath() + "/mapping-schema.xml"));
+        String output = Files.readString(Path.of(testLocation.getPath() + "/output.json"));
 
         validateSchemaTest(testLocation.getName(), input, jsonSchema, mappingSchema, output);
     }
