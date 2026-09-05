@@ -2,7 +2,7 @@ package com.neo.util.helidon.rest.parser;
 
 import com.neo.util.common.impl.json.JsonUtil;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
-import io.helidon.microprofile.testing.junit5.AddBean;
+import io.helidon.microprofile.testing.AddBean;
 import io.helidon.microprofile.testing.junit5.HelidonTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.client.Entity;
@@ -57,7 +57,7 @@ class InboundParsingIT extends AbstractIntegrationTest {
         //Assert
 
         JsonNode body = validateResponse(response, 400);
-        Assertions.assertEquals("required property 'aString' not found", body.get("message").asString());
+        Assertions.assertEquals("Missing required creator property 'aString' (index 0)", body.get("message").asString());
     }
 
     @Test
@@ -95,6 +95,6 @@ class InboundParsingIT extends AbstractIntegrationTest {
         //Assert
 
         JsonNode body = validateResponse(response, 400);
-        Assertions.assertEquals("required property 'a_different_name' not found", body.get("message").asString());
+        Assertions.assertEquals("Missing required creator property 'a_different_name' (index 0)", body.get("message").asString());
     }
 }

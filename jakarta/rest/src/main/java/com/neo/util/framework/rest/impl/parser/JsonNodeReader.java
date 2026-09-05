@@ -52,7 +52,7 @@ public class JsonNodeReader implements MessageBodyReader<JsonNode> {
 
     @Override
     public boolean isReadable(Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType) {
-        return JsonNode.class.equals(aClass);
+        return JsonNode.class.isAssignableFrom(aClass);
     }
 
     @Override

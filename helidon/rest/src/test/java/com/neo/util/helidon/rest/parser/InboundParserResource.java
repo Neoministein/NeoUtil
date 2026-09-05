@@ -2,7 +2,6 @@ package com.neo.util.helidon.rest.parser;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.rest.api.parser.InboundDto;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -29,7 +28,6 @@ public class InboundParserResource {
         return Response.ok().entity(JsonUtil.toJson(advancedInboundDto)).build();
     }
 
-    @InboundDto
     public record BasicInboundDto(
             @JsonProperty(required = true)
             String aString,
@@ -37,7 +35,6 @@ public class InboundParserResource {
             int aNumber
     ) {}
 
-    @InboundDto
     public record AdvancedInboundDto(
             @JsonProperty(value = "a_different_name", required = true)
             String aString,

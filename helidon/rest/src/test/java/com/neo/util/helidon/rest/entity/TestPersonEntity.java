@@ -1,8 +1,9 @@
 package com.neo.util.helidon.rest.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.neo.util.common.api.json.Views;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
-
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -20,15 +21,19 @@ public class TestPersonEntity implements PersistenceEntity {
     @Id
     @Column(name = PersistenceEntity.C_ID)
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonView(Views.Public.class)
     private Long id;
 
     @Column(name = C_TEXT, nullable = false, unique = true)
+    @JsonView(Views.Public.class)
     private String name;
 
     @Column(name = C_DESCRIPTION)
+    @JsonView(Views.Public.class)
     private String description;
 
     @Column(name = C_AGE)
+    @JsonView(Views.Public.class)
     private Integer age;
 
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)

@@ -1,12 +1,15 @@
 package com.neo.util.helidon.rest.entity;
 
 import com.neo.util.common.impl.json.JsonUtil;
-import io.helidon.microprofile.testing.junit5.AddBean;
+import io.helidon.microprofile.testing.AddBean;
 import io.helidon.microprofile.testing.junit5.HelidonTest;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ObjectNode;
 
 @HelidonTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AddBean(TestPersonResource.class)
 class EntityRestEndpointIT extends AbstractEntityRestEndpointIT {
 

@@ -3,7 +3,6 @@ package com.neo.util.helidon.rest.parser;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.neo.util.common.api.json.Views;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.rest.api.parser.OutboundJsonView;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -47,21 +46,21 @@ public class OutboundJsonResource {
 
     @GET
     @Path(P_VIEW_PUBLIC)
-    @OutboundJsonView(Views.Public.class)
+    @JsonView(Views.Public.class)
     public Response viewPublic() {
         return Response.ok().entity(OUTBOUND_DTO).build();
     }
 
     @GET
     @Path(P_VIEW_OWNER)
-    @OutboundJsonView(Views.Owner.class)
+    @JsonView(Views.Owner.class)
     public Response viewOwner() {
         return Response.ok().entity(OUTBOUND_DTO).build();
     }
 
     @GET
     @Path(P_VIEW_INTERNAL)
-    @OutboundJsonView(Views.Internal.class)
+    @JsonView(Views.Internal.class)
     public Response viewInternal() {
         return Response.ok().entity(OUTBOUND_DTO).build();
     }
