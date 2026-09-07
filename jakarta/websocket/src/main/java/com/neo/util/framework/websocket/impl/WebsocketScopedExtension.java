@@ -15,6 +15,8 @@ import jakarta.enterprise.inject.spi.configurator.AnnotatedMethodConfigurator;
 import jakarta.enterprise.inject.spi.configurator.AnnotatedParameterConfigurator;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -24,6 +26,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class WebsocketScopedExtension implements Extension {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebsocketScopedExtension.class);
 
     private static final ExceptionDetails EX_MISSING_SERVER_ENDPOINT = new ExceptionDetails("websocket/missing/serverEndpoint",
             "The Class [{0}] requires the ServerEndpoint annotation and configurator [{1}]");
@@ -37,13 +41,13 @@ public class WebsocketScopedExtension implements Extension {
     public void processAnnotatedType(@Observes @WithAnnotations(NeoUtilWebsocket.class) ProcessAnnotatedType<?> pat) {
         Class<?> clazz = pat.getAnnotatedType().getJavaClass();
         if (clazz.getAnnotation(NeoUtilWebsocket.class) != null) {
+            LOGGER.trace("Registering NeoUtilWebsocket [{}]", clazz.getName());
             ServerEndpoint serverEndpoint = clazz.getAnnotation(ServerEndpoint.class);
             if (serverEndpoint == null || !serverEndpoint.configurator().isAssignableFrom(WebserverHttpHeaderForwarding.class)) {
                 throw new ConfigurationException(EX_MISSING_SERVER_ENDPOINT, clazz.getName(), WebserverHttpHeaderForwarding.class.getName());
             }
 
             boolean onOpen = false;
-            boolean onMessage = false;
             boolean onClose = false;
 
             for (AnnotatedMethodConfigurator<?> method: pat.configureAnnotatedType().methods()) {
@@ -55,13 +59,10 @@ public class WebsocketScopedExtension implements Extension {
                 } else if (annotations.contains(OnMessage.class)) {
                     method.add(() -> NeoUtilWebsocketOnMessage.class);
                     validateMethod(method, Session.class);
-                    onMessage = true;
                 } else if (annotations.contains(OnClose.class)) {
                     method.add(() -> NeoUtilWebsocketOnClose.class);
                     validateMethod(method, Session.class);
                     onClose = true;
-                } else if (onOpen && onMessage && onClose) {
-                    break;
                 }
             }
 

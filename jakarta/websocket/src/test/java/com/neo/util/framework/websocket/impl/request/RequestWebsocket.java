@@ -9,11 +9,15 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @NeoUtilWebsocket
 @ApplicationScoped
 @ServerEndpoint(value = "/request/{id}", configurator = WebserverHttpHeaderForwarding.class)
 public class RequestWebsocket implements BasicWebsocket {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestWebsocket.class);
 
 
     protected RequestDetails requestDetails;
@@ -23,11 +27,13 @@ public class RequestWebsocket implements BasicWebsocket {
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+        LOGGER.info("OnOpen");
         requestDetails = requestDetailsProvider.get();
     }
 
     @OnMessage
     public void onMessage(Session session, String message) {
+        LOGGER.info("OnMessage");
         requestDetails = requestDetailsProvider.get();
     }
 
