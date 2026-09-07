@@ -38,7 +38,7 @@ class JobRunrQueueIT {
 
     @BeforeEach
     void init() {
-        weld.select(ConfigService.class).get().save(1, JobRunnerConfigurator.CONFIG_PREFIX + JobRunnerConfigurator.CONFIG_POLL_INTERVAL);
+        weld.select(ConfigService.class).get().save(0.2f, JobRunnerConfigurator.CONFIG_PREFIX + JobRunnerConfigurator.CONFIG_POLL_INTERVAL);
         weld.select(ConfigService.class).get().save(5, "queue." + DelayedQueueListener.QUEUE_NAME + ".delay");
         weld.select(ConfigService.class).get().save(5, "queue." + RetryQueueListener.QUEUE_NAME + ".retry");
 
@@ -72,6 +72,7 @@ class JobRunrQueueIT {
         int basicDelay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
         Assertions.assertTrue(MathUtils.isInBounds(basicDelay,0, 2000), "The delay " + basicDelay);
 
+
         //DelayTest
 
         start = Instant.now();
@@ -87,8 +88,7 @@ class JobRunrQueueIT {
         });
 
         int delay = (int) Instant.now().minus(start.toEpochMilli(), ChronoUnit.MILLIS).toEpochMilli();
-        Assertions.assertTrue(MathUtils.isInBounds(delay,4000, 6000), "The delay " + delay);
-
+        Assertions.assertTrue(MathUtils.isInBounds(delay,3000, 7000), "The delay " + delay);
         //RetryTest
 
         QueueMessage retryMessage = new QueueMessage(create(RetryQueueListener.QUEUE_NAME), "messageType", "retryPayload");

@@ -17,6 +17,8 @@ import org.jobrunr.utils.reflection.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+
 @ApplicationScoped
 public class JobRunnerConfigurator {
 
@@ -30,7 +32,7 @@ public class JobRunnerConfigurator {
 
     private static final int DEFAULT_DASHBOARD_PORT = 8050;
     private static final int DEFAULT_WORKERS = 1;
-    private static final int DEFAULT_POLL_INTERVAL = 5;
+    private static final double DEFAULT_POLL_INTERVAL = 5;
 
     protected final ConfigService configService;
     protected final JobRunrStorageProvider jobRunrStorageProvider;
@@ -49,7 +51,7 @@ public class JobRunnerConfigurator {
 
         boolean backGroundWorkerEnabled = configService.getAsBoolean(CONFIG_PREFIX + CONFIG_BACKGROUND_WORKER + CONFIG_ENABLED).orElse(true);
         int backGroundWorkers = configService.getAsInt(CONFIG_PREFIX + CONFIG_BACKGROUND_WORKER).orElse(DEFAULT_WORKERS);
-        int pollInterval = configService.getAsInt(CONFIG_PREFIX + CONFIG_POLL_INTERVAL).orElse(DEFAULT_POLL_INTERVAL);
+        double pollInterval = configService.getAsDouble(CONFIG_PREFIX + CONFIG_POLL_INTERVAL).orElse(DEFAULT_POLL_INTERVAL);
         LOGGER.info("JobRunrConfiguration, BackgroundJobServer: [{}], workers: [{}] pollIntervalInSeconds: [{}]", backGroundWorkerEnabled, backGroundWorkers, pollInterval);
 
         boolean dashboardEnabled = configService.getAsBoolean(CONFIG_PREFIX + CONFIG_DASHBOARD + CONFIG_ENABLED).orElse(false);
@@ -72,7 +74,7 @@ public class JobRunnerConfigurator {
 
         BackgroundJobServerConfiguration backgroundJobServerConfiguration = BackgroundJobServerConfiguration
                 .usingStandardBackgroundJobServerConfiguration()
-                .andPollIntervalInSeconds(pollInterval)
+                .andPollInterval(Duration.ofMillis((long) (pollInterval * 1000)))
                 .andWorkerCount(backGroundWorkers);
 
         JobRunr.configure()
