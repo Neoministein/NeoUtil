@@ -85,8 +85,8 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
             MethodSpec constructor = MethodSpec.constructorBuilder()
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(Inject.class)
-                    .addParameter(ReactiveMessageTransformerService.class, "messageTransformerService")
-                    .addStatement("super($S, $N.getTransformer($S))", queueName, "messageTransformerService", queueName)
+                    .addParameter(ReactiveMessageTransformerService.class, "service")
+                    .addStatement("super($S, $N)", queueName, "service")
                     .build();
 
             MethodSpec produceToQueue = MethodSpec.methodBuilder("addToQueue")

@@ -2,6 +2,7 @@ package com.neo.util.framework.microprofile.reactive.messaging.impl;
 
 import com.neo.util.framework.api.queue.QueueProducer;
 import com.neo.util.framework.microprofile.reactive.messaging.api.ReactiveMessageTransformer;
+import com.neo.util.framework.microprofile.reactive.messaging.api.ReactiveMessageTransformerService;
 import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
 import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 import org.reactivestreams.FlowAdapters;
@@ -16,9 +17,9 @@ public abstract class AbstractMpQueueProducer implements QueueProducer {
     protected final ReactiveMessageTransformer reactiveMessageTransformer;
 
 
-    protected AbstractMpQueueProducer(String queueName, ReactiveMessageTransformer reactiveMessageTransformer) {
+    protected AbstractMpQueueProducer(String queueName, ReactiveMessageTransformerService service) {
         this.queueName = queueName;
-        this.reactiveMessageTransformer = reactiveMessageTransformer;
+        this.reactiveMessageTransformer = service.getTransformer(queueName);
     }
 
     @Override

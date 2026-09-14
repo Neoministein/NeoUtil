@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletionStage;
 
-public abstract class AbstractMpQueueListener {
+public abstract class AbstractMpQueueListener<QListener extends QueueListener> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMpQueueListener.class);
 
@@ -24,7 +24,8 @@ public abstract class AbstractMpQueueListener {
     @Inject
     protected InstanceIdentification instanceIdentification;
 
-    protected abstract QueueListener getListener();
+    @Inject
+    protected QListener listener;
 
     protected abstract String getQueueName();
 
@@ -37,7 +38,7 @@ public abstract class AbstractMpQueueListener {
             return msg.ack();
         }
         try {
-            requestContextExecutor.execute(new QueueRequestDetails(instanceIdentification.getInstanceId(), queueMessage, new QueueRequestDetails.Context(getQueueName())), () -> getListener().onMessage(queueMessage));
+            requestContextExecutor.execute(new QueueRequestDetails(instanceIdentification.getInstanceId(), queueMessage, new QueueRequestDetails.Context(getQueueName())), () -> listener.onMessage(queueMessage));
             return msg.ack();
         } catch(Exception ex) {
             LOGGER.error("Unexpected error occurred while processing a queue message. Action will be retried based on the retry policy.", ex);

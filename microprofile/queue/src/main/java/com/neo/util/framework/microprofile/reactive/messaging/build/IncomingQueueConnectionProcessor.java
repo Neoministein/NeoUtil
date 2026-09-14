@@ -8,7 +8,6 @@ import com.neo.util.framework.api.queue.QueueListener;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.AbstractMpQueueListener;
 import com.squareup.javapoet.*;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
@@ -83,16 +82,6 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
 
     protected void createConsumeClass(String queueName, Class<?> queueConsumerClass, BuildContext context) {
         try {
-            FieldSpec queueConsumer = FieldSpec.builder(TypeName.get(queueConsumerClass), "queueConsumer")
-                    .addModifiers(Modifier.PRIVATE)
-                    .addAnnotation(Inject.class)
-                    .build();
-            MethodSpec getListener = MethodSpec.methodBuilder("getListener")
-                    .addModifiers(Modifier.PROTECTED)
-                    .addAnnotation(Override.class)
-                    .returns(QueueListener.class)
-                    .addStatement("return queueConsumer")
-                    .build();
             MethodSpec getQueueName = MethodSpec.methodBuilder("getQueueName")
                     .addModifiers(Modifier.PROTECTED)
                     .addAnnotation(Override.class)
@@ -113,11 +102,9 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
             TypeSpec callerClass = TypeSpec.classBuilder(queueConsumerClass.getSimpleName() + "Caller")
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(ApplicationScoped.class)
-                    .superclass(AbstractMpQueueListener.class)
+                    .superclass(ParameterizedTypeName.get(ClassName.get(AbstractMpQueueListener.class), TypeName.get(queueConsumerClass)))
                     .addMethod(consumeMethodBuilder)
-                    .addMethod(getListener)
                     .addMethod(getQueueName)
-                    .addField(queueConsumer)
                     .build();
 
             LOGGER.info("Generating src file {}Caller", queueConsumerClass.getSimpleName());
