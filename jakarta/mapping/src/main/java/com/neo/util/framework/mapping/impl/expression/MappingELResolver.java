@@ -76,8 +76,8 @@ public class MappingELResolver extends ELResolver {
 
     private Object tryHandleLeaf(Object value) {
         if (value instanceof JsonNode node) {
-            if (node.isTextual()) {
-                return node.textValue();
+            if (node.isString()) {
+                return node.asString();
             } else if (node.isInt()) {
                 return node.intValue();
             } else if (node.isLong()) {
