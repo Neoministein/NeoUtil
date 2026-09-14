@@ -163,7 +163,7 @@
 						<version>${surefire.version}</version>
 						<configuration>
 							<!-- the 2gb of memory are needed by the tests of resource optimization -->
-							<argLine>-Xms384m -Xmx4g -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow --enable-preview</argLine>
+							<argLine>-Xms384m -Xmx4g -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow</argLine>
 							<includes>
 								<include>**/Test*.java</include>
 								<include>**/*Test.java</include>
