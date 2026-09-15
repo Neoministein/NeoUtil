@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.build;
+package com.neo.util.api.build;
 
 /**
  * Build Steps are run after compile time and are used to generate and validate code for runtime use.

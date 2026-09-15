@@ -1,5 +1,5 @@
 package com.neo.util.framework.build;
-
+/*
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.framework.api.PriorityConstants;
@@ -11,7 +11,7 @@ import com.neo.util.framework.api.persistence.search.SearchableIndex;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Set;
-
+*/
 /**
  * Validates that all classes implementing {@link Searchable} are annotated with {@link SearchableIndex}
  * otherwise, a {@link ValidationException} is thrown.
@@ -21,7 +21,7 @@ import java.util.Set;
  * <li>The class is Abstract</li>
  * <li>The class is annotated with {@link SuppressWarnings} containing {@link SearchableAnnotationBuildStep#SUPPRESS_TYPE}</li>
  * </ul>
- */
+ *//*
 public class SearchableAnnotationBuildStep implements BuildStep {
 
     public static final String SUPPRESS_TYPE = "neoutil:SearchableIndex";
@@ -58,3 +58,4 @@ public class SearchableAnnotationBuildStep implements BuildStep {
         return PriorityConstants.PLATFORM_AFTER;
     }
 }
+*/

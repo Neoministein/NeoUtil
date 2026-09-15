@@ -18,6 +18,11 @@
             <artifactId>neoutil-framework</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-api-build-step</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- Micro profile-->
         <dependency>
             <groupId>org.eclipse.microprofile.reactive.messaging</groupId>
@@ -95,7 +100,7 @@
             <!-- NeoUtil Compile Time stuff -->
             <plugin>
                 <groupId>com.neo.util</groupId>
-                <artifactId>neoutil-maven-plugin</artifactId>
+                <artifactId>build-step-maven-plugin</artifactId>
                 <version>${project.version}</version>
                 <executions>
                     <execution>

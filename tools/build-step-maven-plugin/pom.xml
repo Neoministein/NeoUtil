@@ -7,10 +7,10 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-maven-plugin</artifactId>
+    <artifactId>build-step-maven-plugin</artifactId>
     <version>1.0.0</version>
 
-    <name>Neo Util Framework Maven Plugin JAR</name>
+    <name>Neo Util Build Step Maven Plugin JAR</name>
     <packaging>maven-plugin</packaging>
 
     <dependencies>
@@ -18,7 +18,7 @@
         <!-- Internal Modules -->
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-framework</artifactId>
+            <artifactId>neoutil-api-build-step</artifactId>
             <version>${project.version}</version>
         </dependency>
 

@@ -1,8 +1,8 @@
 package com.neo.util.framework.microprofile.reactive.messaging.build;
 
+import com.neo.util.api.build.BuildContext;
+import com.neo.util.api.build.BuildStep;
 import com.neo.util.framework.api.PriorityConstants;
-import com.neo.util.framework.api.build.BuildContext;
-import com.neo.util.framework.api.build.BuildStep;
 import com.neo.util.framework.api.queue.IncomingQueue;
 import com.neo.util.framework.api.queue.QueueListener;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.AbstractMpQueueListener;

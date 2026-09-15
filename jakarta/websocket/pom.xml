@@ -19,6 +19,11 @@
             <artifactId>neoutil-framework</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-api-build-step</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>jakarta.websocket</groupId>

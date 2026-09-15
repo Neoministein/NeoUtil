@@ -3,8 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.neo.util</groupId>
-        <artifactId>neoutil-tool-root</artifactId>
+        <artifactId>neoutil-root</artifactId>
         <version>1.0.0</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>rendex-maven-plugin</artifactId>
     <name>Neo Util Tools Rendex jar</name>

@@ -1,7 +1,7 @@
-package com.neo.util.framework.impl.build;
+package com.neo.util.framework.impl;
 
-import com.neo.util.framework.api.build.BuildContext;
-import com.neo.util.framework.api.build.BuildStep;
+import com.neo.util.api.build.BuildContext;
+import com.neo.util.api.build.BuildStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.build;
+package com.neo.util.api.build;
 
 import com.neo.util.common.api.reflection.ReflectionProvider;
 

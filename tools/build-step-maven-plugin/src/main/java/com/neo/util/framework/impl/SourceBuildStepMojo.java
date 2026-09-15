@@ -1,8 +1,7 @@
 package com.neo.util.framework.impl;
 
+import com.neo.util.api.build.BuildContext;
 import com.neo.util.common.impl.reflection.JavaReflectionProvider;
-import com.neo.util.framework.api.build.BuildContext;
-import com.neo.util.framework.impl.build.BuildStepExecutor;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
