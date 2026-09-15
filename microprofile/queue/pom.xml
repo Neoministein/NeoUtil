@@ -29,11 +29,13 @@
             <artifactId>microprofile-reactive-streams-operators-api</artifactId>
             <version>3.0-RC1</version>
         </dependency>
-        <!-- Class generation and reflection for processor logic -->
+
+        <!-- Class Generation -->
         <dependency>
-            <groupId>com.squareup</groupId>
-            <artifactId>javapoet</artifactId>
-            <version>${javapoet.version}</version>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>${byte-buddy.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Test - Framework -->
@@ -90,31 +92,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler.plugin.version}</version>
-                <!-- Custom compilation mode -->
-                <executions>
-                    <execution>
-                        <id>default-test-compile</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>build-generated-test-code</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                        <configuration>
-                            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/annotations</generatedTestSourcesDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <!-- NeoUtil Compile Time stuff -->
             <plugin>
                 <groupId>com.neo.util</groupId>

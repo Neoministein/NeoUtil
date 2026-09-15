@@ -6,21 +6,27 @@ import com.neo.util.framework.api.build.BuildStep;
 import com.neo.util.framework.api.queue.OutgoingQueue;
 import com.neo.util.framework.microprofile.reactive.messaging.api.ReactiveMessageTransformerService;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.AbstractMpQueueProducer;
-import com.squareup.javapoet.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.modifier.Visibility;
+import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.implementation.MethodCall;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.lang.model.element.Modifier;
-import java.io.File;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static com.neo.util.framework.microprofile.reactive.messaging.build.ByteBuddyHelper.annotation;
+import static com.neo.util.framework.microprofile.reactive.messaging.build.ByteBuddyHelper.type;
 
 /**
  * Generates a microprofile specific impl for a {@link OutgoingQueue}
@@ -31,7 +37,6 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
 
     protected static final String PACKAGE_LOCATION = "com.neo.util.framework.microprofile.reactive.messaging";
 
-    protected static final String BASIC_ANNOTATION_FIELD_NAME = "value";
     public static final String QUEUE_PREFIX = "to-";
 
     protected Map<String, Class<?>> existingOutgoingAnnotation = new HashMap<>();
@@ -82,36 +87,38 @@ public class OutgoingQueueConnectionProcessor implements BuildStep {
     protected void createConsumeClass(String queueName, Class<?> executionMethod, BuildContext context) {
         try {
             String className = parseToClassName(queueName);
-            MethodSpec constructor = MethodSpec.constructorBuilder()
-                    .addModifiers(Modifier.PUBLIC)
-                    .addAnnotation(Inject.class)
-                    .addParameter(ReactiveMessageTransformerService.class, "service")
-                    .addStatement("super($S, $N)", queueName, "service")
-                    .build();
+            DynamicType.Builder<?> builder = classDefinition(queueName);
+            builder = defineConstructor(builder, queueName);
+            builder = defineGetPublisher(builder, queueName);
 
-            MethodSpec produceToQueue = MethodSpec.methodBuilder("addToQueue")
-                    .addModifiers(Modifier.PUBLIC)
-                    .returns(ParameterizedTypeName.get(PublisherBuilder.class, Object.class))
-                    .addAnnotation(AnnotationSpec.builder(Outgoing.class)
-                            .addMember(BASIC_ANNOTATION_FIELD_NAME, "$S", QUEUE_PREFIX + queueName).build())
-                    .addStatement("return createPublisher()")
-                    .build();
-
-            TypeSpec callerClass = TypeSpec.classBuilder(className)
-                    .addModifiers(Modifier.PUBLIC)
-                    .addAnnotation(ApplicationScoped.class)
-                    .superclass(AbstractMpQueueProducer.class)
-                    .addMethod(constructor)
-                    .addMethod(produceToQueue)
-                    .build();
-
-            JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();
-            javaFile.writeTo(new File(context.sourceOutPutDirectory()));
-            LOGGER.info("Generating src file {}: {}",context.sourceOutPutDirectory(), className);
-
+            try(DynamicType.Unloaded<?> clazz = builder.make()) {
+                clazz.saveIn(Path.of(context.targetDirectory()).toFile());
+            }
+            LOGGER.info("Generating src file {}: {}",context.targetDirectory(), className);
         } catch (Exception ex) {
             throw new IllegalArgumentException("Unable to generate src file for " + executionMethod.getName(), ex);
         }
+    }
+
+    private DynamicType.Builder<?> classDefinition(String queueName) {
+        return new ByteBuddy().subclass(AbstractMpQueueProducer.class)
+                .name(PACKAGE_LOCATION + "." + parseToClassName(queueName))
+                .annotateType(annotation(ApplicationScoped.class));
+    }
+
+    private DynamicType.Builder<?> defineConstructor(DynamicType.Builder<?> builder, String queueName) throws Exception {
+        Constructor<?> constructor = AbstractMpQueueProducer.class.getDeclaredConstructor(String.class, ReactiveMessageTransformerService.class);
+        return builder.defineConstructor(Visibility.PUBLIC)
+                .withParameters(ReactiveMessageTransformerService.class)
+                .intercept(MethodCall.invoke(constructor).with(queueName).withArgument(0))
+                .annotateMethod(annotation(Inject.class));
+    }
+
+    private DynamicType.Builder<?> defineGetPublisher(DynamicType.Builder<?> builder, String queueName) throws Exception {
+        Method method = AbstractMpQueueProducer.class.getDeclaredMethod("createPublisher");
+        return builder.defineMethod("addToQueue", type(PublisherBuilder.class, Object.class), Visibility.PUBLIC)
+                .intercept(MethodCall.invoke(method))
+                .annotateMethod(annotation(Outgoing.class, x ->x.define("value", QUEUE_PREFIX + queueName)));
     }
 
     protected String parseToClassName(String queueName) {

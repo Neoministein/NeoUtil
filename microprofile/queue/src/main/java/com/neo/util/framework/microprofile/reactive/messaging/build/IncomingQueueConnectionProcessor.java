@@ -6,20 +6,27 @@ import com.neo.util.framework.api.build.BuildStep;
 import com.neo.util.framework.api.queue.IncomingQueue;
 import com.neo.util.framework.api.queue.QueueListener;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.AbstractMpQueueListener;
-import com.squareup.javapoet.*;
 import jakarta.enterprise.context.ApplicationScoped;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.modifier.Visibility;
+import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.implementation.FixedValue;
+import net.bytebuddy.implementation.MethodCall;
 import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.lang.model.element.Modifier;
-import java.io.File;
+import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
+
+import static com.neo.util.framework.microprofile.reactive.messaging.build.ByteBuddyHelper.annotation;
+import static com.neo.util.framework.microprofile.reactive.messaging.build.ByteBuddyHelper.type;
 
 /**
  * Generates a microprofile specific impl for a {@link IncomingQueue}
@@ -29,8 +36,6 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
     private static final Logger LOGGER = LoggerFactory.getLogger(IncomingQueueConnectionProcessor.class);
 
     protected static final String PACKAGE_LOCATION = "com.neo.util.framework.microprofile.reactive.messaging";
-
-    protected static final String BASIC_ANNOTATION_FIELD_NAME = "value";
 
     public static final String QUEUE_PREFIX = "from-";
 
@@ -82,52 +87,33 @@ public class IncomingQueueConnectionProcessor implements BuildStep {
 
     protected void createConsumeClass(String queueName, Class<?> queueConsumerClass, BuildContext context) {
         try {
-            MethodSpec getQueueName = MethodSpec.methodBuilder("getQueueName")
-                    .addModifiers(Modifier.PROTECTED)
-                    .addAnnotation(Override.class)
-                    .returns(String.class)
-                    .addStatement("return $S",queueName)
-                    .build();
+            DynamicType.Builder<?> builder = classDefinition(queueConsumerClass);
+            builder = consumerMethod(builder, queueName);
+            builder = builder.defineMethod("getQueueName", String.class, Visibility.PROTECTED).intercept(FixedValue.value(queueName));
 
-            MethodSpec consumeMethodBuilder = MethodSpec.methodBuilder("consumeQueue")
-                    .addModifiers(Modifier.PUBLIC)
-                    .addAnnotation(AnnotationSpec.get(getAcknowledgment()))
-                    .returns(ParameterizedTypeName.get(ClassName.get(CompletionStage.class), ClassName.get(Void.class)))
-                    .addAnnotation(AnnotationSpec.builder(Incoming.class)
-                            .addMember(BASIC_ANNOTATION_FIELD_NAME,"$S" , QUEUE_PREFIX + queueName).build())
-                    .addParameter(ParameterizedTypeName.get(Message.class, String.class),"msg")
-                    .addStatement("return super.handleMessage(msg)")
-                    .build();
+            try(DynamicType.Unloaded<?> clazz = builder.make()) {
+                clazz.saveIn(Path.of(context.targetDirectory()).toFile());
+                LOGGER.info("Generating src file {}: {}Caller",context.targetDirectory(), queueConsumerClass.getSimpleName());
+            }
 
-            TypeSpec callerClass = TypeSpec.classBuilder(queueConsumerClass.getSimpleName() + "Caller")
-                    .addModifiers(Modifier.PUBLIC)
-                    .addAnnotation(ApplicationScoped.class)
-                    .superclass(ParameterizedTypeName.get(ClassName.get(AbstractMpQueueListener.class), TypeName.get(queueConsumerClass)))
-                    .addMethod(consumeMethodBuilder)
-                    .addMethod(getQueueName)
-                    .build();
-
-            LOGGER.info("Generating src file {}Caller", queueConsumerClass.getSimpleName());
-            JavaFile javaFile = JavaFile.builder(PACKAGE_LOCATION, callerClass).build();
-            javaFile.writeTo(new File(context.sourceOutPutDirectory()));
-            LOGGER.info("Generating src file {}: {}Caller",context.sourceOutPutDirectory(), queueConsumerClass.getSimpleName());
         } catch (Exception ex) {
             throw new IllegalArgumentException("Unable to generate src file for " + queueConsumerClass.getSimpleName(), ex);
         }
     }
 
-    public Acknowledgment getAcknowledgment() {
-        return new Acknowledgment() {
+    private DynamicType.Builder<?> classDefinition(Class<?> queueConsumerClass) {
+        return new ByteBuddy().subclass(type(AbstractMpQueueListener.class, queueConsumerClass))
+                .name(PACKAGE_LOCATION + "." + queueConsumerClass.getSimpleName() + "Caller")
+                .annotateType(annotation(ApplicationScoped.class));
+    }
 
-            @Override
-            public Class<Acknowledgment> annotationType() {
-                return Acknowledgment.class;
-            }
+    private DynamicType.Builder<?> consumerMethod(DynamicType.Builder<?> builder, String queueName) throws Exception {
+        Method method = AbstractMpQueueListener.class.getDeclaredMethod("handleMessage", Message.class);
 
-            @Override
-            public Strategy value() {
-                return Acknowledgment.Strategy.MANUAL;
-            }
-        };
+        return builder.defineMethod("consumeQueue", type(CompletionStage.class, Void.class), Visibility.PUBLIC)
+                .withParameter(type(Message.class, String.class),"msg")
+                .intercept(MethodCall.invoke(method).withArgument(0))
+                .annotateMethod(annotation(Acknowledgment.class, x -> x.define("value", Acknowledgment.Strategy.MANUAL)))
+                .annotateMethod(annotation(Incoming.class, x -> x.define("value",QUEUE_PREFIX + queueName)));
     }
 }

@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 @Mojo(name = "source-BuildStep",
-        defaultPhase = LifecyclePhase.PROCESS_RESOURCES,
+        defaultPhase = LifecyclePhase.PROCESS_CLASSES,
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
         requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME,
         threadSafe = true)
@@ -32,9 +32,7 @@ public class SourceBuildStepMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException {
         BuildContext buildContext = new BuildContext(
-                project.getBuild().getDirectory() + "/generated-sources/annotations",
                 project.getBuild().getOutputDirectory(),
-                project.getBuild().getDirectory(),
                 new JavaReflectionProvider(
                 ClassLoaderUtils.generate(new ClassLoaderUtils.BuildConfig(
                         false, false, project.getArtifacts(), new File(project.getBuild().getOutputDirectory())))),

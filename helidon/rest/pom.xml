@@ -137,31 +137,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler.plugin.version}</version>
-                <!-- Custom compilation mode -->
-                <executions>
-                    <execution>
-                        <id>default-test-compile</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>build-generated-test-code</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                        <configuration>
-                            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/test-annotations/java</generatedTestSourcesDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <!-- NeoUtil Compile Time stuff -->
             <plugin>
                 <groupId>com.neo.util</groupId>

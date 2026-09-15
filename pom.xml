@@ -26,12 +26,11 @@
 		<slf4j.version>2.0.18</slf4j.version>
 		<log4j.version>2.26.1</log4j.version>
 
-		<!-- Class Generation -->
-		<javapoet.version>1.13.0</javapoet.version>
-
+        <!-- Code Generation -->
+        <byte-buddy.version>1.18.13</byte-buddy.version>
 		<!-- Reflection -->
-		<jandex.version>3.1.5</jandex.version>
-		<jandex.plugin.version>3.1.5</jandex.plugin.version>
+		<jandex.version>3.3.0</jandex.version>
+		<jandex.plugin.version>3.3.0</jandex.plugin.version>
 		<org.reflections.version>0.10.2</org.reflections.version>
 
 		<!-- Jackson -->
@@ -71,7 +70,6 @@
 				<configuration>
 					<source>25</source>
 					<target>25</target>
-					<compilerArgs>--enable-preview</compilerArgs>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -85,7 +83,6 @@
 						<include>**/*TestCase.java</include>
 					</includes>
 					<reuseForks>true</reuseForks>
-					<argLine>--enable-preview</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
