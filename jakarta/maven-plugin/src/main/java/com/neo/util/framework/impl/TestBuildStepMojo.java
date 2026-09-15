@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 @Mojo(name = "test-BuildStep",
-        defaultPhase = LifecyclePhase.PROCESS_TEST_CLASSES,
+        defaultPhase = LifecyclePhase.TEST_COMPILE,
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
         requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME,
         threadSafe = true)
