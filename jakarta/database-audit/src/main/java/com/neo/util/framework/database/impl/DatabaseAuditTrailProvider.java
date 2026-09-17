@@ -1,7 +1,7 @@
 package com.neo.util.framework.database.impl;
 
+import com.neo.util.common.api.PriorityConstants;
 import com.neo.util.common.impl.enumeration.PersistenceOperation;
-import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.persistence.entity.AuditParameter;
 import com.neo.util.framework.api.persistence.entity.EntityAuditTrailProvider;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;

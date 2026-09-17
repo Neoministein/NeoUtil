@@ -1,6 +1,6 @@
 package com.neo.util.framework.websocket.impl.security;
 
-import com.neo.util.framework.api.PriorityConstants;
+import com.neo.util.common.api.PriorityConstants;
 import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.AuthenticationScheme;

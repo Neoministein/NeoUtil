@@ -2,10 +2,10 @@ package com.neo.util.framework.jobrunr.queue.impl;
 
 import com.neo.util.api.config.ConfigService;
 import com.neo.util.api.event.ApplicationReadyEvent;
+import com.neo.util.common.api.PriorityConstants;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.NoContentFoundException;
-import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.queue.*;
 import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.api.security.InstanceIdentification;

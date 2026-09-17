@@ -180,6 +180,7 @@
         <module>api/startup</module>
         <module>api/build</module>
         <module>api/config</module>
+        <module>api/scheduler</module>
         <module>tools/build-step-maven-plugin</module>
 		<module>framework</module>
 		<module>jakarta/startup</module>

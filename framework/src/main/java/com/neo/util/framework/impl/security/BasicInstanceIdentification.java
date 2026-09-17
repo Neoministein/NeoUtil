@@ -1,6 +1,6 @@
 package com.neo.util.framework.impl.security;
 
-import com.neo.util.framework.api.PriorityConstants;
+import com.neo.util.common.api.PriorityConstants;
 import com.neo.util.framework.api.security.InstanceIdentification;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;

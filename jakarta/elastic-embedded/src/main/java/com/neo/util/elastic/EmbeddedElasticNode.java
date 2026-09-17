@@ -2,7 +2,7 @@ package com.neo.util.elastic;
 
 import com.neo.util.api.config.ConfigService;
 import com.neo.util.api.event.ApplicationPreReadyEvent;
-import com.neo.util.framework.api.PriorityConstants;
+import com.neo.util.common.api.PriorityConstants;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;

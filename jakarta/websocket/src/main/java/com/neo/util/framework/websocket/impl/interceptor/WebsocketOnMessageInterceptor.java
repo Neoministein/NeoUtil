@@ -1,6 +1,6 @@
 package com.neo.util.framework.websocket.impl.interceptor;
 
-import com.neo.util.framework.api.PriorityConstants;
+import com.neo.util.common.api.PriorityConstants;
 import com.neo.util.framework.websocket.api.WebsocketInterceptorLogic;
 import com.neo.util.framework.websocket.impl.interceptor.internal.NeoUtilWebsocketOnMessage;
 import jakarta.annotation.Priority;

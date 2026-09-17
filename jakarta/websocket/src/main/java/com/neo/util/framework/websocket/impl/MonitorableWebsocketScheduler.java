@@ -1,7 +1,7 @@
 package com.neo.util.framework.websocket.impl;
 
+import com.neo.util.api.scheduler.CronSchedule;
 import com.neo.util.framework.api.persistence.search.SearchProvider;
-import com.neo.util.framework.api.scheduler.CronSchedule;
 import com.neo.util.framework.websocket.api.WebsocketInterceptorLogic;
 import com.neo.util.framework.websocket.api.WebsocketStateContext;
 import jakarta.enterprise.context.ApplicationScoped;

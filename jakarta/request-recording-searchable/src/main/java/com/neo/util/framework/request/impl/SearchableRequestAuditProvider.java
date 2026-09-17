@@ -1,6 +1,6 @@
 package com.neo.util.framework.request.impl;
 
-import com.neo.util.framework.api.PriorityConstants;
+import com.neo.util.common.api.PriorityConstants;
 import com.neo.util.framework.api.persistence.search.SearchProvider;
 import com.neo.util.framework.api.request.RequestAuditProvider;
 import com.neo.util.framework.api.request.RequestDetails;

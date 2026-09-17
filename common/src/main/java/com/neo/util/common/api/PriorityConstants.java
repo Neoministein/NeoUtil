@@ -1,6 +1,4 @@
-package com.neo.util.framework.api;
-
-import jakarta.interceptor.Interceptor;
+package com.neo.util.common.api;
 
 /**
  * <a href="https://docs.oracle.com/javaee/7/api/javax/interceptor/Interceptor.Priority.html">https://docs.oracle.com/javaee/7/api/javax/interceptor/Interceptor.Priority.html</a>
@@ -10,27 +8,27 @@ public final class PriorityConstants {
     /**
      * Start of range for early interceptors defined by platform specifications.
      */
-    public static final int PLATFORM_BEFORE = Interceptor.Priority.PLATFORM_BEFORE;
+    public static final int PLATFORM_BEFORE = 0;
 
     /**
      * Start of range for early interceptors defined by extension libraries.
      */
-    public static final int LIBRARY_BEFORE = Interceptor.Priority.LIBRARY_BEFORE;
+    public static final int LIBRARY_BEFORE = 1000;
 
     /**
      * Start of range for interceptors defined by applications.
      */
-    public static final int APPLICATION =  Interceptor.Priority.APPLICATION;
+    public static final int APPLICATION =  2000;
 
     /**
      * Start of range for late interceptors defined by extension libraries.
      */
-    public static final int LIBRARY_AFTER = Interceptor.Priority.LIBRARY_AFTER;
+    public static final int LIBRARY_AFTER = 3000;
 
     /**
      * Start of range for late interceptors defined by platform specifications.
      */
-    public static final int PLATFORM_AFTER = Interceptor.Priority.PLATFORM_AFTER;
+    public static final int PLATFORM_AFTER = 4000;
 
     /**
      * Start of range for late interceptors defined by testing specifications.

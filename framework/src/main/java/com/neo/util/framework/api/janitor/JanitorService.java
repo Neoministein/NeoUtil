@@ -1,8 +1,8 @@
 package com.neo.util.framework.api.janitor;
 
+import com.neo.util.api.scheduler.CronSchedule;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.NoContentFoundException;
-import com.neo.util.framework.api.scheduler.CronSchedule;
 
 import java.util.Set;
 

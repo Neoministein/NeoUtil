@@ -1,10 +1,10 @@
 package com.neo.util.framework.impl;
 
 import com.neo.util.api.event.ApplicationPostReadyEvent;
+import com.neo.util.common.api.PriorityConstants;
 import com.neo.util.common.api.reflection.ReflectionProvider;
 import com.neo.util.common.impl.ThreadUtils;
 import com.neo.util.common.impl.reflection.IndexReflectionProvider;
-import com.neo.util.framework.api.PriorityConstants;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;

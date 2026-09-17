@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.scheduler;
+package com.neo.util.api.scheduler;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

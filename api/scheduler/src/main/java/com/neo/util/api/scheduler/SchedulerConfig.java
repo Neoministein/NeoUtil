@@ -1,10 +1,7 @@
-package com.neo.util.framework.api.scheduler;
+package com.neo.util.api.scheduler;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
-import com.neo.util.framework.api.request.RequestContext;
-import com.neo.util.framework.impl.request.SchedulerRequestDetails;
 
 import java.time.Instant;
 
@@ -15,8 +12,6 @@ public class SchedulerConfig {
 
     public static final ExceptionDetails INVALID_CRON_EXPRESSION = new ExceptionDetails("scheduler/invalid-cron",
             "Invalid cron expression [{0}] for scheduler key [{0}].");
-    @JsonIgnore
-    protected final RequestContext context;
 
     protected final String id;
 
@@ -29,7 +24,6 @@ public class SchedulerConfig {
         if (id.contains(" ")) {
             throw new ConfigurationException(INVALID_SCHEDULER_ID, id);
         }
-        this.context = new SchedulerRequestDetails.Context(id);
         this.id = id;
         this.enabled = enabled;
         this.cronValue = cronValue;
@@ -37,10 +31,6 @@ public class SchedulerConfig {
 
     public String getId() {
         return id;
-    }
-
-    public RequestContext getContext() {
-        return context;
     }
 
     public boolean isEnabled() {

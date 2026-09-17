@@ -2,9 +2,9 @@ package com.neo.util.framework.microprofile.reactive.messaging.impl;
 
 import com.neo.util.api.config.ConfigService;
 import com.neo.util.api.event.ApplicationPreReadyEvent;
+import com.neo.util.common.api.PriorityConstants;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.queue.*;
 import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.impl.ReflectionService;

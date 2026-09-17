@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.scheduler;
+package com.neo.util.api.scheduler;
 
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.NoContentFoundException;

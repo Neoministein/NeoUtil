@@ -2,9 +2,9 @@ package com.neo.util.framework.websocket.build;
 
 import com.neo.util.api.build.BuildContext;
 import com.neo.util.api.build.BuildStep;
+import com.neo.util.common.api.PriorityConstants;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
-import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.websocket.api.NeoUtilWebsocket;
 import com.neo.util.framework.websocket.api.WebserverHttpHeaderForwarding;
 import jakarta.websocket.*;

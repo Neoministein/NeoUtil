@@ -1,6 +1,6 @@
 package com.neo.util.framework.jobrunr.scheduler.impl;
 
-import com.neo.util.framework.api.scheduler.CronSchedule;
+import com.neo.util.api.scheduler.CronSchedule;
 
 public interface InterfaceWithSchedule {
 

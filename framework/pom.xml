@@ -23,6 +23,11 @@
         </dependency>
         <dependency>
             <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-api-scheduler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.neo.util</groupId>
             <artifactId>neoutil-config</artifactId>
             <version>${project.version}</version>
         </dependency>
