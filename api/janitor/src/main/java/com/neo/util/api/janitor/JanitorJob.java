@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.janitor;
+package com.neo.util.api.janitor;
 
 import java.time.LocalDate;
 

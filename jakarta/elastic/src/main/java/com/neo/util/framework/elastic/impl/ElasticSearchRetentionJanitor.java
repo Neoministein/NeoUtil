@@ -1,6 +1,6 @@
 package com.neo.util.framework.elastic.impl;
 
-import com.neo.util.framework.api.janitor.JanitorJob;
+import com.neo.util.api.janitor.JanitorJob;
 import com.neo.util.framework.api.persistence.search.SearchRetentionStrategy;
 import com.neo.util.framework.api.persistence.search.Searchable;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;

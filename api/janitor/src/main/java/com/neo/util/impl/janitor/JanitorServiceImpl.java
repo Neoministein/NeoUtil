@@ -1,13 +1,13 @@
-package com.neo.util.framework.impl.janitor;
+package com.neo.util.impl.janitor;
 
 import com.neo.util.api.config.ConfigService;
 import com.neo.util.api.event.ApplicationPostReadyEvent;
+import com.neo.util.api.janitor.JanitorConfig;
+import com.neo.util.api.janitor.JanitorJob;
+import com.neo.util.api.janitor.JanitorService;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.NoContentFoundException;
-import com.neo.util.framework.api.janitor.JanitorConfig;
-import com.neo.util.framework.api.janitor.JanitorJob;
-import com.neo.util.framework.api.janitor.JanitorService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.Instance;

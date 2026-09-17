@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.janitor;
+package com.neo.util.api.janitor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.neo.util.common.impl.exception.ConfigurationException;
