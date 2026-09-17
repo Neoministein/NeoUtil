@@ -1,6 +1,6 @@
 package com.neo.util.helidon.rest.security;
 
-import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.api.request.RequestDetails;
 import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.rest.api.security.SecuredResource;
 import jakarta.annotation.security.RolesAllowed;

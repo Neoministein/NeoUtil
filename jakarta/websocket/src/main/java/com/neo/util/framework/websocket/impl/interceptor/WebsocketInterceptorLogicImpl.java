@@ -1,7 +1,7 @@
 package com.neo.util.framework.websocket.impl.interceptor;
 
+import com.neo.util.api.request.UserRequestDetails;
 import com.neo.util.common.impl.exception.ExternalRuntimeException;
-import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.HttpCredentialsGenerator;
 import com.neo.util.framework.api.security.InstanceIdentification;

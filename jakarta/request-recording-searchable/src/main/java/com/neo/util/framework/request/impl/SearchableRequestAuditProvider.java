@@ -1,9 +1,9 @@
 package com.neo.util.framework.request.impl;
 
+import com.neo.util.api.request.RequestAuditProvider;
+import com.neo.util.api.request.RequestDetails;
 import com.neo.util.common.api.PriorityConstants;
 import com.neo.util.framework.api.persistence.search.SearchProvider;
-import com.neo.util.framework.api.request.RequestAuditProvider;
-import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.request.api.RequestSearchableParser;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;

@@ -1,9 +1,9 @@
 package com.neo.util.framework.database.impl;
 
+import com.neo.util.api.request.RequestDetails;
 import com.neo.util.common.impl.enumeration.PersistenceOperation;
 import com.neo.util.framework.api.persistence.entity.AuditParameter;
 import com.neo.util.framework.api.persistence.entity.EntityAuditTrailProvider;
-import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.database.persistence.AuditableDataBaseEntity;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;

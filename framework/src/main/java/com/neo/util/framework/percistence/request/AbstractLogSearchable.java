@@ -1,8 +1,8 @@
 package com.neo.util.framework.percistence.request;
 
+import com.neo.util.api.request.RequestDetails;
 import com.neo.util.framework.api.persistence.search.AbstractSearchable;
 import com.neo.util.framework.api.persistence.search.Searchable;
-import com.neo.util.framework.api.request.RequestDetails;
 
 import java.time.Instant;
 

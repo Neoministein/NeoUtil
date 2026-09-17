@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.request;
+package com.neo.util.api.request;
 
 import org.slf4j.MDC;
 

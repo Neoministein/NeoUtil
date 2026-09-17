@@ -1,5 +1,6 @@
 package com.neo.util.framework.rest.impl.entity;
 
+import com.neo.util.api.request.UserRequestDetails;
 import com.neo.util.common.api.json.Views;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.NoContentFoundException;
@@ -11,7 +12,6 @@ import com.neo.util.framework.api.persistence.entity.EntityQuery;
 import com.neo.util.framework.api.persistence.entity.EntityResult;
 import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.api.request.UserRequest;
-import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.rest.api.response.ClientResponseService;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;

@@ -1,6 +1,6 @@
 package com.neo.util.framework.request.api;
 
-import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.api.request.RequestDetails;
 import com.neo.util.framework.request.percistence.RequestLogSearchable;
 
 /**

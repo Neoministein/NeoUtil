@@ -1,9 +1,9 @@
 package com.neo.util.framework.impl.request;
 
+import com.neo.util.api.request.RequestAuditProvider;
+import com.neo.util.api.request.RequestDetails;
 import com.neo.util.common.api.func.CheckedRunnable;
 import com.neo.util.common.impl.ThreadUtils;
-import com.neo.util.framework.api.request.RequestAuditProvider;
-import com.neo.util.framework.api.request.RequestDetails;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.context.control.RequestContextController;

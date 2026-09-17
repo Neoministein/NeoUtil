@@ -1,6 +1,7 @@
 package com.neo.util.framework.api.security;
 
-import com.neo.util.framework.api.request.UserRequestDetails;
+import com.neo.util.api.request.UserRequestDetails;
+import com.neo.util.api.request.user.RolePrincipal;
 import jakarta.security.enterprise.credential.Credential;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface AuthenticationProvider {
     boolean isSecurityEnabled();
 
     /**
-     * Authenticated and returns an {@link Optional<RolePrincipal>} based if it succeeds
+     * Authenticated and returns an {@link Optional< RolePrincipal >} based if it succeeds
      *
      * @param credential to authenticate against
      *

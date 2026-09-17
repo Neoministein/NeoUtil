@@ -1,7 +1,7 @@
 package com.neo.util.framework.rest.api.request;
 
-import com.neo.util.framework.api.request.AbstractUserRequestDetails;
-import com.neo.util.framework.api.request.RequestContext;
+import com.neo.util.api.request.AbstractUserRequestDetails;
+import com.neo.util.api.request.RequestContext;
 
 /**
  * This impl consolidates all the data for a single http request.

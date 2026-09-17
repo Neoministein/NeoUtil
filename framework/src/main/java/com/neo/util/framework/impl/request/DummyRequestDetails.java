@@ -1,7 +1,7 @@
 package com.neo.util.framework.impl.request;
 
-import com.neo.util.framework.api.request.RequestContext;
-import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.api.request.RequestContext;
+import com.neo.util.api.request.RequestDetails;
 
 import java.time.Instant;
 import java.util.UUID;

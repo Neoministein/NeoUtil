@@ -1,8 +1,8 @@
-package com.neo.util.framework.api.request;
+package com.neo.util.api.request;
 
+import com.neo.util.api.request.user.RolePrincipal;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.ValidationException;
-import com.neo.util.framework.api.security.RolePrincipal;
 
 import java.util.Collection;
 import java.util.Optional;

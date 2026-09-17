@@ -1,9 +1,9 @@
 package com.neo.util.framework.rest.impl.security;
 
+import com.neo.util.api.request.UserRequestDetails;
 import com.neo.util.common.impl.StringUtils;
 import com.neo.util.common.impl.exception.InternalRuntimeException;
 import com.neo.util.framework.api.request.UserRequest;
-import com.neo.util.framework.api.request.UserRequestDetails;
 import com.neo.util.framework.api.security.AuthenticationProvider;
 import com.neo.util.framework.api.security.HttpCredentialsGenerator;
 import jakarta.annotation.Priority;

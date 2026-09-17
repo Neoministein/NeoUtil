@@ -1,6 +1,6 @@
 package com.neo.util.framework.websocket.api;
 
-import com.neo.util.framework.api.request.UserRequestDetails;
+import com.neo.util.api.request.UserRequestDetails;
 import com.neo.util.framework.websocket.persistence.SocketLogSearchable;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.websocket.EndpointConfig;

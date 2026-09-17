@@ -1,6 +1,6 @@
 package com.neo.util.framework.rest.api.security;
 
-import com.neo.util.framework.api.request.UserRequestDetails;
+import com.neo.util.api.request.UserRequestDetails;
 import jakarta.ws.rs.NameBinding;
 
 import java.lang.annotation.Retention;

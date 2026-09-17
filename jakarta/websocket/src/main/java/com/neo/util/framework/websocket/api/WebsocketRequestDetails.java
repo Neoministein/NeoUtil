@@ -1,7 +1,7 @@
 package com.neo.util.framework.websocket.api;
 
-import com.neo.util.framework.api.request.AbstractUserRequestDetails;
-import com.neo.util.framework.api.request.RequestContext;
+import com.neo.util.api.request.AbstractUserRequestDetails;
+import com.neo.util.api.request.RequestContext;
 
 public class WebsocketRequestDetails extends AbstractUserRequestDetails {
 

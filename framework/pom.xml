@@ -28,6 +28,11 @@
         </dependency>
         <dependency>
             <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-api-request</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.neo.util</groupId>
             <artifactId>neoutil-config</artifactId>
             <version>${project.version}</version>
         </dependency>

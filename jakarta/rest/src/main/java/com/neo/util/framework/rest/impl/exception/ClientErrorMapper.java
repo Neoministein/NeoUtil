@@ -1,6 +1,6 @@
 package com.neo.util.framework.rest.impl.exception;
 
-import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.api.request.RequestDetails;
 import com.neo.util.framework.rest.impl.security.AuthenticationFilter;
 import com.neo.util.framework.rest.impl.security.IdentificationFilter;
 import jakarta.enterprise.context.RequestScoped;

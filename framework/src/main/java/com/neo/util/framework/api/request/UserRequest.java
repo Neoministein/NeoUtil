@@ -1,5 +1,7 @@
 package com.neo.util.framework.api.request;
 
+import com.neo.util.api.request.RequestDetails;
+import com.neo.util.api.request.UserRequestDetails;
 import jakarta.inject.Qualifier;
 
 import java.lang.annotation.ElementType;

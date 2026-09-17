@@ -1,8 +1,8 @@
 package com.neo.util.framework.impl.security;
 
-import com.neo.util.framework.api.request.UserRequestDetails;
+import com.neo.util.api.request.UserRequestDetails;
+import com.neo.util.api.request.user.RolePrincipal;
 import com.neo.util.framework.api.security.AuthenticationProvider;
-import com.neo.util.framework.api.security.RolePrincipal;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.security.enterprise.credential.Credential;
 

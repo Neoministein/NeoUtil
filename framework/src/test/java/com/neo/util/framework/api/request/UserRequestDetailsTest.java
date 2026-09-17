@@ -1,6 +1,9 @@
 package com.neo.util.framework.api.request;
 
-import com.neo.util.framework.api.security.RolePrincipal;
+import com.neo.util.api.request.AbstractUserRequestDetails;
+import com.neo.util.api.request.RequestContext;
+import com.neo.util.api.request.UserRequestDetails;
+import com.neo.util.api.request.user.RolePrincipal;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

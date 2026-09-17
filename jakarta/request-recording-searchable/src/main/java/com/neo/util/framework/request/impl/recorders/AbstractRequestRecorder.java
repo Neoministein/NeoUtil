@@ -1,7 +1,7 @@
 package com.neo.util.framework.request.impl.recorders;
 
 import com.neo.util.api.config.ConfigService;
-import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.api.request.RequestDetails;
 import com.neo.util.framework.request.api.RequestSearchableParser;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;

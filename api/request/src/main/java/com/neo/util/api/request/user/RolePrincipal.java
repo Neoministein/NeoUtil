@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.security;
+package com.neo.util.api.request.user;
 
 import java.security.Principal;
 import java.util.Set;

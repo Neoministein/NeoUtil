@@ -1,6 +1,6 @@
 package com.neo.util.framework.websocket.impl.request;
 
-import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.api.request.RequestDetails;
 import com.neo.util.framework.websocket.api.NeoUtilWebsocket;
 import com.neo.util.framework.websocket.api.WebserverHttpHeaderForwarding;
 import com.neo.util.framework.websocket.impl.BasicWebsocket;

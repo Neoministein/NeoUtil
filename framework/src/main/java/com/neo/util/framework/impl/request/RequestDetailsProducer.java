@@ -1,8 +1,8 @@
 package com.neo.util.framework.impl.request;
 
-import com.neo.util.framework.api.request.RequestDetails;
+import com.neo.util.api.request.RequestDetails;
+import com.neo.util.api.request.UserRequestDetails;
 import com.neo.util.framework.api.request.UserRequest;
-import com.neo.util.framework.api.request.UserRequestDetails;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.inject.Produces;
 
