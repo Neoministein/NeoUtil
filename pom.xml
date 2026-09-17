@@ -182,10 +182,12 @@
         <module>api/scheduler</module>
         <module>api/request</module>
         <module>api/queue</module>
+        <module>api/cache</module>
         <module>api/config</module>
         <module>api/janitor</module>
         <module>tools/build-step-maven-plugin</module>
 		<module>framework</module>
+        <module>jakarta/cache</module>
 		<module>jakarta/startup</module>
 		<module>jakarta/mapping</module>
 		<module>jakarta/elastic</module>

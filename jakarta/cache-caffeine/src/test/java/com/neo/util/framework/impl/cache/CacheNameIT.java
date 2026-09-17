@@ -1,7 +1,8 @@
 package com.neo.util.framework.impl.cache;
 
+import com.neo.uti.jakarta.cache.CacheProducer;
+import com.neo.util.api.cache.Cache;
 import com.neo.util.common.impl.exception.ConfigurationException;
-import com.neo.util.framework.api.cache.Cache;
 import jakarta.enterprise.inject.UnsatisfiedResolutionException;
 import org.jboss.weld.junit5.WeldJunit5Extension;
 import org.junit.jupiter.api.Assertions;

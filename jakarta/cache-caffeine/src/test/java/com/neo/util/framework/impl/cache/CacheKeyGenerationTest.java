@@ -1,9 +1,9 @@
 package com.neo.util.framework.impl.cache;
 
-import com.neo.util.framework.api.cache.CacheKeyGenerator;
-import com.neo.util.framework.api.cache.spi.CompositeCacheKey;
-import com.neo.util.framework.api.cache.spi.UndefinedCacheKeyGenerator;
-import com.neo.util.framework.impl.cache.spi.CacheInterceptor;
+import com.neo.uti.jakarta.cache.spi.CacheInterceptor;
+import com.neo.uti.jakarta.cache.spi.CacheKeyGenerator;
+import com.neo.uti.jakarta.cache.spi.CompositeCacheKey;
+import com.neo.uti.jakarta.cache.spi.UndefinedCacheKeyGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;

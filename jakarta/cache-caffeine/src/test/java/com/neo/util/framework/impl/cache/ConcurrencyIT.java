@@ -1,8 +1,8 @@
 package com.neo.util.framework.impl.cache;
 
+import com.neo.uti.jakarta.cache.spi.CacheResultInterceptor;
+import com.neo.uti.jakarta.cache.spi.annotation.CacheResult;
 import com.neo.util.common.impl.ThreadUtils;
-import com.neo.util.framework.api.cache.spi.CacheResult;
-import com.neo.util.framework.impl.cache.spi.CacheResultInterceptor;
 import org.jboss.weld.junit5.WeldJunit5Extension;
 import org.jboss.weld.junit5.auto.AddEnabledInterceptors;
 import org.junit.jupiter.api.Assertions;

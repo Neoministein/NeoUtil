@@ -1,10 +1,10 @@
 package com.neo.util.framework.impl.cache;
 
-import com.neo.util.framework.api.cache.spi.*;
-import com.neo.util.framework.impl.cache.spi.CacheInvalidateAllInterceptor;
-import com.neo.util.framework.impl.cache.spi.CacheInvalidateInterceptor;
-import com.neo.util.framework.impl.cache.spi.CachePutInterceptor;
-import com.neo.util.framework.impl.cache.spi.CacheResultInterceptor;
+import com.neo.uti.jakarta.cache.spi.CacheInvalidateAllInterceptor;
+import com.neo.uti.jakarta.cache.spi.CacheInvalidateInterceptor;
+import com.neo.uti.jakarta.cache.spi.CachePutInterceptor;
+import com.neo.uti.jakarta.cache.spi.CacheResultInterceptor;
+import com.neo.uti.jakarta.cache.spi.annotation.*;
 import jakarta.inject.Singleton;
 import org.jboss.weld.junit5.WeldJunit5Extension;
 import org.jboss.weld.junit5.auto.AddEnabledInterceptors;

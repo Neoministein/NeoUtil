@@ -1,6 +1,6 @@
 package com.neo.util.framework.rest.web.rest;
 
-import com.neo.util.framework.api.cache.CacheManager;
+import com.neo.util.api.cache.CacheManager;
 import com.neo.util.framework.api.excpetion.ToExternalException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

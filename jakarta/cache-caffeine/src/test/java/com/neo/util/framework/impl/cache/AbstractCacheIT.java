@@ -1,10 +1,12 @@
 package com.neo.util.framework.impl.cache;
 
+import com.neo.uti.jakarta.cache.BasicCacheManagerImpl;
+import com.neo.uti.jakarta.cache.CacheInstanceSearcher;
+import com.neo.uti.jakarta.cache.spi.CacheKeyGeneratorManager;
+import com.neo.uti.jakarta.cache.spi.annotation.CacheName;
 import com.neo.util.common.impl.reflection.IndexReflectionProvider;
-import com.neo.util.framework.api.cache.spi.CacheName;
 import com.neo.util.framework.caffeine.impl.CaffeineCacheBuilder;
 import com.neo.util.framework.impl.ReflectionService;
-import com.neo.util.framework.impl.cache.spi.CacheKeyGeneratorManager;
 import com.neo.util.impl.config.ConfigServiceImpl;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;

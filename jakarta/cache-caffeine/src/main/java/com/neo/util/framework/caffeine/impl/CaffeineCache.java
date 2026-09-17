@@ -2,8 +2,8 @@ package com.neo.util.framework.caffeine.impl;
 
 import com.github.benmanes.caffeine.cache.AsyncCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.neo.util.framework.api.cache.Cache;
-import com.neo.util.framework.impl.cache.spi.CacheException;
+import com.neo.uti.jakarta.cache.CacheException;
+import com.neo.util.api.cache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

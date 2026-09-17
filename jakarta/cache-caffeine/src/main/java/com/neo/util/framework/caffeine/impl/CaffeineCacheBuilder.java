@@ -1,10 +1,9 @@
 package com.neo.util.framework.caffeine.impl;
 
+import com.neo.util.api.cache.Cache;
+import com.neo.util.api.cache.CacheBuilder;
 import com.neo.util.api.config.ConfigService;
 import com.neo.util.common.api.PriorityConstants;
-import com.neo.util.framework.api.cache.Cache;
-import com.neo.util.framework.api.cache.CacheBuilder;
-import com.neo.util.framework.impl.cache.CacheInstanceSearcher;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Alternative;
@@ -22,18 +21,16 @@ public class CaffeineCacheBuilder implements CacheBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(CaffeineCacheBuilder.class);
 
     protected final ConfigService configService;
-    protected final Set<String> cacheInstances;
 
     @Inject
-    public CaffeineCacheBuilder(ConfigService configService, CacheInstanceSearcher cacheInstanceSearcher) {
+    public CaffeineCacheBuilder(ConfigService configService) {
         this.configService = configService;
-        this.cacheInstances = cacheInstanceSearcher.getCacheNames();
     }
 
     @Override
-    public Map<String, Cache> build() {
+    public Map<String, Cache> build(Set<String> names) {
         LOGGER.info("Building all caffeine cache instances");
-        List<CaffeineCacheConfig> configs = getConfigs();
+        List<CaffeineCacheConfig> configs = getConfigs(names);
 
         Map<String, Cache> caffeineCacheMap = new HashMap<>(configs.size() + 1, 1.0F);
         for (CaffeineCacheConfig config: configs) {
@@ -46,11 +43,11 @@ public class CaffeineCacheBuilder implements CacheBuilder {
     }
 
 
-    public List<CaffeineCacheConfig> getConfigs() {
+    public List<CaffeineCacheConfig> getConfigs(Set<String> names) {
         CaffeineCacheConfig defaultConfig = createDefault();
         LOGGER.trace("Default CaffeineCacheConfig loaded Config: {}", defaultConfig);
         List<CaffeineCacheConfig> configs = new ArrayList<>();
-        for (String configName: cacheInstances) {
+        for (String configName: names) {
             LOGGER.trace("Creating CaffeineCacheConfig from Config: {}", configName);
             configs.add(createConfig(configName, defaultConfig));
         }

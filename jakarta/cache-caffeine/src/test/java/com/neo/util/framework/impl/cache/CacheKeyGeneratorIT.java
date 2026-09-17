@@ -1,13 +1,9 @@
 package com.neo.util.framework.impl.cache;
 
-import com.neo.util.framework.api.cache.CacheKeyGenerator;
-import com.neo.util.framework.api.cache.spi.CacheInvalidate;
-import com.neo.util.framework.api.cache.spi.CacheKeyParameterPositions;
-import com.neo.util.framework.api.cache.spi.CacheResult;
-import com.neo.util.framework.api.cache.spi.CompositeCacheKey;
-import com.neo.util.framework.impl.cache.spi.CacheInvalidateAllInterceptor;
-import com.neo.util.framework.impl.cache.spi.CacheInvalidateInterceptor;
-import com.neo.util.framework.impl.cache.spi.CacheResultInterceptor;
+import com.neo.uti.jakarta.cache.spi.*;
+import com.neo.uti.jakarta.cache.spi.annotation.CacheInvalidate;
+import com.neo.uti.jakarta.cache.spi.annotation.CacheKeyParameterPositions;
+import com.neo.uti.jakarta.cache.spi.annotation.CacheResult;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
