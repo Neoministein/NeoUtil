@@ -2,8 +2,8 @@ package com.neo.util.framework.microprofile.reactive.messaging.build;
 
 import com.neo.util.api.build.BuildContext;
 import com.neo.util.api.build.BuildStep;
+import com.neo.util.api.queue.OutgoingQueue;
 import com.neo.util.common.api.PriorityConstants;
-import com.neo.util.framework.api.queue.OutgoingQueue;
 import com.neo.util.framework.microprofile.reactive.messaging.api.ReactiveMessageTransformerService;
 import com.neo.util.framework.microprofile.reactive.messaging.impl.AbstractMpQueueProducer;
 import jakarta.enterprise.context.ApplicationScoped;

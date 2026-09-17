@@ -1,7 +1,7 @@
 package com.neo.util.framework.microprofile.reactive.messaging.api;
 
-import com.neo.util.framework.api.queue.QueueConfig;
-import com.neo.util.framework.api.queue.QueueProducer;
+import com.neo.util.api.queue.QueueConfig;
+import com.neo.util.api.queue.QueueProducer;
 
 public class MicroProfileQueueConfig {
 

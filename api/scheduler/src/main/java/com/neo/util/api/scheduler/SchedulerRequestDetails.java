@@ -1,4 +1,4 @@
-package com.neo.util.framework.impl.request;
+package com.neo.util.api.scheduler;
 
 import com.neo.util.api.request.AbstractRequestDetails;
 import com.neo.util.api.request.RequestContext;

@@ -1,4 +1,6 @@
-package com.neo.util.api.request;
+package com.neo.util.framework.api.request;
+
+import com.neo.util.api.request.RequestDetails;
 
 /**
  * This interfaces defines the capability for auditing request

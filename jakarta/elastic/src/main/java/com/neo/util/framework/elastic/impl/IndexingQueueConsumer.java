@@ -1,10 +1,10 @@
 package com.neo.util.framework.elastic.impl;
 
+import com.neo.util.api.queue.IncomingQueue;
+import com.neo.util.api.queue.QueueListener;
+import com.neo.util.api.queue.QueueMessage;
 import com.neo.util.framework.api.persistence.search.QueueableSearchable;
 import com.neo.util.framework.api.persistence.search.SearchProvider;
-import com.neo.util.framework.api.queue.IncomingQueue;
-import com.neo.util.framework.api.queue.QueueListener;
-import com.neo.util.framework.api.queue.QueueMessage;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 

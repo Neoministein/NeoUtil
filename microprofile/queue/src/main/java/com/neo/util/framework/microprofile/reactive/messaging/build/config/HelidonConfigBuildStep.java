@@ -2,10 +2,10 @@ package com.neo.util.framework.microprofile.reactive.messaging.build.config;
 
 import com.neo.util.api.build.BuildContext;
 import com.neo.util.api.build.BuildStep;
+import com.neo.util.api.queue.IncomingQueue;
+import com.neo.util.api.queue.OutgoingQueue;
+import com.neo.util.api.queue.QueueType;
 import com.neo.util.common.api.PriorityConstants;
-import com.neo.util.framework.api.queue.IncomingQueue;
-import com.neo.util.framework.api.queue.OutgoingQueue;
-import com.neo.util.framework.api.queue.QueueType;
 
 import java.io.IOException;
 import java.nio.file.Files;

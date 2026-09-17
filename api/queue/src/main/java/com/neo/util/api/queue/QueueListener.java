@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.queue;
+package com.neo.util.api.queue;
 
 /**
  * This interface is designed for a CDI bean which has the {@link  IncomingQueue} annotation.

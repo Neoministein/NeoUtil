@@ -181,6 +181,7 @@
         <module>api/build</module>
         <module>api/scheduler</module>
         <module>api/request</module>
+        <module>api/queue</module>
         <module>api/config</module>
         <module>api/janitor</module>
         <module>tools/build-step-maven-plugin</module>

@@ -1,7 +1,7 @@
 package com.neo.util.framework.request.impl.recorders;
 
-import com.neo.util.framework.impl.request.QueueRequestDetails;
-import com.neo.util.framework.impl.request.SchedulerRequestDetails;
+import com.neo.util.api.queue.QueueRequestDetails;
+import com.neo.util.api.scheduler.SchedulerRequestDetails;
 import com.neo.util.framework.request.percistence.RequestLogSearchable;
 import jakarta.enterprise.context.ApplicationScoped;
 

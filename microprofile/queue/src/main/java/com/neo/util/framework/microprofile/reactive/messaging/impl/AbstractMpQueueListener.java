@@ -1,11 +1,11 @@
 package com.neo.util.framework.microprofile.reactive.messaging.impl;
 
+import com.neo.util.api.queue.QueueListener;
+import com.neo.util.api.queue.QueueMessage;
+import com.neo.util.api.queue.QueueRequestDetails;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.api.queue.QueueListener;
-import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.api.security.InstanceIdentification;
-import com.neo.util.framework.impl.request.QueueRequestDetails;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Message;

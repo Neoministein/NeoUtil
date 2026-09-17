@@ -1,6 +1,6 @@
 package com.neo.util.framework.microprofile.reactive.messaging.impl;
 
-import com.neo.util.framework.api.queue.QueueProducer;
+import com.neo.util.api.queue.QueueProducer;
 import com.neo.util.framework.microprofile.reactive.messaging.api.ReactiveMessageTransformer;
 import com.neo.util.framework.microprofile.reactive.messaging.api.ReactiveMessageTransformerService;
 import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;

@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.queue;
+package com.neo.util.api.queue;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

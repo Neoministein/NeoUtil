@@ -7,10 +7,10 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-api-scheduler</artifactId>
+    <artifactId>neoutil-api-queue</artifactId>
     <version>1.0.0</version>
 
-    <name>Neo Util Api Scheduler JAR</name>
+    <name>Neo Util Api Queue JAR</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-api-build-step</artifactId>
+            <artifactId>neoutil-config</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

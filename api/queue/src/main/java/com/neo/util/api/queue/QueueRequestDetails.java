@@ -1,8 +1,7 @@
-package com.neo.util.framework.impl.request;
+package com.neo.util.api.queue;
 
 import com.neo.util.api.request.AbstractRequestDetails;
 import com.neo.util.api.request.RequestContext;
-import com.neo.util.framework.api.queue.QueueMessage;
 
 /**
  * This impl consolidates all the data for a single request by a queue.

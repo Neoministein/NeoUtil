@@ -1,6 +1,6 @@
 package com.neo.util.framework.elastic.impl;
 
-import com.neo.util.framework.api.queue.QueueMessage;
+import com.neo.util.api.queue.QueueMessage;
 
 public class DummyIndexerNotificationService extends IndexingQueueService {
 

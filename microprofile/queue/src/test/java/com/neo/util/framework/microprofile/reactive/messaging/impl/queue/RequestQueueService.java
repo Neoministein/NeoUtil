@@ -1,8 +1,8 @@
 package com.neo.util.framework.microprofile.reactive.messaging.impl.queue;
 
-import com.neo.util.framework.api.queue.OutgoingQueue;
-import com.neo.util.framework.api.queue.QueueMessage;
-import com.neo.util.framework.api.queue.QueueService;
+import com.neo.util.api.queue.OutgoingQueue;
+import com.neo.util.api.queue.QueueMessage;
+import com.neo.util.api.queue.QueueService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 

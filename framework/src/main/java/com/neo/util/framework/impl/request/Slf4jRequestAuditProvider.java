@@ -1,7 +1,7 @@
 package com.neo.util.framework.impl.request;
 
-import com.neo.util.api.request.RequestAuditProvider;
 import com.neo.util.api.request.RequestDetails;
+import com.neo.util.framework.api.request.RequestAuditProvider;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

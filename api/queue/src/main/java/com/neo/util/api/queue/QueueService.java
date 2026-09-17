@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.queue;
+package com.neo.util.api.queue;
 
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.NoContentFoundException;

@@ -2,9 +2,9 @@ package com.neo.util.framework.jobrunr.scheduler.api;
 
 import com.neo.util.api.request.RequestContext;
 import com.neo.util.api.scheduler.SchedulerConfig;
+import com.neo.util.api.scheduler.SchedulerRequestDetails;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
-import com.neo.util.framework.impl.request.SchedulerRequestDetails;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

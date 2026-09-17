@@ -2,12 +2,12 @@ package com.neo.util.framework.jobrunr.scheduler.impl;
 
 import com.neo.util.api.event.ApplicationReadyEvent;
 import com.neo.util.api.scheduler.SchedulerConfig;
+import com.neo.util.api.scheduler.SchedulerRequestDetails;
 import com.neo.util.api.scheduler.SchedulerService;
 import com.neo.util.common.api.func.CheckedRunnable;
 import com.neo.util.common.impl.exception.InternalRuntimeException;
 import com.neo.util.framework.api.security.InstanceIdentification;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
-import com.neo.util.framework.impl.request.SchedulerRequestDetails;
 import com.neo.util.framework.jobrunr.scheduler.api.JobRunnerSchedulerConfig;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
