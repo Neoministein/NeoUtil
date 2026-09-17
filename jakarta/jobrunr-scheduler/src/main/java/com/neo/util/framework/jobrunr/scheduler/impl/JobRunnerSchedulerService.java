@@ -1,8 +1,8 @@
 package com.neo.util.framework.jobrunr.scheduler.impl;
 
+import com.neo.util.api.event.ApplicationReadyEvent;
 import com.neo.util.common.api.func.CheckedRunnable;
 import com.neo.util.common.impl.exception.InternalRuntimeException;
-import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.api.scheduler.SchedulerConfig;
 import com.neo.util.framework.api.scheduler.SchedulerService;
 import com.neo.util.framework.api.security.InstanceIdentification;

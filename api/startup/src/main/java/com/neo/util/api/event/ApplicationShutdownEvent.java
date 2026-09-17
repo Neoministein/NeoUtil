@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.event;
+package com.neo.util.api.event;
 
 /**
  * This class is used for a CDI event which is fired when the application is shutting down

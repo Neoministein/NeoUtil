@@ -1,10 +1,10 @@
 package com.neo.util.framework.jobrunr.queue.impl;
 
+import com.neo.util.api.config.ConfigService;
+import com.neo.util.api.event.ApplicationPreReadyEvent;
+import com.neo.util.api.event.ApplicationReadyEvent;
 import com.neo.util.common.impl.MathUtils;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
-import com.neo.util.framework.api.config.ConfigService;
-import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
-import com.neo.util.framework.api.event.ApplicationReadyEvent;
 import com.neo.util.framework.api.queue.QueueMessage;
 import com.neo.util.framework.api.request.RequestDetails;
 import com.neo.util.framework.impl.request.QueueRequestDetails;

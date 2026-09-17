@@ -177,6 +177,7 @@
 	<modules>
 		<module>tools/rendex-maven-plugin</module>
 		<module>common</module>
+        <module>api/startup</module>
         <module>api/build</module>
         <module>tools/build-step-maven-plugin</module>
 		<module>framework</module>

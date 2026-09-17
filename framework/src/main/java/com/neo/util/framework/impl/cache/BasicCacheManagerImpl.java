@@ -1,9 +1,9 @@
 package com.neo.util.framework.impl.cache;
 
+import com.neo.util.api.event.ApplicationPreReadyEvent;
 import com.neo.util.framework.api.cache.Cache;
 import com.neo.util.framework.api.cache.CacheBuilder;
 import com.neo.util.framework.api.cache.CacheManager;
-import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;

@@ -1,11 +1,9 @@
 package com.neo.util.framework.startup.impl;
 
-import com.neo.util.framework.api.event.ApplicationPostReadyEvent;
-import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
-import com.neo.util.framework.api.event.ApplicationReadyEvent;
-import com.neo.util.framework.api.event.ApplicationShutdownEvent;
-import com.neo.util.framework.impl.config.ConfigServiceImpl;
-import com.neo.util.framework.impl.config.store.InMemoryConfigStore;
+import com.neo.util.api.event.ApplicationPostReadyEvent;
+import com.neo.util.api.event.ApplicationPreReadyEvent;
+import com.neo.util.api.event.ApplicationReadyEvent;
+import com.neo.util.api.event.ApplicationShutdownEvent;
 import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.impl.request.RequestDetailsProducer;
 import com.neo.util.framework.impl.request.Slf4jRequestAuditProvider;
@@ -14,6 +12,8 @@ import com.neo.util.framework.startup.impl.event.PostReadyListener;
 import com.neo.util.framework.startup.impl.event.PreReadyListener;
 import com.neo.util.framework.startup.impl.event.ReadyListener;
 import com.neo.util.framework.startup.impl.event.ShutDownListener;
+import com.neo.util.impl.config.ConfigServiceImpl;
+import com.neo.util.impl.config.store.InMemoryConfigStore;
 import jakarta.enterprise.context.RequestScoped;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.jboss.weld.junit5.WeldInitiator;
