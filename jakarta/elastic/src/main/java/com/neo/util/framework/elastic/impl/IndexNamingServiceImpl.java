@@ -1,7 +1,7 @@
 package com.neo.util.framework.elastic.impl;
 
+import com.neo.util.api.config.ConfigService;
 import com.neo.util.common.impl.StringUtils;
-import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.Searchable;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;

@@ -1,11 +1,11 @@
 package com.neo.util.framework.impl.persistence.search;
 
-import com.neo.util.framework.api.config.ConfigService;
+import com.neo.util.api.config.ConfigService;
 import com.neo.util.framework.api.persistence.search.IndexPeriod;
 import com.neo.util.framework.api.persistence.search.RetentionPeriod;
 import com.neo.util.framework.api.persistence.search.SearchableIndex;
-import com.neo.util.framework.impl.config.ConfigServiceImpl;
-import com.neo.util.framework.impl.config.store.InMemoryConfigStore;
+import com.neo.util.impl.config.ConfigServiceImpl;
+import com.neo.util.impl.config.store.InMemoryConfigStore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
-package com.neo.util.framework.impl.config.store;
+package com.neo.util.impl.config.store;
 
-import com.neo.util.framework.api.config.ConfigStore;
+import com.neo.util.api.config.ConfigStore;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped

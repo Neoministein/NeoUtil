@@ -1,10 +1,10 @@
-package com.neo.util.framework.impl.config;
+package com.neo.util.impl.config;
 
+import com.neo.util.api.config.ConfigService;
+import com.neo.util.api.config.ConfigStore;
+import com.neo.util.api.config.ConfigValue;
+import com.neo.util.api.event.ApplicationPreReadyEvent;
 import com.neo.util.common.impl.exception.InternalRuntimeException;
-import com.neo.util.framework.api.config.ConfigService;
-import com.neo.util.framework.api.config.ConfigStore;
-import com.neo.util.framework.api.config.ConfigValue;
-import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.Instance;

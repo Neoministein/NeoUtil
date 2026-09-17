@@ -1,9 +1,9 @@
 package com.neo.util.elastic;
 
+import com.neo.util.api.config.ConfigService;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
-import com.neo.util.framework.api.config.ConfigService;
-import com.neo.util.framework.impl.config.ConfigServiceImpl;
-import com.neo.util.framework.impl.config.store.InMemoryConfigStore;
+import com.neo.util.impl.config.ConfigServiceImpl;
+import com.neo.util.impl.config.store.InMemoryConfigStore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

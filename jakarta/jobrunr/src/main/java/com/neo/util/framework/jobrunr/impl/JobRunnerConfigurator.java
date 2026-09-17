@@ -1,8 +1,6 @@
 package com.neo.util.framework.jobrunr.impl;
 
-import com.neo.util.framework.api.config.ConfigService;
-import com.neo.util.framework.api.event.ApplicationPreReadyEvent;
-import com.neo.util.framework.api.event.ApplicationShutdownEvent;
+import com.neo.util.api.config.ConfigService;
 import com.neo.util.api.event.ApplicationPreReadyEvent;
 import com.neo.util.api.event.ApplicationShutdownEvent;
 import com.neo.util.framework.jobrunr.api.JobRunrStorageProvider;

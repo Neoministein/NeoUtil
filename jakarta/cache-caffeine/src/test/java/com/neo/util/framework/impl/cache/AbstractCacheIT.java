@@ -5,7 +5,7 @@ import com.neo.util.framework.api.cache.spi.CacheName;
 import com.neo.util.framework.caffeine.impl.CaffeineCacheBuilder;
 import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.impl.cache.spi.CacheKeyGeneratorManager;
-import com.neo.util.framework.impl.config.ConfigServiceImpl;
+import com.neo.util.impl.config.ConfigServiceImpl;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
 import org.jboss.weld.junit5.WeldInitiator;

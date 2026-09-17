@@ -1,6 +1,6 @@
 package com.neo.util.framework.microprofile.reactive.messaging.impl;
 
-import com.neo.util.framework.api.config.ConfigService;
+import com.neo.util.api.config.ConfigService;
 import com.neo.util.framework.microprofile.reactive.messaging.api.ReactiveMessageTransformer;
 import com.neo.util.framework.microprofile.reactive.messaging.api.ReactiveMessageTransformerService;
 import jakarta.enterprise.context.ApplicationScoped;

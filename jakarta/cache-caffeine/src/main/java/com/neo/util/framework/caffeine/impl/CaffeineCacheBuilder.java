@@ -1,9 +1,9 @@
 package com.neo.util.framework.caffeine.impl;
 
+import com.neo.util.api.config.ConfigService;
 import com.neo.util.framework.api.PriorityConstants;
 import com.neo.util.framework.api.cache.Cache;
 import com.neo.util.framework.api.cache.CacheBuilder;
-import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.impl.cache.CacheInstanceSearcher;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;

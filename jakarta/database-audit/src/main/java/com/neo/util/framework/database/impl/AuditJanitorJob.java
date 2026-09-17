@@ -1,6 +1,6 @@
 package com.neo.util.framework.database.impl;
 
-import com.neo.util.framework.api.config.ConfigService;
+import com.neo.util.api.config.ConfigService;
 import com.neo.util.framework.api.janitor.JanitorJob;
 import com.neo.util.framework.database.api.PersistenceContextProvider;
 import jakarta.enterprise.context.ApplicationScoped;

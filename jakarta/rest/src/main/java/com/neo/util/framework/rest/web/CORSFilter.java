@@ -1,6 +1,6 @@
 package com.neo.util.framework.rest.web;
 
-import com.neo.util.framework.api.config.ConfigService;
+import com.neo.util.api.config.ConfigService;
 import com.neo.util.framework.rest.api.response.ClientResponseService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

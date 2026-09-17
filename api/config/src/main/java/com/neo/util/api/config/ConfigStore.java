@@ -1,4 +1,4 @@
-package com.neo.util.framework.api.config;
+package com.neo.util.api.config;
 
 import java.util.List;
 import java.util.Optional;

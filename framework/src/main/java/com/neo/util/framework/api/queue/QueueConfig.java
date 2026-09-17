@@ -1,6 +1,6 @@
 package com.neo.util.framework.api.queue;
 
-import com.neo.util.framework.api.config.ConfigService;
+import com.neo.util.api.config.ConfigService;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;

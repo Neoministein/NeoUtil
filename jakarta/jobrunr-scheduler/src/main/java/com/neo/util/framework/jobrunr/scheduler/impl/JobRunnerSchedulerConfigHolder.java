@@ -1,9 +1,9 @@
 package com.neo.util.framework.jobrunr.scheduler.impl;
 
+import com.neo.util.api.config.ConfigService;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.NoContentFoundException;
 import com.neo.util.common.impl.exception.ValidationException;
-import com.neo.util.framework.api.config.ConfigService;
 import com.neo.util.framework.api.scheduler.CronSchedule;
 import com.neo.util.framework.api.scheduler.SchedulerConfig;
 import com.neo.util.framework.api.scheduler.SchedulerService;

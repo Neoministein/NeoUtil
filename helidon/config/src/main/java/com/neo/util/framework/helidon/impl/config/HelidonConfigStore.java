@@ -1,6 +1,6 @@
 package com.neo.util.framework.helidon.impl.config;
 
-import com.neo.util.framework.api.config.ConfigStore;
+import com.neo.util.api.config.ConfigStore;
 import io.helidon.config.Config;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

@@ -1,6 +1,6 @@
 package com.neo.util.framework.mapping.impl;
 
-import com.neo.util.framework.api.config.ConfigService;
+import com.neo.util.api.config.ConfigService;
 import com.neo.util.framework.mapping.api.MappingSchema;
 import com.neo.util.framework.mapping.api.MappingSchemaHolder;
 import jakarta.enterprise.context.ApplicationScoped;
