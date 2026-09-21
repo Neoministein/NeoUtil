@@ -8,8 +8,8 @@ import java.util.function.Function;
 
 public class ByteBuddyHelper {
 
-    public static AnnotationDescription annotation(Class<? extends Annotation> annotation, Function<AnnotationDescription.Builder, AnnotationDescription.Builder> a) {
-        return a.apply(AnnotationDescription.Builder.ofType(annotation)).build();
+    public static AnnotationDescription annotation(Class<? extends Annotation> annotation, Function<AnnotationDescription.Builder, AnnotationDescription.Builder> configureAnnotation) {
+        return configureAnnotation.apply(AnnotationDescription.Builder.ofType(annotation)).build();
     }
 
     public static AnnotationDescription annotation(Class<? extends Annotation> annotation) {

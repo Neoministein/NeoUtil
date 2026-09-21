@@ -1,6 +1,6 @@
 package com.neo.util.framework.elastic.api;
 
-import com.neo.util.framework.api.persistence.search.Searchable;
+import com.neo.util.api.persistence.search.Searchable;
 
 import java.time.LocalDate;
 import java.util.Optional;

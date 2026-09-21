@@ -1,6 +1,6 @@
 package com.neo.util.framework.database.api;
 
-import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
+import com.neo.util.api.persistence.entity.PersistenceEntity;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Optional;
  * upon with queries
  * @param <T> the {@link PersistenceEntity} of this repository
  */
-public interface EntityRepository<T extends PersistenceEntity> {
+public interface EntityRepository<P, T extends PersistenceEntity<P>> {
 
     /**
      * Persists {@link T}
@@ -63,7 +63,7 @@ public interface EntityRepository<T extends PersistenceEntity> {
      *
      * @return the entry as an {@link Optional<T>}
      */
-    Optional<T> fetch(Object primaryKey);
+    Optional<T> fetch(P primaryKey);
 
     /**
      * Finds all {@link T} and returns them order asc by the provided column.

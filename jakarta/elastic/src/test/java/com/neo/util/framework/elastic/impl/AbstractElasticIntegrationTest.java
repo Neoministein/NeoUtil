@@ -6,16 +6,15 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.indices.*;
 import com.carrotsearch.randomizedtesting.annotations.ThreadLeakScope;
 import com.neo.util.api.config.ConfigService;
+import com.neo.util.api.config.DefaultConfigService;
+import com.neo.util.api.request.DummyRequestDetails;
 import com.neo.util.api.request.RequestDetails;
 import com.neo.util.common.impl.StringUtils;
-import com.neo.util.common.impl.ThreadUtils;
 import com.neo.util.common.impl.reflection.IndexReflectionProvider;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
 import com.neo.util.framework.elastic.api.IndexNamingService;
-import com.neo.util.framework.impl.ReflectionService;
-import com.neo.util.framework.impl.request.DummyRequestDetails;
-import com.neo.util.impl.config.ConfigServiceImpl;
-import com.neo.util.impl.config.store.InMemoryConfigStore;
+import com.neo.util.jakarta.config.InMemoryConfigStore;
+import com.neo.util.jakarta.reflexion.JakartaReflectionProviderWrapper;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.event.NotificationOptions;
 import jakarta.enterprise.util.TypeLiteral;
@@ -52,11 +51,11 @@ public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
 
     protected static RestClient restClient;
 
-    protected ConfigService configService = new ConfigServiceImpl(List.of(new InMemoryConfigStore()));
+    protected ConfigService configService = new DefaultConfigService(List.of(new InMemoryConfigStore()));
 
     protected static ElasticSearchConnectionProviderImpl connection;
     protected RequestDetails requestDetails = new DummyRequestDetails();
-    protected IndexNamingService indexNamingService = new IndexNamingServiceImpl(configService, new ReflectionService(new IndexReflectionProvider(ThreadUtils.classLoader())));
+    protected IndexNamingService indexNamingService = new IndexNamingServiceImpl(configService, new JakartaReflectionProviderWrapper(IndexReflectionProvider.INSTANCE));
 
     @Override
     protected boolean addMockTransportService() {

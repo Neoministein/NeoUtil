@@ -1,6 +1,6 @@
 package com.neo.util.framework.websocket.impl;
 
-import com.neo.util.framework.api.security.AuthenticationScheme;
+import com.neo.util.api.security.AuthenticationScheme;
 import jakarta.inject.Inject;
 import jakarta.websocket.*;
 import jakarta.ws.rs.client.WebTarget;

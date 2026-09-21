@@ -1,7 +1,7 @@
 package com.neo.util.framework.database.impl;
 
-import com.neo.util.framework.api.persistence.entity.EntityQuery;
-import com.neo.util.framework.api.persistence.entity.EntityResult;
+import com.neo.util.api.persistence.entity.EntityQuery;
+import com.neo.util.api.persistence.entity.EntityResult;
 import com.neo.util.framework.database.impl.entity.AddressEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -77,7 +77,7 @@ class DatabaseProviderCrudIT extends AbstractIntegrationTest<DatabaseProvider> {
         //Act
         subject.create(address);
 
-        Optional<AddressEntity> wrongPrimaryKey = subject.fetch(200, AddressEntity.class);
+        Optional<AddressEntity> wrongPrimaryKey = subject.fetch(200L, AddressEntity.class);
         //Assert
 
         Assertions.assertFalse(wrongPrimaryKey.isPresent());

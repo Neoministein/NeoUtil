@@ -1,14 +1,13 @@
 package com.neo.util.framework.elastic.impl;
 
 import com.neo.util.api.config.ConfigService;
-import com.neo.util.common.impl.ThreadUtils;
+import com.neo.util.api.config.DefaultConfigService;
+import com.neo.util.api.persistence.search.IndexPeriod;
+import com.neo.util.api.persistence.search.Searchable;
+import com.neo.util.api.persistence.search.SearchableIndex;
 import com.neo.util.common.impl.reflection.IndexReflectionProvider;
-import com.neo.util.framework.api.persistence.search.IndexPeriod;
-import com.neo.util.framework.api.persistence.search.Searchable;
-import com.neo.util.framework.api.persistence.search.SearchableIndex;
-import com.neo.util.framework.impl.ReflectionService;
-import com.neo.util.impl.config.ConfigServiceImpl;
-import com.neo.util.impl.config.store.InMemoryConfigStore;
+import com.neo.util.jakarta.config.InMemoryConfigStore;
+import com.neo.util.jakarta.reflexion.JakartaReflectionProviderWrapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,9 +25,9 @@ public class IndexNamingServiceImplTest {
 
     @Before
     public void before() {
-        basicConfigService = new ConfigServiceImpl(List.of(new InMemoryConfigStore()));
+        basicConfigService = new DefaultConfigService(List.of(new InMemoryConfigStore()));
 
-        subject = new IndexNamingServiceImpl(basicConfigService, new ReflectionService(new IndexReflectionProvider(ThreadUtils.classLoader())));
+        subject = new IndexNamingServiceImpl(basicConfigService, new JakartaReflectionProviderWrapper(IndexReflectionProvider.INSTANCE));
     }
 
     @Test

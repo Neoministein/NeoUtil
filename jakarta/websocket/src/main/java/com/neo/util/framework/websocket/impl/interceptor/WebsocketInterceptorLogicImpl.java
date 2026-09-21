@@ -1,17 +1,17 @@
 package com.neo.util.framework.websocket.impl.interceptor;
 
 import com.neo.util.api.request.UserRequestDetails;
+import com.neo.util.api.security.AuthenticationProvider;
+import com.neo.util.api.security.HttpCredentialsGenerator;
 import com.neo.util.common.impl.exception.ExternalRuntimeException;
-import com.neo.util.framework.api.security.AuthenticationProvider;
-import com.neo.util.framework.api.security.HttpCredentialsGenerator;
-import com.neo.util.framework.api.security.InstanceIdentification;
-import com.neo.util.framework.impl.request.RequestContextExecutor;
 import com.neo.util.framework.websocket.api.NeoUtilWebsocket;
 import com.neo.util.framework.websocket.api.WebsocketInterceptorLogic;
 import com.neo.util.framework.websocket.api.WebsocketRequestDetails;
 import com.neo.util.framework.websocket.api.WebsocketStateContext;
 import com.neo.util.framework.websocket.impl.InterceptorWebsocketStateContext;
 import com.neo.util.framework.websocket.impl.WebsocketUtil;
+import com.neo.util.jakarta.request.InstanceIdentification;
+import com.neo.util.jakarta.request.RequestContextExecutor;
 import com.networknt.org.apache.commons.validator.routines.InetAddressValidator;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

@@ -2,10 +2,10 @@ package com.neo.util.framework.websocket.impl.security;
 
 import com.neo.util.api.request.UserRequestDetails;
 import com.neo.util.api.request.user.RolePrincipal;
+import com.neo.util.api.security.AuthenticationProvider;
+import com.neo.util.api.security.AuthenticationScheme;
+import com.neo.util.api.security.credential.BearerCredentials;
 import com.neo.util.common.api.PriorityConstants;
-import com.neo.util.framework.api.security.AuthenticationProvider;
-import com.neo.util.framework.api.security.AuthenticationScheme;
-import com.neo.util.framework.api.security.credential.BearerCredentials;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Alternative;

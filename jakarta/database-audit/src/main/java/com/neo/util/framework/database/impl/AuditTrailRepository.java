@@ -6,7 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 @ApplicationScoped
-public class AuditTrailRepository extends AbstractDatabaseRepository<EntityAuditTrail> {
+public class AuditTrailRepository extends AbstractDatabaseRepository<Long, EntityAuditTrail> {
 
     @Inject
     public AuditTrailRepository(PersistenceContextProvider pcp) {

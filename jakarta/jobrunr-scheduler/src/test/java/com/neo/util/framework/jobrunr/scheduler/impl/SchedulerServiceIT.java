@@ -9,16 +9,15 @@ import com.neo.util.common.impl.exception.InternalRuntimeException;
 import com.neo.util.common.impl.exception.ValidationException;
 import com.neo.util.common.impl.reflection.IndexReflectionProvider;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
-import com.neo.util.framework.impl.ReflectionService;
-import com.neo.util.framework.impl.request.RequestContextExecutor;
-import com.neo.util.framework.impl.request.RequestDetailsProducer;
-import com.neo.util.framework.impl.request.Slf4jRequestAuditProvider;
-import com.neo.util.framework.impl.security.BasicInstanceIdentification;
 import com.neo.util.framework.jobrunr.impl.JobRunnerConfigurator;
 import com.neo.util.framework.jobrunr.impl.JobRunnerInMemoryStorageProvider;
-import com.neo.util.impl.config.ConfigServiceImpl;
-import com.neo.util.impl.config.store.InMemoryConfigStore;
-import com.neo.util.impl.janitor.JanitorServiceImpl;
+import com.neo.util.jakarta.config.InMemoryConfigStore;
+import com.neo.util.jakarta.config.JakartaConfigService;
+import com.neo.util.jakarta.reflexion.JakartaReflectionProviderWrapper;
+import com.neo.util.jakarta.request.BasicInstanceIdentification;
+import com.neo.util.jakarta.request.RequestContextExecutor;
+import com.neo.util.jakarta.request.RequestDetailsProducer;
+import com.neo.util.jakarta.request.Slf4jRequestAuditProvider;
 import org.jboss.weld.junit5.WeldInitiator;
 import org.jboss.weld.junit5.WeldJunit5Extension;
 import org.jboss.weld.junit5.WeldSetup;
@@ -35,17 +34,16 @@ class SchedulerServiceIT {
             JobRunnerConfigurator.class,
             JobRunnerInMemoryStorageProvider.class,
             JobRunnerSchedulerConfigHolder.class,
-            ConfigServiceImpl.class,
+            JakartaConfigService.class,
             InMemoryConfigStore.class,
             BasicInstanceIdentification.class,
-            ReflectionService.class,
+            JakartaReflectionProviderWrapper.class,
             IndexReflectionProvider.class,
             RequestContextExecutor.class,
             RequestDetailsProducer.class,
             Slf4jRequestAuditProvider.class,
             JobRunnerSchedulerService.class,
-            TestSchedulers.class,
-            JanitorServiceImpl.class
+            TestSchedulers.class
     ).build();
 
     protected SchedulerService schedulerService;

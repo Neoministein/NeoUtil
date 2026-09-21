@@ -7,7 +7,7 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-janitor</artifactId>
+    <artifactId>neoutil-api-janitor</artifactId>
     <version>1.0.0</version>
 
     <name>Neo Util Janitor JAR</name>
@@ -24,24 +24,6 @@
             <groupId>com.neo.util</groupId>
             <artifactId>neoutil-api-scheduler</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-api-startup</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-config</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!-- Jakarta -->
-        <dependency>
-            <groupId>jakarta.enterprise</groupId>
-            <artifactId>jakarta.enterprise.cdi-api</artifactId>
-            <version>${jakarta.enterprise.cdi-api.version}</version>
         </dependency>
     </dependencies>
 </project>

@@ -7,7 +7,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 @ApplicationScoped
-public class AddressRepository extends AbstractDatabaseRepository<AddressEntity> {
+public class AddressRepository extends AbstractDatabaseRepository<Long, AddressEntity> {
 
     @Inject
     public AddressRepository(PersistenceContextProvider pcp) {

@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-config</artifactId>
+            <artifactId>neoutil-api-config</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

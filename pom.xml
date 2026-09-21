@@ -175,7 +175,6 @@
 	</profiles>
 
 	<modules>
-		<module>tools/rendex-maven-plugin</module>
 		<module>common</module>
         <module>api/startup</module>
         <module>api/build</module>
@@ -185,8 +184,16 @@
         <module>api/cache</module>
         <module>api/config</module>
         <module>api/janitor</module>
+        <module>api/security</module>
+        <module>api/persistence-query</module>
+        <module>api/persistence-entity</module>
+        <module>api/persistence-search</module>
         <module>tools/build-step-maven-plugin</module>
-		<module>framework</module>
+        <module>tools/rendex-maven-plugin</module>
+        <module>jakarta/base</module>
+        <module>jakarta/request</module>
+        <module>jakarta/security</module>
+        <module>jakarta/janitor</module>
         <module>jakarta/cache</module>
 		<module>jakarta/startup</module>
 		<module>jakarta/mapping</module>

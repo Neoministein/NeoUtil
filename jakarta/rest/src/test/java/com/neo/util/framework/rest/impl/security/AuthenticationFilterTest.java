@@ -1,11 +1,10 @@
 package com.neo.util.framework.rest.impl.security;
 
+import com.neo.util.api.security.AuthenticationProvider;
+import com.neo.util.api.security.HttpCredentialsGenerator;
 import com.neo.util.common.impl.exception.ValidationException;
-import com.neo.util.framework.api.security.AuthenticationProvider;
-import com.neo.util.framework.api.security.HttpCredentialsGenerator;
-import com.neo.util.framework.impl.security.HttpCredentialsGeneratorImpl;
 import com.neo.util.framework.rest.api.request.HttpRequestDetails;
-import com.neo.util.framework.rest.api.response.ClientResponseService;
+import com.neo.util.jakarta.security.HttpCredentialsGeneratorImpl;
 import jakarta.security.enterprise.credential.Credential;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.HttpHeaders;

@@ -1,12 +1,12 @@
 package com.neo.util.framework.database.impl.entity;
 
+import com.neo.util.api.persistence.entity.PersistenceEntity;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = AddressEntity.TABLE_NAME)
-public class AddressEntity implements PersistenceEntity {
+public class AddressEntity implements PersistenceEntity<Long> {
 
     public static final String TABLE_NAME = "address";
     public static final String C_CITY = "city";
@@ -69,7 +69,7 @@ public class AddressEntity implements PersistenceEntity {
     }
 
     @Override
-    public Object getPrimaryKey() {
+    public Long getPrimaryKey() {
         return id;
     }
 

@@ -13,8 +13,15 @@
     <dependencies>
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-framework</artifactId>
+            <artifactId>neoutil-api-config</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <!-- Jakarta -->
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <version>${jakarta.enterprise.cdi-api.version}</version>
         </dependency>
 
         <dependency>

@@ -1,10 +1,10 @@
 package com.neo.util.framework.database.impl;
 
+import com.neo.util.api.persistence.entity.EntityQuery;
+import com.neo.util.api.persistence.entity.EntityResult;
+import com.neo.util.api.persistence.query.criteria.*;
 import com.neo.util.common.impl.ThreadUtils;
 import com.neo.util.common.impl.enumeration.Association;
-import com.neo.util.framework.api.persistence.criteria.*;
-import com.neo.util.framework.api.persistence.entity.EntityQuery;
-import com.neo.util.framework.api.persistence.entity.EntityResult;
 import com.neo.util.framework.database.impl.entity.PersonEntity;
 import com.neo.util.framework.database.persistence.AuditableDataBaseEntity;
 import org.junit.jupiter.api.Assertions;

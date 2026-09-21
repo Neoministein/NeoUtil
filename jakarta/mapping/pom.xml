@@ -16,8 +16,14 @@
     <dependencies>
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-framework</artifactId>
+            <artifactId>neoutil-jakarta-base</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+            <version>5.0.0-M1</version>  <!-- Check latest version -->
         </dependency>
 
         <!-- Test - Framework -->

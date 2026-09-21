@@ -38,7 +38,11 @@ public interface ReflectionProvider {
      * @return a List of instances of the annotation
      * @param <T> the annotation type
      */
-    <T extends Annotation> List<T> getAnnotationInstance(Class<T> annotationClazz);
+    default  <T extends Annotation> List<T> getAnnotationInstance(Class<T> annotationClazz) {
+        return getAnnotatedElement(annotationClazz).stream()
+                .map(x -> x.getAnnotation(annotationClazz))
+                .toList();
+    }
 
     /**
      * Returns a set of the classes which have the annotation.

@@ -1,7 +1,7 @@
 package com.neo.util.framework.database.impl.entity;
 
+import com.neo.util.api.persistence.entity.PersistenceEntity;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import jakarta.persistence.*;
 
 @Entity

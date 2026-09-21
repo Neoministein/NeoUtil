@@ -5,9 +5,9 @@ import com.neo.util.api.event.ApplicationPreReadyEvent;
 import com.neo.util.api.queue.*;
 import com.neo.util.api.request.RequestDetails;
 import com.neo.util.common.api.PriorityConstants;
+import com.neo.util.common.api.reflection.ReflectionProvider;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.microprofile.reactive.messaging.api.MicroProfileQueueConfig;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -43,11 +43,11 @@ public class MicroProfileQueueService implements QueueService {
      */
     @Inject
     public MicroProfileQueueService(Provider<RequestDetails> requestDetailsProvider, ConfigService configService,
-                                    Instance<QueueProducer> queueProducerInstances, ReflectionService reflectionService) {
+                                    Instance<QueueProducer> queueProducerInstances, ReflectionProvider reflectionProvider) {
         this.requestDetailsProvider = requestDetailsProvider;
 
         Map<String, OutgoingQueue> queueConnectionMap = new HashMap<>();
-        for (AnnotatedElement annotatedElement: reflectionService.getAnnotatedElement(OutgoingQueue.class)) {
+        for (AnnotatedElement annotatedElement: reflectionProvider.getAnnotatedElement(OutgoingQueue.class)) {
             OutgoingQueue annotation = annotatedElement.getAnnotation(OutgoingQueue.class);
             queueConnectionMap.put(annotation.value(), annotation);
         }

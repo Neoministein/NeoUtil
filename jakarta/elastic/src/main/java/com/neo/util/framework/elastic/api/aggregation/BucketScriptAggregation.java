@@ -1,6 +1,6 @@
 package com.neo.util.framework.elastic.api.aggregation;
 
-import com.neo.util.framework.api.persistence.aggregation.SearchAggregation;
+import com.neo.util.api.persistence.query.aggregation.SearchAggregation;
 
 import java.util.Map;
 

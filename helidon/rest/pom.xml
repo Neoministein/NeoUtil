@@ -14,11 +14,6 @@
         <!-- Framework -->
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-framework</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.neo.util</groupId>
             <artifactId>neoutil-rest</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -86,13 +81,25 @@
         <!-- Testing -->
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-startup</artifactId>
+            <artifactId>neoutil-jakarta-janitor</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-database</artifactId>
+            <artifactId>neoutil-jakarta-cache</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-jobrunr-scheduler</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-startup</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

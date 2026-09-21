@@ -1,10 +1,9 @@
 package com.neo.util.framework.database.persistence;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.neo.util.api.persistence.entity.PersistenceEntity;
 import com.neo.util.common.api.json.Views;
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
-
 import com.neo.util.framework.database.impl.DataBaseAuditListener;
 import com.neo.util.framework.database.impl.InstantConverter;
 import jakarta.persistence.Column;
@@ -16,7 +15,7 @@ import java.time.Instant;
 
 @MappedSuperclass
 @EntityListeners( { DataBaseAuditListener.class } )
-public abstract class AuditableDataBaseEntity implements PersistenceEntity {
+public abstract class AuditableDataBaseEntity<P> implements PersistenceEntity<P> {
 
     public static final String C_CREATED_ON = "createdOn";
     public static final String C_CREATED_BY = "createdBy";

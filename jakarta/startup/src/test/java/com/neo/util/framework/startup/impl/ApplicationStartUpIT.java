@@ -4,16 +4,14 @@ import com.neo.util.api.event.ApplicationPostReadyEvent;
 import com.neo.util.api.event.ApplicationPreReadyEvent;
 import com.neo.util.api.event.ApplicationReadyEvent;
 import com.neo.util.api.event.ApplicationShutdownEvent;
-import com.neo.util.framework.impl.request.RequestContextExecutor;
-import com.neo.util.framework.impl.request.RequestDetailsProducer;
-import com.neo.util.framework.impl.request.Slf4jRequestAuditProvider;
-import com.neo.util.framework.impl.security.BasicInstanceIdentification;
 import com.neo.util.framework.startup.impl.event.PostReadyListener;
 import com.neo.util.framework.startup.impl.event.PreReadyListener;
 import com.neo.util.framework.startup.impl.event.ReadyListener;
 import com.neo.util.framework.startup.impl.event.ShutDownListener;
-import com.neo.util.impl.config.ConfigServiceImpl;
-import com.neo.util.impl.config.store.InMemoryConfigStore;
+import com.neo.util.jakarta.request.BasicInstanceIdentification;
+import com.neo.util.jakarta.request.RequestContextExecutor;
+import com.neo.util.jakarta.request.RequestDetailsProducer;
+import com.neo.util.jakarta.request.Slf4jRequestAuditProvider;
 import jakarta.enterprise.context.RequestScoped;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.jboss.weld.junit5.WeldInitiator;
@@ -42,9 +40,7 @@ class ApplicationStartUpIT {
             RequestDetailsProducer.class,
             RequestContextExecutor.class,
             BasicInstanceIdentification.class,
-            Slf4jRequestAuditProvider.class,
-            ConfigServiceImpl.class,
-            InMemoryConfigStore.class
+            Slf4jRequestAuditProvider.class
     ).activate(RequestScoped.class).build();
 
     protected ListenerSequenceRecorder recorder;

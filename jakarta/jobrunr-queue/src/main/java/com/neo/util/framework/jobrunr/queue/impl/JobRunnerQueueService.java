@@ -5,12 +5,12 @@ import com.neo.util.api.event.ApplicationReadyEvent;
 import com.neo.util.api.queue.*;
 import com.neo.util.api.request.RequestDetails;
 import com.neo.util.common.api.PriorityConstants;
+import com.neo.util.common.api.reflection.ReflectionProvider;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.ExceptionDetails;
 import com.neo.util.common.impl.exception.NoContentFoundException;
-import com.neo.util.framework.api.security.InstanceIdentification;
-import com.neo.util.framework.impl.ReflectionService;
-import com.neo.util.framework.impl.request.RequestContextExecutor;
+import com.neo.util.jakarta.request.InstanceIdentification;
+import com.neo.util.jakarta.request.RequestContextExecutor;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
@@ -48,14 +48,14 @@ public class JobRunnerQueueService implements QueueService {
     protected final Map<String, JobRunnerQueueConfig> queueListenerMap = new HashMap<>();
 
     @Inject
-    public JobRunnerQueueService(ConfigService configService, RequestContextExecutor requestContextExecutor, InstanceIdentification instanceIdentification, Provider<RequestDetails> requestDetailsProvider, Instance<QueueListener> queueListeners, ReflectionService reflectionService) {
+    public JobRunnerQueueService(ConfigService configService, RequestContextExecutor requestContextExecutor, InstanceIdentification instanceIdentification, Provider<RequestDetails> requestDetailsProvider, Instance<QueueListener> queueListeners, ReflectionProvider reflectionProvider) {
         this.configService = configService;
         this.requestContextExecutor = requestContextExecutor;
         this.instanceIdentification = instanceIdentification;
         this.requestDetailsProvider = requestDetailsProvider;
 
         Map<String, OutgoingQueue> queueConnectionMap = new HashMap<>();
-        for (AnnotatedElement annotatedElement: reflectionService.getAnnotatedElement(OutgoingQueue.class)) {
+        for (AnnotatedElement annotatedElement: reflectionProvider.getAnnotatedElement(OutgoingQueue.class)) {
             OutgoingQueue annotation = annotatedElement.getAnnotation(OutgoingQueue.class);
             queueConnectionMap.put(annotation.value(), annotation);
         }

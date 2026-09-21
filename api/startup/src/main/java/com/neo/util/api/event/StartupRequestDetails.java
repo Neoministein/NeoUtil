@@ -1,0 +1,31 @@
+package com.neo.util.api.event;
+
+import com.neo.util.api.request.AbstractRequestDetails;
+import com.neo.util.api.request.RequestContext;
+
+import java.util.UUID;
+
+public class StartupRequestDetails extends AbstractRequestDetails {
+
+    public StartupRequestDetails(String instanceId, String stage) {
+        super(UUID.randomUUID().toString() ,instanceId, new Context(stage));
+    }
+
+    @Override
+    public String getInitiator() {
+        return "Startup:" + requestContext.toString();
+    }
+
+    public record Context(String stage) implements RequestContext {
+
+        @Override
+        public String type() {
+            return "Startup";
+        }
+
+        @Override
+        public String toString() {
+            return stage;
+        }
+    }
+}

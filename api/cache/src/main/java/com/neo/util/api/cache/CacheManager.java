@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public interface CacheManager {
 
-    String E_CACHE_DOES_NOT_EXIST = "cache/invalid-id";
+    String E_CACHE_DOES_NOT_EXIST = "cache/unknown-key";
 
     ExceptionDetails EX_CACHE_DOES_NOT_EXIST = new ExceptionDetails(E_CACHE_DOES_NOT_EXIST,
             "The cache id [{0}] does not exist.");

@@ -1,16 +1,17 @@
 package com.neo.util.framework.websocket.persistence;
 
-import com.neo.util.framework.api.persistence.search.IndexPeriod;
-import com.neo.util.framework.api.persistence.search.SearchableIndex;
-import com.neo.util.framework.percistence.request.AbstractLogSearchable;
+import com.neo.util.api.persistence.search.IndexPeriod;
+import com.neo.util.api.persistence.search.SearchableIndex;
+import com.neo.util.framework.request.percistence.AbstractLogSearchable;
 import com.neo.util.framework.websocket.api.WebsocketRequestDetails;
 
 import java.time.Instant;
 
+//TODO Move out to new module
 @SearchableIndex(indexName = SocketLogSearchable.INDEX_NAME, indexPeriod = IndexPeriod.MONTHLY)
 public class SocketLogSearchable extends AbstractLogSearchable {
 
-    public static final String INDEX_NAME = INDEX_PREFIX + "-socket";
+    public static final String INDEX_NAME = AbstractLogSearchable.INDEX_PREFIX + "-socket";
 
     protected String initiator;
     protected String context;

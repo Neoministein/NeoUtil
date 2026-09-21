@@ -74,7 +74,7 @@ class BaseRepositoryIT extends AbstractIntegrationTest<AddressRepository> {
         //Act
         subject.create(address);
 
-        Optional<AddressEntity> wrongPrimaryKey = subject.fetch(200);
+        Optional<AddressEntity> wrongPrimaryKey = subject.fetch(200L);
         //Assert
 
         Assertions.assertFalse(wrongPrimaryKey.isPresent());

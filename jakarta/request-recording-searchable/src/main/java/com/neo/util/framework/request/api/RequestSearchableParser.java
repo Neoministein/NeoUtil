@@ -1,10 +1,11 @@
 package com.neo.util.framework.request.api;
 
+import com.neo.util.api.persistence.search.Searchable;
 import com.neo.util.api.request.RequestDetails;
 import com.neo.util.framework.request.percistence.RequestLogSearchable;
 
 /**
- * Parses the {@link RequestDetails} to {@link com.neo.util.framework.api.persistence.search.Searchable}
+ * Parses the {@link RequestDetails} to {@link Searchable}
  *
  * @param <T> type of {@link RequestDetails}
  */

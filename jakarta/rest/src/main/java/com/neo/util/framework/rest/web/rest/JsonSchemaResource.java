@@ -1,8 +1,8 @@
 package com.neo.util.framework.rest.web.rest;
 
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.api.excpetion.ToExternalException;
-import com.neo.util.framework.impl.json.JsonSchemaLoader;
+import com.neo.util.framework.rest.api.excpetion.ToExternalException;
+import com.neo.util.jakarta.json.JsonSchemaLoader;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;

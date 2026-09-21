@@ -1,12 +1,12 @@
 package com.neo.util.framework.database.impl;
 
+import com.neo.util.api.persistence.entity.EntityProvider;
+import com.neo.util.api.persistence.entity.EntityQuery;
+import com.neo.util.api.persistence.entity.EntityResult;
+import com.neo.util.api.persistence.entity.PersistenceEntity;
+import com.neo.util.api.persistence.query.criteria.*;
 import com.neo.util.common.impl.StopWatch;
 import com.neo.util.common.impl.enumeration.Association;
-import com.neo.util.framework.api.persistence.criteria.*;
-import com.neo.util.framework.api.persistence.entity.EntityProvider;
-import com.neo.util.framework.api.persistence.entity.EntityQuery;
-import com.neo.util.framework.api.persistence.entity.EntityResult;
-import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.database.api.PersistenceContextProvider;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -37,25 +37,25 @@ public class DatabaseProvider implements EntityProvider {
     }
 
     @Override
-    public void create(PersistenceEntity entity) {
+    public void create(PersistenceEntity<?> entity) {
         pcp.getEm().persist(entity);
         LOGGER.debug("Created entity {}:{}", entity.getClass().getSimpleName(),  entity);
     }
 
     @Override
-    public void edit(PersistenceEntity entity) {
+    public void edit(PersistenceEntity<?> entity) {
         pcp.getEm().merge(entity);
         LOGGER.debug("Edited entity {}:{}",entity.getClass().getSimpleName(), entity);
     }
 
     @Override
-    public void remove(PersistenceEntity entity) {
+    public void remove(PersistenceEntity<?> entity) {
         pcp.getEm().remove(pcp.getEm().merge(entity));
         LOGGER.debug("Removed entity {}:{}",entity.getClass().getSimpleName(), entity);
     }
 
     @Override
-    public <X extends PersistenceEntity> Optional<X> fetch(Object primaryKey, Class<X> entityClazz) {
+    public <P, T extends PersistenceEntity<P>>  Optional<T> fetch(P primaryKey, Class<T> entityClazz) {
         try {
             LOGGER.trace("Searching for entity {}:{}", entityClazz.getSimpleName(), primaryKey);
             return Optional.ofNullable(pcp.getEm().find(entityClazz, primaryKey));
@@ -66,7 +66,7 @@ public class DatabaseProvider implements EntityProvider {
     }
 
     @Override
-    public <X extends PersistenceEntity> EntityResult<X> fetch(EntityQuery<X> parameters) {
+    public <X extends PersistenceEntity<?>> EntityResult<X> fetch(EntityQuery<X> parameters) {
         LOGGER.trace("Searching for entity {} maxResults {} SearchCriteria {}",
                 parameters.getEntityClass().getSimpleName(),
                 parameters.getMaxResults().orElse(-1),

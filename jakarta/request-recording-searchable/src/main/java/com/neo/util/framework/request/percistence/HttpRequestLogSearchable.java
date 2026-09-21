@@ -1,9 +1,9 @@
 package com.neo.util.framework.request.percistence;
 
+import com.neo.util.api.persistence.search.IndexPeriod;
+import com.neo.util.api.persistence.search.Searchable;
+import com.neo.util.api.persistence.search.SearchableIndex;
 import com.neo.util.api.request.user.RolePrincipal;
-import com.neo.util.framework.api.persistence.search.IndexPeriod;
-import com.neo.util.framework.api.persistence.search.Searchable;
-import com.neo.util.framework.api.persistence.search.SearchableIndex;
 import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 
 @SearchableIndex(indexName = RequestLogSearchable.INDEX_NAME, indexPeriod = IndexPeriod.DAILY)

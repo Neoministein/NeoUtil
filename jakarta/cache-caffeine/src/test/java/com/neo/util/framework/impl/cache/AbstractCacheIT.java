@@ -6,8 +6,8 @@ import com.neo.uti.jakarta.cache.spi.CacheKeyGeneratorManager;
 import com.neo.uti.jakarta.cache.spi.annotation.CacheName;
 import com.neo.util.common.impl.reflection.IndexReflectionProvider;
 import com.neo.util.framework.caffeine.impl.CaffeineCacheBuilder;
-import com.neo.util.framework.impl.ReflectionService;
-import com.neo.util.impl.config.ConfigServiceImpl;
+import com.neo.util.jakarta.config.JakartaConfigService;
+import com.neo.util.jakarta.reflexion.JakartaReflectionProviderWrapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
 import org.jboss.weld.junit5.WeldInitiator;
@@ -34,9 +34,9 @@ public abstract class AbstractCacheIT {
         classes.add(BasicCacheManagerImpl.class);
         classes.add(CacheKeyGeneratorManager.class);
         classes.add(CaffeineCacheBuilder.class);
-        classes.add(ConfigServiceImpl.class);
+        classes.add(JakartaConfigService.class);
         classes.add(IndexReflectionProvider.class);
-        classes.add(ReflectionService.class);
+        classes.add(JakartaReflectionProviderWrapper.class);
         classes.add(CacheInstanceSearcher.class);
         return classes;
     }

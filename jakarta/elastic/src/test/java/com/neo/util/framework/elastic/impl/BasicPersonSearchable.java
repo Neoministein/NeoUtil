@@ -1,8 +1,8 @@
 package com.neo.util.framework.elastic.impl;
 
-import com.neo.util.framework.api.persistence.search.AbstractSearchable;
-import com.neo.util.framework.api.persistence.search.IndexPeriod;
-import com.neo.util.framework.api.persistence.search.SearchableIndex;
+import com.neo.util.api.persistence.search.AbstractSearchable;
+import com.neo.util.api.persistence.search.IndexPeriod;
+import com.neo.util.api.persistence.search.SearchableIndex;
 
 import java.time.Instant;
 

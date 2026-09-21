@@ -1,7 +1,8 @@
 package com.neo.util.framework.rest.web.rest;
 
 import com.neo.util.api.cache.CacheManager;
-import com.neo.util.framework.api.excpetion.ToExternalException;
+import com.neo.util.framework.rest.api.excpetion.ToExternalException;
+import com.neo.util.jakarta.veto.RequiresBean;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -12,6 +13,7 @@ import java.util.Set;
 @ApplicationScoped
 @Path(CacheResource.RESOURCE_LOCATION)
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+@RequiresBean(CacheManager.class)
 @ToExternalException({CacheManager.E_CACHE_DOES_NOT_EXIST})
 public class CacheResource {
 

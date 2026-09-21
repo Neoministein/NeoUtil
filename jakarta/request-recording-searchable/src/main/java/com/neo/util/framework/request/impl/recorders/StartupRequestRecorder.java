@@ -1,7 +1,7 @@
 package com.neo.util.framework.request.impl.recorders;
 
+import com.neo.util.api.event.StartupRequestDetails;
 import com.neo.util.framework.request.percistence.RequestLogSearchable;
-import com.neo.util.framework.startup.impl.StartupRequestDetails;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped

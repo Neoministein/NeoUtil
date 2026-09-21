@@ -1,10 +1,10 @@
 package com.neo.util.framework.rest.impl.security;
 
 import com.neo.util.api.request.UserRequestDetails;
-import com.neo.util.framework.api.request.RequestAuditProvider;
-import com.neo.util.framework.api.request.UserRequest;
 import com.neo.util.framework.rest.api.request.HttpRequestDetails;
 import com.neo.util.framework.rest.api.response.ClientResponseService;
+import com.neo.util.jakarta.request.RequestAuditProvider;
+import com.neo.util.jakarta.request.UserRequest;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;

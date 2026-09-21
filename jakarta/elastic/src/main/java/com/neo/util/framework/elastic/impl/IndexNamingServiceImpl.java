@@ -1,12 +1,12 @@
 package com.neo.util.framework.elastic.impl;
 
 import com.neo.util.api.config.ConfigService;
+import com.neo.util.api.persistence.search.IndexPeriod;
+import com.neo.util.api.persistence.search.Searchable;
+import com.neo.util.api.persistence.search.SearchableIndex;
+import com.neo.util.common.api.reflection.ReflectionProvider;
 import com.neo.util.common.impl.StringUtils;
-import com.neo.util.framework.api.persistence.search.IndexPeriod;
-import com.neo.util.framework.api.persistence.search.Searchable;
-import com.neo.util.framework.api.persistence.search.SearchableIndex;
 import com.neo.util.framework.elastic.api.IndexNamingService;
-import com.neo.util.framework.impl.ReflectionService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -58,8 +58,8 @@ public class IndexNamingServiceImpl implements IndexNamingService {
     protected final Map<Class<? extends Searchable>, SearchableIndex> searchableIndexCache = new HashMap<>();
 
     @Inject
-    public IndexNamingServiceImpl(ConfigService configService, ReflectionService reflectionService) {
-        for (AnnotatedElement annotatedElement: reflectionService.getAnnotatedElement(SearchableIndex.class)) {
+    public IndexNamingServiceImpl(ConfigService configService, ReflectionProvider reflectionprovider) {
+        for (AnnotatedElement annotatedElement: reflectionprovider.getAnnotatedElement(SearchableIndex.class)) {
             Class<? extends Searchable> searchableClass = (Class<? extends Searchable>) annotatedElement;
             searchableIndexCache.put(searchableClass, searchableClass.getAnnotation(SearchableIndex.class));
         }

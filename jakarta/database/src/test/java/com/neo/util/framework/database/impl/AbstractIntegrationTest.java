@@ -1,8 +1,8 @@
 package com.neo.util.framework.database.impl;
 
+import com.neo.util.api.request.DummyRequestDetails;
 import com.neo.util.framework.database.impl.connection.JtaEnvironment;
-import com.neo.util.framework.impl.request.DummyRequestDetails;
-import com.neo.util.framework.impl.request.RequestDetailsProducer;
+import com.neo.util.jakarta.request.RequestDetailsProducer;
 import jakarta.enterprise.context.RequestScoped;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.junit5.WeldInitiator;

@@ -7,10 +7,10 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-config</artifactId>
+    <artifactId>neoutil-api-config</artifactId>
     <version>1.0.0</version>
 
-    <name>Neo Util Config JAR</name>
+    <name>Neo Util Api Config JAR</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -25,13 +25,6 @@
             <groupId>com.neo.util</groupId>
             <artifactId>neoutil-api-startup</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <!-- Jakarta -->
-        <dependency>
-            <groupId>jakarta.enterprise</groupId>
-            <artifactId>jakarta.enterprise.cdi-api</artifactId>
-            <version>${jakarta.enterprise.cdi-api.version}</version>
         </dependency>
     </dependencies>
 </project>

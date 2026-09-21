@@ -15,12 +15,23 @@
         <!-- Internal Modules -->
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-framework</artifactId>
+            <artifactId>neoutil-api-build-step</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-api-build-step</artifactId>
+            <artifactId>neoutil-api-queue</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-jakarta-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-jakarta-request</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- Micro profile-->

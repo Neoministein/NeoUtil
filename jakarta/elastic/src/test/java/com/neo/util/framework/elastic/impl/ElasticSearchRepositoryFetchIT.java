@@ -1,14 +1,14 @@
 package com.neo.util.framework.elastic.impl;
 
+import com.neo.util.api.persistence.query.aggregation.*;
+import com.neo.util.api.persistence.query.criteria.*;
+import com.neo.util.api.persistence.search.IndexParameter;
+import com.neo.util.api.persistence.search.SearchQuery;
+import com.neo.util.api.persistence.search.SearchResult;
+import com.neo.util.api.persistence.search.Searchable;
 import com.neo.util.common.impl.enumeration.Association;
 import com.neo.util.common.impl.enumeration.Synchronization;
 import com.neo.util.common.impl.test.IntegrationTestUtil;
-import com.neo.util.framework.api.persistence.aggregation.*;
-import com.neo.util.framework.api.persistence.criteria.*;
-import com.neo.util.framework.api.persistence.search.IndexParameter;
-import com.neo.util.framework.api.persistence.search.SearchQuery;
-import com.neo.util.framework.api.persistence.search.SearchResult;
-import com.neo.util.framework.api.persistence.search.Searchable;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;

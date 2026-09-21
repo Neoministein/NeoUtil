@@ -12,4 +12,12 @@
 
     <name>Neo Util Api Startup JAR</name>
     <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.neo.util</groupId>
+            <artifactId>neoutil-api-request</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>

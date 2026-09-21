@@ -1,10 +1,10 @@
 package com.neo.util.framework.database.impl;
 
+import com.neo.util.api.persistence.entity.AuditParameter;
+import com.neo.util.api.persistence.entity.PersistenceEntity;
 import com.neo.util.common.api.PriorityConstants;
 import com.neo.util.common.impl.enumeration.PersistenceOperation;
-import com.neo.util.framework.api.persistence.entity.AuditParameter;
-import com.neo.util.framework.api.persistence.entity.EntityAuditTrailProvider;
-import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
+import com.neo.util.framework.database.api.EntityAuditTrailProvider;
 import com.neo.util.framework.database.persistence.EntityAuditTrail;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;

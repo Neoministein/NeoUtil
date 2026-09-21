@@ -2,8 +2,8 @@ package com.neo.util.framework.elastic.impl;
 
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
+import com.neo.util.api.persistence.search.*;
 import com.neo.util.common.impl.enumeration.Synchronization;
-import com.neo.util.framework.api.persistence.search.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;

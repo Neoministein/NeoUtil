@@ -1,13 +1,12 @@
 package com.neo.util.framework.database.persistence;
 
-import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
-
+import com.neo.util.api.persistence.entity.PersistenceEntity;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = EntityAuditTrail.TABLE_NAME)
 @Cacheable(value = false)
-public class EntityAuditTrail extends AuditableDataBaseEntity implements PersistenceEntity {
+public class EntityAuditTrail extends AuditableDataBaseEntity<Long> {
 
     public static final String TABLE_NAME = "audit_trail";
 
@@ -73,7 +72,7 @@ public class EntityAuditTrail extends AuditableDataBaseEntity implements Persist
     }
 
     @Override
-    public Object getPrimaryKey() {
+    public Long getPrimaryKey() {
         return getId();
     }
 }

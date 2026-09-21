@@ -1,11 +1,11 @@
 package com.neo.util.framework.rest.impl.security;
 
 import com.neo.util.api.request.UserRequestDetails;
-import com.neo.util.framework.api.FrameworkConstants;
-import com.neo.util.framework.api.request.UserRequest;
-import com.neo.util.framework.api.security.AuthenticationProvider;
+import com.neo.util.api.security.AuthenticationProvider;
+import com.neo.util.api.security.SecurityConstants;
 import com.neo.util.framework.rest.api.response.ClientResponseService;
 import com.neo.util.framework.rest.api.security.SecuredResource;
+import com.neo.util.jakarta.request.UserRequest;
 import jakarta.annotation.Priority;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
@@ -61,7 +61,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         Set<String> roles = Set.of(rolesAllowed.value());
         if (!userRequestDetails.hasOneOfTheRoles(roles)) {
             LOGGER.info("Aborting request with forbidden, one of the permissions is required {}", roles);
-            containerRequest.abortWith(clientResponseService.error(403, FrameworkConstants.EX_FORBIDDEN));
+            containerRequest.abortWith(clientResponseService.error(403, SecurityConstants.EX_FORBIDDEN));
         }
     }
 }

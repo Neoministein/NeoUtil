@@ -4,10 +4,10 @@ import com.neo.util.api.config.ConfigService;
 import com.neo.util.api.scheduler.CronSchedule;
 import com.neo.util.api.scheduler.SchedulerConfig;
 import com.neo.util.api.scheduler.SchedulerService;
+import com.neo.util.common.api.reflection.ReflectionProvider;
 import com.neo.util.common.impl.exception.ConfigurationException;
 import com.neo.util.common.impl.exception.NoContentFoundException;
 import com.neo.util.common.impl.exception.ValidationException;
-import com.neo.util.framework.impl.ReflectionService;
 import com.neo.util.framework.jobrunr.scheduler.api.JobRunnerSchedulerConfig;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
@@ -33,14 +33,14 @@ public class JobRunnerSchedulerConfigHolder {
      * Initializes the mapping for the {@link JobRunnerSchedulerConfig}.
      */
     @Inject
-    public JobRunnerSchedulerConfigHolder(Instance<Object> instance, ReflectionService reflectionService,
+    public JobRunnerSchedulerConfigHolder(Instance<Object> instance, ReflectionProvider reflectionProvider,
             ConfigService configService) {
         this.configService = configService;
 
         LOGGER.info("Registering Schedulers...");
 
         Map<String, JobRunnerSchedulerConfig> configMap = new HashMap<>();
-        Set<AnnotatedElement> schedulerElements = reflectionService.getAnnotatedElement(CronSchedule.class);
+        Set<AnnotatedElement> schedulerElements = reflectionProvider.getAnnotatedElement(CronSchedule.class);
         for (AnnotatedElement schedulerElement: schedulerElements) {
             Method schedulerMethod = (Method) schedulerElement;
             JobRunnerSchedulerConfig config = createConfigFromMethod(schedulerMethod, instance);

@@ -1,9 +1,9 @@
 package com.neo.util.framework.elastic.impl;
 
 import com.neo.util.api.janitor.JanitorJob;
-import com.neo.util.framework.api.persistence.search.SearchRetentionStrategy;
-import com.neo.util.framework.api.persistence.search.Searchable;
-import com.neo.util.framework.api.persistence.search.SearchableIndex;
+import com.neo.util.api.persistence.search.SearchRetentionStrategy;
+import com.neo.util.api.persistence.search.Searchable;
+import com.neo.util.api.persistence.search.SearchableIndex;
 import com.neo.util.framework.elastic.api.IndexNamingService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

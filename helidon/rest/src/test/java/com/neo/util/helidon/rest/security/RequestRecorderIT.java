@@ -1,6 +1,5 @@
 package com.neo.util.helidon.rest.security;
 
-import com.neo.util.framework.impl.persistence.search.DummySearchProvider;
 import com.neo.util.framework.request.percistence.HttpRequestLogSearchable;
 import com.neo.util.framework.rest.impl.security.HttpRequestRecordingFilter;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;

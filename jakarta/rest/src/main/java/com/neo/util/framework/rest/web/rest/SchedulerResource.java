@@ -2,7 +2,8 @@ package com.neo.util.framework.rest.web.rest;
 
 import com.neo.util.api.scheduler.SchedulerConfig;
 import com.neo.util.api.scheduler.SchedulerService;
-import com.neo.util.framework.api.excpetion.ToExternalException;
+import com.neo.util.framework.rest.api.excpetion.ToExternalException;
+import com.neo.util.jakarta.veto.RequiresBean;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -13,6 +14,7 @@ import java.util.List;
 @ApplicationScoped
 @Path(SchedulerResource.RESOURCE_LOCATION)
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+@RequiresBean(SchedulerService.class)
 @ToExternalException({SchedulerService.E_UNKNOWN_SCHEDULER_ID})
 public class SchedulerResource {
 

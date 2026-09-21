@@ -1,10 +1,10 @@
 package com.neo.util.framework.websocket.impl.security;
 
-import com.neo.util.framework.api.security.AuthenticationProvider;
-import com.neo.util.framework.api.security.HttpCredentialsGenerator;
-import com.neo.util.framework.api.security.InstanceIdentification;
-import com.neo.util.framework.impl.request.RequestContextExecutor;
+import com.neo.util.api.security.AuthenticationProvider;
+import com.neo.util.api.security.HttpCredentialsGenerator;
 import com.neo.util.framework.websocket.impl.interceptor.WebsocketInterceptorLogicImpl;
+import com.neo.util.jakarta.request.InstanceIdentification;
+import com.neo.util.jakarta.request.RequestContextExecutor;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Specializes;
 import jakarta.inject.Inject;

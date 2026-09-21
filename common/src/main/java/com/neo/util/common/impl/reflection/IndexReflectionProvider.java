@@ -1,6 +1,7 @@
 package com.neo.util.common.impl.reflection;
 
 import com.neo.util.common.api.reflection.ReflectionProvider;
+import com.neo.util.common.impl.ThreadUtils;
 import org.jboss.jandex.*;
 
 import java.lang.annotation.Annotation;
@@ -18,6 +19,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class IndexReflectionProvider implements ReflectionProvider {
+
+    public static final IndexReflectionProvider INSTANCE = new IndexReflectionProvider(ThreadUtils.classLoader());
 
     protected final List<Index> indexes;
     protected final List<Rendex> resources;
@@ -82,7 +85,7 @@ public class IndexReflectionProvider implements ReflectionProvider {
 
         if (type.isInterface()) {
             return indexes.stream()
-                    .map(index -> index.getAllKnownImplementors(type))
+                    .map(index -> index.getAllKnownImplementations(type))
                     .flatMap(Collection::stream)
                     .map(parseClass)
                     .collect(Collectors.toSet());

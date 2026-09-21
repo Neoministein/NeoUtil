@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-framework</artifactId>
+            <artifactId>neoutil-jakarta-base</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

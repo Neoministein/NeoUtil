@@ -4,7 +4,7 @@ import com.neo.uti.jakarta.cache.spi.annotation.CacheInvalidate;
 import com.neo.uti.jakarta.cache.spi.annotation.CacheInvalidateAll;
 import com.neo.uti.jakarta.cache.spi.annotation.CacheName;
 import com.neo.uti.jakarta.cache.spi.annotation.CacheResult;
-import com.neo.util.framework.impl.ReflectionService;
+import com.neo.util.common.api.reflection.ReflectionProvider;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -22,7 +22,7 @@ public class CacheInstanceSearcher {
     protected final Set<String> cacheNames;
 
     @Inject
-    public CacheInstanceSearcher(ReflectionService reflectionService) {
+    public CacheInstanceSearcher(ReflectionProvider reflectionService) {
         Set<String> names = new HashSet<>();
 
         for (AnnotatedElement element: reflectionService.getAnnotatedElement(CacheName.class)) {

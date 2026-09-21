@@ -1,6 +1,6 @@
 package com.neo.util.framework.database.impl;
 
-import com.neo.util.framework.api.persistence.entity.PersistenceEntity;
+import com.neo.util.api.persistence.entity.PersistenceEntity;
 import com.neo.util.framework.database.api.EntityRepository;
 import com.neo.util.framework.database.api.PersistenceContextProvider;
 import jakarta.persistence.NoResultException;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Transactional
-public abstract class AbstractDatabaseRepository<T extends PersistenceEntity> implements EntityRepository<T> {
+public abstract class AbstractDatabaseRepository<P, T extends PersistenceEntity<P>> implements EntityRepository<P,T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDatabaseRepository.class);
 
@@ -31,7 +31,7 @@ public abstract class AbstractDatabaseRepository<T extends PersistenceEntity> im
     }
 
     @Override
-    public Optional<T> fetch(Object primaryKey) {
+    public Optional<T> fetch(P primaryKey) {
         try {
             LOGGER.trace("Searching for entity {}:{}", clazz.getSimpleName(), primaryKey);
             return Optional.ofNullable(pcp.getEm().find(clazz, primaryKey));
