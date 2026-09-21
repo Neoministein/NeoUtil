@@ -1,8 +1,8 @@
 package com.neo.util.helidon.rest.security;
 
 import com.neo.util.api.request.RequestDetails;
-import com.neo.util.framework.rest.api.request.HttpRequestDetails;
-import com.neo.util.framework.rest.api.security.SecuredResource;
+import com.neo.util.jakarta.rest.HttpRequestDetails;
+import com.neo.util.jakarta.rest.security.SecuredResource;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;

@@ -1,0 +1,23 @@
+package com.neo.util.microprofile.reactive.messaging;
+
+import com.neo.util.api.queue.QueueConfig;
+import com.neo.util.api.queue.QueueProducer;
+
+public class MicroProfileQueueConfig {
+
+    protected final QueueConfig queueConfig;
+    protected final QueueProducer queueProducer;
+
+    public MicroProfileQueueConfig(QueueConfig queueConfig, QueueProducer queueProducer) {
+        this.queueConfig = queueConfig;
+        this.queueProducer = queueProducer;
+    }
+
+    public QueueConfig getQueueConfig() {
+        return queueConfig;
+    }
+
+    public QueueProducer getQueueProducer() {
+        return queueProducer;
+    }
+}

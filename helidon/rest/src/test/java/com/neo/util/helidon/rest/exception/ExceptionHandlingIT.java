@@ -1,8 +1,8 @@
 package com.neo.util.helidon.rest.exception;
 
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.rest.impl.exception.RuntimeExceptionMapper;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
+import com.neo.util.jakarta.rest.exception.RuntimeExceptionMapper;
 import io.helidon.microprofile.testing.AddBean;
 import io.helidon.microprofile.testing.junit5.HelidonTest;
 import jakarta.inject.Inject;

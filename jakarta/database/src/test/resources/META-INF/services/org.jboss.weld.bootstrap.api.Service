@@ -1,1 +1,1 @@
-com.neo.util.framework.database.impl.connection.TestingTransactionServices
+connection.com.neo.util.jakarta.database.impl.TestingTransactionServices

@@ -1,8 +1,8 @@
 package com.neo.util.helidon.rest.security;
 
-import com.neo.util.framework.rest.impl.security.IdentificationFilter;
 import com.neo.util.jakarta.request.InstanceIdentification;
 import com.neo.util.jakarta.request.RequestDetailsProducer;
+import com.neo.util.jakarta.rest.security.IdentificationFilter;
 import io.helidon.webserver.http.ServerRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Specializes;

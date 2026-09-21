@@ -5,10 +5,10 @@
              version="3.0">
     <persistence-unit name="testPersistence" transaction-type="JTA">
         <description>The test database</description>
-        <class>com.neo.util.framework.database.persistence.EntityAuditTrail</class>
-        <class>com.neo.util.framework.database.impl.entity.PersonEntity</class>
-        <class>com.neo.util.framework.database.impl.entity.AddressEntity</class>
-        <class>com.neo.util.framework.database.impl.InstantConverter</class>
+        <class>com.neo.util.jakarta.database.audit.EntityAuditTrail</class>
+        <class>com.neo.util.jakarta.database.audit.entity.PersonEntity</class>
+        <class>com.neo.util.jakarta.database.audit.entity.AddressEntity</class>
+        <class>com.neo.util.jakarta.database.InstantConverter</class>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
             <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create" />

@@ -1,0 +1,49 @@
+package com.neo.util.jakarta.rest.security;
+
+import com.neo.util.api.request.UserRequestDetails;
+import com.neo.util.jakarta.request.RequestAuditProvider;
+import com.neo.util.jakarta.request.UserRequest;
+import com.neo.util.jakarta.rest.HttpRequestDetails;
+import com.neo.util.jakarta.rest.response.ClientResponseService;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.ext.Provider;
+
+@Provider
+@RequestScoped
+public class HttpRequestRecordingFilter implements ContainerResponseFilter {
+
+    public static final String FRAMEWORK_PROVIDED_ERROR = "FRAMEWORK_PROVIDED_ERROR";
+
+    @Inject
+    @UserRequest
+    protected UserRequestDetails userRequestDetails;
+
+    @Inject
+    protected RequestAuditProvider requestAuditProvider;
+
+    @Override
+    public void filter(ContainerRequestContext req,
+            ContainerResponseContext resp) {
+        if (userRequestDetails instanceof HttpRequestDetails httpRequestDetails) {
+            String error = parseErrorCodeIfPresent(resp);
+            httpRequestDetails.setStatus(resp.getStatus());
+            httpRequestDetails.setError(error);
+            requestAuditProvider.audit(httpRequestDetails, error != null);
+        }
+    }
+
+    protected String parseErrorCodeIfPresent(ContainerResponseContext containerResponse) {
+        if (containerResponse.getStatus() >= 400) {
+            Object value = containerResponse.getHeaders().getFirst(ClientResponseService.VALID_BACKEND_ERROR);
+            if (value instanceof String stringValue) {
+                return stringValue;
+            }
+            return FRAMEWORK_PROVIDED_ERROR;
+        }
+        return null;
+    }
+}

@@ -1,0 +1,33 @@
+package com.neo.util.jakarta.rest.response;
+
+import com.neo.util.common.impl.json.JsonUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import tools.jackson.databind.node.ObjectNode;
+
+import static com.neo.util.jakarta.rest.response.ClientResponseService.VALID_BACKEND_ERROR;
+
+@ApplicationScoped
+public class JsonResponseGenerator implements ClientResponseGenerator {
+
+    @Override
+    public Response generateErrorResponse(int code, String errorCode, String message) {
+        return Response.status(code)
+                .entity(parseToErrorEntity(errorCode, message))
+                .header(VALID_BACKEND_ERROR, errorCode)
+                .build();
+    }
+
+    protected String parseToErrorEntity(String errorCode, String message) {
+        ObjectNode errorObject = JsonUtil.emptyObjectNode();
+        errorObject.put("code", errorCode);
+        errorObject.put("message", message);
+        return errorObject.toString();
+    }
+
+    @Override
+    public MediaType getMediaType() {
+        return MediaType.APPLICATION_JSON_TYPE;
+    }
+}

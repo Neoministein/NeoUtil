@@ -1,0 +1,101 @@
+package com.neo.util.microprofile.reactive.messaging;
+
+import com.neo.util.api.config.ConfigService;
+import com.neo.util.api.event.ApplicationPreReadyEvent;
+import com.neo.util.api.queue.*;
+import com.neo.util.api.request.RequestDetails;
+import com.neo.util.common.api.PriorityConstants;
+import com.neo.util.common.api.reflection.ReflectionProvider;
+import com.neo.util.common.impl.exception.ConfigurationException;
+import com.neo.util.common.impl.json.JsonUtil;
+import jakarta.annotation.Priority;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.inject.Alternative;
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.lang.reflect.AnnotatedElement;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+@Priority(PriorityConstants.APPLICATION)
+@Alternative
+@ApplicationScoped
+public class MicroProfileQueueService implements QueueService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MicroProfileQueueService.class);
+
+
+    protected final Provider<RequestDetails> requestDetailsProvider;
+    protected final Map<String, MicroProfileQueueConfig> queueProducerMap;
+
+    /**
+     * Initializes the mapping to the {@link QueueProducer}.
+     * This is done only once at startup as no new queues should be added at runtime.
+     */
+    @Inject
+    public MicroProfileQueueService(Provider<RequestDetails> requestDetailsProvider, ConfigService configService,
+                                    Instance<QueueProducer> queueProducerInstances, ReflectionProvider reflectionProvider) {
+        this.requestDetailsProvider = requestDetailsProvider;
+
+        Map<String, OutgoingQueue> queueConnectionMap = new HashMap<>();
+        for (AnnotatedElement annotatedElement: reflectionProvider.getAnnotatedElement(OutgoingQueue.class)) {
+            OutgoingQueue annotation = annotatedElement.getAnnotation(OutgoingQueue.class);
+            queueConnectionMap.put(annotation.value(), annotation);
+        }
+
+        Map<String, MicroProfileQueueConfig> newMap = new HashMap<>();
+        for (QueueProducer queueProducer: queueProducerInstances) {
+            if (newMap.containsKey(queueProducer.getQueueName())) {
+                throw new ConfigurationException(QueueService.EX_DUPLICATED_QUEUE, queueProducer.getClass().getName(), newMap.get(queueProducer.getClass().getName()).toString());
+            }
+            OutgoingQueue outgoingConnection = queueConnectionMap.get(queueProducer.getQueueName());
+
+            QueueConfig queueConfig = new QueueConfig(configService, outgoingConnection);
+            newMap.put(queueProducer.getQueueName(), new MicroProfileQueueConfig(queueConfig, queueProducer));
+            LOGGER.debug("Registered Queue [{}], Producer [{}]", outgoingConnection.value(), queueProducer.getClass().getSimpleName());
+        }
+        LOGGER.info("Registered [{}] Queues {}", newMap.size(), newMap.keySet());
+        this.queueProducerMap = Collections.unmodifiableMap(newMap);
+    }
+
+    protected void onStartUp(@Observes ApplicationPreReadyEvent preReadyEvent) {
+        LOGGER.debug("ApplicationPreReadyEvent received");
+    }
+
+    @Override
+    public Set<String> getQueueNames() {
+        return queueProducerMap.keySet();
+    }
+
+    @Override
+    public void addToQueue(String queueName, Serializable payload) {
+        addToQueue(queueName, new QueueMessage(requestDetailsProvider.get(), "", payload));
+    }
+
+    @Override
+    public void addToQueue(String queueName, QueueMessage message) {
+        requestMpQueueConfig(queueName).getQueueProducer().addToQueue(JsonUtil.toJson(message));
+    }
+
+    @Override
+    public QueueConfig requestQueueConfig(String queueName) {
+        return requestMpQueueConfig(queueName).getQueueConfig();
+    }
+
+
+    protected MicroProfileQueueConfig requestMpQueueConfig(String queueName) {
+        MicroProfileQueueConfig config = queueProducerMap.get(queueName);
+        if (config == null) {
+            throw new ConfigurationException(QueueService.EX_UNKNOWN_QUEUE, QueueProducer.class.getSimpleName(), queueName);
+        }
+        return config;
+    }
+}

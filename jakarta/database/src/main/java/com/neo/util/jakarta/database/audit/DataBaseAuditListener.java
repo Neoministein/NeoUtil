@@ -1,0 +1,83 @@
+package com.neo.util.jakarta.database.audit;
+
+import com.neo.util.api.persistence.entity.AuditParameter;
+import com.neo.util.api.request.RequestDetails;
+import com.neo.util.common.impl.enumeration.PersistenceOperation;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.persistence.*;
+import jakarta.transaction.Status;
+import jakarta.transaction.Synchronization;
+import jakarta.transaction.TransactionSynchronizationRegistry;
+
+import java.time.Instant;
+
+public class DataBaseAuditListener {
+
+    private final Provider<RequestDetails> requestDetailsProvider;
+
+    private final EntityAuditTrailProvider auditTrailProvider;
+
+    private final TransactionSynchronizationRegistry registry;
+
+    @Inject
+    public DataBaseAuditListener(Provider<RequestDetails> requestDetailsProvider, EntityAuditTrailProvider auditTrailProvider, TransactionSynchronizationRegistry registry) {
+        this.requestDetailsProvider = requestDetailsProvider;
+        this.auditTrailProvider = auditTrailProvider;
+        this.registry = registry;
+    }
+
+    @PrePersist
+    protected void prePersist(AuditableDataBaseEntity entity) {
+        final RequestDetails requestDetails = requestDetailsProvider.get();
+        setPersistData(entity,requestDetails.getInitiator());
+        setUpdateData(entity, requestDetails.getInitiator());
+    }
+
+    @PreUpdate
+    protected void preUpdate(AuditableDataBaseEntity entity) {
+        setUpdateData(entity, requestDetailsProvider.get().getInitiator());
+    }
+
+    protected void setPersistData(AuditableDataBaseEntity entity, String by) {
+        entity.setCreatedBy(by);
+        entity.setCreatedOn(Instant.now());
+    }
+
+    protected void setUpdateData(AuditableDataBaseEntity entity, String by) {
+        entity.setTransactionCount(entity.getTransactionCount()+1);
+        entity.setUpdatedBy(by);
+        entity.setUpdatedOn(Instant.now());
+    }
+    @PostPersist
+    protected void postPersist(AuditableDataBaseEntity entity) {
+        registry.registerInterposedSynchronization(new AfterCommitAction(() ->
+                auditTrailProvider.audit(entity, new AuditParameter(PersistenceOperation.CREATE))));
+    }
+
+    @PostUpdate
+    protected void postUpdate(AuditableDataBaseEntity entity) {
+        registry.registerInterposedSynchronization(new AfterCommitAction(() ->
+                auditTrailProvider.audit(entity, new AuditParameter(PersistenceOperation.UPDATE))));
+    }
+
+    @PostRemove
+    protected void postRemove(AuditableDataBaseEntity entity) {
+        registry.registerInterposedSynchronization(new AfterCommitAction(() ->
+                auditTrailProvider.audit(entity, new AuditParameter(PersistenceOperation.DELETE))));
+    }
+
+    public record AfterCommitAction(Runnable action) implements Synchronization {
+        @Override
+        public void beforeCompletion() {
+
+        }
+
+        @Override
+        public void afterCompletion(int status) {
+            if (status == Status.STATUS_COMMITTED) {
+                action.run();
+            }
+        }
+    }
+}

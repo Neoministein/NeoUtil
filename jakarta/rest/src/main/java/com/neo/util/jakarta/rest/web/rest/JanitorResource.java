@@ -1,0 +1,64 @@
+package com.neo.util.jakarta.rest.web.rest;
+
+import com.neo.util.api.janitor.JanitorConfig;
+import com.neo.util.api.janitor.JanitorService;
+import com.neo.util.jakarta.rest.exception.ToExternalException;
+import com.neo.util.jakarta.veto.RequiresBean;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+
+import java.util.List;
+
+@ApplicationScoped
+@Path(JanitorResource.RESOURCE_LOCATION)
+@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+@RequiresBean(JanitorService.class)
+@ToExternalException({JanitorService.E_NON_EXISTENT_JANITOR_JOB})
+public class JanitorResource {
+
+    public static final String RESOURCE_LOCATION = "/admin/api/janitor";
+
+    protected final JanitorService janitorService;
+
+    @Inject
+    public JanitorResource(JanitorService janitorService) {
+        this.janitorService = janitorService;
+    }
+
+    @GET
+    @Path("{id}")
+    public JanitorConfig getJanitorConfig(@PathParam("id") String janitorId) {
+        return janitorService.requestJanitorConfig(janitorId);
+    }
+    @GET
+    public List<JanitorConfig> getJanitorConfig() {
+        return janitorService.fetchJanitorIds().stream()
+                .map(janitorService::requestJanitorConfig)
+                .toList();
+    }
+
+    @POST
+    public void executeAll() {
+        janitorService.executeAll();
+    }
+
+    @POST
+    @Path("{id}")
+    public void execute(@PathParam("id") String janitorId) {
+        janitorService.execute(janitorId);
+    }
+
+    @POST
+    @Path("/enable/{id}")
+    public void enable(@PathParam("id") String janitorId) {
+        janitorService.enable(janitorId);
+    }
+
+    @POST
+    @Path("/disable/{id}")
+    public void disable(@PathParam("id") String janitorId) {
+        janitorService.disable(janitorId);
+    }
+}

@@ -1,0 +1,39 @@
+package com.neo.util.microprofile.reactive.messaging.impl;
+
+import com.neo.util.api.queue.QueueMessage;
+import com.neo.util.common.impl.test.IntegrationTestUtil;
+import com.neo.util.microprofile.reactive.messaging.impl.queue.RequestQueueConsumer;
+import com.neo.util.microprofile.reactive.messaging.impl.queue.RequestQueueService;
+import io.helidon.microprofile.messaging.MessagingCdiExtension;
+import io.helidon.microprofile.testing.AddExtension;
+import io.helidon.microprofile.testing.junit5.HelidonTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+@HelidonTest
+@AddExtension(MessagingCdiExtension.class)
+class NonFailingRequestContextQueueIT {
+
+    protected static final QueueMessage BASIC_QUEUE_MESSAGE = new QueueMessage("A_CALLER", "A_TRACE_ID","A_TYPE", "A_PAYLOAD");
+
+    @Inject
+    RequestQueueService requestQueueService;
+
+    @Inject
+    RequestQueueConsumer requestQueueConsumer;
+
+    @Test
+    @SuppressWarnings("java:S2699") //IntegrationTestUtil.sleepUntil contains Assertions.fail
+    void test() {
+        requestQueueService.addToIndexingQueue(BASIC_QUEUE_MESSAGE);
+        IntegrationTestUtil.sleepUntil(2000,10,() -> {
+            Assertions.assertEquals(1, requestQueueConsumer.getMessages().size());
+
+            QueueMessage messageFromQueue = requestQueueConsumer.getMessages().get(0);
+
+            Assertions.assertEquals(BASIC_QUEUE_MESSAGE.getMessageType(), messageFromQueue.getMessageType());
+            Assertions.assertEquals(BASIC_QUEUE_MESSAGE.getPayload(), messageFromQueue.getPayload());
+        });
+    }
+}

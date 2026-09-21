@@ -1,0 +1,31 @@
+package com.neo.util.microprofile.reactive.messaging.impl.queue;
+
+import com.neo.util.api.queue.IncomingQueue;
+import com.neo.util.api.queue.QueueListener;
+import com.neo.util.api.queue.QueueMessage;
+import com.neo.util.microprofile.reactive.messaging.impl.BasicRequestScopedBean;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@ApplicationScoped
+@IncomingQueue(RequestQueueService.QUEUE_NAME)
+public class RequestQueueConsumer implements QueueListener {
+
+    protected List<QueueMessage> messages = new ArrayList<>();
+
+    @Inject
+    BasicRequestScopedBean basicRequestScopedBean;
+
+    @Override
+    public void onMessage(QueueMessage message) {
+        basicRequestScopedBean.triggerClassMethod();
+        messages.add(message);
+    }
+
+    public List<QueueMessage> getMessages() {
+        return messages;
+    }
+}

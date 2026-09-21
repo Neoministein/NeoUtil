@@ -1,1 +1,1 @@
-com.neo.util.framework.websocket.impl.WebsocketScopedExtension
+com.neo.util.jakarta.websocket.WebsocketScopedExtension

@@ -1,7 +1,7 @@
 package com.neo.util.helidon.rest.parser;
 
 import com.neo.util.common.impl.json.JsonUtil;
-import com.neo.util.framework.rest.api.parser.ValidateJsonSchema;
+import com.neo.util.jakarta.rest.parser.ValidateJsonSchema;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;

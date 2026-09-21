@@ -1,0 +1,309 @@
+package com.neo.util.jakarta.elastic;
+
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.indices.*;
+import com.carrotsearch.randomizedtesting.annotations.ThreadLeakScope;
+import com.neo.util.api.config.ConfigService;
+import com.neo.util.api.config.DefaultConfigService;
+import com.neo.util.api.request.DummyRequestDetails;
+import com.neo.util.api.request.RequestDetails;
+import com.neo.util.common.impl.StringUtils;
+import com.neo.util.common.impl.reflection.IndexReflectionProvider;
+import com.neo.util.common.impl.test.IntegrationTestUtil;
+import com.neo.util.jakarta.config.InMemoryConfigStore;
+import com.neo.util.jakarta.reflexion.JakartaReflectionProviderWrapper;
+import jakarta.enterprise.event.Event;
+import jakarta.enterprise.event.NotificationOptions;
+import jakarta.enterprise.util.TypeLiteral;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.common.network.NetworkModule;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.plugins.Plugin;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.test.ESIntegTestCase;
+import org.elasticsearch.transport.netty4.Netty4Plugin;
+import org.junit.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
+
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CompletionStage;
+
+@ESIntegTestCase.ClusterScope(scope = ESIntegTestCase.Scope.TEST, numDataNodes = 0)
+@ThreadLeakScope(ThreadLeakScope.Scope.NONE)
+public abstract class AbstractElasticIntegrationTest extends ESIntegTestCase {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractElasticIntegrationTest.class);
+
+    protected static final String F_ID = "_id";
+    protected static final int TIME_TO_SLEEP_IN_MILLISECOND = 500;
+    protected static final int SLEEP_RETRY_COUNT = 10;
+
+    protected static ElasticSearchProvider elasticSearchRepository;
+
+    protected static RestClient restClient;
+
+    protected ConfigService configService = new DefaultConfigService(List.of(new InMemoryConfigStore()));
+
+    protected static ElasticSearchConnectionProviderImpl connection;
+    protected RequestDetails requestDetails = new DummyRequestDetails();
+    protected IndexNamingService indexNamingService = new IndexNamingServiceImpl(configService, new JakartaReflectionProviderWrapper(IndexReflectionProvider.INSTANCE));
+
+    @Override
+    protected boolean addMockTransportService() {
+        return false;
+    }
+
+    @Override
+    protected boolean addMockHttpTransport() {
+        return false;
+    }
+
+    /**
+     * Randomize netty settings
+     * <p>
+     * <a href="https://stackoverflow.com/questions/47766777/what-is-the-purpose-of-this-propertyes-set-netty-runtime-available-processors">This is why</a>
+     */
+    @Override
+    protected Settings nodeSettings(int nodeOrdinal, Settings settings) {
+        Settings.Builder builder = Settings.builder().put(super.nodeSettings(nodeOrdinal, settings));
+        builder.put(NetworkModule.TRANSPORT_TYPE_KEY, Netty4Plugin.NETTY_TRANSPORT_NAME);
+        builder.put(NetworkModule.HTTP_TYPE_KEY, Netty4Plugin.NETTY_HTTP_TRANSPORT_NAME);
+        return builder.build();
+    }
+
+    @Override
+    protected Collection<Class<? extends Plugin>> nodePlugins() {
+        return List.of(Netty4Plugin.class);
+    }
+
+    /**
+     * Look at {@link #nodeSettings(int nodeOrdinal,Settings settings) NodeSettings}
+     */
+    @BeforeClass
+    public static void enableMultipleNettyProcessors() {
+        //System.setProperty("es.set.netty.runtime.available.processors", "false");
+    }
+
+    @Before
+    public void beforeTest() {
+        internalCluster().startNodes(1);
+        ensureStableCluster(1);
+        restClient = getRestClient();
+        LOGGER.info("Elasticsearch node started at [{}]", restClient.getNodes().get(0).getHost().toString());
+
+        configService.save(true, ElasticSearchConnectionProviderImpl.ENABLED_CONFIG);
+        configService.save(1, ElasticSearchProvider.FLUSH_INTERVAL_CONFIG);
+        configService.save(restClient.getNodes().get(0).getHost().toString(), ElasticSearchConnectionProviderImpl.NODE_CONFIG, "0");
+
+
+        initialiseElasticSearchProvider();
+    }
+
+    @After
+    public void afterTest() {
+        connection.disconnect();
+    }
+
+    @AfterClass
+    public static void disconnectElasticsearchConnector() {
+        connection.disconnect();
+    }
+
+    protected void initialiseElasticSearchProvider() {
+        connection = new ElasticSearchConnectionProviderImpl(configService, new EventMock<>());
+        connection.connect();
+        elasticSearchRepository = new ElasticSearchProvider(configService, () -> requestDetails, new DummyIndexerNotificationService(), indexNamingService, connection);
+        elasticSearchRepository.setupBulkIngester();
+    }
+
+    /*
+        Helper methods
+     */
+
+    protected boolean closeIndex(String indexName) throws IOException {
+        CloseIndexRequest request = new CloseIndexRequest.Builder().index(indexName).build();
+        CloseIndexResponse indexResponse = elasticSearchRepository.getApiClient().indices().close(request);
+        return indexResponse.acknowledged();
+    }
+
+    protected boolean openIndex(String indexName) throws IOException {
+        OpenRequest request = new OpenRequest.Builder().index(indexName).build();
+        OpenResponse indexResponse = elasticSearchRepository.getApiClient().indices().open(request);
+        return indexResponse.acknowledged();
+    }
+
+    protected SearchResponse<ObjectNode> fetchDocumentsInIndex(String uuid, String indexName) {
+        SearchRequest.Builder builder = new SearchRequest.Builder();
+        builder.index(indexName);
+        if (StringUtils.isEmpty(uuid)) {
+            builder.query(QueryBuilders.matchAll().build()._toQuery());
+        } else {
+            builder.query(QueryBuilders.term(q -> q.field(F_ID).value(uuid)));
+        }
+        SearchRequest searchRequest = builder.build();
+        LOGGER.info("SearchRequest: [{}]", searchRequest);
+
+        try {
+            SearchResponse<ObjectNode> searchResponse = connection.getApiClient().search(searchRequest, ObjectNode.class);
+            LOGGER.info("searchResponse: [{}]", searchResponse.toString());
+            return searchResponse;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected SearchResponse<ObjectNode> fetchAllDocumentsOnIndex(String indexName) {
+        SearchRequest.Builder builder = new SearchRequest.Builder();
+        builder.index(indexName);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        builder.query(QueryBuilders.matchAll().build()._toQuery());
+        SearchRequest searchRequest = builder.build();
+        LOGGER.info("SearchRequest: [{}]", searchRequest);
+        try {
+            SearchResponse<ObjectNode> searchResponse = connection.getApiClient().search(searchRequest, ObjectNode.class);
+            LOGGER.info("searchResponse: [{}]", searchResponse.toString());
+            return searchResponse;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void validateDocumentInIndex(String uuid, String indexName, boolean mustExist) {
+        SearchRequest.Builder builder = new SearchRequest.Builder();
+        builder.index(indexName);
+        builder.query(co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders.term(q -> q.field(F_ID).value(uuid)));
+        co.elastic.clients.elasticsearch.core.SearchRequest searchQuery = builder.build();
+        LOGGER.info("SearchRequest: [{}]", builder);
+
+        IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
+            flushAndRefresh();
+
+            SearchResponse<ObjectNode> searchResponse = connection.getApiClient().search(searchQuery, ObjectNode.class);
+            LOGGER.info("SearchResponse: [{}]", searchResponse.toString());
+            if (mustExist) {
+                if (searchResponse.hits().total() == null || searchResponse.hits().total().value() != 1) {
+                    Assert.fail();
+                }
+                Assert.assertEquals(uuid, searchResponse.hits().hits().get(0).id());
+            } else {
+                Assert.assertNotNull(searchResponse.hits().total());
+                Assert.assertEquals(0, searchResponse.hits().total().value());
+            }
+        });
+
+    }
+
+    protected void validateDocumentInIndex(String uuid, String indexName, String fieldName, String fieldValue) {
+        SearchRequest.Builder builder = new SearchRequest.Builder();
+        builder.index(indexName);
+        builder.query(QueryBuilders.term(q -> q.field(F_ID).value(uuid)));
+        SearchRequest searchQuery = builder.build();
+        LOGGER.info("SearchRequest: [{}]", searchQuery);
+
+        IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
+            flushAndRefresh();
+
+            SearchResponse<ObjectNode> searchResponse = connection.getApiClient().search(searchQuery, ObjectNode.class);
+            LOGGER.info("SearchResponse: [{}]", searchResponse.toString());
+            if (searchResponse.hits().total() == null || searchResponse.hits().total().value() != 1) {
+                Assert.fail();
+            }
+            ObjectNode source = searchResponse.hits().hits().get(0).source();
+            if (source == null) {
+                Assert.fail();
+            }
+            JsonNode field = source.get(fieldName);
+            Assert.assertNotNull(field);
+            Assert.assertEquals(fieldValue, field.asString());
+
+        });
+
+    }
+
+    protected void validateDocumentInIndex(String uuid, String indexName, String fieldName, String fieldValue,
+            String fieldToCheck, boolean fieldToCheckMustExist) {
+        SearchRequest.Builder builder = new SearchRequest.Builder();
+        builder.index(indexName);
+        builder.query(QueryBuilders.term(q -> q.field(F_ID).value(uuid)));
+        SearchRequest searchQuery = builder.build();
+        LOGGER.info("SearchRequest: [{}]", searchQuery);
+
+        IntegrationTestUtil.sleepUntil(TIME_TO_SLEEP_IN_MILLISECOND, SLEEP_RETRY_COUNT, () -> {
+            flushAndRefresh();
+
+            SearchResponse<ObjectNode> searchResponse = connection.getApiClient().search(searchQuery, ObjectNode.class);
+            LOGGER.info("SearchResponse: [{}]", searchResponse.toString());
+            if (searchResponse.hits().total() == null || searchResponse.hits().total().value() != 1) {
+                Assert.fail();
+            }
+            ObjectNode source = searchResponse.hits().hits().get(0).source();
+            if (source == null) {
+                Assert.fail();
+            }
+            JsonNode field = source.get(fieldName);
+            if (field == null && !fieldValue.equals(field.asString())) {
+                Assert.fail();
+            }
+
+            if (fieldToCheckMustExist) {
+                Assert.assertNotNull(source.get(fieldToCheck));
+            }
+        });
+    }
+
+    protected boolean checkIfIndexExists(String indexName) {
+        GetIndexRequest getIndexRequest = new GetIndexRequest.Builder().index(indexName).build();
+        try {
+            GetIndexResponse response = elasticSearchRepository.getApiClient().indices().get(getIndexRequest);
+            return response.get(indexName) != null;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    protected static class EventMock<T> implements Event<T> {
+        private Object event;
+
+        public Object getEvent() {
+            return event;
+        }
+
+        @Override
+        public void fire(Object event) {
+            this.event = event;
+        }
+
+        @Override
+        public Event<T> select(Annotation... qualifiers) {
+            return null;
+        }
+
+        @Override
+        public <U extends T> Event<U> select(Class<U> clazz, Annotation... qualifiers) {
+            return null;
+        }
+
+        @Override
+        public <U extends T> Event<U> select(TypeLiteral<U> u, Annotation... qualifiers) {
+            return null;
+        }
+
+        @Override
+        public <U extends T> CompletionStage<U> fireAsync(U u) {
+            return null;
+        }
+
+        @Override
+        public <U extends T> CompletionStage<U> fireAsync(U u, NotificationOptions options) {
+            return null;
+        }
+    }
+}

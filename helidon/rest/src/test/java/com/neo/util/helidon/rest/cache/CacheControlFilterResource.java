@@ -1,6 +1,6 @@
 package com.neo.util.helidon.rest.cache;
 
-import com.neo.util.framework.rest.api.cache.ClientCacheControl;
+import com.neo.util.jakarta.rest.cache.ClientCacheControl;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;

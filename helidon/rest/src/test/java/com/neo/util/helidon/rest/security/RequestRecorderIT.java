@@ -1,8 +1,8 @@
 package com.neo.util.helidon.rest.security;
 
-import com.neo.util.framework.request.percistence.HttpRequestLogSearchable;
-import com.neo.util.framework.rest.impl.security.HttpRequestRecordingFilter;
 import com.neo.util.helidon.rest.AbstractIntegrationTest;
+import com.neo.util.jakarta.request.recording.searchable.HttpRequestLogSearchable;
+import com.neo.util.jakarta.rest.security.HttpRequestRecordingFilter;
 import io.helidon.microprofile.testing.junit5.HelidonTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.client.WebTarget;
