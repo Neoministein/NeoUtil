@@ -2,7 +2,7 @@ package com.neo.util.jakarta.database.audit;
 
 import com.neo.util.api.config.ConfigService;
 import com.neo.util.api.janitor.JanitorJob;
-import com.neo.util.jakarta.database.PersistenceContextProvider;
+import com.neo.util.api.persistence.entity.PersistenceContextProvider;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;

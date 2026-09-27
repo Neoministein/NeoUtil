@@ -1,6 +1,6 @@
 package com.neo.util.jakarta.database.audit;
 
-import com.neo.util.jakarta.database.PersistenceContextProvider;
+import com.neo.util.api.persistence.entity.PersistenceContextProvider;
 import com.neo.util.jakarta.database.repository.AbstractDatabaseRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

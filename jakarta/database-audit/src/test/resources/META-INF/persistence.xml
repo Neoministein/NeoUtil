@@ -17,7 +17,6 @@
             <property name="jakarta.persistence.jdbc.user" value="sa"/>
             <property name="jakarta.persistence.jdbc.password" value=""/>
 
-            <property name="jakarta.persistence.sql-load-script-source" value="/META-INF/sql/data.sql" />
             <property name="hibernate.show_sql" value="false"/>
             <property name="hibernate.format_sql" value="false"/>
         </properties>

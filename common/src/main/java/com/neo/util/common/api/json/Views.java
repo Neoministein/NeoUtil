@@ -6,11 +6,11 @@ public class Views {
 
     }
 
-    public interface Owner extends Public {
+    public interface Admin extends Public {
 
     }
 
-    public interface Internal extends Owner {
+    public interface Internal extends Admin {
 
     }
 }

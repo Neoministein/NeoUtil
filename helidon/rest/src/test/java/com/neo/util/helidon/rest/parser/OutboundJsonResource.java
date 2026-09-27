@@ -53,7 +53,7 @@ public class OutboundJsonResource {
 
     @GET
     @Path(P_VIEW_OWNER)
-    @JsonView(Views.Owner.class)
+    @JsonView(Views.Admin.class)
     public Response viewOwner() {
         return Response.ok().entity(OUTBOUND_DTO).build();
     }
@@ -76,7 +76,7 @@ public class OutboundJsonResource {
             String basicValue,
             @JsonView(Views.Public.class)
             String publicValue,
-            @JsonView(Views.Owner.class)
+            @JsonView(Views.Admin.class)
             String ownerValue,
             @JsonView(Views.Internal.class)
             String internalValue

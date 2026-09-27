@@ -30,17 +30,17 @@ public class SearchResult<T> {
     /**
      * Duration of search in milliseconds
      */
-        @JsonView(Views.Owner.class)
+        @JsonView(Views.Admin.class)
     private long tookInMillis;
     /**
      * true in case the search was terminated due to reaching the timeout setting in the search parameter
      */
-        @JsonView(Views.Owner.class)
+        @JsonView(Views.Admin.class)
     private boolean terminatedEarly;
     /**
      * true in case the search was terminated by elasticsearch's timeout settings
      */
-        @JsonView(Views.Owner.class)
+        @JsonView(Views.Admin.class)
     private boolean timedOut;
     /**
      * scrollId in case paging is used

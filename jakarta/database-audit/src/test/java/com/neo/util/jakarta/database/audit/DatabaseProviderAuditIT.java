@@ -5,6 +5,7 @@ import com.neo.util.api.persistence.entity.EntityResult;
 import com.neo.util.common.impl.enumeration.PersistenceOperation;
 import com.neo.util.jakarta.database.DatabaseProvider;
 import com.neo.util.jakarta.database.audit.entity.PersonEntity;
+import com.neo.util.jakarta.database.testing.AbstractIntegrationTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

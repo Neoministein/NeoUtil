@@ -25,7 +25,7 @@ public abstract class AuditableDataBaseEntity<P> implements PersistenceEntity<P>
 
     @Convert(converter = InstantConverter.class)
     @Column(name = C_CREATED_ON, nullable = false, updatable = false)
-        @JsonView(Views.Owner.class)
+        @JsonView(Views.Admin.class)
     protected Instant createdOn = Instant.now();
 
     @Column(name = C_CREATED_BY, nullable = false, updatable = false)
@@ -38,11 +38,11 @@ public abstract class AuditableDataBaseEntity<P> implements PersistenceEntity<P>
 
     @Convert(converter = InstantConverter.class)
     @Column(name = C_UPDATED_ON, nullable = false)
-        @JsonView(Views.Owner.class)
+        @JsonView(Views.Admin.class)
     protected Instant updatedOn = Instant.now();
 
     @Column(name = C_UPDATED_BY, nullable = false)
-        @JsonView(Views.Owner.class)
+        @JsonView(Views.Admin.class)
     protected String updatedBy;
 
     public Instant getCreatedOn() {

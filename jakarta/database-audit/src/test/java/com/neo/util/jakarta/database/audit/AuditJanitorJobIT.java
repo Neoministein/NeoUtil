@@ -1,6 +1,7 @@
 package com.neo.util.jakarta.database.audit;
 
 import com.neo.util.api.config.ConfigService;
+import com.neo.util.jakarta.database.testing.AbstractIntegrationTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

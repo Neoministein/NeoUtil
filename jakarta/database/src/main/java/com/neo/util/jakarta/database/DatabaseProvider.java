@@ -1,9 +1,6 @@
 package com.neo.util.jakarta.database;
 
-import com.neo.util.api.persistence.entity.EntityProvider;
-import com.neo.util.api.persistence.entity.EntityQuery;
-import com.neo.util.api.persistence.entity.EntityResult;
-import com.neo.util.api.persistence.entity.PersistenceEntity;
+import com.neo.util.api.persistence.entity.*;
 import com.neo.util.api.persistence.query.criteria.*;
 import com.neo.util.common.impl.StopWatch;
 import com.neo.util.common.impl.enumeration.Association;

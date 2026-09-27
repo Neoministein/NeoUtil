@@ -1,7 +1,7 @@
 package com.neo.util.jakarta.database.repository;
 
+import com.neo.util.api.persistence.entity.PersistenceContextProvider;
 import com.neo.util.api.persistence.entity.PersistenceEntity;
-import com.neo.util.jakarta.database.PersistenceContextProvider;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

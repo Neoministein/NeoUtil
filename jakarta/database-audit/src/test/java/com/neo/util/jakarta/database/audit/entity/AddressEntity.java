@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = AddressEntity.TABLE_NAME)
-public class AddressEntity implements PersistenceEntity {
+public class AddressEntity implements PersistenceEntity<Long> {
 
     public static final String TABLE_NAME = "address";
     public static final String C_CITY = "city";
@@ -69,7 +69,7 @@ public class AddressEntity implements PersistenceEntity {
     }
 
     @Override
-    public Object getPrimaryKey() {
+    public Long getPrimaryKey() {
         return id;
     }
 

@@ -5,8 +5,8 @@
              version="3.0">
     <persistence-unit name="testPersistence" transaction-type="JTA">
         <description>The test database</description>
-        <class>entity.com.neo.util.jakarta.database.impl.PersonEntity</class>
-        <class>entity.com.neo.util.jakarta.database.impl.AddressEntity</class>
+        <class>com.neo.util.jakarta.database.entity.PersonEntity</class>
+        <class>com.neo.util.jakarta.database.entity.AddressEntity</class>
         <class>com.neo.util.jakarta.database.InstantConverter</class>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />

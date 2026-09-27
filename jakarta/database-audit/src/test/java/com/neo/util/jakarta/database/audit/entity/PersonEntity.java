@@ -9,7 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name = PersonEntity.TABLE_NAME)
-public class PersonEntity extends AuditableDataBaseEntity implements PersistenceEntity {
+public class PersonEntity extends AuditableDataBaseEntity<Long> {
 
     public static final String TABLE_NAME = "person";
 
@@ -98,7 +98,7 @@ public class PersonEntity extends AuditableDataBaseEntity implements Persistence
     }
 
     @Override
-    public Object getPrimaryKey() {
+    public Long getPrimaryKey() {
         return id;
     }
 }

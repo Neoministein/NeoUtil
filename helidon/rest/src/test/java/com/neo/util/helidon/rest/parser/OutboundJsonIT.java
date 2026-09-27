@@ -49,7 +49,7 @@ class OutboundJsonIT extends AbstractIntegrationTest {
     @Test
     void viewsOwner() {
         //Arrange
-        String expect = JsonUtil.toJson(OutboundJsonResource.OUTBOUND_DTO, Views.Owner.class);
+        String expect = JsonUtil.toJson(OutboundJsonResource.OUTBOUND_DTO, Views.Admin.class);
 
         //Act
         Response response = webTarget.path(OutboundJsonResource.RESOURCE_LOCATION + OutboundJsonResource.P_VIEW_OWNER).request().method("GET");
