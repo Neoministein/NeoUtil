@@ -205,6 +205,7 @@
         <module>jakarta/database-config</module>
 		<module>jakarta/rest</module>
 		<module>jakarta/websocket</module>
+        <module>jakarta/websocket-monitoring</module>
 		<module>jakarta/request-recording-searchable</module>
 		<module>jakarta/jobrunr</module>
 		<module>jakarta/jobrunr-queue</module>

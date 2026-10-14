@@ -13,19 +13,15 @@ import jakarta.inject.Inject;
 import jakarta.interceptor.InvocationContext;
 import jakarta.security.enterprise.credential.Credential;
 import jakarta.websocket.EndpointConfig;
-import jakarta.websocket.OnMessage;
 import jakarta.websocket.Session;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MultivaluedMap;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 @ApplicationScoped
 public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic {
@@ -56,12 +52,12 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
     @Override
     public void onOpen(InvocationContext invocationContext, Session session, EndpointConfig config) throws Exception {
         MultivaluedMap<String, String> headers = WebsocketUtil.getStoredObject(session, HttpHeaders.class.getSimpleName());
-        WebsocketRequestDetails requestDetails = createUserRequestDetails(session, headers);
-        WebsocketStateContext stateContext = new InterceptorWebsocketStateContext(session, requestDetails, getMessageFromContext(invocationContext), isMonitored(invocationContext));
-        websocketStateContextMap.put(session.getId(), stateContext);
+        WebsocketStateContext stateContext = createContext(invocationContext, session, headers);
 
+        websocketStateContextMap.put(session.getId(), stateContext);
         WebsocketUtil.storeWebsocketContext(session, stateContext);
 
+        WebsocketRequestDetails requestDetails = stateContext.newRequestDetailInstance();
         executor.executeChecked(requestDetails, () -> {
             boolean shouldDisconnect = authenticate(requestDetails, headers, getPermittedRoles(invocationContext));
 
@@ -75,9 +71,7 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
 
     @Override
     public void onMessage(InvocationContext invocationContext, Session session) throws Exception {
-        InterceptorWebsocketStateContext stateContext = (InterceptorWebsocketStateContext) websocketStateContextMap.get(session.getId());
-        stateContext.addToIncomingSocketLog(invocationContext);
-        executor.executeChecked(stateContext.newRequestDetailInstance(), invocationContext::proceed);
+        executor.executeChecked(websocketStateContextMap.get(session.getId()).newRequestDetailInstance(), invocationContext::proceed);
     }
 
     @Override
@@ -99,12 +93,16 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
                 new WebsocketRequestDetails.Context(session.getRequestURI().toString()));
     }
 
+    protected WebsocketStateContext createContext(InvocationContext invocationContext, Session session, MultivaluedMap<String, String> headers) {
+        return new DefaultWebsocketStateContext(session, createUserRequestDetails(session, headers));
+    }
+
     protected boolean authenticate(UserRequestDetails requestDetails, MultivaluedMap<String, String> headers, Set<String> permitted) {
         boolean failed = true;
         try {
             String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
             if (authHeader == null) {
-                return failed;
+                return true;
             }
 
             Credential credential = credentialsGenerator.generate(authHeader);
@@ -128,10 +126,6 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
         return Set.of(invocationContext.getMethod().getDeclaringClass().getAnnotation(NeoUtilWebsocket.class).roles());
     }
 
-    protected boolean isMonitored(InvocationContext invocationContext) {
-        return invocationContext.getMethod().getDeclaringClass().getAnnotation(NeoUtilWebsocket.class).monitored();
-    }
-
     /**
      * When pacing through proxies the remote address will no longer represent the original IP.
      * </p>
@@ -148,22 +142,5 @@ public class WebsocketInterceptorLogicImpl implements WebsocketInterceptorLogic 
             return remoteAddress;
         }
         return INVALID_IP;
-    }
-
-    protected Function<InvocationContext, String> getMessageFromContext(InvocationContext invocationContext) {
-        for (Method method: invocationContext.getMethod().getDeclaringClass().getMethods()) {
-            if (method.getAnnotation(OnMessage.class) != null) {
-                Parameter[] parameters = method.getParameters();
-                for (int i = 0; i < parameters.length; i++) {
-                    Class<?> clazz = parameters[i].getType();
-                    if (clazz.equals(String.class) && parameters[i].getAnnotations().length == 0) {
-                        final int index = i;
-                        return invocationContext1 -> (String) invocationContext1.getParameters()[index];
-                    }
-                }
-            }
-        }
-
-        return x -> "";
     }
 }

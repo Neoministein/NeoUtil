@@ -24,8 +24,8 @@ public class MonitorableWebsocketScheduler {
     @CronSchedule(value = "MonitorableWebsocketScheduler", cron = "0 0/1 * * * *") // Every Minute
     public void action() {
         for (WebsocketStateContext stateContext: websocketInterceptorLogic.getActiveWebsocketStates()) {
-            if (stateContext.isMonitored()) {
-                searchProvider.index(stateContext.clearSocketLog());
+            if (stateContext instanceof MonitorableWebsocketStateContext monitorableContext) {
+                searchProvider.index(monitorableContext.clearSocketLog());
             }
         }
     }

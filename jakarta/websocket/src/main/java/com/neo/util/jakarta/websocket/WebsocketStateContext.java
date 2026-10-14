@@ -1,6 +1,5 @@
 package com.neo.util.jakarta.websocket;
 
-import com.neo.util.jakarta.websocket.persistence.SocketLogSearchable;
 import jakarta.websocket.Session;
 
 import java.io.IOException;
@@ -16,24 +15,9 @@ public interface WebsocketStateContext {
     Session getSession();
 
     /**
-     * If the current Websocket is monitored {@link NeoUtilWebsocket#monitored()}
-     */
-    boolean isMonitored();
-
-    /**
      * A new Instance of a request detail based for the current context
      */
     WebsocketRequestDetails newRequestDetailInstance();
-
-    /**
-     * Create a new {@link SocketLogSearchable} and returns the old one
-     */
-    SocketLogSearchable clearSocketLog();
-
-    /**
-     * The current {@link SocketLogSearchable}
-     */
-    SocketLogSearchable getSocketLogSearchable();
 
     /**
      * Broadcasts the message on the async channel and logs the outgoing message length
@@ -41,10 +25,6 @@ public interface WebsocketStateContext {
      * @param message to broadcast
      */
     default void broadcastAsync(String message) {
-        if (isMonitored()) {
-            getSocketLogSearchable().addToOutgoing(message.length());
-        }
-
         getSession().getAsyncRemote().sendText(message);
     }
 
@@ -55,10 +35,6 @@ public interface WebsocketStateContext {
      * @throws IOException if there is a problem delivering the message.
      */
     default void broadcast(String message) throws IOException {
-        if (isMonitored()) {
-            getSocketLogSearchable().addToOutgoing(message.length());
-        }
-
         getSession().getBasicRemote().sendText(message);
     }
 }

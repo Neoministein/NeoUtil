@@ -2,7 +2,6 @@ package com.neo.util.jakarta.websocket.monitoring;
 
 import com.neo.util.common.impl.ThreadUtils;
 import com.neo.util.jakarta.websocket.AbstractWebsocketIT;
-import com.neo.util.jakarta.websocket.persistence.SocketLogSearchable;
 import io.helidon.microprofile.testing.junit5.HelidonTest;
 import jakarta.inject.Inject;
 import jakarta.websocket.Session;

@@ -8,7 +8,8 @@ import jakarta.websocket.server.ServerEndpoint;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@NeoUtilWebsocket(monitored = true)
+@MonitoredWebsocket
+@NeoUtilWebsocket
 @ApplicationScoped
 @ServerEndpoint(value = "/monitoring/{id}", configurator = WebserverHttpHeaderForwarding.class)
 public class MonitoringWebsocket implements BasicWebsocket {

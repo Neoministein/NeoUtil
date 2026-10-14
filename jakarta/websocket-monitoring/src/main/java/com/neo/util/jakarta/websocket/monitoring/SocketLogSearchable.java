@@ -1,13 +1,12 @@
-package com.neo.util.jakarta.websocket.persistence;
+package com.neo.util.jakarta.websocket.monitoring;
 
 import com.neo.util.api.persistence.search.IndexPeriod;
 import com.neo.util.api.persistence.search.SearchableIndex;
-import com.neo.util.jakarta.request.percistence.AbstractLogSearchable;
+import com.neo.util.jakarta.request.recording.searchable.AbstractLogSearchable;
 import com.neo.util.jakarta.websocket.WebsocketRequestDetails;
 
 import java.time.Instant;
 
-//TODO Move out to new module
 @SearchableIndex(indexName = SocketLogSearchable.INDEX_NAME, indexPeriod = IndexPeriod.MONTHLY)
 public class SocketLogSearchable extends AbstractLogSearchable {
 

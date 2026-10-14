@@ -1,7 +1,6 @@
 package com.neo.util.jakarta.websocket;
 
 import com.neo.util.api.request.UserRequestDetails;
-import com.neo.util.jakarta.websocket.persistence.SocketLogSearchable;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
@@ -27,13 +26,6 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NeoUtilWebsocket {
-
-    /**
-     * If the endpoint throughput is monitored with a {@link SocketLogSearchable}
-     * <p>
-     * Outgoing needs to go through the {@link WebsocketStateContext#broadcastAsync(String)} or {@link WebsocketStateContext#broadcast(String)}
-     */
-    boolean monitored() default false;
 
     /**
      * Used to define a websocket which requires authentication.
