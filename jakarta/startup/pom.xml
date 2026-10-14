@@ -7,10 +7,10 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-startup</artifactId>
+    <artifactId>neoutil-jakarta-startup</artifactId>
     <version>1.0.0</version>
 
-    <name>Neo Util Framework Startup JAR</name>
+    <name>Neo Util Jakarta Startup JAR</name>
     <packaging>jar</packaging>
 
     <dependencies>

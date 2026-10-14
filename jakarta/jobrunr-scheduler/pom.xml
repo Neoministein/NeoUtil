@@ -7,10 +7,10 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-jobrunr-scheduler</artifactId>
+    <artifactId>neoutil-jakarta-scheduler-jobrunr</artifactId>
     <version>1.0.0</version>
 
-    <name>Neo Util Framework JobRunner Scheduler JAR</name>
+    <name>Neo Util Jakarta Scheduler JobRunner JAR</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-jobrunr</artifactId>
+            <artifactId>neoutil-jakarta-jobrunr</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -7,10 +7,10 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-websocket</artifactId>
+    <artifactId>neoutil-jakarta-websocket</artifactId>
     <version>1.0.0</version>
 
-    <name>Neo Util Framework Websocket JAR</name>
+    <name>Neo Util Jakarta Websocket JAR</name>
     <packaging>jar</packaging>
 
     <dependencies>

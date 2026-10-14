@@ -7,7 +7,7 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-mapping</artifactId>
+    <artifactId>neoutil-jakarta-mapping</artifactId>
     <version>1.0.0</version>
 
     <name>Neo Util Framework Mapping JAR</name>

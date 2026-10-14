@@ -7,10 +7,10 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-cache-caffeine</artifactId>
+    <artifactId>neoutil-jakarta-cache-caffeine</artifactId>
     <version>1.0.0</version>
 
-    <name>Neo Util Framework Cache Caffeine JAR</name>
+    <name>Neo Util Jakarta Cache Caffeine JAR</name>
     <packaging>jar</packaging>
 
     <dependencies>

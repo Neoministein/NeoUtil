@@ -7,14 +7,14 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-elastic-embedded</artifactId>
+    <artifactId>neoutil-jakarta-elastic-embedded</artifactId>
     <version>1.0.0</version>
 
-    <name>Neo Util Framework Elastic Embedded JAR</name>
+    <name>Neo Util Jakarta Elastic Embedded JAR</name>
     <packaging>jar</packaging>
 
     <properties>
-        <elastic.version>9.5.1</elastic.version>
+        <elastic.version>9.5.5</elastic.version>
     </properties>
 
     <dependencies>

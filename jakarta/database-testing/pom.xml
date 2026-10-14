@@ -7,10 +7,10 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-database-testing</artifactId>
+    <artifactId>neoutil-jakarta-database-testing</artifactId>
     <version>1.0.0</version>
 
-    <name>Neo Util Framework Database Testing JAR</name>
+    <name>Neo Util Jakarta Database Testing JAR</name>
     <packaging>jar</packaging>
 
     <dependencies>

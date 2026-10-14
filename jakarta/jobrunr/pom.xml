@@ -7,10 +7,10 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-jobrunr</artifactId>
+    <artifactId>neoutil-jakarta-jobrunr</artifactId>
     <version>1.0.0</version>
 
-    <name>Neo Util Framework JobRunner JAR</name>
+    <name>Neo Util Jakarta JobRunner JAR</name>
     <packaging>jar</packaging>
 
     <dependencies>

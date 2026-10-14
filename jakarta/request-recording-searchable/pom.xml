@@ -7,10 +7,10 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>neoutil-request-recording-searchable</artifactId>
+    <artifactId>neoutil-jakarta-request-recording-searchable</artifactId>
     <version>1.0.0</version>
 
-    <name>Neo Util Framework Request Recoding Searchable JAR</name>
+    <name>Neo Util Jakarta Request Recoding Searchable JAR</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -37,13 +37,13 @@
 
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-rest</artifactId>
+            <artifactId>neoutil-jakarta-rest</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.neo.util</groupId>
-            <artifactId>neoutil-websocket</artifactId>
+            <artifactId>neoutil-jakarta-websocket</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

@@ -34,7 +34,7 @@
 		<org.reflections.version>0.10.2</org.reflections.version>
 
 		<!-- Jackson -->
-		<jackson.version>3.2.2</jackson.version>
+		<jackson.version>3.2.3</jackson.version>
 		<json-schema-validator.version>3.0.7</json-schema-validator.version>
 
 		<jobrunr.version>8.8.2</jobrunr.version>
@@ -42,7 +42,7 @@
 		<caffeine.version>3.2.4</caffeine.version>
 
 		<!-- MP Implementation -->
-		<helidon.version>4.5.3</helidon.version>
+		<helidon.version>4.5.5</helidon.version>
 		<!-- Testing -->
 		<junit.version>6.1.3</junit.version>
 		<mockito.version>5.23.0</mockito.version>
